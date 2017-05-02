@@ -22,6 +22,7 @@ defmodule UcxUcc.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import UcxUcc.DataCase
+      import UcxUcc.TestHelpers
     end
   end
 
