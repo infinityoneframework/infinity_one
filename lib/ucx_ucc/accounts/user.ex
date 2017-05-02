@@ -22,7 +22,7 @@ defmodule UcxUcc.Accounts.User do
     field :uri, :string
     field :active, :boolean
 
-    many_to_many :roles, UccUsers.Accounts.Role, join_through: UccUsers.Accounts.UserRole
+    many_to_many :roles, UcxUcc.Accounts.Role, join_through: UcxUcc.Accounts.UserRole
 
     coherence_schema()
 

@@ -29,6 +29,10 @@ defmodule UcxUcc.Repo.Migrations.CreateCoherenceUser do
       add :locked_at, :utc_datetime
       # authenticatable
       add :password_hash, :string
+      #confimrable
+      add :confirmation_token, :string
+      add :confirmed_at, :utc_datetime
+      add :confirmation_sent_at, :utc_datetime
 
       add :active, :boolean, default: true
       add :chat_status, :string

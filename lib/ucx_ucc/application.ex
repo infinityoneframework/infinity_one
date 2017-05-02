@@ -12,6 +12,7 @@ defmodule UcxUcc.Application do
       supervisor(UcxUcc.Repo, []),
       # Start the endpoint when the application starts
       supervisor(UcxUcc.Web.Endpoint, []),
+      worker(UcxUcc.Permissions, [])
       # Start your own worker by calling: UcxUcc.Worker.start_link(arg1, arg2, arg3)
       # worker(UcxUcc.Worker, [arg1, arg2, arg3]),
     ]

@@ -2,6 +2,7 @@ defmodule UcxUcc.Accounts.Role do
   use Ecto.Schema
   import Ecto.Changeset
   alias UcxUcc.Accounts.{Role, User, UserRole}
+  alias UcxUcc.Permissions.{Permission, PermissionRole}
 
 
   schema "accounts_roles" do
@@ -10,6 +11,7 @@ defmodule UcxUcc.Accounts.Role do
     field :scope, :string
 
     many_to_many :users, User, join_through: UserRole
+    many_to_many :permissions, Permission, join_through: PermissionRole
 
     timestamps(type: :utc_datetime)
   end
