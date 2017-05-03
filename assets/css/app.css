@@ -1,1 +1,7 @@
 /* This file is for your main application css. */
+html, body, body > .wrapper {
+  overflow: hidden;
+}
+.btn.soft-key {
+  width: 100%;
+}

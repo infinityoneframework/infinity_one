@@ -24,22 +24,23 @@ defmodule UcxUcc.Web.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", Coherence  do
+  scope "/", UcxUcc.Web  do
     pipe_through :browser
     coherence_routes()
   end
 
-  scope "/", Coherence  do
+  scope "/", UcxUcc.Web  do
     pipe_through :protected
     coherence_routes :protected
   end
 
+
   scope "/", UcxUcc.Web do
-    pipe_through :browser # Use the default browser stack
+    pipe_through :protected # Use the default browser stack
 
-    get "/", PageController, :index
+    get "/", MasterController, :index
+    get "/phone", MasterController, :phone
   end
-
   # Other scopes may use custom stacks.
   # scope "/api", UcxUcc.Web do
   #   pipe_through :api

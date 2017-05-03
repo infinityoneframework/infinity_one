@@ -19,7 +19,7 @@ defmodule UcxUcc.Mixfile do
     [mod: {UcxUcc.Application, []},
      extra_applications: extra_applications(Mix.env)]
   end
-  defp extra_applications(:prod), do: [:logger, :runtime_tools]
+  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
@@ -39,6 +39,7 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_html, "~> 2.6"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
+      {:phoenix_haml, "~> 0.2"},
       {:unbrella, path: "../unbrella"},
       {:coherence, github: "smpallen99/coherence", branch: "phx-1.3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
