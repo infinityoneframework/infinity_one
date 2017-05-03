@@ -21,7 +21,8 @@ defmodule UccChat.Web do
       use Phoenix.Controller, namespace: UccChat.Web
       import Plug.Conn
       import UccChat.Web.Router.Helpers
-      import UccChat.Web.Gettext
+      import UcxUcc.Web.Gettext
+      # import UccChat.Web.Gettext
     end
   end
 
@@ -38,7 +39,8 @@ defmodule UccChat.Web do
 
       import UccChat.Web.Router.Helpers
       import UccChat.Web.ErrorHelpers
-      import UccChat.Web.Gettext
+      # import UccChat.Web.Gettext
+      import UcxUcc.Web.Gettext
     end
   end
 
@@ -53,7 +55,8 @@ defmodule UccChat.Web do
   def channel do
     quote do
       use Phoenix.Channel
-      import UccChat.Web.Gettext
+      # import UccChat.Web.Gettext
+      import UcxUcc.Web.Gettext
     end
   end
 

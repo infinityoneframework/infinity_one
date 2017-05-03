@@ -18,4 +18,11 @@ import "phoenix_html"
 // Local files can be imported directly using relative
 // paths "./socket" or full ones "web/static/js/socket".
 
-// import socket from "./socket"
+import socket from "./socket"
+import main from "./main"
+import flex_bar from "./flex_bar"
+import utils from './utils'
+import cc from './chat_channel'
+require('./notifications_form')
+require('./favico')
+require('./emoji')

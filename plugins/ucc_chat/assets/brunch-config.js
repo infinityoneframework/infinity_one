@@ -2,34 +2,31 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: "js/app.js"
+      joinTo: "js/ucc_chat.js"
 
-      // To use a separate vendor.js bundle, specify two files path
-      // http://brunch.io/docs/config#-files-
-      // joinTo: {
-      //  "js/app.js": /^(js)/,
-      //  "js/vendor.js": /^(vendor)|(deps)/
-      // }
-      //
-      // To change the order of concatenation of files, explicitly mention here
-      // order: {
-      //   before: [
-      //     "vendor/js/jquery-2.1.1.js",
-      //     "vendor/js/bootstrap.min.js"
-      //   ]
-      // }
     },
     stylesheets: {
-      joinTo: "css/app.css"
+      joinTo: {
+        "css/ucc_chat.css": [
+          /^(css)/,
+          "node_modules/highlight.js/styles/default.css"
+        ],
+        "css/channel_settings.css": ["scss/channel_settings.scss"],
+        "css/emojipicker.css": ["vendor/emojiPicker.css"]
+      },
+      order: {
+        // after: ["web/static/css/theme/main.scss", "web/static/css/app.css"] // concat app.css last
+        // after: ["web/static/css/livechat.scss", "web/static/css/app.css"] // concat app.css last
+      }
     },
     templates: {
-      joinTo: "js/app.js"
+      joinTo: "js/ucc_chat.js"
     }
   },
 
   conventions: {
     // This option sets where we should place non-css and non-js assets in.
-    // By default, we set this to "/assets/static". Files in this directory
+    // By default, we set this to "/web/static/assets". Files in this directory
     // will be copied to `paths.public`, which is "priv/static" by default.
     assets: /^(static)/
   },
@@ -38,8 +35,9 @@ exports.config = {
   paths: {
     // Dependencies and current project directories to watch
     watched: ["static", "css", "js", "vendor"],
+
     // Where to compile files to
-    public: "../priv/static"
+    public: "../../../priv/static"
   },
 
   // Configure your plugins
@@ -47,16 +45,36 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/]
-    }
+    },
+    postcss: {
+      processors: [
+        require("autoprefixer")
+      ]
+    },
+    sass: {
+      mode: "native", // This is the important part!
+      options: {
+        // includePaths: [ 'node_modules' ]
+      }
+    },
   },
 
   modules: {
     autoRequire: {
-      "js/app.js": ["js/app"]
+      "js/ucc_chat.js": ["js/app"]
     }
   },
 
   npm: {
-    enabled: true
+    enabled: true,
+    whitelist: ["highlight.js"],
+    styles: {
+      "highlight.js": ['styles/default.css']
+    },
+    globals: {
+      // $: 'jquery',
+      // JQuery: 'jquery',
+      _: 'underscore'
+    }
   }
 };
