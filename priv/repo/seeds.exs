@@ -1,12 +1,13 @@
 alias UcxUcc.Repo
 alias UcxUcc.{Accounts, Permissions}
-alias Accounts.{User, Role, UserRole}
+alias Accounts.{User, Role, UserRole, Account}
 alias Permissions.{Permission, PermissionRole}
 
 Repo.delete_all PermissionRole
 Repo.delete_all UserRole
 Repo.delete_all Permission
 Repo.delete_all Role
+Repo.delete_all Account
 Repo.delete_all User
 
 default_permissions = [
@@ -95,6 +96,8 @@ create_user = fn name, email, password, admin ->
     |> User.changeset(params)
     |> Repo.insert!
 
+  User.confirm! user
+
   role_id = case admin do
     true -> roles["admin"]
     false -> roles["user"]
@@ -102,7 +105,7 @@ create_user = fn name, email, password, admin ->
   end
 
   Accounts.create_user_role(%{user_id: user.id, role_id: role_id})
-
+  Accounts.create_account(%{user_id: user.id})
   user
 end
 

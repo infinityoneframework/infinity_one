@@ -41,6 +41,8 @@ defmodule UcxUcc.Web.Router do
     get "/", MasterController, :index
     get "/phone", MasterController, :phone
   end
+
+  use Unbrella.Plugin.Router
   # Other scopes may use custom stacks.
   # scope "/api", UcxUcc.Web do
   #   pipe_through :api

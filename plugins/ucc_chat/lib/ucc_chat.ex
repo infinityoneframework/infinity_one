@@ -7,7 +7,7 @@ defmodule UccChat do
       # supervisor(UccChat.Presence, []),
       worker(UccChat.TypingAgent, []),
       worker(UccChat.MessageAgent, []),
-      worker(UcxUcc.Accounts.UserAgent, []),
+      worker(UccChat.UserAgent, []),
       worker(UccChat.PresenceAgent, []),
       # worker(UccChat.Robot.Adapters.UccChat, []),
       # worker(UccChat.Robot, []),

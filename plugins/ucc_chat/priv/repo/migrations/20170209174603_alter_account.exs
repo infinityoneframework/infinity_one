@@ -1,7 +1,8 @@
-defmodule UccChat.Repo.Migrations.CreateAccount do
+defmodule UccChat.Repo.Migrations.AlterAccount do
   use Ecto.Migration
 
   def change do
+    IO.puts "altering account ......"
     alter table(:accounts_accounts) do
       add :language, :string, default: "en"
       add :desktop_notification_enabled, :boolean, default: true, null: false

@@ -4,7 +4,7 @@ defmodule UccChat.Repo.Migrations.CreateAccountNotification do
   def change do
     create table(:accounts_notifications, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :account_id, references(:accounts, on_delete: :nothing, type: :binary_id)
+      add :account_id, references(:accounts_accounts, on_delete: :nothing, type: :binary_id)
       add :notification_id, references(:notifications, on_delete: :nothing, type: :binary_id)
 
       timestamps(type: :utc_datetime)

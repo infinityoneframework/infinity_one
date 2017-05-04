@@ -22,6 +22,8 @@ defmodule UccChat.Web do
       import Plug.Conn
       import UccChat.Web.Router.Helpers
       import UcxUcc.Web.Gettext
+      alias UcxUcc.Repo
+      import Ecto.Query
       # import UccChat.Web.Gettext
     end
   end
@@ -39,7 +41,7 @@ defmodule UccChat.Web do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/ucc_chat/web/templates",
+      use Phoenix.View, root: "plugins/ucc_chat/lib/ucc_chat/web/templates",
                         namespace: UccChat.Web
 
       # Import convenience functions from controllers

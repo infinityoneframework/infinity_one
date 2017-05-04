@@ -4,7 +4,7 @@ defmodule UcxUcc.Repo.Migrations.CreateUcxUcc.Accounts.Account do
   def change do
     create table(:accounts_accounts, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :user_id, references("accounts_users", on_delete: :delete_all), type: :binary_id
+      add :user_id, references(:accounts_users, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end

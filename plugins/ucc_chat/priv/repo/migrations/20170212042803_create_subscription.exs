@@ -15,7 +15,7 @@ defmodule UccChat.Repo.Migrations.CreateSubscription do
       add :unread, :integer, default: 0
       add :current_message, :string, default: ""
       add :channel_id, references(:channels, on_delete: :delete_all, type: :binary_id)
-      add :user_id, references(:users, on_delete: :nilify_all, type: :binary_id)
+      add :user_id, references(:accounts_users, on_delete: :nilify_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
       # timestamps()

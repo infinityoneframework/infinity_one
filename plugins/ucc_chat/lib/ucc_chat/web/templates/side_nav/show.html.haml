@@ -1,0 +1,24 @@
+%aside.side-nav.primary-background-color.color-tertiary-font-color(role="navigation")
+  %header.header
+    = render "account_box.html", chatd: @chatd
+  - if Coherence.current_user(@conn) do
+    = render "toolbar.html", conn: @conn
+    .unread-rooms.background-primary-action-color.color-primary-action-contrast.top-unread-rooms.hidden
+      = ~g(More unreads)
+      %i.icon-up-big
+    .rooms-list(role="region" area-label="Channels")
+      = render "rooms_list.html", chatd: @chatd
+      - if false do
+        .presence-list.hidden
+          %ul#UserList.list-unstyled
+            %li= ~g(Loading online users...)
+    .unread-rooms.background-primary-action-color.color-primary-action-contrast.bottom-unread-rooms.hidden
+      = ~g(More unreads)
+      %i.icon-down-big
+    .flex-nav.primary-background-color.animated-hidden
+      %section
+        = render "create_combined_flex.html"
+        = #render @side_nav[:flex_template], conn: @conn, flex_data: @side_nav[:flex_data]
+    %span.arrow.bottom
+  %footer.footer
+    = render "footer.html"

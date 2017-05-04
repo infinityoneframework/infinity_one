@@ -23,8 +23,8 @@ defmodule UcxUcc.Mixfile do
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["plugins", "lib", "test/support"]
-  defp elixirc_paths(_),     do: ["plugins", "lib"]
+  defp elixirc_paths(:test), do: ["plugins", "plugins/lib", "lib", "test/support"]
+  defp elixirc_paths(_),     do: ["plugins", "plugins/lib", "lib"]
 
   # Specifies your project dependencies.
   #
@@ -49,6 +49,7 @@ defmodule UcxUcc.Mixfile do
       {:cowboy, "~> 1.0"},
       {:mogrify, "~> 0.4.0"},
       {:tempfile, "~> 0.1.0"},
+      {:calliope, "== 0.4.1", override: true},
       {:hackney, "~> 1.8", override: true}
     ]
   end

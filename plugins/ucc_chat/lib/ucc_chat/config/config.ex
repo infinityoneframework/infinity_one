@@ -1,6 +1,5 @@
 defmodule UccChat.Config do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use UccChat.Shared, :schema
 
   alias UcxUcc.Repo
 

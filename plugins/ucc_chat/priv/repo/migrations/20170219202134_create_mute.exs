@@ -4,7 +4,7 @@ defmodule UccChat.Repo.Migrations.CreateMute do
   def change do
     create table(:muted, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :user_id, references(:users, on_delete: :nilify_all, type: :binary_id)
+      add :user_id, references(:accounts_users, on_delete: :nilify_all, type: :binary_id)
       add :channel_id, references(:channels, on_delete: :delete_all, type: :binary_id)
 
       timestamps()

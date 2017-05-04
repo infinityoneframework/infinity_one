@@ -1,0 +1,12 @@
+-# defer = Application.get_env :ucx_chat, :defer, true
+%h3{class: "add-room background-transparent-darker-hover#{is_active(@rooms)}"}
+  Channels
+  %span.room-count-small= "(#{length @rooms})"
+%ul
+  - if @rooms != [] do
+    - for room <- @rooms do
+      = render "chat_room_item.html", room: room
+  - else
+    %p.empty= ~g(No channels yet)
+# - unless defer do
+%button.more.more-channels.background-transparent-darker-hover= ~g(More channels...)
