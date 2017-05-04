@@ -26,6 +26,17 @@ defmodule UccChat.Web do
     end
   end
 
+  def channel_controller do
+    quote do
+      alias UcxUcc.Repo
+      import Ecto
+      import Ecto.Query
+      alias UccChat.Settings
+      use UcxUcc.Utils
+      use UcxUcc.Web.Gettext
+    end
+  end
+
   def view do
     quote do
       use Phoenix.View, root: "lib/ucc_chat/web/templates",
@@ -41,6 +52,10 @@ defmodule UccChat.Web do
       import UccChat.Web.ErrorHelpers
       # import UccChat.Web.Gettext
       import UcxUcc.Web.Gettext
+      alias UcxUcc.Accounts.User
+      alias UcxUcc.Repo
+      import UccChat.Web.SharedView
+      alias UccChat.Settings
     end
   end
 

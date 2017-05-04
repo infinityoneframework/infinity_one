@@ -43,7 +43,13 @@ defmodule UcxUcc.Mixfile do
       {:unbrella, path: "../unbrella"},
       {:coherence, github: "smpallen99/coherence", branch: "phx-1.3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
-      {:cowboy, "~> 1.0"}
+      {:arc_ecto, "~> 0.6.0"},
+      {:auto_linker, "~> 0.1"},
+      {:link_preview, "~> 1.0.0"},
+      {:cowboy, "~> 1.0"},
+      {:mogrify, "~> 0.4.0"},
+      {:tempfile, "~> 0.1.0"},
+      {:hackney, "~> 1.8", override: true}
     ]
   end
 

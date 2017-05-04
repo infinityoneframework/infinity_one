@@ -32,9 +32,9 @@ defmodule UccChat.Web.ErrorHelpers do
     #     dgettext "errors", "is invalid"
     #
     if count = opts[:count] do
-      Gettext.dngettext(UccChat.Web.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(UcxUcc.Web.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(UccChat.Web.Gettext, "errors", msg, opts)
+      Gettext.dgettext(UcxUcc.Web.Gettext, "errors", msg, opts)
     end
   end
 end

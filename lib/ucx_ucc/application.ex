@@ -15,7 +15,7 @@ defmodule UcxUcc.Application do
       worker(UcxUcc.Permissions, [])
       # Start your own worker by calling: UcxUcc.Worker.start_link(arg1, arg2, arg3)
       # worker(UcxUcc.Worker, [arg1, arg2, arg3]),
-    ]
+    ] ++ Unbrella.application_children()
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
