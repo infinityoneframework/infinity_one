@@ -1,0 +1,50 @@
+- nav_dat = @nav_dat
+- username = username nav_dat
+.sidebar(data-active-color="rose" data-background-color="black" data-image="/images/sidebar-1.jpg")
+  .logo.logo-mini
+    %a.simple-text(href="http://www.creative-tim.com")
+      Ct
+  .sidebar-wrapper
+    .user
+      .photo
+        %img(src="#{avatar_url username}")
+      .info
+        %a.collapsed(data-toggle="collapse" href="#collapseExample")
+          = username
+          %b.caret
+        .collapse#collapseExample
+          %ul.nav
+            =# pre_nav_hooks(nav_dat)
+            %li
+              %a(href="#")
+                %i.material-icons(style="color: #4caf50;;") fiber_manual_record
+                %p Online
+            %li
+              %a(href="#")
+                %i.material-icons(style="color: #ff9800;") fiber_manual_record
+                %p Away
+            %li
+              %a(href="#")
+                %i.material-icons(style="color: #f44336;") fiber_manual_record
+                %p Busy
+            %li
+              %a(href="#")
+                %i.material-icons(style="color: #999;") fiber_manual_record
+                %p Offline
+
+            %li
+              %a(href="#")
+                %i.material-icons tune
+                %p My Profile
+            =# post_nav_hooks(nav_dat)
+            %li
+              %a(href="")
+                %i.material-icons exit_to_app
+                %p Logout
+    %ul.nav
+      %li
+        %a(href="/phone")
+          %i.material-icons phone
+          %p Phone
+
+

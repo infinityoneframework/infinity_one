@@ -20,69 +20,8 @@
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
 </head>
   <body>
-    <div class="wrapper">
-        <div class="sidebar" data-active-color="rose" data-background-color="black" data-image="/images/sidebar-1.jpg">
-            <div class="logo logo-mini">
-                <a href="http://www.creative-tim.com" class="simple-text">
-                    Ct
-                </a>
-            </div>
-            <div class="sidebar-wrapper">
-                <div class="user">
-                    <div class="photo">
-                        <img src="/images/faces/avatar.jpg" />
-                    </div>
-                    <div class="info">
-                        <a data-toggle="collapse" href="#collapseExample" class="collapsed">
-                            Tania Andrew
-                            <b class="caret"></b>
-                        </a>
-                        <div class="collapse" id="collapseExample">
-                            <ul class="nav">
-                                <li>
-                                    <a href="#">My Profile</a>
-                                </li>
-                                <li>
-                                    <a href="#">Edit Profile</a>
-                                </li>
-                                <li>
-                                    <a href="#">Settings</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <ul class="nav">
-                    <li>
-                        <a href="/phone">
-                            <i class="material-icons">phone</i>
-                            <p>Phone</p>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <%= UcxUcc.Web.MasterView.render "index.html", conn: @conn, view_module: @view_module, view_template: @view_template, assigns:  assigns %>
 
-        <div class="main-panel">
-          <%= render @view_module, @view_template, assigns %>
-        </div>
-    <div class="fixed-plugin">
-      <div class="dropdown show-dropdown">
-        <a href="#" data-toggle="dropdown">
-          <i class="material-icons md-48">settings</i>
-          <%# <i class="fa fa-cog fa-2x"></i> %>
-        </a>
-        <%= render "fixed_plugin.html" %>
-      </div>
-    </div>
-    <div class="fixed-plugin2">
-      <div class="dropdown show-dropdown">
-        <a href="#" data-toggle="dropdown">
-          <i class="fa fa-users fa-lg"></i>
-        </a>
-      </div>
-    </div>
-    </div> <!-- /container -->
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
