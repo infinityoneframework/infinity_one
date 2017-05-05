@@ -18,9 +18,10 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons" />
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+    <link rel="stylesheet" href="<%= static_path(@conn, "/fonts/fontello/css/fontello.css") %>">
 </head>
   <body>
-    <%= UcxUcc.Web.MasterView.render "index.html", conn: @conn, view_module: @view_module, view_template: @view_template, assigns:  assigns %>
+    <%= render @view_module, @view_template, assigns %>
 
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>

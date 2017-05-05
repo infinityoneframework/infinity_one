@@ -1,0 +1,32 @@
+.sidebar .nav li>a {
+  margin: 0px 15px;
+  padding: 0px 15px;
+}
+.sidebar .nav li>a>i {
+  font-size: 14px;
+  margin-right: 3px;
+  width: 20px;
+}
+.sidebar .nav li>a.heading {
+  margin-top: 20px;
+}
+.sidebar .nav li>a.heading.first {
+  margin-top: 5px;
+}
+.sidebar .info span[data-status] > i {
+  font-size: 14px;
+}
+
+.sidebar span[data-status="online"] {
+  color: #4caf50;
+}
+.sidebar span[data-status="away"] {
+  color: #ff9800;
+}
+.sidebar span[data-status="busy"] {
+  color: #f44336;
+}
+.sidebar span[data-status="offline"] {
+  color: #999;
+}
+

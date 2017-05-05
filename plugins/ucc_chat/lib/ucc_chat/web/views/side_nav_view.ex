@@ -34,5 +34,11 @@ defmodule UccChat.Web.SideNavView do
     list = ~w(view-statistics  view-room-administration view-user-administration view-privileged-setting)
     UcxUcc.Permissions.has_at_least_one_permission?(user, list)
   end
+
+  def avatar_url(username) do
+    "/avatar/#{username}"
+  end
+
+  def username(chatd), do: chatd.user.username
 end
 

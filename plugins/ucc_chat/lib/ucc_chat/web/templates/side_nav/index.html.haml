@@ -1,0 +1,35 @@
+- username = username @chatd
+.sidebar(data-active-color="rose" data-background-color="black" data-image="/images/sidebar-1.jpg")
+  .sidebar-wrapper
+    = render "account_box.html", chatd: @chatd
+    %ul.nav
+      %li
+        %a.heading.first
+          - #%i.material-icons star
+          %p FAVORITES (3)
+      %li
+        %a(href="#")
+          %i.icon-at
+          %p ardavan.nawaby
+      %li
+        %a(href="#")
+          %i.icon-at
+          %p joseph.abrahm
+
+      %li
+        %a.heading
+          %p CHANNELS (2)
+      %li
+        %a(href="#")
+          %i.icon-hash
+          %p General
+      %li
+        %a(href="#")
+          %i.icon-at
+          %p ChatDev
+
+      %li
+        %a(href="/phone")
+          %i.material-icons phone
+          %p Phone
+
