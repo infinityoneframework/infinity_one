@@ -91,9 +91,10 @@ defmodule UccChat.Channel do
     end
   end
 
-  defp has_permission?(user, %{type: 1}), do: Permissions.has_permission?(user, "create-p")
-  defp has_permission?(user, %{type: 2}), do: Permissions.has_permission?(user, "create-d")
-  defp has_permission?(user, _), do: Permissions.has_permission?(user, "create-c")
+  defp has_permission?(_, _), do: true
+  # defp has_permission?(user, %{type: 1}), do: Permissions.has_permission?(user, "create-p")
+  # defp has_permission?(user, %{type: 2}), do: Permissions.has_permission?(user, "create-d")
+  # defp has_permission?(user, _), do: Permissions.has_permission?(user, "create-c")
 
   def total_rooms do
     from c in @module, select: count(c.id)

@@ -59,6 +59,7 @@ defmodule UccChat.Web.ChannelController do
     # Logger.warn "controller messages_info: #{inspect chatd.messages_info}"
     conn
     |> put_view(UccChat.Web.MasterView)
+    |> put_layout({UcxUcc.Web.LayoutView, "app.html"})
     |> render("main.html", chatd: chatd)
   end
 

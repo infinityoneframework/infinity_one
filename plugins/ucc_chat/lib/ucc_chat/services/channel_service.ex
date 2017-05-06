@@ -225,7 +225,7 @@ defmodule UccChat.ChannelService do
   def insert_channel!(user, params) do
     case insert_channel user, params do
       {:ok, channel} -> channel
-      _ -> raise "insert channel failed"
+      cs -> raise "insert channel failed: #{inspect cs}"
     end
   end
 
@@ -260,8 +260,11 @@ defmodule UccChat.ChannelService do
     end
   end
 
-  def do_roles(%{channel: %{id: ch_id, user_id: u_id} = channel}) do
-    case Repo.insert(UserRole.changeset(%UserRole{}, %{user_id: u_id, role: "owner", scope: ch_id})) do
+  def do_roles(%{channel: %{id: _ch_id, user_id: u_id} = channel}) do
+    role = UcxUcc.Accounts.get_role_by_name("owner")
+    # TODO: The scope concept of user_role is broken.
+    UcxUcc.Accounts.create_user_role(%{user_id: u_id, role_id: role.id}) #, scope: "global"})
+    |> case do
       {:ok, _} -> {:ok, channel}
       error -> error
     end
