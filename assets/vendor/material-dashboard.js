@@ -1,51 +1,22 @@
-/*! =========================================================
- *
- * Material Dashboard PRO - V1.1.0
- *
- * =========================================================
- *
- * Copyright 2016 Creative Tim (http://www.creative-tim.com/product/material-dashboard-pro)
- *
- *
- *                       _oo0oo_
- *                      o8888888o
- *                      88" . "88
- *                      (| -_- |)
- *                      0\  =  /0
- *                    ___/`---'\___
- *                  .' \|     |// '.
- *                 / \|||  :  |||// \
- *                / _||||| -:- |||||- \
- *               |   | \\  -  /// |   |
- *               | \_|  ''\---/''  |_/ |
- *               \  .-\__  '-'  ___/-. /
- *             ___'. .'  /--.--\  `. .'___
- *          ."" '<  `.___\_<|>_/___.' >' "".
- *         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
- *         \  \ `_.   \_ __\ /__ _/   .-` /  /
- *     =====`-.____`.___ \_____/___.-`___.-'=====
- *                       `=---='
- *
- *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- *               Buddha Bless:  "No Bugs"
- *
- * ========================================================= */
+/*!
+    
+ =========================================================
+ * Material Dashboard - v1.1.1.0
+ =========================================================
+ 
+ * Product Page: http://www.creative-tim.com/product/material-dashboard
+ * Copyright 2017 Creative Tim (http://www.creative-tim.com)
+ * Licensed under MIT (https://github.com/creativetimofficial/material-dashboard/blob/master/LICENSE.md)
+ 
+ =========================================================
+ 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ 
+ */
 
- (function(){
-     isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
+// Material Dashboard Wizard Functions
 
-     if (isWindows && !$('body').hasClass('sidebar-mini')){
-        // if we are on windows OS we activate the perfectScrollbar function
-        $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
 
-        $('html').addClass('perfect-scrollbar-on');
-    } else {
-        $('html').addClass('perfect-scrollbar-off');
-    }
- })();
-
-var breakCards = true;
 
 var searchVisible = 0;
 var transparent = true;
@@ -68,78 +39,22 @@ $(document).ready(function(){
 
     $.material.init();
 
-    // We put modals out of wrapper to working properly
-    $('.modal').appendTo("body");
-
     md.initSidebarsCheck();
-
-    if($('body').hasClass('sidebar-mini')){
-        md.misc.sidebar_mini_active = true;
-    }
 
     window_width = $(window).width();
 
     // check if there is an image set for the sidebar's background
     md.checkSidebarImage();
 
-    md.initMinimizeSidebar();
-
-    //    Activate bootstrap-select
-    if($(".selectpicker").length != 0){
-        $(".selectpicker").selectpicker();
-    }
-
     //  Activate the tooltips
     $('[rel="tooltip"]').tooltip();
 
-    //removed class label and label-color from tag span and replaced with data-color
-    var tagClass = $('.tagsinput').data('color');
-
-    $('.tagsinput').tagsinput({
-        tagClass: ' tag-'+ tagClass +' '
-    });
-
-    //    Activate bootstrap-select
-    $(".select").dropdown({ "dropdownClass": "dropdown-menu", "optionClass": "" });
 
     $('.form-control').on("focus", function(){
         $(this).parent('.input-group').addClass("input-group-focus");
     }).on("blur", function(){
         $(this).parent(".input-group").removeClass("input-group-focus");
     });
-
-
-    if(breakCards == true){
-        // We break the cards headers if there is too much stress on them :-)
-        $('[data-header-animation="true"]').each(function(){
-            var $fix_button = $(this)
-            var $card = $(this).parent('.card');
-
-            $card.find('.fix-broken-card').click(function(){
-                console.log(this);
-                var $header = $(this).parent().parent().siblings('.card-header, .card-image');
-
-                $header.removeClass('hinge').addClass('fadeInDown');
-
-                $card.attr('data-count',0);
-
-                setTimeout(function(){
-                    $header.removeClass('fadeInDown animate');
-                },480);
-            });
-
-            $card.mouseenter(function(){
-                var $this = $(this);
-                hover_count = parseInt($this.attr('data-count'), 10) + 1 || 0;
-                $this.attr("data-count", hover_count);
-
-                if (hover_count >= 20){
-                    $(this).children('.card-header, .card-image').addClass('hinge animated');
-                }
-            });
-        });
-    }
-
 
 });
 
@@ -164,30 +79,9 @@ md = {
         image_src = $sidebar.data('image');
 
         if(image_src !== undefined){
-            sidebar_container = '<div class="sidebar-background" style="background-image: url(' + image_src + ') "/>';
+            sidebar_container = '<div class="sidebar-background" style="background-image: url(' + image_src + ') "/>'
             $sidebar.append(sidebar_container);
         }
-    },
-
-    initSliders: function(){
-        // Sliders for demo purpose
-        $('#sliderRegular').noUiSlider({
-            start: 40,
-            connect: "lower",
-            range: {
-                min: 0,
-                max: 100
-            }
-        });
-
-        $('#sliderDouble').noUiSlider({
-            start: [20, 60] ,
-            connect: true,
-            range: {
-                min: 0,
-                max: 100
-            }
-        });
     },
 
     initSidebarsCheck: function(){
@@ -200,58 +94,6 @@ md = {
             }
         }
 
-    },
-
-    initMinimizeSidebar:function(){
-
-        // when we are on a Desktop Screen and the collapse is triggered we check if the sidebar mini is active or not. If it is active then we don't let the collapse to show the elements because the elements from the collapse are showing on the hover state over the icons in sidebar mini, not on the click.
-        $('.sidebar .collapse').on('show.bs.collapse',function(){
-            if($(window).width() > 991 && md.misc.sidebar_mini_active == true){
-                return false;
-            } else{
-                return true;
-            }
-        });
-
-        $('#minimizeSidebar').click(function(){
-            var $btn = $(this);
-
-            if(md.misc.sidebar_mini_active == true){
-                $('body').removeClass('sidebar-mini');
-                md.misc.sidebar_mini_active = false;
-
-                if(isWindows){
-                    $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
-                }
-
-            }else{
-
-                $('.sidebar .collapse').collapse('hide').on('hidden.bs.collapse',function(){
-                    $(this).css('height','auto');
-                });
-
-                if(isWindows){
-                    $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
-                }
-
-                setTimeout(function(){
-                    $('body').addClass('sidebar-mini');
-
-                    $('.sidebar .collapse').css('height','auto');
-                    md.misc.sidebar_mini_active = true;
-                },300);
-            }
-
-            // we simulate the window Resize so the charts will get updated in realtime.
-            var simulateWindowResize = setInterval(function(){
-                window.dispatchEvent(new Event('resize'));
-            },180);
-
-            // we stop the simulation of Window Resize after the animations are completed
-            setTimeout(function(){
-                clearInterval(simulateWindowResize);
-            },1000);
-        });
     },
 
     checkScrollForTransparentNavbar: debounce(function() {
@@ -299,9 +141,6 @@ md = {
                 event.stopPropagation();
 
             });
-
-            // simulate resize so all the charts/maps will be redrawn
-            window.dispatchEvent(new Event('resize'));
 
             mobile_menu_initialized = true;
         } else {
@@ -364,7 +203,7 @@ md = {
 
             toggle_initialized = true;
         }
-    }, 200),
+    }, 500),
 
 
     initBootstrapNavbarMenu: debounce(function(){
