@@ -1,17 +1,22 @@
-.sidebar .nav li>a {
+.sidebar .nav li a {
   margin: 0px 15px;
   padding: 0px 15px;
 }
-.sidebar .nav li>a>i {
+.sidebar .nav li a i {
   font-size: 14px;
   margin-right: 3px;
   width: 20px;
 }
-.sidebar .nav li>a.heading {
-  margin-top: 20px;
+.sidebar .nav li:hover a.heading {
+  background: none;
 }
-.sidebar .nav li>a.heading.first {
-  margin-top: 5px;
+
+.sidebar .nav li a.heading {
+  cursor: default;
+  /*margin-top: 20px;*/
+}
+.sidebar .nav li a.heading.first {
+  /*margin-top: 5px;*/
 }
 .sidebar .info span[data-status] > i {
   font-size: 14px;
@@ -30,3 +35,47 @@
   color: #999;
 }
 
+.sidebar ul li a {
+  display: block;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.sidebar ul li a:hover p {
+  color: white !important;
+}
+.sidebar ul li .opt {
+  position: absolute;
+  right: 0;
+  /*width: 50px;*/
+  /*padding-right: 10px;*/
+  text-align: right;
+  opacity: 0;
+  /*display: block;*/
+  top: 0px;
+  transition: opacity 0.12s ease;
+}
+.sidebar ul li:hover .opt {
+  opacity: 1;
+  transform: translateX(0);
+}
+.sidebar ul li .opt  i {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.sidebar ul li a.more p {
+  font-size: 12px !important;
+}
+.sidebar ul li a {
+  cursor: pointer;
+}
+.sidebar ul li a.more:hover {
+  background: none !important;
+}
+
+.sidebar ul.nav li.nav-text a {
+  cursor: default;
+}
+.sidebar ul.nav li.nav-text:hover a {
+  background: none;
+}

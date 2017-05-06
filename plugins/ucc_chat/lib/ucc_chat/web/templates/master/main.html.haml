@@ -7,7 +7,7 @@
   .connection-status.status-online
 
 .wrapper
-  = UccChat.Web.SideNavView.render "index.html", chatd: @chatd
+  = UccChat.Web.SideNavView.render "index.html", chatd: @chatd, conn: @conn
   = render "room.html", chatd: @chatd, conn: @conn
 
 .sweet-container
