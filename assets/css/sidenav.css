@@ -13,11 +13,9 @@
 
 .sidebar .nav li a.heading {
   cursor: default;
-  /*margin-top: 20px;*/
 }
-.sidebar .nav li a.heading.first {
-  /*margin-top: 5px;*/
-}
+/*.sidebar .nav li a.heading.first {
+}*/
 .sidebar .info span[data-status] > i {
   font-size: 14px;
 }
@@ -39,7 +37,6 @@
   display: block;
   position: relative;
   white-space: nowrap;
-  vertical-align: middle;
 }
 .sidebar ul li a:hover p {
   color: white !important;

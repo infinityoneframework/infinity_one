@@ -41,7 +41,7 @@ exports.config = {
     },
     stylesheets: {
       joinTo: {
-        "css/app.css": /^(css)/,
+        "css/app.css": /^(css|scss)/,
         "css/bootstrap.min.css": "vendor/bootstrap.min.css",
         "css/material-dashboard.css": "vendor/material-dashboard.css",
         "css/demo.css": "vendor/demo.css"
@@ -62,7 +62,7 @@ exports.config = {
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "css", "js", "vendor"],
+    watched: ["static", "css", "js", "vendor", "scss"],
     // Where to compile files to
     public: "../priv/static"
   },
