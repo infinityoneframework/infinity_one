@@ -81,7 +81,7 @@ defmodule EmojiOne do
   end
 
   defp options(opts) do
-    :ucx_ucc
+    :ucc_chat
     |> Application.get_env(:emoji_one, [])
     |> Enum.into(%{})
     |> Map.merge(Enum.into(opts, %{}))

@@ -5,6 +5,12 @@ defmodule UcxUcc.Application do
   # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec
+
+    # allow plugin access by it name
+    # i.e. Application.get_env(:ucc_ucx, :router)
+
+    Unbrella.apply_plugin_config()
+
     children =
       Unbrella.application_children()
       |> Enum.map(fn {mod, fun, args} ->
@@ -29,4 +35,5 @@ defmodule UcxUcc.Application do
     opts = [strategy: :one_for_one, name: UcxUcc.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
 end
