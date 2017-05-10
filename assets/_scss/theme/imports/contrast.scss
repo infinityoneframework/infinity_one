@@ -1,0 +1,48 @@
+// $contrasted-default-dark:   #000;
+// $contrasted-default-light:  #fff;
+
+// @function contrast($bg, $dark:$contrasted-default-dark, $light:$contrasted-default-light){
+//   @return get_contrast_yiq($bg, $dark, $light);
+// }
+// @function get_contrast_yip($color, $dark, $light) {
+//   $yip: ((red($color) * 299) + (green($color) * 587) + (blue($color) * 114)) / 1000;
+//   @if $yip >= 128 {
+//     @return $dark;
+//   } @else {
+//     @return $light;
+//   }
+// }
+@function contrast (
+   $color,
+   $dark: $primary-font-color,
+   $light: $primary-background-color
+){
+   @if $color == null {
+       @return null;
+   } @else {
+       $color-brightness: brightness($color);
+       $light-text-brightness: brightness($light);
+       $dark-text-brightness: brightness($dark);
+       @return if(abs($color-brightness - $light-text-brightness) > abs($color-brightness - $dark-text-brightness), $light, $dark); }
+}
+@function brightness($c) {
+   $rlin: de-gamma(red($c)/255);
+   $glin: de-gamma(green($c)/255);
+   $blin: de-gamma(blue($c)/255);
+   @return re-gamma(0.2126 * $rlin + 0.7152 * $glin + 0.0722 * $blin) * 100;
+}
+@function re-gamma($n) {
+   @if $n <= 0.0031308 {
+      @return $n * 12.92;
+   } @else {
+      @return (1.055 * pow($n,1 / 2.4) - 0.055);
+   }
+}
+@function de-gamma($n) {
+   @if $n <= 0.04045 {
+      @return $n / 12.92;
+   } @else {
+      @return pow((($n + 0.055) / 1.055), 2.4);
+   }
+}
+
