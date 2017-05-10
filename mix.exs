@@ -55,6 +55,8 @@ defmodule UcxUcc.Mixfile do
       # TODO: move this to the chat package
       {:hedwig, "~> 1.0"},
       {:hedwig_simple_responders, "~> 0.1.2"},
+      {:ucc_shared, path: "plugins/ucc_shared", app: false},
+      # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
 

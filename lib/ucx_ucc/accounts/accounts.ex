@@ -421,4 +421,12 @@ defmodule UcxUcc.Accounts do
     Account.changeset(account, %{})
   end
 
+  def get_bot_id do
+    Repo.one from u in User,
+      join: ur in UserRole, on: ur.user_id == u.id,
+      join: r in Role, on: r.id == ur.role_id,
+      where: r.name ==  "bot",
+      select: u.id,
+      limit: 1
+  end
 end

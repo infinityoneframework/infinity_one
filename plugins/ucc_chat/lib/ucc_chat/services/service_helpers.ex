@@ -8,7 +8,7 @@ defmodule UccChat.ServiceHelpers do
   use UcxUcc.Web.Gettext
 
   alias UcxUcc.Repo
-  alias UcxUcc.Accounts.User
+  alias UcxUcc.Accounts.{User, UserRole, Role}
 
   import Ecto.Query
 
@@ -194,16 +194,7 @@ defmodule UccChat.ServiceHelpers do
     %{html: html, message: message.body}
   end
   def get_bot_id do
-    Repo.one from u in User,
-    join: r in UserRole, on: r.user_id == u.id,
-    where: r.role ==  "bot",
-    select: u.id,
-    limit: 1
-    # User
-    # # |> where([m], m.type == "b")
-    # |> select([m], m.id)
-    # |> limit(1)
-    # |> Repo.one
+    UcxUcc.Accounts.get_bot_id()
   end
 
   def render(view, templ, opts \\ []) do
