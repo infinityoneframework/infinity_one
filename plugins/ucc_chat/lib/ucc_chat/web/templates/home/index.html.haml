@@ -7,7 +7,7 @@
   .connection-status.status-online
 
 .wrapper
-  = UccChat.Web.SideNavView.render "index.html", chatd: @chatd
+  = UccChat.Web.SideNavView.render "show.html", chatd: @chatd, conn: @conn
   .main-panel
     %nav.navbar.navbar-transparent.navbar-absolute
       .container-fluid

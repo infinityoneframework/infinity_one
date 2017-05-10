@@ -1,4 +1,4 @@
-defmodule UcxChat.Repo.Migrations.AddOpenIdToUsers do
+defmodule UccChat.Repo.Migrations.AddOpenIdToUsers do
   use Ecto.Migration
 
   def change do

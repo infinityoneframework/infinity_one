@@ -12,17 +12,25 @@ defmodule UcxUcc.Web.Coherence.PasswordController do
   * update - verify password, password confirmation, and update the database
   """
   use UcxUcc.Coherence.Web, :controller
+  use Timex
 
+  alias Coherence.ControllerHelpers, as: Helpers
   alias Coherence.TrackableService
 
   require Logger
 
-  plug :layout_view, view: Coherence.PasswordView
+  plug :set_layout_view
   plug :redirect_logged_in when action in [:new, :create, :edit, :update]
 
   @type schema :: Ecto.Schema.t
   @type conn :: Plug.Conn.t
   @type params :: Map.t
+
+  def set_layout_view(conn, _ \\ []) do
+    conn
+    |> put_view(Coherence.PasswordView)
+    |> put_layout({Coherence.LayoutView, "app.html"})
+  end
 
   @doc """
   Render the recover password form.

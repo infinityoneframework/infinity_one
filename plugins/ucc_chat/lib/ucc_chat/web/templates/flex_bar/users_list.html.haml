@@ -1,0 +1,17 @@
+.content
+  .list-view.animated
+    .title
+      %h2 Members List
+      .buttons-group
+      .control
+        .search-form
+          .input-line.search
+            %input#user-add-search.search.content-background-color(type="text" placeholder="Add users")
+            %i.icon-plus.secondary-font-color
+      %p
+        = get_users_list_stats(@users, @user_info)
+        %button.see-all.show-all Show all
+    %ul.list.clearfix.lines
+      - for user <- @users do
+        = render "users_list_item.html", user: user, channel_id: @channel_id
+  = render "user_card.html", user_info: @user_info, user: @user, channel_id: @channel_id, current_user: @current_user

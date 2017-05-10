@@ -37,7 +37,7 @@
         - {subscribed?, hidden?} = UccChat.Channel.subscription_status(channel, @current_user.id)
         %li
           %a.channel-link(href="/channels/#{channel.name}")
-            %i(class="#{UcxChat.ChannelService.get_icon(channel.type)}")
+            %i(class="#{UccChat.ChannelService.get_icon(channel.type)}")
             = channel.name
             %span.opt.fixed
               - if subscribed? do

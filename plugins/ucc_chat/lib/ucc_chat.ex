@@ -10,7 +10,7 @@ defmodule UccChat do
       worker(UccChat.UserAgent, []),
       worker(UccChat.PresenceAgent, []),
       # worker(UccChat.Robot.Adapters.UccChat, []),
-      # worker(UccChat.Robot, []),
+      worker(UccChat.Robot, []),
       worker(UccChat.ChannelMonitor, [:chan_system]),
     ]
   end

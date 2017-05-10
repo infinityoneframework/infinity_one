@@ -2,6 +2,7 @@ defmodule UcxUcc.Web.Endpoint do
   use Phoenix.Endpoint, otp_app: :ucx_ucc
 
   socket "/socket", UcxUcc.Web.UserSocket
+  # socket "/socket", UcxUcc.Web.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -9,7 +10,7 @@ defmodule UcxUcc.Web.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/", from: :ucx_ucc, gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ~w(sprites uploads css fonts fontello images js favicon.ico robots.txt sounds favicon1.ico favicon-alert.ico manifest.json)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

@@ -1,7 +1,8 @@
 defmodule UccChat.Web.SystemChannel do
   use Phoenix.Channel
   use UccChat.Web.ChannelApi
-  alias UccChat.Web.{Presence, UserChannel}
+  alias UcxUcc.Web.Presence
+  alias UccChat.Web.UserChannel
   alias UccChat.ServiceHelpers, as: Helpers
 
   # import Ecto.Query
@@ -31,7 +32,7 @@ defmodule UccChat.Web.SystemChannel do
 
   def leave(pid, user_id) do
     Logger.warn "user_id: #{inspect user_id} left the channel"
-    UccChat.Web.Presence.untrack(pid, CC.chan_system(), user_id)
+    UcxUcc.Web.Presence.untrack(pid, CC.chan_system(), user_id)
     UccChat.PresenceAgent.unload(user_id)
   end
 

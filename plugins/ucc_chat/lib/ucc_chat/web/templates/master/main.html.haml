@@ -5,14 +5,16 @@
 #user-card-popover
 #ucx-chat.menu-nav
   .connection-status.status-online
+    = # connection status
+  .main-content.content-background-color(style="transform: translateX(0px);")
+    = #{{#if modal}}main-modal{{/if}}">
+    = render "room.html", chatd: @chatd, conn: @conn
 
-.wrapper
-  = UccChat.Web.SideNavView.render "index.html", chatd: @chatd, conn: @conn
-  = render "room.html", chatd: @chatd, conn: @conn
-
+  %div.main-content-cache.hidden
+  = render UccChat.Web.SideNavView, "show.html", conn: @conn, chatd: @chatd
+= UccChat.Web.EmojiView.render("emoji_picker.html", account: @chatd.user.account)
 .sweet-container
-%div.main-content-cache.hidden
-
+  =# render "sweet.html"
 - flash_error = @conn.private[:phoenix_flash]["error"]
 :javascript
   window.UcxChat = {}

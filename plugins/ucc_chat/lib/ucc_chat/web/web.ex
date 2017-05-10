@@ -21,7 +21,7 @@ defmodule UccChat.Web do
       use Phoenix.Controller, namespace: UccChat.Web
       import Plug.Conn
       import UccChat.Web.Router.Helpers
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
       alias UcxUcc.Repo
       import Ecto.Query
       # import UccChat.Web.Gettext
@@ -53,11 +53,13 @@ defmodule UccChat.Web do
       import UccChat.Web.Router.Helpers
       import UccChat.Web.ErrorHelpers
       # import UccChat.Web.Gettext
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
       alias UcxUcc.Accounts.User
       alias UcxUcc.Repo
       import UccChat.Web.SharedView
       alias UccChat.Settings
+      alias UcxUcc.Permissions
+      require Logger
     end
   end
 
@@ -73,7 +75,7 @@ defmodule UccChat.Web do
     quote do
       use Phoenix.Channel
       # import UccChat.Web.Gettext
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
     end
   end
 

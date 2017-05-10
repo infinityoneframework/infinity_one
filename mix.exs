@@ -50,7 +50,11 @@ defmodule UcxUcc.Mixfile do
       {:mogrify, "~> 0.4.0"},
       {:tempfile, "~> 0.1.0"},
       {:calliope, "== 0.4.1", override: true},
-      {:hackney, "~> 1.8", override: true}
+      {:hackney, "~> 1.8", override: true},
+      {:httpoison, "~> 0.11", override: true},
+      # TODO: move this to the chat package
+      {:hedwig, "~> 1.0"},
+      {:hedwig_simple_responders, "~> 0.1.2"},
     ]
   end
 

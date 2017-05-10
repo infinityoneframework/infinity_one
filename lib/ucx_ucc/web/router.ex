@@ -35,10 +35,10 @@ defmodule UcxUcc.Web.Router do
   end
 
 
-  scope "/", UcxUcc.Web do
+  scope "/", UccChat.Web do
     pipe_through :protected # Use the default browser stack
 
-    get "/", MasterController, :index
+    get "/", HomeController, :index
     get "/phone", MasterController, :phone
   end
 

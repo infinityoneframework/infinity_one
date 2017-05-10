@@ -26,8 +26,14 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
   plug Coherence.ValidateOption, :registerable
   plug :scrub_params, "registration" when action in [:create, :update]
 
-  plug :layout_view, view: Coherence.RegistrationView
+  plug :set_layout_view
   plug :redirect_logged_in when action in [:new, :create]
+
+  def set_layout_view(conn, _ \\ []) do
+    conn
+    |> put_view(Coherence.RegistrationView)
+    |> put_layout({Coherence.LayoutView, "app.html"})
+  end
 
   @doc """
   Render the new user form.

@@ -70,18 +70,45 @@ defmodule UcxUcc.Web.Coherence.SessionController do
   """
   @spec create(conn, params) :: conn
   def create(conn, params) do
-    user_schema = Config.user_schema()
-    lockable? = user_schema.lockable?()
-    login_field = Config.login_field()
+    tz_offset = 
+      case Integer.parse(params["tz-offset"] || "") do 
+        :error -> 0
+        {num, _} -> num
+      end
+    remember = if Config.user_schema.rememberable?, do: params["remember"], else: false
+    user_schema = Config.user_schema
+    login_field = Config.login_field
     login_field_str = to_string login_field
     login = params["session"][login_field_str]
     password = params["session"]["password"]
-    remember = if Config.user_schema.rememberable?(), do: params["remember"], else: false
-    user = Config.repo.one(from u in user_schema, where: field(u, ^login_field) == ^login)
-    if user != nil and user_schema.checkpw(password, Map.get(user, Config.password_hash())) do
+    user = Config.repo.one(from u in user_schema, where: u.username == ^login or u.email == ^login)
+    lockable? = user_schema.lockable?
+    if user != nil and user.active and user_schema.checkpw(password, Map.get(user, Config.password_hash)) do
       if ConfirmableService.confirmed?(user) || ConfirmableService.unconfirmed_access?(user) do
-        do_lockable(conn, login_field, [user, user_schema, remember, lockable?, remember, params],
-          user_schema.lockable?() and user_schema.locked?(user))
+        unless lockable? and user_schema.locked?(user) do
+          conn = if lockable? && user.locked_at do
+            Helpers.unlock!(user)
+            track_unlock conn, user, user_schema.trackable_table?
+          else
+            conn
+          end
+          user
+          |> user_schema.changeset(%{tz_offset: tz_offset})
+          |> Config.repo.update!
+
+          apply(Config.auth_module, Config.create_login, [conn, user, [id_key: Config.schema_key]])
+          |> reset_failed_attempts(user, lockable?)
+          |> track_login(user, user_schema.trackable?, user_schema.trackable_table?)
+          |> save_rememberable(user, remember)
+          |> put_flash(:notice, dgettext("coherence", "Signed in successfully."))
+          |> redirect_to(:session_create, params)
+        else
+          conn
+          |> put_flash(:error, dgettext("coherence", "Too many failed login attempts. Account has been locked."))
+          |> assign(:locked, true)
+          |> put_status(423)
+          |> render("new.html", [{login_field, ""}, remember: rememberable_enabled?()])
+        end
       else
         conn
         |> put_flash(:error, dgettext("coherence", "You must confirm your account before you can login."))
@@ -92,34 +119,11 @@ defmodule UcxUcc.Web.Coherence.SessionController do
       conn
       |> track_failed_login(user, user_schema.trackable_table?())
       |> failed_login(user, lockable?)
+      |> put_view(Coherence.SessionView)
+      |> put_layout("app.html")
       |> put_status(401)
       |> render(:new, [{login_field, login}, remember: rememberable_enabled?()])
     end
-  end
-
-  defp do_lockable(conn, login_field, _, true) do
-    conn
-    |> put_flash(:error, dgettext("coherence", "Too many failed login attempts. Account has been locked."))
-    |> assign(:locked, true)
-    |> put_status(423)
-    |> render("new.html", [{login_field, ""}, remember: rememberable_enabled?()])
-  end
-
-  defp do_lockable(conn, _login_field, opts, false) do
-    [user, user_schema, remember, lockable?, remember, params] = opts
-    conn = if lockable? && user.locked_at() do
-      Helpers.unlock!(user)
-      track_unlock conn, user, user_schema.trackable_table?()
-    else
-      conn
-    end
-    Config.auth_module()
-    |> apply(Config.create_login(), [conn, user, [id_key: Config.schema_key()]])
-    |> reset_failed_attempts(user, lockable?)
-    |> track_login(user, user_schema.trackable?(), user_schema.trackable_table?())
-    |> save_rememberable(user, remember)
-    |> put_flash(:notice, dgettext("coherence", "Signed in successfully."))
-    |> redirect_to(:session_create, params)
   end
 
   @doc """
@@ -144,6 +148,10 @@ defmodule UcxUcc.Web.Coherence.SessionController do
   #   |> track_logout(user, user.__struct__.trackable?())
   #   |> delete_rememberable(user)
   # end
+
+  @flash_invalid "Incorrect #{Config.login_field} or password."
+  @flash_locked "Maximum Login attempts exceeded. Your account has been locked."
+  @flash_inactive gettext("Account is inactive")
 
   defp log_lockable_update({:error, changeset}) do
     lockable_failure changeset
@@ -170,7 +178,11 @@ defmodule UcxUcc.Web.Coherence.SessionController do
           |> track_lock(user, user.__struct__.trackable_table?())
         {new_conn, @flash_locked, %{locked_at: Ecto.DateTime.utc()}}
       else
-        {conn, @flash_invalid, %{}}
+        if user.active do
+          {conn, @flash_invalid, %{}}
+        else
+          {conn, @flash_inactive, %{}}
+        end
       end
     :session
     |> Helpers.changeset(user.__struct__, user, Map.put(params, :failed_attempts, attempts))
@@ -188,13 +200,11 @@ defmodule UcxUcc.Web.Coherence.SessionController do
   """
   @spec login_callback(conn) :: conn
   def login_callback(conn) do
-    conn = if Map.get conn.private, "phoenix_layout" do
+    if Map.get conn.private, "phoenix_layout" do
       conn
     else
       put_layout conn, Config.layout({Coherence.LayoutView, :app})
     end
-
-    conn
     |> new(%{})
     |> halt
   end

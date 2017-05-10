@@ -13,7 +13,7 @@ defmodule UcxUcc.Coherence.Web do
 
       import UcxUcc.Web.Router.Helpers
       import UcxUcc.Web.ErrorHelpers
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
       import UcxUcc.Coherence.ViewHelpers
     end
   end
@@ -28,7 +28,7 @@ defmodule UcxUcc.Coherence.Web do
       import Ecto.Query
       import Plug.Conn
       import UcxUcc.Web.Router.Helpers
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
       import Coherence.ControllerHelpers
 
       alias Coherence.Config

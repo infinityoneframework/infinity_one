@@ -7,7 +7,7 @@
   .connection-status.status-online
 
 .wrapper
-  = UcxUcc.Web.SidebarView.render "index.html", nav_dat: @conn
+  = UcxUcc.Web.SidebarView.render "show.html", nav_dat: @conn
   .main-panel
     = render @view_module, @view_template, @assigns
   .fixed-plugin

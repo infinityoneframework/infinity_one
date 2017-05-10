@@ -1,0 +1,38 @@
+!!! 5
+%html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
+  %head
+    = render "initial_loading.html"
+    %meta(charset="utf-8")
+    %meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    %meta(name="viewport" content="width=device-width, initial-scale=1")
+    %meta(name="description" content="")
+    %meta(name="author" content="")
+    %meta(name="apple-mobile-web-app-title" content="WebRTC Chat")
+    %meta(name="apple-mobile-web-app-capable" content="yes")
+
+    %title= site_title()
+    %link(href="/favicon1.ico" rel="shortcut icon" type="image/x-icon")
+    %link(href="/favicon1.ico" rel="icon" type="image/x-icon")
+    %link(rel="stylesheet" href='#{static_path(@conn, "/fonts/fontello/css/fontello.css")}')
+    %link(rel="stylesheet" href='#{static_path(@conn, "/css/app.css")}')
+    %link(rel="stylesheet" href='#{static_path(@conn, "/css/channel_settings.css")}')
+    %link(rel="stylesheet" href='#{static_path(@conn, "/css/toastr.css")}')
+
+    %link(rel="apple-touch-icon" href="/images/logo_globe.png")
+
+    - for {id, fname} <- audio_files() do
+      %audio(id="#{id}")
+        %source(src="#{fname}" type="audio/mpeg")
+      %a(data-audio="[#{id}]" href="#" onClick="$('audio##{id}')[0].play()" style="display:none;")
+
+    %script(src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous")
+    %style body { background-color: #04436A; }
+  %body.global-font-family.color-primary-font-color
+    #initial-page-loading.page-loading
+      .loading-animation
+        .bounce1
+        .bounce2
+        .bounce3
+    = render @view_module, @view_template, assigns
+  = render "translations.html"
+  %script(src='#{static_path(@conn, "/js/app.js")}')

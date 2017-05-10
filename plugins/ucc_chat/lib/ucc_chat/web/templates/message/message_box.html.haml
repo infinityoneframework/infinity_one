@@ -63,7 +63,7 @@
     - if @mb[:can_join?] do
       %div
         you are in preview mode of
-        = UcxChat.SharedView.get_room_display_name(@chatd)
+        = UccChat.Web.SharedView.get_room_display_name(@chatd)
         - if @mb[:join_code_required] do
           %input(type="text" name="joinCode" placeholder="Code" style="width: 100px")
         %button.button.join

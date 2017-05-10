@@ -21,7 +21,7 @@ defmodule UcxUcc.Web do
       use Phoenix.Controller, namespace: UcxUcc.Web
       import Plug.Conn
       import UcxUcc.Web.Router.Helpers
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
     end
   end
 
@@ -38,7 +38,7 @@ defmodule UcxUcc.Web do
 
       import UcxUcc.Web.Router.Helpers
       import UcxUcc.Web.ErrorHelpers
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
     end
   end
 
@@ -53,7 +53,7 @@ defmodule UcxUcc.Web do
   def channel do
     quote do
       use Phoenix.Channel
-      import UcxUcc.Web.Gettext
+      use UcxUcc.Web.Gettext
     end
   end
 
