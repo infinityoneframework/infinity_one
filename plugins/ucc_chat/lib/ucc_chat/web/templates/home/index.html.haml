@@ -1,41 +1,23 @@
-.tooltip
-  .content
-  .tooltip-arrow
-
 #user-card-popover
 #ucx-chat.menu-nav
   .connection-status.status-online
+    = # connection status
+  .main-content.content-background-color(style="transform: translateX(0px);")
+    = #{{#if modal}}main-modal{{/if}}">
+    %section.page-container.page-home.page-static.content-background-color
+      %header.fixed-title.content-background-color.border-component-color
+        .burger
+          %i
+          %i
+          %i
+        %h2
+          .room-title= UccChat.Settings.content_home_title()
+      .content= raw UccChat.Settings.content_home_body()
 
-.wrapper
-  = UccChat.Web.SideNavView.render "show.html", chatd: @chatd, conn: @conn
-  .main-panel
-    %nav.navbar.navbar-transparent.navbar-absolute
-      .container-fluid
-        .navbar-minimize
-          %button#minimizeSidebar.btn.btn-round.btn-white.btn-fill.btn-just-icon
-            %i.material-icons.visible-on-sidebar-regular more_vert
-            %i.material-icons.visible-on-sidebar-mini view_list
-        .navbar-header
-          %button.navbar-toggle(type="button" data-toggle="collapse")
-            %span.sr-only "Toggle navigation"
-            %span.icon-bar
-            %span.icon-bar
-            %span.icon-bar
-          %a.navbar-brand(href="#")
-            = UccChat.Settings.content_home_title()
-            .ripple-container
-        .collapse.navbar-collapse
-          %ul.nav.navbar.navbar-right
-    .content
-      .container-fluid
-        .row
-          .col-md-12
-            = raw UccChat.Settings.content_home_body()
-    %footer.footer
-
+  %div.main-content-cache.hidden
+  = render UccChat.Web.SideNavView, "show.html", conn: @conn, chatd: @chatd
 .sweet-container
-%div.main-content-cache.hidden
-
+  =# render "sweet.html"
 - flash_error = @conn.private[:phoenix_flash]["error"]
 :javascript
   window.UcxChat = {}

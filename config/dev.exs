@@ -53,3 +53,47 @@ config :phoenix, :stacktrace_depth, 20
 # Finally import the config/dev.secret.exs
 # which should be versioned separately.
 import_config "dev.secret.exs"
+
+defmodule GlobalState do
+  # Public API
+  def start(initial_state) do 
+    spawn(fn -> loop(initial_state) end)
+  end
+  def append(pid, item) do
+    send pid, {:append, item}
+  end
+  def prepend(pid, item) do
+    send pid, {:prepend, item}
+  end
+  def get(pid) do
+    send pid, {:get, self()}
+    receive do
+      {:result, result} -> result
+    end
+  end
+  def stop(pid) do
+    send(pid, :stop)
+  end
+
+  # Private main loop
+  defp loop(state) do
+    receive do
+      {:prepend, item} -> 
+        loop([item | state])
+      {:append, item} -> 
+        loop(state ++ [item])
+      {:get, pid} -> 
+        send pid, {:result, state}
+        loop(state)
+      :stop -> 
+        IO.puts "I'm done"
+        :ok
+    end
+  end
+end
+
+pid = GlobalState.start [1,2,3]
+GlobalState.append pid, 4
+GlobalState.prepend pid, 0
+GlobalState.get pid
+GlobalState.stop pid
