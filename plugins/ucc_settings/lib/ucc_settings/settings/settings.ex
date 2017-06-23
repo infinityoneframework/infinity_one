@@ -145,8 +145,14 @@ defmodule UccSettings.Settings do
         end
       end)
 
+      def cast(value, name) when is_binary(value) do
+        value = if Regex.match?(~r/^".*"$/, value),
+          do: String.replace(value, "\"", ""), else: value
+        UccSettings.Settings.cast @types[name], value
+      end
+
       def cast(value, name) do
-        UccSettings.Settings.cast @types[name], String.replace(value, "\"", "")
+        UccSettings.Settings.cast @types[name], value
       end
 
       defoverridable [new: 0, new: 1, init: 0, load: 0, get: 0, get: 1, update: 2, cast: 2]

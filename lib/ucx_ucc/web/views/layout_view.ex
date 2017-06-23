@@ -4,7 +4,7 @@ defmodule UcxUcc.Web.LayoutView do
   # TODO: This does not belog here. Need a generic approach here
   def site_title do
     # UccChat.Settings.site_name()
-    UccSettings.Settings.Config.General.site_name()
+    UccSettings.site_name()
   end
 
   # TODO: same as the previous comment

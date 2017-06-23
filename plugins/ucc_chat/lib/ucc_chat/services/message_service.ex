@@ -6,7 +6,7 @@ defmodule UccChat.MessageService do
 
   alias UccChat.{
     Message, TypingAgent, Mention, Subscription, AppConfig,
-    Settings, Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
+    Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
     SubscriptionService, MessageAgent, AttachmentService
   }
   alias UccChat.ServiceHelpers, as: Helpers
@@ -269,7 +269,7 @@ defmodule UccChat.MessageService do
       nil -> false
       lm ->
         Timex.after?(Timex.shift(lm.inserted_at,
-          seconds: Settings.grouping_period_seconds()), Timex.now) and
+          seconds: UccSettings.grouping_period_seconds()), Timex.now) and
           user_id == lm.user_id
     end
 
@@ -294,7 +294,7 @@ defmodule UccChat.MessageService do
   end
 
   def embed_link_previews(body, channel_id, message_id) do
-    if Settings.embed_link_previews() do
+    if UccSettings.embed_link_previews() do
       body
       |> get_preview_links
       |> case do

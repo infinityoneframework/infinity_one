@@ -80,14 +80,13 @@ defmodule UccChat.Web.MessageView do
   def get_users_typing(_msg, _cmd), do: []
   def alias?(_msg), do: false
   def role_tags(message) do
-    []
-    # if UccChat.Settings.display_roles() do
-    #   message.user_id
-    #   |> Helpers.get_user!
-    #   |> UcxUcc.Accounts.User.tags(message.channel_id)
-    # else
-    #   []
-    # end
+    if UccSettings.display_roles() do
+      message.user_id
+      |> Helpers.get_user!
+      |> UcxUcc.Accounts.User.tags(message.channel_id)
+    else
+      []
+    end
   end
   def is_bot(_msg), do: false
   def get_date_time(msg, user), do: format_date_time(msg, user)
@@ -166,12 +165,13 @@ defmodule UccChat.Web.MessageView do
       ]
       |> Enum.into(defaults)
 
-    config = UcxUcc.Repo.one(UccChat.Config)
+    # config = UcxUcc.Repo.one(UccChat.Config)
+    config = UccSettings.load_all
 
     settings =
       [
-        max_message_length: Settings.max_allowed_message_size(config),
-        show_formatting_tips?: Settings.show_formatting_tips(config),
+        max_message_length: UccSettings.max_allowed_message_size(config),
+        show_formatting_tips?: UccSettings.show_formatting_tips(config),
         show_file_upload?: AttachmentService.allowed?(channel),
       ]
       |> Enum.into(settings)

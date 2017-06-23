@@ -64,7 +64,7 @@ defmodule UccChat.FlexBarService do
 
   def handle_in("notifications_form:play", _params, socket) do
     user = Helpers.get_user(socket.assigns.user_id)
-    sound = "" # UccChat.Settings.get_new_message_sound(user, socket.assigns.channel_id)
+    sound = UccChat.Settings.get_new_message_sound(user, socket.assigns.channel_id)
     {:reply, {:ok, %{sound: sound}}, socket}
   end
 

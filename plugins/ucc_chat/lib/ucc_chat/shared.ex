@@ -5,7 +5,7 @@ defmodule UccChat.Shared do
       import Ecto.Query
       alias UcxUcc.Repo
       alias UcxUcc.Accounts.{User, UserRole}
-      alias UccChat.{Web.RoomChannel, Web.UserChannel, Settings}
+      alias UccChat.{Web.RoomChannel, Web.UserChannel}
       alias UccChat.ServiceHelpers, as: Helpers
       require UccChat.Web.SharedView
       use UcxUcc.Web.Gettext

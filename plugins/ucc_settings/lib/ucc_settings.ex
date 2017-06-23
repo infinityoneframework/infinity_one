@@ -20,4 +20,17 @@ defmodule UccSettings do
     end
   end)
 
+  def load_all do
+    for config <- UccSettings.Settings.list_configs(), into: %{} do
+      {String.to_atom(config.name), config.value}
+    end
+  end
+
+  def init_all do
+    :ucx_ucc
+    |> Application.get_env(:settings_modules, [])
+    |> Enum.map(fn module ->
+      apply module, :init, []
+    end)
+  end
 end

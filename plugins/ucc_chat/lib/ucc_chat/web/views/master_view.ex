@@ -1,6 +1,6 @@
 defmodule UccChat.Web.MasterView do
   use UccChat.Web, :view
-  alias UccChat.{ChannelService, Channel, ChatDat, Settings}
+  alias UccChat.{ChannelService, Channel, ChatDat}
   require IEx
 
   def get_admin_class(_user), do: ""
@@ -73,7 +73,7 @@ defmodule UccChat.Web.MasterView do
   def get_open_ftab({title, _}, flex_tabs), do: Enum.find(flex_tabs, fn tab -> tab[:open] && tab[:title] == title end)
 
   def cc(config, item) do
-    if apply UccChat.Settings, item, [config] do
+    if apply UccSettings, item, [config] do
       ""
     else
       " hidden"
@@ -92,7 +92,7 @@ defmodule UccChat.Web.MasterView do
     else
       " hidden"
     end
-    config = Settings.config
+    config = UccSettings.load_all()
     defn = UccChat.FlexBarService.default_settings()
     tab = case open_tab do
       {title, _} -> %{title => true}
@@ -167,9 +167,9 @@ defmodule UccChat.Web.MasterView do
       link_preview: false,
       use_emojis: true,
       allow_upload: #{UccChat.AttachmentService.allowed?(channel)},
-      accepted_media_types: '#{Settings.accepted_media_types()}',
-      maximum_file_upload_size_kb: #{Settings.maximum_file_upload_size_kb()},
-      protect_upload_files: #{Settings.protect_upload_files()},
+      accepted_media_types: '#{UccSettings.accepted_media_types()}',
+      maximum_file_upload_size_kb: #{UccSettings.maximum_file_upload_size_kb()},
+      protect_upload_files: #{UccSettings.protect_upload_files()},
     };
     UcxChat.settings = chat_settings;
     """

@@ -9,7 +9,7 @@ defmodule UccChat.ChannelService do
   import UccChat.NotifierService
 
   alias UccChat.{
-    Settings, Channel, Subscription, MessageService, UserService,
+    Channel, Subscription, MessageService, UserService,
     ChatDat, Direct, Mute, Web.UserChannel, SideNavService
   }
   alias UcxUcc.Repo
@@ -71,7 +71,7 @@ defmodule UccChat.ChannelService do
     |> case do
       {:ok, subs} ->
         UserChannel.join_room(user_id, channel.name)
-        unless Settings.hide_user_join() do
+        unless UccSettings.hide_user_join() do
           # here
           # broadcast_message(~g"Has joined the channel.", channel.name, user_id, channel.id, system: true, sequential: false)
           # notify_action(socket, :join, channel.name, user_id, channel.id)
@@ -872,7 +872,7 @@ defmodule UccChat.ChannelService do
   def user_command(socket, :mute, %User{} = user, user_id, channel_id) do
     case mute_user(user, user_id, channel_id) do
       {:ok, msg} ->
-        unless Settings.hide_user_muted() do
+        unless UccSettings.hide_user_muted() do
           notify_user_action2 socket, user, user_id, channel_id, &format_binary_msg(&1, &2, "muted")
         end
         Phoenix.Channel.broadcast socket, "user:action", %{action: "mute", user_id: user.id}
@@ -887,7 +887,7 @@ defmodule UccChat.ChannelService do
   def user_command(socket, :unmute, %User{} = user, user_id, channel_id) do
     case unmute_user(user, user_id, channel_id) do
       {:ok, msg} ->
-        unless Settings.hide_user_muted() do
+        unless UccSettings.hide_user_muted() do
           notify_user_action2 socket, user, user_id, channel_id, &format_binary_msg(&1, &2, "unmuted")
         end
         Phoenix.Channel.broadcast socket, "user:action", %{action: "mute", user_id: user.id}
@@ -1138,7 +1138,7 @@ defmodule UccChat.ChannelService do
       subs ->
         Repo.delete! subs
         UserChannel.leave_room(user_id, channel.name)
-        unless Settings.hide_user_leave() do
+        unless UccSettings.hide_user_leave() do
           # here
           # broadcast_message("Has left the channel.", channel.name, user_id, channel.id, system: true, sequential: false)
         end

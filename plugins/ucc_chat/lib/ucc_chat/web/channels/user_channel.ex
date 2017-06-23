@@ -11,7 +11,7 @@ defmodule UccChat.Web.UserChannel do
   alias UccChat.{
     Subscription, Flex, FlexBarService, ChannelService, Channel, SideNavService,
     Web.AccountView, AdminService, Web.FlexBarView, Web.UserSocket,
-    ChannelService, SubscriptionService, InvitationService, Settings, UserService,
+    ChannelService, SubscriptionService, InvitationService, UserService,
     EmojiService
   }
   alias UcxUcc.Web.Endpoint
@@ -568,13 +568,13 @@ defmodule UccChat.Web.UserChannel do
   # Helpers
 
   defp handle_notifications(socket, user, channel, payload) do
-    payload = case Settings.get_new_message_sound(user, channel.id) do
+    payload = case UccSettings.get_new_message_sound(user, channel.id) do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
     end
-    if Settings.enable_desktop_notifications() do
+    if UccSettings.enable_desktop_notifications() do
       # Logger.warn "doing desktop notification"
-      push socket, "notification:new", Map.put(payload, :duration, Settings.get_desktop_notification_duration(user, channel))
+      push socket, "notification:new", Map.put(payload, :duration, UccSettings.get_desktop_notification_duration(user, channel))
     else
       # Logger.warn "doing badges only notification"
       push socket, "notification:new", Map.put(payload, :badges_only, true)

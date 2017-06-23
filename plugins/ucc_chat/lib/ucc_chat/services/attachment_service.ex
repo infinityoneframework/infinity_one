@@ -1,7 +1,7 @@
 defmodule UccChat.AttachmentService do
   use UccChat.Shared, :service
 
-  alias UccChat.{Attachment, Message, MessageService, Channel, Settings}
+  alias UccChat.{Attachment, Message, MessageService, Channel}
   alias Ecto.Multi
 
   require Logger
@@ -58,6 +58,6 @@ defmodule UccChat.AttachmentService do
   end
 
   def allowed?(channel) do
-    Settings.file_uploads_enabled() && ((channel.type != 2) || Settings.dm_file_uploads())
+    UccSettings.file_uploads_enabled() && ((channel.type != 2) || UccSettings.dm_file_uploads())
   end
 end

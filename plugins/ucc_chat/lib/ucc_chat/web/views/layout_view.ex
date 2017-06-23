@@ -7,6 +7,6 @@ defmodule UccChat.Web.LayoutView do
   end
 
   def site_title do
-    Settings.site_name()
+    UccSettings.site_name()
   end
 end

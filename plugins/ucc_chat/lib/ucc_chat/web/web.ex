@@ -33,7 +33,6 @@ defmodule UccChat.Web do
       alias UcxUcc.Repo
       import Ecto
       import Ecto.Query
-      alias UccChat.Settings
       use UcxUcc.Utils
       use UcxUcc.Web.Gettext
     end
@@ -57,7 +56,6 @@ defmodule UccChat.Web do
       alias UcxUcc.Accounts.User
       alias UcxUcc.Repo
       import UccChat.Web.SharedView
-      alias UccChat.Settings
       alias UcxUcc.Permissions
       require Logger
     end
