@@ -3,9 +3,10 @@ defmodule UcxUcc.Web.LayoutView do
 
   # TODO: This does not belog here. Need a generic approach here
   def site_title do
-    UccChat.Settings.site_name()
+    # UccChat.Settings.site_name()
+    UccSettings.Settings.Config.General.site_name()
   end
-  
+
   # TODO: same as the previous comment
   def audio_files do
     ~w(chime beep chelle ding droplet highbell seasons door)

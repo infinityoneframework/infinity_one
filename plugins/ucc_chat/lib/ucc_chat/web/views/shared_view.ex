@@ -119,6 +119,12 @@ defmodule UccChat.Web.SharedView do
 
   def user_muted?(%{} = user, channel_id), do: UccChat.ChannelService.user_muted?(user.id, channel_id)
 
+  def content_home_title do
+    "test"
+  end
+  def content_home_body do
+    "test"
+  end
   defmacro gt(text, opts \\ []) do
     quote do
       gettext(unquote(text), unquote(opts))

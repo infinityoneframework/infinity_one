@@ -3,7 +3,7 @@ defmodule UccChat.AdminService do
   use UccChat.Web.ChannelApi
 
   alias UccChat.{Message, Channel, UserService, Web.FlexBarView, Web.AdminView}
-  alias UccChat.Config
+  alias UccSettings.Settings.Config
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
 
@@ -17,18 +17,23 @@ defmodule UccChat.AdminService do
       |> do_slash_commands_params("chat_slash_commands")
       |> do_slash_commands_params("rooms_slash_commands")
 
-    resp =
-      Config
-      |> Repo.one
-      |> Config.changeset(%{general: params})
-      |> Repo.update
-      |> case do
-        {:ok, _} ->
-          {:ok, %{success: ~g"General settings updated successfully"}}
-        {:error, cs} ->
-          Logger.error "problem updating general: #{inspect cs}"
-          {:ok, %{error: ~g"There a problem updating your settings."}}
-      end
+    params
+    |> Enum.map(fn {k, v} -> 
+      Config.ChatGeneral.update k, v
+    end)
+    resp = {:ok, %{success: ~g"General settings updated successfully"}}
+    
+      # Config
+      # |> Repo.one
+      # |> Config.changeset(%{general: params})
+      # |> Repo.update
+      # |> case do
+      #   {:ok, _} ->
+      #     {:ok, %{success: ~g"General settings updated successfully"}}
+      #   {:error, cs} ->
+      #     Logger.error "problem updating general: #{inspect cs}"
+      #     {:ok, %{error: ~g"There a problem updating your settings."}}
+      # end
     {:reply, resp, socket}
   end
 
@@ -38,18 +43,24 @@ defmodule UccChat.AdminService do
       |> Helpers.normalize_form_params
       |> Map.get("message")
 
-    resp =
-      Config
-      |> Repo.one
-      |> Config.changeset(%{message: params})
-      |> Repo.update
-      |> case do
-        {:ok, _} ->
-          {:ok, %{success: ~g"Message settings updated successfully"}}
-        {:error, cs} ->
-          Logger.error "problem updating Message settings: #{inspect cs}"
-          {:ok, %{error: ~g"There a problem updating your settings."}}
-      end
+    params
+    |> Enum.map(fn {k, v} -> 
+      Config.Message.update k, v
+    end)
+
+    resp = {:ok, %{success: ~g"Message settings updated successfully"}}
+    # resp =
+    #   Config
+    #   |> Repo.one
+    #   |> Config.changeset(%{message: params})
+    #   |> Repo.update
+    #   |> case do
+    #     {:ok, _} ->
+    #       {:ok, %{success: ~g"Message settings updated successfully"}}
+    #     {:error, cs} ->
+    #       Logger.error "problem updating Message settings: #{inspect cs}"
+    #       {:ok, %{error: ~g"There a problem updating your settings."}}
+    #   end
     {:reply, resp, socket}
   end
 
@@ -59,18 +70,23 @@ defmodule UccChat.AdminService do
       |> Helpers.normalize_form_params
       |> Map.get("layout")
 
-    resp =
-      Config
-      |> Repo.one
-      |> Config.changeset(%{layout: params})
-      |> Repo.update
-      |> case do
-        {:ok, _} ->
-          {:ok, %{success: ~g"Layout settings updated successfully"}}
-        {:error, cs} ->
-          Logger.error "problem updating Layout settings: #{inspect cs}"
-          {:ok, %{error: ~g"There a problem updating your settings."}}
-      end
+    params
+    |> Enum.map(fn {k, v} -> 
+      Config.Layout.update k, v
+    end)
+    resp = {:ok, %{success: ~g"Layout settings updated successfully"}}
+    # resp =
+    #   Config
+    #   |> Repo.one
+    #   |> Config.changeset(%{layout: params})
+    #   |> Repo.update
+    #   |> case do
+    #     {:ok, _} ->
+    #       {:ok, %{success: ~g"Layout settings updated successfully"}}
+    #     {:error, cs} ->
+    #       Logger.error "problem updating Layout settings: #{inspect cs}"
+    #       {:ok, %{error: ~g"There a problem updating your settings."}}
+    #   end
     {:reply, resp, socket}
   end
 
@@ -80,18 +96,24 @@ defmodule UccChat.AdminService do
       |> Helpers.normalize_form_params
       |> Map.get("file_upload")
 
-    resp =
-      Config
-      |> Repo.one
-      |> Config.changeset(%{file_upload: params})
-      |> Repo.update
-      |> case do
-        {:ok, _} ->
-          {:ok, %{success: ~g"FileUpload settings updated successfully"}}
-        {:error, cs} ->
-          Logger.error "problem updating FileUpload settings: #{inspect cs}"
-          {:ok, %{error: ~g"There a problem updating your settings."}}
-      end
+    params
+    |> Enum.map(fn {k, v} -> 
+      Config.FileUpload.update k, v
+    end)
+
+    resp = {:ok, %{success: ~g"FileUpload settings updated successfully"}}
+    # resp =
+    #   Config
+    #   |> Repo.one
+    #   |> Config.changeset(%{file_upload: params})
+    #   |> Repo.update
+    #   |> case do
+    #     {:ok, _} ->
+    #       {:ok, %{success: ~g"FileUpload settings updated successfully"}}
+    #     {:error, cs} ->
+    #       Logger.error "problem updating FileUpload settings: #{inspect cs}"
+    #       {:ok, %{error: ~g"There a problem updating your settings."}}
+    #   end
     {:reply, resp, socket}
   end
 

@@ -26,6 +26,13 @@ config :ucx_ucc, :generators,
   migration: true,
   binary_id: true
   # sample_binary_id: "11111111-1111-1111-1111-111111111111"
+config :ucx_ucc, :settings_modules, [
+  UccSettings.Settings.Config.General,
+  UccSettings.Settings.Config.ChatGceneral,
+  UccSettings.Settings.Config.FileUpload,
+  UccSettings.Settings.Config.Layout,
+  UccSettings.Settings.Config.Message
+]
 
 config :phoenix, :template_engines,
   haml: PhoenixHaml.Engine

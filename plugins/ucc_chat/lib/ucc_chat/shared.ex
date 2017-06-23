@@ -21,7 +21,7 @@ defmodule UccChat.Shared do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      alias UccChat.Settings
+      # alias UccChat.Settings
 
       @primary_key {:id, :binary_id, autogenerate: true}
       @foreign_key_type :binary_id
