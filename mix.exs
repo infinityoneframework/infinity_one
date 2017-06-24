@@ -19,7 +19,7 @@ defmodule UcxUcc.Mixfile do
     [mod: {UcxUcc.Application, []},
      extra_applications: extra_applications(Mix.env)]
   end
-  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
+  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence, :talon]
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
@@ -56,6 +56,7 @@ defmodule UcxUcc.Mixfile do
       {:hedwig, "~> 1.0"},
       {:hedwig_simple_responders, "~> 0.1.2"},
       {:ucc_shared, path: "plugins/ucc_shared", app: false},
+      {:talon, path: "../talonframework/talon"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
