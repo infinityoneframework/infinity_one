@@ -1,0 +1,8 @@
+elixir:
+  {name, path} = @link
+  {class, content} = nav_resource_link_decorator(@conn, name, path)
+
+li
+  = link to: path do
+    i(class="#{class}")= content
+    span= name

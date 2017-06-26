@@ -1,0 +1,32 @@
+.container-fluid
+  .row
+    .col-md-12#datatable-view(data-path="#{search_path @conn}")
+      = UccAdmin.Admin.AdminLte.Web.DatatableView.render_table(@conn, @resources)
+javascript:
+
+  function search_path(value) {
+    return $('#datatable-view').data('path') + '/' + value + '?format.js';
+  }
+
+  window.onload = function(e) {
+    $('body').on('click', '.index-actions button.action-show', function(e) {
+      window.location = $(this).attr('href');
+    })
+    $('body').on('click', '.index-actions button.action-edit', function(e) {
+      window.location = $(this).attr('href');
+    })
+    $('body').on('keypress', '#search', function(e) {
+      var value = $(this).val() + e.key
+      $.get(search_path(value), function(html) {
+        $('#datatable-body').html(html)
+      })
+    })
+    $('body').on('keyup', '#search', function(e) {
+      var value = $(this).val()
+      if(e.keyCode == 8) {
+        $.get(search_path(value), function(html) {
+          $('#datatable-body').html(html)
+        })
+      }
+    })
+  }
