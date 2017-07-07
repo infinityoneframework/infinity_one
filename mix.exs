@@ -40,7 +40,8 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:phoenix_haml, "~> 0.2"},
-      {:unbrella, github: "smpallen99/unbrella"},
+      # {:unbrella, github: "smpallen99/unbrella"},
+      {:unbrella, path: "../unbrella"},
       {:coherence, github: "smpallen99/coherence", branch: "phx-1.3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.6.0"},
@@ -69,6 +70,6 @@ defmodule UcxUcc.Mixfile do
   defp aliases do
     ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
-     "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
+     "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
   end
 end

@@ -27,9 +27,9 @@ defmodule UccChat.Web.ChannelCase do
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(UccChat.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(UcxUcc.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(UccChat.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(UcxUcc.Repo, {:shared, self()})
     end
     :ok
   end

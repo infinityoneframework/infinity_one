@@ -5,4 +5,8 @@ defmodule UccSettingsTest do
   test "the truth" do
     assert 1 + 1 == 2
   end
+
+  test "another" do
+    assert 2 + 2 == 4
+  end
 end
