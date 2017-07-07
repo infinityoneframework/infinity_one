@@ -5,6 +5,9 @@
 # is restricted to this project.
 use Mix.Config
 
+config :unbrella, :plugins, ucc_admin: [
+  module: UccAdmin,
+]
 # Configures the endpoint
 config :ucc_admin, UccAdmin.Web.Endpoint,
   url: [host: "localhost"],

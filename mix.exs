@@ -23,8 +23,8 @@ defmodule UcxUcc.Mixfile do
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["plugins", "plugins/lib", "lib", "test/support"]
-  defp elixirc_paths(_),     do: ["plugins", "plugins/lib", "lib"]
+  defp elixirc_paths(:test), do: ["plugins/lib", "lib", "test/support"]
+  defp elixirc_paths(_),     do: ["plugins/lib", "lib"]
 
   # Specifies your project dependencies.
   #
@@ -52,11 +52,11 @@ defmodule UcxUcc.Mixfile do
       {:calliope, "== 0.4.1", override: true},
       {:hackney, "~> 1.8", override: true},
       {:httpoison, "~> 0.11", override: true},
+      {:talon, path: "../talonframework/talon"},
       # TODO: move this to the chat package
       {:hedwig, "~> 1.0"},
       {:hedwig_simple_responders, "~> 0.1.2"},
       {:ucc_shared, path: "plugins/ucc_shared", app: false},
-      {:talon, path: "../talonframework/talon"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
