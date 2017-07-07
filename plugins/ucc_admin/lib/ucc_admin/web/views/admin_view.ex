@@ -1,5 +1,5 @@
-defmodule UccChat.Web.AdminView do
-  use UccChat.Web, :view
+defmodule UccAdmin.Web.AdminView do
+  use UccAdmin.Web, :view
 
   def collapsable_section(title, fun) do
     content_tag :div, class: "section section-collapsed" do
@@ -166,7 +166,7 @@ defmodule UccChat.Web.AdminView do
     # user = chatd.user
     # user_mode = chatd.channel.type == 2
     # config = Settings.config
-    UccChat.FlexAdminService.default_settings(mode)
+    UccAdmin.FlexAdminService.default_settings(mode)
   end
 
   def render_user_action_button(user, "admin") do

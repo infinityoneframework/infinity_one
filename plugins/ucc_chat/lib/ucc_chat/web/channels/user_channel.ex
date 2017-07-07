@@ -10,10 +10,11 @@ defmodule UccChat.Web.UserChannel do
   alias UcxUcc.Accounts.{Account, User}
   alias UccChat.{
     Subscription, Flex, FlexBarService, ChannelService, Channel, SideNavService,
-    Web.AccountView, AdminService, Web.FlexBarView, Web.UserSocket,
+    Web.AccountView, Web.FlexBarView, Web.UserSocket,
     ChannelService, SubscriptionService, InvitationService, UserService,
     EmojiService
   }
+  alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
   alias UccChat.ServiceHelpers, as: Helpers
   require UccChat.ChatConstants, as: CC
@@ -175,10 +176,10 @@ defmodule UccChat.Web.UserChannel do
 
     user = Helpers.get_user!(socket)
 
-    html = UccChat.AdminService.render_info(user)
+    html = AdminService.render_info(user)
     push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
 
-    html = Helpers.render(UccChat.Web.AdminView, "admin_flex.html", user: user)
+    html = Helpers.render(UccAdmin.Web.AdminView, "admin_flex.html", user: user)
     {:reply, {:ok, %{html: html}}, socket}
   end
 

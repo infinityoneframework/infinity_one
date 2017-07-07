@@ -1,4 +1,4 @@
-:javascript
+javascript:
   window.gettext = {
     are_you_sure: '#{~g"Are you sure?"}',
 

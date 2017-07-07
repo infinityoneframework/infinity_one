@@ -64,6 +64,8 @@ defmodule UcxUcc.Mixfile do
       {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.5", only: :test},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+      {:phoenix_slime, "~> 0.9"},
+      {:slime, "~> 1.0", override: true},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end

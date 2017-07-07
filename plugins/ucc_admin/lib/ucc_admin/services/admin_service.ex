@@ -1,8 +1,9 @@
-defmodule UccChat.AdminService do
+defmodule UccAdmin.AdminService do
   use UccChat.Shared, :service
   use UccChat.Web.ChannelApi
 
-  alias UccChat.{Message, Channel, UserService, Web.FlexBarView, Web.AdminView}
+  alias UccChat.{Message, Channel, UserService, Web.FlexBarView}
+  alias UccAdmin.Web.{AdminView}
   alias UccSettings.Settings.Config
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
@@ -18,11 +19,11 @@ defmodule UccChat.AdminService do
       |> do_slash_commands_params("rooms_slash_commands")
 
     params
-    |> Enum.map(fn {k, v} -> 
+    |> Enum.map(fn {k, v} ->
       Config.ChatGeneral.update k, v
     end)
     resp = {:ok, %{success: ~g"General settings updated successfully"}}
-    
+
       # Config
       # |> Repo.one
       # |> Config.changeset(%{general: params})
@@ -44,7 +45,7 @@ defmodule UccChat.AdminService do
       |> Map.get("message")
 
     params
-    |> Enum.map(fn {k, v} -> 
+    |> Enum.map(fn {k, v} ->
       Config.Message.update k, v
     end)
 
@@ -71,7 +72,7 @@ defmodule UccChat.AdminService do
       |> Map.get("layout")
 
     params
-    |> Enum.map(fn {k, v} -> 
+    |> Enum.map(fn {k, v} ->
       Config.Layout.update k, v
     end)
     resp = {:ok, %{success: ~g"Layout settings updated successfully"}}
@@ -97,7 +98,7 @@ defmodule UccChat.AdminService do
       |> Map.get("file_upload")
 
     params
-    |> Enum.map(fn {k, v} -> 
+    |> Enum.map(fn {k, v} ->
       Config.FileUpload.update k, v
     end)
 
@@ -357,13 +358,13 @@ defmodule UccChat.AdminService do
     render(AdminView, "info", "info.html")
   end
 
-  defp get_args("permissions", user) do
+  def get_args("permissions", user) do
     roles = Repo.all Role
     permissions = Permissions.all
 
     [user: user, roles: roles, permissions: permissions]
   end
-  defp get_args(view, user) when view in ~w(general message layout file_upload) do
+  def get_args(view, user) when view in ~w(general message layout file_upload) do
     view_a = String.to_atom view
     mod = Module.concat Config, UcxUcc.Utils.to_camel_case(view)
     cs =
@@ -373,11 +374,11 @@ defmodule UccChat.AdminService do
       |> mod.changeset(%{})
     [user: user, changeset: cs]
   end
-  defp get_args("users", user) do
+  def get_args("users", user) do
     users = Repo.all(from u in User, order_by: [asc: u.username])
     [user: user, users: users]
   end
-  defp get_args("rooms", user) do
+  def get_args("rooms", user) do
     # view_a = String.to_atom view
     # mod = Module.concat Config, String.capitalize(view)
     rooms = Repo.all(from c in Channel, order_by: [asc: c.name], preload: [:subscriptions, :messages])
@@ -391,7 +392,7 @@ defmodule UccChat.AdminService do
   #     |> Config.Message.changeset(%{})
   #   [user: user, changeset: cs]
   # end
-  defp get_args("info", user) do
+  def get_args("info", user) do
     total = UserService.total_users_count()
     online = UserService.online_users_count()
 

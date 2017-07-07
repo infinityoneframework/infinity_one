@@ -83,12 +83,19 @@ let render = (presences) => {
 // end of presence stuff
 
 $(document).ready(function() {
-
+  console.log('socket ready ...')
 
   setTimeout(() => {
     $('#initial-page-loading').remove()
     utils.remove_page_loading()
   }, 1000)
+
+  if (!window.ucxchat) {
+    console.log('no ucxchat. exiting')
+    return;
+  } else {
+    console.log('ucxchat continuing')
+  }
 
   let ucxchat = window.ucxchat
   let typing = new Typing(ucxchat.typing)

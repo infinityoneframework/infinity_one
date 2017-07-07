@@ -1,4 +1,4 @@
-defmodule UccChat.FlexAdminService do
+defmodule UccAdmin.FlexAdminService do
   use UccChat.Shared, :service
   require Logger
 

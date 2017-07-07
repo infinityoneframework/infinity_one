@@ -173,11 +173,14 @@ export function code_update(resp) {
 }
 
 export function push_history() {
-  history.pushState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
+  console.log('ucxchat', ucxchat)
+  if (ucxchat.room_route)
+    history.pushState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
 }
 
 export function replace_history() {
-  history.replaceState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
+  if (ucx.room_route)
+    history.replaceState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
 }
 
 window.pl = page_loading

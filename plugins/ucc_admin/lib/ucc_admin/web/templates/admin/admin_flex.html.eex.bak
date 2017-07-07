@@ -1,0 +1,43 @@
+<header>
+  <div>
+    <h4>Administration</h4>
+  </div>
+</header>
+<div class="content">
+  <div class="wrapper">
+    <ul>
+      <li>
+        <a href="#" class="admin-link" data-link="info"><%= ~g"Info" %></a>
+      </li>
+
+      <li>
+        <a href="#" class="admin-link" data-link="rooms"><%= ~g"Rooms" %></a>
+      </li>
+
+      <li>
+        <a href="#" class="admin-link" data-link="users"><%= ~g"Users" %></a>
+      </li>
+
+      <%= if  has_permission? @user, "access-permissions" do %>
+        <li>
+          <a href="#" class="admin-link" data-link="permissions"><%= ~g"Permissions" %></a>
+        </li>
+      <% end %>
+       <h3 class=""
+
+      <li>
+        <a href="#" class="admin-link" data-link="general"><%= ~g"General" %></a>
+      </li>
+
+      <%= if  has_permission? @user, "view-message-administration" do %>
+        <li>
+          <a href="#" class="admin-link" data-link="message"><%= ~g"Message" %></a>
+        </li>
+      <% end %>
+        <li>
+          <a href="#" class="admin-link" data-link="layout"><%= ~g"Layout" %></a>
+        </li>
+
+    </ul>
+  </div>
+</div>
