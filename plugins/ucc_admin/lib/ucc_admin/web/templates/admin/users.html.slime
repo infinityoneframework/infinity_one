@@ -1,0 +1,50 @@
+.main-content-flex
+  section.page-container.page-list.flex-tab-main-content
+    header.fixed-title.border-component-color
+      .burger
+        i
+        i
+        i
+      h2
+        span.room-title= "New " <> ~g"Users"
+    .content
+      = if not has_permission? @user, "view-user-administration" do
+        p= ~g(You are not authorized to view this page)
+      - else
+        form.search-form(role="form")
+          .input-line.search
+            input(type="text" id="users-filter" placeholder="#{~g(Search)}" dir="auto")
+            i.icon-search.secondary-font-color
+              / unless :isReady do
+              /  <%# <i class="icon-spin secondary-font-color"></i> %>
+              /<%# end %>
+        .results
+          = ~g(SHOWING) <> " "
+          b= @users |> length
+          = " " <> ~g(RESULTS)
+        .list
+          table.secondary-background-color
+            thead
+              tr.admin-table-row
+                th.content-background-color.border-component-color &nbsp;
+                th.content-background-color.border-component-color(width="34%")= ~g(Name)
+                th.content-background-color.border-component-color(width="33%")= ~g(Username)
+                th.content-background-color.border-component-color(width="33%")= ~g(Email)
+            tbody
+              = for user <- @users do
+                tr.user-info.row-link(data-name="#{user.username}")
+                  td.border-component-color
+                    div(class="user-image status-#{get_status(user)}" data-status-name="#{user.username}")
+                      .avatar
+                        - avatar = if user.avatar_url, do: user.avatar_url, else: "/avatar/#{user.username}"
+                        .avatar-image(style="background-image:url(#{avatar});")
+                  td.border-component-color= user.name
+                  td.border-component-color= user.username
+                  td.border-component-color= user.email
+          /<%# {{#if hasMore}} %>
+          /  <%# <button class="button secondary load-more {{isLoading}}">{{_ "Load_more"}}</button> %>
+          /<%# {{/if}} %>
+  = render "admin_flex_tab_bar.html", mode: "user"
+  /<%# {{#with flexData}} %>
+  /   <%# {{> flexTabBar}} %>
+  / <%# {{/with}} %>
