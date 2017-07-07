@@ -8,6 +8,10 @@ defmodule UcxUcc.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      start_permanent: Mix.env == :prod,
+     dialyzer: [plt_add_apps: [:mix]],
+     elixirc_paths: elixirc_paths(Mix.env),
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
      aliases: aliases(),
      deps: deps()]
   end
@@ -57,6 +61,9 @@ defmodule UcxUcc.Mixfile do
       {:hedwig, "~> 1.0"},
       {:hedwig_simple_responders, "~> 0.1.2"},
       {:ucc_shared, path: "plugins/ucc_shared", app: false},
+      {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
+      {:excoveralls, "~> 0.5", only: :test},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
@@ -70,6 +77,7 @@ defmodule UcxUcc.Mixfile do
   defp aliases do
     ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
+     "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
      "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
   end
 end

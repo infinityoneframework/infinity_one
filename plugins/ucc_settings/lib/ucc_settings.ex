@@ -20,12 +20,20 @@ defmodule UccSettings do
     end
   end)
 
+  @doc """
+  Load all configuration from the database.
+  """
+  @spec load_all() :: Keyword.t
   def load_all do
     for config <- UccSettings.Settings.list_configs(), into: %{} do
       {String.to_atom(config.name), config.value}
     end
   end
 
+  @doc """
+  Initialize the settings database to its defaults.
+  """
+  @spec init_all() :: term
   def init_all do
     :ucx_ucc
     |> Application.get_env(:settings_modules, [])
