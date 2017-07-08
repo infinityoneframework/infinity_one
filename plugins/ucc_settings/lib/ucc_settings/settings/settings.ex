@@ -48,16 +48,7 @@ defmodule UccSettings.Settings do
       end
 
       @doc """
-      Load the configuation struct from the database.
-      """
-      def load do
-        get()
-      end
-
-      @doc """
       Gets all the fields from the database.
-
-
       """
       def get do
         @repo.one from c in @schema, limit: 1
@@ -75,6 +66,11 @@ defmodule UccSettings.Settings do
         @schema
       end
 
+      def update(%@schema{} = settings) do
+        @repo.update __MODULE__.changeset(get(), Map.from_struct(settings))
+      end
+
+
       @doc """
       Update a field in the database
       """
@@ -82,8 +78,8 @@ defmodule UccSettings.Settings do
         @repo.update __MODULE__.changeset(get(), %{name => value})
       end
 
-      def update(%@schema{} = settings) do
-        @repo.update __MODULE__.changeset(get(), Map.from_struct(settings))
+      def update(%@schema{} = settings, params) when is_map(params) do
+        @repo.update settings, params
       end
 
       def changeset(schema, params \\ %{}) do
