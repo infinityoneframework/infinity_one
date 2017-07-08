@@ -8,7 +8,7 @@ defmodule UccChat.ServiceHelpers do
   use UcxUcc.Web.Gettext
 
   alias UcxUcc.Repo
-  alias UcxUcc.Accounts.{User, UserRole, Role}
+  alias UcxUcc.Accounts.{User}
 
   import Ecto.Query
 

@@ -4,7 +4,7 @@ defmodule UccAdmin.AdminService do
 
   alias UccChat.{Message, Channel, UserService, Web.FlexBarView}
   alias UccAdmin.Web.{AdminView}
-  alias UccSettings.Settings.Config
+  alias UccChat.Settings.{FileUpload, Message, ChatGeneral, Layout}
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
 
@@ -20,7 +20,7 @@ defmodule UccAdmin.AdminService do
 
     params
     |> Enum.map(fn {k, v} ->
-      Config.ChatGeneral.update k, v
+      ChatGeneral.update k, v
     end)
     resp = {:ok, %{success: ~g"General settings updated successfully"}}
 
@@ -46,7 +46,7 @@ defmodule UccAdmin.AdminService do
 
     params
     |> Enum.map(fn {k, v} ->
-      Config.Message.update k, v
+      Message.update k, v
     end)
 
     resp = {:ok, %{success: ~g"Message settings updated successfully"}}
@@ -73,7 +73,7 @@ defmodule UccAdmin.AdminService do
 
     params
     |> Enum.map(fn {k, v} ->
-      Config.Layout.update k, v
+      Layout.update k, v
     end)
     resp = {:ok, %{success: ~g"Layout settings updated successfully"}}
     # resp =
@@ -99,7 +99,7 @@ defmodule UccAdmin.AdminService do
 
     params
     |> Enum.map(fn {k, v} ->
-      Config.FileUpload.update k, v
+      FileUpload.update k, v
     end)
 
     resp = {:ok, %{success: ~g"FileUpload settings updated successfully"}}
@@ -365,13 +365,9 @@ defmodule UccAdmin.AdminService do
     [user: user, roles: roles, permissions: permissions]
   end
   def get_args(view, user) when view in ~w(general message layout file_upload) do
-    view_a = String.to_atom view
-    mod = Module.concat Config, UcxUcc.Utils.to_camel_case(view)
-    cs =
-      Config
-      |> Repo.one
-      |> Map.get(view_a)
-      |> mod.changeset(%{})
+    # view_a = String.to_atom view
+    mod = Module.concat UcxUcc.Utils.to_camel_case(view), nil
+    cs = mod.changeset(mod.get())
     [user: user, changeset: cs]
   end
   def get_args("users", user) do

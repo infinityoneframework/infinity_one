@@ -13,8 +13,6 @@
     color: #a94442;
   }
 </style>
-<% require Logger %>
-<% Logger.warn inspect(@conn.private[:phoenix_flash]) %>
 <% flash = @conn.private[:phoenix_flash] %>
 <%= unless flash == %{} do %>
   <%= if error = flash["error"] do %>
@@ -57,7 +55,7 @@
   </div>
   <div>
     <button type="button" class="register"><%= ~g(Register a new account) %></button>
-  </div> 
+  </div>
   <div>
     <button type="button" class="forgot-password"><%= ~g(Forgot your password) %></button>
   </div>

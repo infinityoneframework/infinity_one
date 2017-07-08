@@ -3,16 +3,17 @@ defmodule UccAdmin.Web.AdminController do
 
   alias UccChat.{ChatDat}
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UcxUcc.Web.LayoutView
 
   plug :do_layout
 
   def do_layout(conn, _) do
-    put_layout conn, {UcxUcc.Web.LayoutView, "app.html"}
+    put_layout conn, {LayoutView, "app.html"}
   end
 
-  alias UccChat.AdminService
+  alias UccAdmin.AdminService
 
-  def info(conn, params) do
+  def info(conn, _params) do
     user = Helpers.get_user!(Coherence.current_user(conn) |> Map.get(:id))
 
     chatd = ChatDat.new(user)

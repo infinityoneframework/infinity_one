@@ -1,5 +1,5 @@
 defmodule UccChat.Settings do
-  import UccSettings
+  use UccSettings
 
   def get_desktop_notification_duration(user, channel) do
     cond do

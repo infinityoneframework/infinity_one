@@ -4,11 +4,31 @@ defmodule UccSettings do
   plugins
   """
 
+  defmacro __using__(_) do
+    quote bind_quoted: [] do
+      :ucx_ucc
+      |> Application.get_env(:settings_modules, [])
+      |> Enum.map(fn module ->
+        if not Code.ensure_compiled?(module), do: raise("module #{module} not compiled")
+        Enum.map module.schema().__schema__(:fields), fn field ->
+          @field field
+          @mod module
+          def unquote(field)() do
+            apply(@mod, @field, [])
+          end
+          def unquote(field)(config) do
+            apply(@mod, @field, [config])
+          end
+        end
+      end)
+    end
+  end
+
   :ucx_ucc
   |> Application.get_env(:settings_modules, [])
   |> Enum.map(fn module ->
     if not Code.ensure_compiled?(module), do: raise("module #{module} not compiled")
-    Enum.map module.fields(), fn field ->
+    Enum.map module.schema().__schema__(:fields), fn field ->
       @field field
       @mod module
       def unquote(field)() do
@@ -25,9 +45,9 @@ defmodule UccSettings do
   """
   @spec load_all() :: Keyword.t
   def load_all do
-    for config <- UccSettings.Settings.list_configs(), into: %{} do
-      {String.to_atom(config.name), config.value}
-    end
+    # for config <- UccSettings.Settings.list_configs(), into: %{} do
+    #   {String.to_atom(config.name), config.value}
+    # end
   end
 
   @doc """

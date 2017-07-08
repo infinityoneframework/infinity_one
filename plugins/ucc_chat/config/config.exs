@@ -14,9 +14,9 @@ config :unbrella, :plugins, ucc_chat: [
     # src_path: "/images",
     # src_version: "?v=2.2.7",
     # img_type: ".png"
-  ] 
+  ]
 
-] 
+]
 
 config :ucx_ucc, UccChat.Robot, [
   # adapter: Hedwig.Adapters.Console,
@@ -58,4 +58,4 @@ config :ucx_ucc, UccChat.Robot, [
 
 # # Import environment specific config. This must remain at the bottom
 # # of this file so it overrides the configuration defined above.
-# import_config "#{Mix.env}.exs"
+import_config "#{Mix.env}.exs"

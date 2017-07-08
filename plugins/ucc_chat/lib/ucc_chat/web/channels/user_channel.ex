@@ -573,9 +573,9 @@ defmodule UccChat.Web.UserChannel do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
     end
-    if UccSettings.enable_desktop_notifications() do
+    if UccChat.enable_desktop_notifications() do
       # Logger.warn "doing desktop notification"
-      push socket, "notification:new", Map.put(payload, :duration, UccSettings.get_desktop_notification_duration(user, channel))
+      push socket, "notification:new", Map.put(payload, :duration, UccChat.get_desktop_notification_duration(user, channel))
     else
       # Logger.warn "doing badges only notification"
       push socket, "notification:new", Map.put(payload, :badges_only, true)
