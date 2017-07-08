@@ -74,12 +74,13 @@ defmodule UccSettings.Settings do
       @doc """
       Update a field in the database
       """
+      def update(name_or_schema, value \\ %{})
       def update(name, value) when is_atom(name) do
         @repo.update __MODULE__.changeset(get(), %{name => value})
       end
 
-      def update(%@schema{} = settings, params) when is_map(params) do
-        @repo.update settings, params
+      def update(%@schema{} = settings, params) do
+        @repo.update __MODULE__.changeset(settings, params)
       end
 
       def changeset(schema, params \\ %{}) do

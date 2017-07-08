@@ -1,6 +1,9 @@
 defmodule UccChat.Settings.Schema.Layout do
   use UccSettings.Settings.Schema
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
+
   schema "settings_layout" do
     field :display_roles, :boolean, default: true
     field :merge_private_groups, :boolean, default: true

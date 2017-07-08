@@ -4,6 +4,8 @@ defmodule UccSettings do
   plugins
   """
 
+  alias UccSettings.Utils
+
   defmacro __using__(_) do
     quote bind_quoted: [] do
       :ucx_ucc
@@ -40,14 +42,29 @@ defmodule UccSettings do
     end
   end)
 
+  # Module.register_attribute(__MODULE__, :modules, persist: true, accumulate: true)
+
+  fields =
+    :ucx_ucc
+    |> Application.get_env(:settings_modules, [])
+    |> Enum.map(fn module ->
+      {Utils.module_key(module), module.schema().__struct__}
+    end)
+
+  defstruct fields
+
   @doc """
   Load all configuration from the database.
   """
-  @spec load_all() :: Keyword.t
-  def load_all do
-    # for config <- UccSettings.Settings.list_configs(), into: %{} do
-    #   {String.to_atom(config.name), config.value}
-    # end
+  @spec get_all() :: Keyword.t
+  def get_all do
+    opts =
+      :ucx_ucc
+      |> Application.get_env(:settings_modules, [])
+      |> Enum.map(fn module ->
+        {Utils.module_key(module), module.get()}
+      end)
+    struct %__MODULE__{}, opts
   end
 
   @doc """
@@ -58,7 +75,15 @@ defmodule UccSettings do
     :ucx_ucc
     |> Application.get_env(:settings_modules, [])
     |> Enum.map(fn module ->
-      apply module, :init, []
+      module.init
+      # apply module, :init, []
     end)
   end
+
+  # defp fields do
+  #   __MODULE__.__struct__
+  #   |> Enum.map(fn {name, value} ->
+  #     {name, value.__stuct__}
+  #   end)
+  # end
 end

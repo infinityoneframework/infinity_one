@@ -66,6 +66,7 @@ defmodule UcxUcc.Mixfile do
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:phoenix_slime, "~> 0.9"},
       {:slime, "~> 1.0", override: true},
+      {:inflex, "~> 1.7"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end

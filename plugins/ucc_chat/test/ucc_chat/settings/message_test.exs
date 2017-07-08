@@ -45,10 +45,5 @@ defmodule UccChatTest.Settings.Message do
     {:ok, msgs} = Message.update struct(message, hide_user_join: true)
     assert Message.get(:hide_user_join)
     assert msgs.hide_user_join
-
-    refute Message.get(:hide_user_muted)
-    {:ok, msgs} = Message.update message, :hide_user_muted, true
-    assert Message.get(:hide_user_muted)
-    assert msgs.hide_user_muted
   end
 end
