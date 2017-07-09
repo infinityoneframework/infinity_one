@@ -12,7 +12,7 @@ defmodule UccChat.Web.UserChannel do
     Subscription, Flex, FlexBarService, ChannelService, Channel, SideNavService,
     Web.AccountView, Web.FlexBarView, Web.UserSocket,
     ChannelService, SubscriptionService, InvitationService, UserService,
-    EmojiService
+    EmojiService, Settings
   }
   alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
@@ -275,7 +275,7 @@ defmodule UccChat.Web.UserChannel do
     {:reply, resp, socket}
   end
 
-  @links ~w(info general message permissions layout users rooms file_upload)
+  @links ~w(info general chat_general message permissions layout users rooms file_upload)
   def handle_in(ev = "admin_link:click:" <> link, params, socket) when link in @links do
     debug ev, params
     user = Helpers.get_user! socket
@@ -569,13 +569,13 @@ defmodule UccChat.Web.UserChannel do
   # Helpers
 
   defp handle_notifications(socket, user, channel, payload) do
-    payload = case UccSettings.get_new_message_sound(user, channel.id) do
+    payload = case UccChat.Settings.get_new_message_sound(user, channel.id) do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
     end
-    if UccChat.enable_desktop_notifications() do
+    if UccSettings.enable_desktop_notifications() do
       # Logger.warn "doing desktop notification"
-      push socket, "notification:new", Map.put(payload, :duration, UccChat.get_desktop_notification_duration(user, channel))
+      push socket, "notification:new", Map.put(payload, :duration, Settings.get_desktop_notification_duration(user, channel))
     else
       # Logger.warn "doing badges only notification"
       push socket, "notification:new", Map.put(payload, :badges_only, true)
@@ -624,8 +624,6 @@ defmodule UccChat.Web.UserChannel do
     Logger.warn "clear_unreads/1: default"
     socket
   end
-
-
 
   defp clear_unreads(room, %{assigns: assigns} = socket) do
     Logger.warn "room: #{inspect room}, assigns: #{inspect assigns}"

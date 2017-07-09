@@ -209,4 +209,8 @@ defmodule UccAdmin.Web.AdminView do
 
   defp do_admin_label(true), do: ~g(True)
   defp do_admin_label(false), do: ~g(False)
+
+  def get_slash_commands(item, field) do
+    item |> Map.get(field) |> String.split("\n")
+  end
 end

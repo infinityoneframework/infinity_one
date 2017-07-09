@@ -24,11 +24,11 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
     {:ok, %Connection{name: name, owner: owner, user: user}}
   end
 
-  def handle_cast(:after_init, %{name: name, user: user} = state) do
+  def handle_cast(:after_init, state) do
     {:noreply, state}
   end
 
-  def handle_info({:reply, %{text: text, room: room, user: %{id: user_id, name: name}}}, %{} = state) do
+  def handle_info({:reply, %{text: text, room: room, user: %{id: user_id, name: _name}}}, %{} = state) do
     body = if Regex.match? ~r/^http.+?(jpg|jpeg|png|gif)$/, text do
       # body = String.replace(text, ~r/^https?:\/\//, "")
       ~s(<img src="#{text}" class="bot-img">)

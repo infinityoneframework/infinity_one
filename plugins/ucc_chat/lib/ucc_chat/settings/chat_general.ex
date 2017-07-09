@@ -1,3 +1,3 @@
-defmodule UccChat.Settings.ChatGceneral do
+defmodule UccChat.Settings.ChatGeneral do
   use UccSettings.Settings, schema: UccChat.Settings.Schema.ChatGeneral
 end

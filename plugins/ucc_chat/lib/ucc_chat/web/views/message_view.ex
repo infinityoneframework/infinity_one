@@ -166,7 +166,7 @@ defmodule UccChat.Web.MessageView do
       |> Enum.into(defaults)
 
     # config = UcxUcc.Repo.one(UccChat.Config)
-    config = UccSettings.load_all
+    config = UccSettings.get_all
 
     settings =
       [

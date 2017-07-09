@@ -4,7 +4,10 @@ defmodule UccAdmin.AdminService do
 
   alias UccChat.{Message, Channel, UserService, Web.FlexBarView}
   alias UccAdmin.Web.{AdminView}
-  alias UccChat.Settings.{FileUpload, Message, ChatGeneral, Layout}
+  alias UccChat.Settings, as: ChatSettings
+  alias ChatSettings.{FileUpload, Layout}
+  alias ChatSettings.ChatGeneral
+  alias UcxUcc.Settings.General
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
 
@@ -15,26 +18,38 @@ defmodule UccAdmin.AdminService do
       params
       |> Helpers.normalize_form_params
       |> Map.get("general")
+
+    resp =
+      General.get
+      |> General.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"General settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating general: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
+    {:reply, resp, socket}
+  end
+
+  def handle_in("save:chat_general", params, socket) do
+    params =
+      params
+      |> Helpers.normalize_form_params
+      |> Map.get("chat_general")
       |> do_slash_commands_params("chat_slash_commands")
       |> do_slash_commands_params("rooms_slash_commands")
 
-    params
-    |> Enum.map(fn {k, v} ->
-      ChatGeneral.update k, v
-    end)
-    resp = {:ok, %{success: ~g"General settings updated successfully"}}
-
-      # Config
-      # |> Repo.one
-      # |> Config.changeset(%{general: params})
-      # |> Repo.update
-      # |> case do
-      #   {:ok, _} ->
-      #     {:ok, %{success: ~g"General settings updated successfully"}}
-      #   {:error, cs} ->
-      #     Logger.error "problem updating general: #{inspect cs}"
-      #     {:ok, %{error: ~g"There a problem updating your settings."}}
-      # end
+    resp =
+      ChatGeneral.get
+      |> ChatGeneral.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"General settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating general: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
     {:reply, resp, socket}
   end
 
@@ -44,24 +59,16 @@ defmodule UccAdmin.AdminService do
       |> Helpers.normalize_form_params
       |> Map.get("message")
 
-    params
-    |> Enum.map(fn {k, v} ->
-      Message.update k, v
-    end)
-
-    resp = {:ok, %{success: ~g"Message settings updated successfully"}}
-    # resp =
-    #   Config
-    #   |> Repo.one
-    #   |> Config.changeset(%{message: params})
-    #   |> Repo.update
-    #   |> case do
-    #     {:ok, _} ->
-    #       {:ok, %{success: ~g"Message settings updated successfully"}}
-    #     {:error, cs} ->
-    #       Logger.error "problem updating Message settings: #{inspect cs}"
-    #       {:ok, %{error: ~g"There a problem updating your settings."}}
-    #   end
+    resp =
+      ChatSettings.Message.get
+      |> ChatSettings.Message.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"Message settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating Message settings: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
     {:reply, resp, socket}
   end
 
@@ -71,23 +78,16 @@ defmodule UccAdmin.AdminService do
       |> Helpers.normalize_form_params
       |> Map.get("layout")
 
-    params
-    |> Enum.map(fn {k, v} ->
-      Layout.update k, v
-    end)
-    resp = {:ok, %{success: ~g"Layout settings updated successfully"}}
-    # resp =
-    #   Config
-    #   |> Repo.one
-    #   |> Config.changeset(%{layout: params})
-    #   |> Repo.update
-    #   |> case do
-    #     {:ok, _} ->
-    #       {:ok, %{success: ~g"Layout settings updated successfully"}}
-    #     {:error, cs} ->
-    #       Logger.error "problem updating Layout settings: #{inspect cs}"
-    #       {:ok, %{error: ~g"There a problem updating your settings."}}
-    #   end
+    resp =
+      Layout.get
+      |> Layout.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"Layout settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating Layout settings: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
     {:reply, resp, socket}
   end
 
@@ -97,24 +97,16 @@ defmodule UccAdmin.AdminService do
       |> Helpers.normalize_form_params
       |> Map.get("file_upload")
 
-    params
-    |> Enum.map(fn {k, v} ->
-      FileUpload.update k, v
-    end)
-
-    resp = {:ok, %{success: ~g"FileUpload settings updated successfully"}}
-    # resp =
-    #   Config
-    #   |> Repo.one
-    #   |> Config.changeset(%{file_upload: params})
-    #   |> Repo.update
-    #   |> case do
-    #     {:ok, _} ->
-    #       {:ok, %{success: ~g"FileUpload settings updated successfully"}}
-    #     {:error, cs} ->
-    #       Logger.error "problem updating FileUpload settings: #{inspect cs}"
-    #       {:ok, %{error: ~g"There a problem updating your settings."}}
-    #   end
+    resp =
+      FileUpload.get
+      |> FileUpload.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"FileUpload settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating FileUpload settings: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
     {:reply, resp, socket}
   end
 
@@ -346,6 +338,7 @@ defmodule UccAdmin.AdminService do
         {opt, "on"}, acc -> [opt|acc]
         _, acc -> acc
       end)
+      |> Enum.join("\n")
 
     put_in(params, [which], slash_commands)
   end
@@ -364,9 +357,15 @@ defmodule UccAdmin.AdminService do
 
     [user: user, roles: roles, permissions: permissions]
   end
-  def get_args(view, user) when view in ~w(general message layout file_upload) do
+
+  def get_args("general", user) do
     # view_a = String.to_atom view
-    mod = Module.concat UcxUcc.Utils.to_camel_case(view), nil
+    cs = UcxUcc.Settings.General.changeset(UcxUcc.Settings.General.get())
+    [user: user, changeset: cs]
+  end
+  def get_args(view, user) when view in ~w(chat_general message layout file_upload) do
+    # view_a = String.to_atom view
+    mod = Module.concat UccChat.Settings, UcxUcc.Utils.to_camel_case(view)
     cs = mod.changeset(mod.get())
     [user: user, changeset: cs]
   end

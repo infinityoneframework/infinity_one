@@ -11,6 +11,6 @@
         .setting-field
           %label
             - field = @field
-            - opts = [type: "checkbox", name: "general[#{field}][#{cmd}]", id: "general_#{field}_#{cmd}", class: "input-monitor"]
-            <% opts = if cmd in Map.get(@item, field), do: [{:checked, "checked"}|opts], else: opts %>
+            - opts = [type: "checkbox", name: "chat_general[#{field}][#{cmd}]", id: "chat_general_#{field}_#{cmd}", class: "input-monitor"]
+            <% opts = if cmd in get_slash_commands(@item, field), do: [{:checked, "checked"}|opts], else: opts %>
             = Phoenix.HTML.Tag.tag(:input, opts)

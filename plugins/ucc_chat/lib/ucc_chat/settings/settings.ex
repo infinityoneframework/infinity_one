@@ -1,6 +1,9 @@
 defmodule UccChat.Settings do
   use UccSettings
 
+  alias UccChat.Notification
+  alias UcxUcc.Repo
+
   def get_desktop_notification_duration(user, channel) do
     cond do
       not enable_desktop_notifications() ->

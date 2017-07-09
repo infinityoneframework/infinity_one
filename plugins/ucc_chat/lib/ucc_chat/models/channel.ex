@@ -3,7 +3,7 @@ defmodule UccChat.Channel do
 
   alias UccChat.{Subscription}
   alias UcxUcc.Repo
-  alias UcxUcc.Permissions
+  # alias UcxUcc.Permissions
   alias UcxUcc.Accounts.User
 
   require Logger

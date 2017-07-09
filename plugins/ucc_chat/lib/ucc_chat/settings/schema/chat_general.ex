@@ -28,6 +28,7 @@ defmodule UccChat.Settings.Schema.ChatGeneral do
   ]
 
   def changeset(struct, params \\ %{}) do
+    IO.inspect params, label: ".... params"
     struct
     |> cast(params, @fields)
     |> validate_required(@fields)

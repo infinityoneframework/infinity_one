@@ -19,7 +19,7 @@ defmodule UccChat.Robot.Adapters.UccChat do
   end
 
   @doc false
-  def handle_cast({:reply, %{user: user, text: text} = msg}, %{conn: conn} = state) do
+  def handle_cast({:reply, %{user: _user, text: text} = msg}, %{conn: conn} = state) do
     # Kernel.send(conn, {:reply, %{msg | text: "#{user}: #{text}"}})
     Kernel.send(conn, {:reply, %{msg | text: "#{text}"}})
     {:noreply, state}

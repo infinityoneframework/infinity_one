@@ -92,7 +92,7 @@ defmodule UccChat.Web.MasterView do
     else
       " hidden"
     end
-    config = UccSettings.load_all()
+    config = UccSettings.get_all()
     defn = UccChat.FlexBarService.default_settings()
     tab = case open_tab do
       {title, _} -> %{title => true}

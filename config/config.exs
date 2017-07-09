@@ -28,7 +28,7 @@ config :ucx_ucc, :generators,
   # sample_binary_id: "11111111-1111-1111-1111-111111111111"
 config :ucx_ucc, :settings_modules, [
   UcxUcc.Settings.General,
-  UccChat.Settings.ChatGceneral,
+  UccChat.Settings.ChatGeneral,
   UccChat.Settings.FileUpload,
   UccChat.Settings.Layout,
   UccChat.Settings.Message

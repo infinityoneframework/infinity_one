@@ -24,6 +24,8 @@ header
 
       = if  has_permission? @user, "view-message-administration" do
         li
+          a.admin-link(href="#" data-link="chat_general")= ~g"Chat General"
+        li
           a.admin-link(href="#" data-link="message")= ~g"Message"
         li
           a.admin-link(href="#" data-link="layout")= ~g"Layout"
