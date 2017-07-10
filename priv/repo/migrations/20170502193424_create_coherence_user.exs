@@ -35,7 +35,6 @@ defmodule UcxUcc.Repo.Migrations.CreateCoherenceUser do
       add :confirmation_sent_at, :utc_datetime
 
       add :active, :boolean, default: true
-      add :chat_status, :string
       add :tag_line, :string, default: ""
       add :uri, :string, default: ""
 

@@ -114,6 +114,9 @@ defmodule UccChat.Web.FlexBarView do
   def file_icon(:audio), do: "icon-play"
   def file_icon(_), do: "icon-docs"
 
+  def show_webrtc?(user, user_info) do
+    true
+  end
               #   = radio_tag(settings, :desktop, id, text)
               # %label
               #   %input(type="radio" name="desktopNotifications" value="all" checked="{{$eq desktopNotifications 'all'}}")= ~g"All_messages"

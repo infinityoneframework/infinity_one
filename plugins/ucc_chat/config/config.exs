@@ -2,7 +2,7 @@ use Mix.Config
 
 config :unbrella, :plugins, ucc_chat: [
   module: UccChat,
-  schemas: [UccChat.Accounts.Account],
+  schemas: [UccChat.Accounts.Account, UccChat.Accounts.User],
   router: UccChat.Web.Router,
   page_size: 150,
   defer: true,

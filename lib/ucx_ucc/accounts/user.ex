@@ -1,7 +1,7 @@
 defmodule UcxUcc.Accounts.User do
   @moduledoc false
-  use Ecto.Schema
   use Coherence.Schema
+  use Unbrella.Schema
   import Ecto.Query
 
   @mod __MODULE__
