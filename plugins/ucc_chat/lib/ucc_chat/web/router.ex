@@ -2,6 +2,8 @@ defmodule UccChat.Web.Router do
   use UccChat.Web, :router
   use Coherence.Router
 
+  IO.inspect "Compiling router"
+
   pipeline :browser do
     plug :accepts, ["html", "json"]
     plug :fetch_session

@@ -20,7 +20,7 @@ defmodule UccAdmin.Web do
     quote do
       use Phoenix.Controller, namespace: UccAdmin.Web
       import Plug.Conn
-      import UccAdmin.Web.Router.Helpers
+      # import UccAdmin.Web.Router.Helpers
       use UcxUcc.Web.Gettext
       alias UcxUcc.Repo
       import Ecto.Query
@@ -36,7 +36,7 @@ defmodule UccAdmin.Web do
       use Phoenix.HTML
       use UcxUcc.Web.Gettext
 
-      import UccAdmin.Web.Router.Helpers
+      # import UccAdmin.Web.Router.Helpers
       import UccAdmin.Web.ErrorHelpers
       import UccChat.Web.SharedView
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]

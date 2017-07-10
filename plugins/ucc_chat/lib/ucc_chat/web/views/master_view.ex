@@ -171,7 +171,7 @@ defmodule UccChat.Web.MasterView do
       maximum_file_upload_size_kb: #{UccSettings.maximum_file_upload_size_kb()},
       protect_upload_files: #{UccSettings.protect_upload_files()},
     };
-    UcxChat.settings = chat_settings;
+    UccChat.settings = chat_settings;
     """
   end
 end

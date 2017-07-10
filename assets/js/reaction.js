@@ -12,13 +12,13 @@ $(document).ready(() => {
   .on('mouseenter','.reactions > li:not(.add-reaction)', (event) => {
     event.preventDefault()
     event.stopPropagation();
-    UcxChat.tooltip.showElement($(event.currentTarget).find('.people').get(0), event.currentTarget);
+    UccChat.tooltip.showElement($(event.currentTarget).find('.people').get(0), event.currentTarget);
   })
 
   .on('mouseleave', '.reactions > li:not(.add-reaction)', (event) => {
     event.preventDefault()
     event.stopPropagation();
-    UcxChat.tooltip.hide();
+    UccChat.tooltip.hide();
   })
 })
 

@@ -101,7 +101,7 @@ defmodule UccChat.Web.ChannelController do
     end
   end
   # def direct(conn, %{"name" => name}) do
-  #   case UcxChat.ServiceHelpers.get_by User, :username, name do
+  #   case UccChat.ServiceHelpers.get_by User, :username, name do
   #     nil ->
   #       redirect conn, to: "/"
   #     user ->

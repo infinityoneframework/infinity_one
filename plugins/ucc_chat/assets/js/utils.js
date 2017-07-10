@@ -1,7 +1,7 @@
 
 const debug = false;
 
-UcxChat.randomString = (length, charList) => {
+UccChat.randomString = (length, charList) => {
   let chars = charList
   if (!chars)
     chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$%#@!'
