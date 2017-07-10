@@ -284,6 +284,15 @@ defmodule UccChat.Web.UserChannel do
     {:noreply, socket}
   end
 
+  def handle_in(ev = "admin_link:click:webrtc" , params, socket) do
+    link = "webrtc"
+    debug ev, params
+    user = Helpers.get_user! socket
+    html = AdminService.render user, link, "#{link}.html"
+    push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
+    {:noreply, socket}
+  end
+
   def handle_in(ev = "admin:" <> link, params, socket) do
     debug ev, params
     AdminService.handle_in(link, params, socket)

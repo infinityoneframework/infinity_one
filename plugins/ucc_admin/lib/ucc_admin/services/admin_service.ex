@@ -10,6 +10,7 @@ defmodule UccAdmin.AdminService do
   alias UcxUcc.Settings.General
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
+  alias UccWebrtc.Settings.Webrtc
 
   require Logger
 
@@ -105,6 +106,25 @@ defmodule UccAdmin.AdminService do
           {:ok, %{success: ~g"FileUpload settings updated successfully"}}
         {:error, cs} ->
           Logger.error "problem updating FileUpload settings: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
+    {:reply, resp, socket}
+  end
+
+  def handle_in("save:webrtc", params, socket) do
+    params =
+      params
+      |> Helpers.normalize_form_params
+      |> Map.get("webrtc")
+
+    resp =
+      Webrtc.get
+      |> Webrtc.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"WebRTC settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating WebRTC settings: #{inspect cs}"
           {:ok, %{error: ~g"There a problem updating your settings."}}
       end
     {:reply, resp, socket}
@@ -361,6 +381,11 @@ defmodule UccAdmin.AdminService do
   def get_args("general", user) do
     # view_a = String.to_atom view
     cs = UcxUcc.Settings.General.changeset(UcxUcc.Settings.General.get())
+    [user: user, changeset: cs]
+  end
+  def get_args("webrtc", user) do
+    # view_a = String.to_atom view
+    cs = UccWebrtc.Settings.Webrtc.changeset(UccWebrtc.Settings.Webrtc.get())
     [user: user, changeset: cs]
   end
   def get_args(view, user) when view in ~w(chat_general message layout file_upload) do

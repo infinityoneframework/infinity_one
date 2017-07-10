@@ -31,3 +31,5 @@ header
           a.admin-link(href="#" data-link="layout")= ~g"Layout"
         li
           a.admin-link(href="#" data-link="file_upload")= ~g"File Upload"
+        li
+          a.admin-link(href="#" data-link="webrtc")= ~g"WebRTC"

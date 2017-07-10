@@ -31,7 +31,8 @@ config :ucx_ucc, :settings_modules, [
   UccChat.Settings.ChatGeneral,
   UccChat.Settings.FileUpload,
   UccChat.Settings.Layout,
-  UccChat.Settings.Message
+  UccChat.Settings.Message,
+  UccWebrtc.Settings.Webrtc,
 ]
 
 config :phoenix, :template_engines,

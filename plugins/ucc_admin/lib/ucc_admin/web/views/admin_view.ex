@@ -80,7 +80,7 @@ defmodule UccAdmin.Web.AdminView do
   defp do_description(tag, description) when is_list(tag) do
     tag ++ [
       content_tag :div, class: "settings-description" do
-        description
+        Phoenix.HTML.raw description
       end
     ]
   end
@@ -88,7 +88,7 @@ defmodule UccAdmin.Web.AdminView do
     [
       tag,
       content_tag :div, class: "settings-description" do
-        description
+        Phoenix.HTML.raw description
       end
     ]
   end
