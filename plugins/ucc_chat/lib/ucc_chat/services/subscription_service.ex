@@ -2,6 +2,11 @@ defmodule UccChat.SubscriptionService do
   use UccChat.Shared, :service
 
   alias UccChat.{Subscription}
+  alias UccChat.Schema.Subscription, as: SubscriptionSchema
+
+  def update(%SubscriptionSchema{} = subscription, params) do
+    Subscription.update(subscription, params)
+  end
 
   def update(%{channel_id: channel_id, user_id: user_id}, params),
     do: __MODULE__.update(channel_id, user_id, params)
@@ -16,11 +21,11 @@ defmodule UccChat.SubscriptionService do
   end
 
   def get(channel_id, user_id) do
-    Subscription.get(channel_id: channel_id, user_id: user_id)
+    Subscription.get_by(channel_id: channel_id, user_id: user_id)
   end
 
   def get(channel_id, user_id, field) do
-    case Subscription.get(channel_id: channel_id, user_id: user_id) do
+    case Subscription.get_by(channel_id: channel_id, user_id: user_id) do
       nil ->
         :error
       sub ->

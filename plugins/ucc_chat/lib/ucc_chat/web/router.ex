@@ -2,8 +2,6 @@ defmodule UccChat.Web.Router do
   use UccChat.Web, :router
   use Coherence.Router
 
-  IO.inspect "Compiling router"
-
   pipeline :browser do
     plug :accepts, ["html", "json"]
     plug :fetch_session
@@ -12,8 +10,6 @@ defmodule UccChat.Web.Router do
     plug :put_secure_browser_headers
     plug Coherence.Authentication.Session
   end
-
-  IO.inspect "Compiling router 2"
 
   pipeline :protected do
     plug :accepts, ["html"]
@@ -24,7 +20,6 @@ defmodule UccChat.Web.Router do
     plug Coherence.Authentication.Session, protected: true
   end
 
-  IO.inspect "Compiling router 3"
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -41,10 +36,8 @@ defmodule UccChat.Web.Router do
     # resources "/channel", ChannelController
   end
 
-  IO.inspect "Compiling router 4"
   scope "/", UccChat.Web do
     pipe_through :api
     post "/attachments/create", AttachmentController, :create
   end
-  IO.inspect "Compiling router 5"
 end

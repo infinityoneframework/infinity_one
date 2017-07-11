@@ -10,7 +10,7 @@ defmodule UccChat.Schema.Subscription do
     belongs_to :channel, Channel
     belongs_to :user, User
     field :last_read, :string, default: ""
-    field :type, :integer
+    field :type, :integer, default: 0
     field :open, :boolean, default: false
     field :alert, :boolean, default: false
     field :hidden, :boolean, default: false

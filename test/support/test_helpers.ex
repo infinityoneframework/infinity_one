@@ -28,7 +28,10 @@ defmodule UcxUcc.TestHelpers do
 
   def insert_user(attrs \\ %{})
   def insert_user(attrs) do
-    role = Repo.one!(from r in Role, where: r.name == "user")
+    attrs = Enum.into attrs, %{}
+    role = attrs[:role] || Repo.one!(from r in Role, where: r.name == "user")
+    attrs = Map.delete attrs, :role
+
     changes = Map.merge(%{
       name: Faker.Name.name,
       username: Faker.Internet.user_name,
@@ -36,14 +39,24 @@ defmodule UcxUcc.TestHelpers do
       password: "secret",
       password_confirmation: "secret",
       }, to_map(attrs))
+
     user =
       %User{}
       |> User.changeset(changes)
       |> Repo.insert!()
+
     %UserRole{}
     |> UserRole.changeset(%{user_id: user.id, role_id: role.id})
     |> Repo.insert!
+
     Repo.preload user, [roles: :permissions]
+  end
+
+  def insert_role_user(role, attrs \\ %{}) do
+    Map.merge(%{
+      role: insert_role(role),
+    }, Enum.into(attrs, %{}))
+    |> insert_user
   end
 
   defp to_map(attrs) when is_list(attrs), do: Enum.into(attrs, %{})

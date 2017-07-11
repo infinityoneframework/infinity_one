@@ -50,41 +50,32 @@ defmodule UccChat.ChannelService do
     |> create_subscription(user_id)
   end
 
-  def invite_user(%User{} = current_user, channel_id, user_id) do
-    current_user.id
-    |> invite_user(channel_id)
-    |> case do
-      {:ok, subs} ->
-        notify_user_action(current_user, user_id, channel_id, "added")
-        {:ok, subs}
-      error ->
-        error
-    end
-  end
-
   @doc """
   Create a channel subscription and announce the join if configured.
   """
-  def join_channel(%ChannelSchema{} = channel, user_id) do
+  def join_channel(channel, user_id, opts \\ [])
+  def join_channel(%ChannelSchema{} = channel, user_id, opts) do
     channel
     |> create_subscription(user_id)
     |> case do
       {:ok, subs} ->
-        UserChannel.join_room(user_id, channel.name)
-        unless UccSettings.hide_user_join() do
-          # here
-          # broadcast_message(~g"Has joined the channel.", channel.name, user_id, channel.id, system: true, sequential: false)
-          # notify_action(socket, :join, channel.name, user_id, channel.id)
+        unless opts[:channel] == false do
+          UserChannel.join_room(user_id, channel.name)
+          unless UccSettings.hide_user_join() do
+            # here
+            # broadcast_message(~g"Has joined the channel.", channel.name, user_id, channel.id, system: true, sequential: false)
+            # notify_action(socket, :join, channel.name, user_id, channel.id)
+          end
         end
         {:ok, subs}
       error ->
         error
     end
   end
-  def join_channel(channel_id, user_id) do
+  def join_channel(channel_id, user_id, opts) do
     channel_id
     |> Channel.get!
-    |> join_channel(user_id)
+    |> join_channel(user_id, opts)
   end
 
   # def room_type(:public), do: @public_channel
@@ -211,6 +202,7 @@ defmodule UccChat.ChannelService do
     user = Helpers.get!(User, user_id, preload: [:roles])
     insert_channel(user, params)
   end
+
   def insert_channel(user, params) do
     multi =
       Multi.new
@@ -240,7 +232,8 @@ defmodule UccChat.ChannelService do
   end
 
   def do_roles(%{channel: %{id: _ch_id, user_id: u_id} = channel}) do
-    role = UcxUcc.Accounts.get_role_by_name("owner")
+    role = UcxUcc.Accounts.get_role_by_name("owner") ||
+      raise("owner role required")
     # TODO: The scope concept of user_role is broken.
     %{user_id: u_id, role_id: role.id}
     |> UcxUcc.Accounts.create_user_role() #, scope: "global"})
@@ -254,6 +247,7 @@ defmodule UccChat.ChannelService do
   def add_moderator(_channel, _user_id) do
     Logger.error "add_moderator not implemented"
   end
+
   ##################
   #
 
@@ -1122,11 +1116,26 @@ defmodule UccChat.ChannelService do
     end
   end
 
-  def invite_user(user_id, channel_id) do
+  def invite_user(current_user, channel_id, user_id \\ [], opts \\ [])
+  def invite_user(%User{} = current_user, channel_id, user_id, opts)
+    when is_binary(user_id) do
+    current_user.id
+    |> invite_user(channel_id, opts)
+    |> case do
+      {:ok, subs} ->
+        notify_user_action(current_user, user_id, channel_id, "added")
+        {:ok, subs}
+      error ->
+        error
+    end
+  end
+
+  def invite_user(user_id, channel_id, opts, _) when is_list(opts) do
     channel_id
     |> Channel.get!
-    |> add_user_to_channel(user_id)
+    |> add_user_to_channel(user_id, opts)
   end
+
 
   def remove_role(nil) do
     {:error, ~g"Role not found"}
@@ -1180,8 +1189,8 @@ defmodule UccChat.ChannelService do
     end
   end
 
-  def add_user_to_channel(channel, user_id) do
-    case join_channel(channel, user_id) do
+  def add_user_to_channel(channel, user_id, opts \\ []) do
+    case join_channel(channel, user_id, opts) do
       {:ok, _subs} ->
         {:ok, ~g"added"}
       result -> result

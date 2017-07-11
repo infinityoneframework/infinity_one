@@ -337,14 +337,15 @@ defmodule UccChat.Web.UserChannel do
     FlexBarService.handle_in action, params, socket
   end
 
-  def handle_in(ev = "update:currentMessage", %{"value" => value } = params,
-    %{assigns: assigns} = socket) do
+  def handle_in(ev = "update:currentMessage", params, socket) do
     debug ev, params
+
+    value = params["value"] || "0"
+    assigns = socket.assigns
     last_read = SubscriptionService.get(assigns.channel_id, assigns.user_id,
-      :last_read)
+      :last_read) || ""
     cond do
-      last_read == "" or String.to_integer(last_read)
-        < String.to_integer(value) ->
+      last_read == "" or String.to_integer(last_read) < String.to_integer(value) ->
         SubscriptionService.update(assigns.channel_id, assigns.user_id,
           %{last_read: value})
       true ->

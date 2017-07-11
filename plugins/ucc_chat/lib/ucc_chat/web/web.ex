@@ -43,7 +43,6 @@ defmodule UccChat.Web do
   def view do
     quote do
       Code.ensure_compiled(UccChat.Web.Router)
-      |> IO.inspect(label: "router comiled?")
       use Phoenix.View, root: "plugins/ucc_chat/lib/ucc_chat/web/templates",
                         namespace: UccChat.Web
 
