@@ -11,23 +11,16 @@ defmodule UccChat.SubscriptionService do
       nil ->
         {:error, :not_found}
       sub ->
-        sub
-        |> Subscription.changeset(params)
-        |> Repo.update
+        Subscription.update(sub, params)
     end
   end
 
   def get(channel_id, user_id) do
-    channel_id
-    |> Subscription.get(user_id)
-    |> Repo.one
+    Subscription.get(channel_id: channel_id, user_id: user_id)
   end
 
   def get(channel_id, user_id, field) do
-    channel_id
-    |> Subscription.get(user_id)
-    |> Repo.one
-    |> case do
+    case Subscription.get(channel_id: channel_id, user_id: user_id) do
       nil ->
         :error
       sub ->

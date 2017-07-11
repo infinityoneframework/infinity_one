@@ -1,6 +1,7 @@
 defmodule UccChat.Web.MasterView do
   use UccChat.Web, :view
-  alias UccChat.{ChannelService, Channel, ChatDat}
+  alias UccChat.{ChannelService, ChatDat}
+  alias UccChat.Schema.Channel, as: ChannelSchema
   require IEx
 
   def get_admin_class(_user), do: ""
@@ -20,7 +21,11 @@ defmodule UccChat.Web.MasterView do
     count_span = content_tag :span, class: "unread-cnt" do
       "0"
     end
-    %{count: " new messages", since: " new messages since 11:08 AM", count_span: count_span}
+    %{
+      count: " new messages",
+      since: " new messages since 11:08 AM",
+      count_span: count_span
+    }
     # %{count: "78 new messages", since: "78 new messages since 11:08 AM"}
   end
 
@@ -49,8 +54,7 @@ defmodule UccChat.Web.MasterView do
 
   def has_more_next(text) do
     # {{#unless hasMoreNext}}not{{/unless}}">
-    to_string(text)
-    |> String.replace("_", "-")
+    text |> to_string |> String.replace("_", "-")
   end
   def has_more(), do: false
   def can_preview, do: true
@@ -70,7 +74,11 @@ defmodule UccChat.Web.MasterView do
   def get_mb(chatd), do: UccChat.Web.MessageView.get_mb(chatd)
 
   def get_open_ftab(nil, _), do: nil
-  def get_open_ftab({title, _}, flex_tabs), do: Enum.find(flex_tabs, fn tab -> tab[:open] && tab[:title] == title end)
+  def get_open_ftab({title, _}, flex_tabs) do
+    Enum.find(flex_tabs, fn tab ->
+      tab[:open] && tab[:title] == title
+    end)
+  end
 
   def cc(config, item) do
     if apply UccSettings, item, [config] do
@@ -87,17 +95,21 @@ defmodule UccChat.Web.MasterView do
   def get_flex_tabs(chatd, open_tab) do
     user = chatd.user
     user_mode = chatd.channel.type == 2
-    switch_user = if Application.get_env(:ucx_chat, :switch_user, false) and UcxUcc.env() != :prod do
-      ""
-    else
-      " hidden"
-    end
+    switch_user =
+      if Application.get_env(:ucx_chat, :switch_user, false)
+        and UcxUcc.env() != :prod do
+        ""
+      else
+        " hidden"
+      end
+
     config = UccSettings.get_all()
     defn = UccChat.FlexBarService.default_settings()
-    tab = case open_tab do
-      {title, _} -> %{title => true}
-      _ -> %{}
-    end
+    tab =
+      case open_tab do
+        {title, _} -> %{title => true}
+        _ -> %{}
+      end
     [
       {"IM Mode", "chat", ""},
       {"Rooms Mode", "hash", " hidden"},
@@ -121,10 +133,20 @@ defmodule UccChat.Web.MasterView do
     |> Enum.map(fn {title, icon, display} ->
       if tab[title] do
         titlea = String.to_atom title
-        %{title: title, icon: icon, display: display, open: true, templ: defn[titlea][:templ] }
+        %{
+          title: title,
+          icon: icon,
+          display: display,
+          open: true,
+          templ: defn[titlea][:templ]
+        }
       else
         display = check_im_mode_display(title, user.account.chat_mode, display)
-        %{title: title, icon: icon, display: display}
+        %{
+          title: title,
+          icon: icon,
+          display: display
+        }
       end
     end)
   end
@@ -145,7 +167,6 @@ defmodule UccChat.Web.MasterView do
     end
   end
   def get_fav_icon_label(chatd) do
-
     case ChatDat.get_channel_data(chatd) do
       %{type: :stared} ->
         {"icon-star favorite-room pending-color", "Unfavorite"}
@@ -153,7 +174,7 @@ defmodule UccChat.Web.MasterView do
         {"icon-star-empty", "Favorite"}
     end
   end
-  def favorite_room?(%User{} = user, %Channel{} = channel) do
+  def favorite_room?(%User{} = user, %ChannelSchema{} = channel) do
     ChannelService.favorite_room?(user, channel)
   end
 

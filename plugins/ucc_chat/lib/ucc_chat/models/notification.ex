@@ -1,37 +1,16 @@
 defmodule UccChat.Notification do
-  use UccChat.Shared, :schema
+  use UccModel, schema: UccChat.Schema.Notification
 
-  alias UccChat.{AccountNotification, NotificationSetting}
-
-  @mod __MODULE__
-
-  schema "notifications" do
-    embeds_one :settings, UccChat.NotificationSetting
-    belongs_to :channel, UccChat.Channel
-    many_to_many :accounts, UcxUcc.Accounts.Account, join_through: UccChat.AccountNotification
-
-    timestamps(type: :utc_datetime)
-  end
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:channel_id])
-    |> cast_embed(:settings)
-    |> validate_required([:settings, :channel_id])
-  end
+  alias UccChat.Schema.{AccountNotification, NotificationSetting}
 
   def new_changeset(channel_id) do
     settings = Map.from_struct %NotificationSetting{}
-    changeset %__MODULE__{}, %{channel_id: channel_id, settings: settings}
+    change %{channel_id: channel_id, settings: settings}
   end
-
 
   def get_notification(%{id: id}, channel_id), do: get_notification(id, channel_id)
   def get_notification(id, channel_id) do
-    from n in @mod,
+    from n in @schema,
       join: j in AccountNotification,
       on: j.notification_id == n.id,
       where: j.account_id == ^id and n.channel_id == ^channel_id,

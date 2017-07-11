@@ -24,9 +24,13 @@ defmodule UccChat.Web.ChannelApi do
 
       if debug() do
         if UcxUcc.env() == :prod do
-          Logger.debug "%% " <> inspect(__MODULE__) <> ".#{unquote(name)} #{unquote(event)}: #{msg1}params: #{inspect unquote(params)}"
+          Logger.debug "%% " <> inspect(__MODULE__) <>
+            ".#{unquote(name)} #{unquote(event)}: #{msg1}params: " <>
+            "#{inspect unquote(params)}"
         else
-          Logger.info "%% " <> inspect(__MODULE__) <> ".#{unquote(name)} #{unquote(event)}: #{msg1}params: #{inspect unquote(params)}"
+          Logger.info "%% " <> inspect(__MODULE__) <>
+            ".#{unquote(name)} #{unquote(event)}: #{msg1}params: " <>
+            "#{inspect unquote(params)}"
         end
       end
     end
@@ -40,7 +44,8 @@ defmodule UccChat.Web.ChannelApi do
       end
 
       if debug() do
-        Logger.warn "%% " <> inspect(__MODULE__) <> ".#{unquote(name)} #{unquote(event)}: #{msg1}params: #{inspect unquote(params)}"
+        Logger.warn "%% " <> inspect(__MODULE__) <> ".#{unquote(name)} " <>
+          "#{unquote(event)}: #{msg1}params: #{inspect unquote(params)}"
       end
     end
   end

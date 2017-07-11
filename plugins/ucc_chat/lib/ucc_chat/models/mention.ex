@@ -1,33 +1,8 @@
 defmodule UccChat.Mention do
-  use UccChat.Shared, :schema
-
-  @mod __MODULE__
-
-  schema "mentions" do
-    field :unread, :boolean, default: true
-    field :all, :boolean, default: false
-    field :name, :string
-
-    belongs_to :user, UcxUcc.Accounts.User
-    belongs_to :message, UccChat.Message
-    belongs_to :channel, UccChat.Channel
-
-    timestamps(type: :utc_datetime)
-  end
-
-  @fields ~w(user_id message_id channel_id)a
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, @fields ++ [:unread, :all, :name])
-    |> validate_required(@fields)
-  end
+  use UccModel, schema: UccChat.Schema.Mention
 
   def count(channel_id, user_id) do
-    from m in @mod,
+    from m in @schema,
       where: m.user_id == ^user_id and m.channel_id == ^channel_id,
       select: count(m.id)
   end

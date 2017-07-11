@@ -9,10 +9,7 @@ defmodule UccChat.Web.DirectController do
   def show(conn, %{"id" => id}) do
     Logger.warn "direct show id: #{inspect id}"
 
-    channel =
-      Channel
-      |> where([c], c.name == ^id)
-      |> Repo.one!
+    channel = Channel.get_by name: id
 
     user =
       conn

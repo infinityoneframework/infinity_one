@@ -3,13 +3,17 @@ defmodule UccChat.FlexBarService do
   use UccChat.Shared, :service
   import Phoenix.Socket, only: [assign: 3]
 
-  alias UccChat.{Web.FlexBarView, Mention, StaredMessage, PinnedMessage,
-    UserAgent, Direct, Channel, Notification, AccountService, Attachment,
-    Message
+  alias UccChat.{Web.FlexBarView,
+    UserAgent, Direct, Channel, Notification, AccountService
   }
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
   alias UcxUcc.Permissions
+  alias UccChat.Schema.Message, as: MessageSchema
+  alias UccChat.Schema.Attachment, as: AttachmentSchema
+  alias UccChat.Schema.PinnedMessage, as: PinnedMessageSchema
+  # alias UccChat.Schema.SharedMessage, as: SharedMesageSchema
+  alias UccChat.Schema.Mention, as: MentionSchema
   # alias UccChat.ServiceHelpers, as: Helpers
 
   require Logger
@@ -36,7 +40,8 @@ defmodule UccChat.FlexBarService do
     channel_id = params["channel_id"]
     html =
       for user <- users do
-        FlexBarView.render("users_list_item.html", user: user, channel_id: channel_id)
+        "users_list_item.html"
+        |> FlexBarView.render(user: user, channel_id: channel_id)
         |> safe_to_string
       end
       |> Enum.join("")
@@ -142,8 +147,10 @@ defmodule UccChat.FlexBarService do
       # args = Helpers.get_channel(channel_id)
       args = get_render_args("Info", msg["user_id"], channel_id, nil, nil)
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["temp"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       UserAgent.open_ftab(msg["user_id"], channel_id, event, nil)
 
@@ -157,8 +164,10 @@ defmodule UccChat.FlexBarService do
     handle_open_close event, msg, fn msg ->
       args = get_render_args("Members List", msg["user_id"], channel_id, nil, msg)
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["templ"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       view = if msg["username"], do: {"username", msg["username"]}, else: nil
 
@@ -190,8 +199,10 @@ defmodule UccChat.FlexBarService do
 
       args = get_render_args("Mentions", user_id, channel_id, nil)
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["templ"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
@@ -205,8 +216,10 @@ defmodule UccChat.FlexBarService do
     handle_open_close event, msg, fn msg ->
       args = get_render_args("Stared Messages", user_id,  channel_id, msg["message_id"])
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["templ"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
@@ -218,8 +231,10 @@ defmodule UccChat.FlexBarService do
     handle_open_close event, msg, fn  msg ->
       args = get_render_args("Pinned Messages", user_id, channel_id, msg["message_id"])
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["templ"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
@@ -232,8 +247,10 @@ defmodule UccChat.FlexBarService do
     handle_open_close event, msg, fn msg ->
       args = get_render_args("Files List", user_id, channel_id, nil)
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["templ"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
@@ -279,7 +296,8 @@ defmodule UccChat.FlexBarService do
   end
 
   def get_setting_form_field(name, channel, user_id) do
-    settings_form_fields(channel, user_id)
+    channel
+    |> settings_form_fields(user_id)
     |> Enum.find(&(&1[:name] == name))
   end
 
@@ -288,7 +306,8 @@ defmodule UccChat.FlexBarService do
   def get_render_args("Info", user_id, channel_id, _, _)  do
     current_user = Helpers.get_user! user_id
     channel = Helpers.get_channel(channel_id)
-    [channel: settings_form_fields(channel, user_id), current_user: current_user, channel_type: channel.type]
+    [channel: settings_form_fields(channel, user_id),
+     current_user: current_user, channel_type: channel.type]
   end
 
   def get_render_args("Notifications", user_id, channel_id, _, _)  do
@@ -308,11 +327,10 @@ defmodule UccChat.FlexBarService do
   def get_render_args("Files List", user_id, channel_id, _, _)  do
     current_user = Helpers.get_user! user_id
     channel = Helpers.get_channel(channel_id)
-    attachments = (from a in Attachment,
-      join: m in Message, on: a.message_id == m.id,
+    attachments = (from a in AttachmentSchema,
+      join: m in MessageSchema, on: a.message_id == m.id,
       order_by: [desc: m.timestamp],
       where: a.channel_id == ^(channel.id))
-
     |> Repo.all
     [current_user: current_user, attachments: attachments]
   end
@@ -320,9 +338,7 @@ defmodule UccChat.FlexBarService do
   def get_render_args("User Info", user_id, channel_id, _, _)  do
     current_user = Helpers.get_user! user_id
     channel = Helpers.get_channel(channel_id)
-    direct = (from d in Direct,
-      where: d.user_id == ^user_id and d.channel_id == ^(channel.id))
-    |> Repo.one
+    direct = Direct.get_by user_id: user_id, channel_id: channel_id
 
     user = Helpers.get_user_by_name(direct.users)
     user_info = user_info(channel, direct: true)
@@ -357,94 +373,63 @@ defmodule UccChat.FlexBarService do
 
   def get_render_args("Mentions", user_id, channel_id, _message_id, _) do
     mentions =
-      Mention
+      MentionSchema
       |> where([m], m.user_id == ^user_id and m.channel_id == ^channel_id)
       |> preload([:user, :message])
       |> Repo.all
-      |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
-        day = DateTime.to_date(m.updated_at)
-        msg =
-          %{
-            channel_id: channel_id,
-            message: m.message,
-            username: m.user.username,
-            user: m.user,
-            own: m.message.user_id == user_id,
-            id: m.id,
-            new_day: day != last_day,
-            date: Helpers.format_date(m.message.updated_at),
-            time: Helpers.format_time(m.message.updated_at),
-            timestamp: m.message.timestamp
-          }
-        {day, [msg|acc]}
-      end)
-      |> elem(1)
-      |> Enum.reverse
+      |> do_get_render_args(user_id, channel_id)
 
     [mentions: mentions]
   end
+
   def get_render_args("Stared Messages", user_id,  channel_id, _message_id, _) do
     stars =
-      StaredMessage
+      StaredMessageSchema
       |> where([m], m.channel_id == ^channel_id)
       |> preload([:user, message: [:user]])
       |> order_by([m], desc: m.inserted_at)
       |> Repo.all
-      |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
-        day = DateTime.to_date(m.updated_at)
-        msg =
-          %{
-            channel_id: channel_id,
-            message: m.message,
-            username: m.message.user.username,
-            user: m.message.user,
-            own: m.message.user_id == user_id,
-            id: m.id,
-            new_day: day != last_day,
-            date: Helpers.format_date(m.message.updated_at),
-            time: Helpers.format_time(m.message.updated_at),
-            timestamp: m.message.timestamp
-          }
-        {day, [msg|acc]}
-      end)
-      |> elem(1)
-      |> Enum.reverse
+      |> do_get_render_args(user_id, channel_id)
     [stars: stars]
   end
 
   def get_render_args("Pinned Messages", user_id, channel_id, _message_id, _) do
     pinned =
-      PinnedMessage
+      PinnedMessageSchema
       |> where([m], m.channel_id == ^channel_id)
       |> preload([message: :user])
       |> order_by([p], desc: p.inserted_at)
       |> Repo.all
-      |> Enum.reduce({nil, []}, fn p, {last_day, acc} ->
-        day = DateTime.to_date(p.updated_at)
-        msg =
-          %{
-            channel_id: channel_id,
-            message: p.message,
-            username: p.message.user.username,
-            user: p.message.user,
-            own: p.message.user_id == user_id,
-            id: p.id,
-            new_day: day != last_day,
-            date: Helpers.format_date(p.message.updated_at),
-            time: Helpers.format_time(p.message.updated_at),
-            timestamp: p.message.timestamp
-          }
-        {day, [msg|acc]}
-      end)
-      |> elem(1)
-      |> Enum.reverse
+      |> do_get_render_args(user_id, channel_id)
 
     [pinned: pinned]
   end
 
+  defp do_get_render_args(collection, user_id, channel_id) do
+    collection
+    |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
+      day = DateTime.to_date(m.updated_at)
+      msg =
+        %{
+          channel_id: channel_id,
+          message: m.message,
+          username: m.user.username,
+          user: m.user,
+          own: m.message.user_id == user_id,
+          id: m.id,
+          new_day: day != last_day,
+          date: Helpers.format_date(m.message.updated_at),
+          time: Helpers.format_time(m.message.updated_at),
+          timestamp: m.message.timestamp
+        }
+      {day, [msg|acc]}
+    end)
+    |> elem(1)
+    |> Enum.reverse
+  end
+
   def get_all_channel_users(channel) do
-    channel.users
-    |> Enum.map(fn user ->
+    Enum.map(channel.users, fn user ->
       struct(user, status: UccChat.PresenceAgent.get(user.id))
     end)
   end
@@ -462,21 +447,16 @@ defmodule UccChat.FlexBarService do
   end
 
   def user_info(channel, opts \\ []) do
-    show_admin = opts[:admin] || false
-    direct = opts[:direct] || false
-    user_mode = opts[:user_mode] || false
-    view_mode = opts[:view_mode] || false
-
-    %{direct: direct, show_admin: show_admin, blocked: channel.blocked, user_mode: user_mode, view_mode: view_mode}
+    %{
+      direct: opts[:direct] || false,
+      show_admin: opts[:admin] || false,
+      blocked: channel.blocked,
+      user_mode: opts[:user_mode] || false,
+      view_mode: opts[:view_mode] || false
+    }
   end
 
   def default_settings do
-    switch_user =
-      if Application.get_env(:ucx_chat, :switch_user) && UcxUcc.env() != :prod do
-        %{templ: "switch_user_list.html", args: %{}}
-      else
-        %{hidden: true}
-      end
     %{
       "IM Mode": %{},
       "Rooms Mode": %{},
@@ -508,13 +488,22 @@ defmodule UccChat.FlexBarService do
       "Video Chat": %{hidden: true},
       "Snippeted Messages": %{},
       "Logout": %{function: "function() { window.location.href = '/logout'}" },
-      "Switch User": switch_user
+      "Switch User": switch_user()
     }
   end
 
+  defp switch_user do
+    if Application.get_env(:ucx_chat, :switch_user) && UcxUcc.env() != :prod do
+      %{templ: "switch_user_list.html", args: %{}}
+    else
+      %{hidden: true}
+    end
+  end
+
   def visible_tab_names do
-    default_settings()
-    |> Enum.filter_map(&(elem(&1, 1)[:hidden] != true), &(to_string elem(&1, 0)))
+    Enum.filter_map(default_settings(),
+      &(elem(&1, 1)[:hidden] != true),
+      &(to_string elem(&1, 0)))
   end
 
   defp log_click(event, msg, level \\ :debug) do

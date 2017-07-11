@@ -14,12 +14,15 @@ defmodule UccChat.NotifierService do
     body = ~g"This room has been archived by " <> owner.username
     MessageService.broadcast_system_message(channel.id, owner.id, body)
   end
+
   defp do_notifier_action(_socket, :unarchive, owner, channel) do
     body = ~g"This room has been unarchived by " <> owner.username
     MessageService.broadcast_system_message(channel.id, owner.id, body)
   end
+
   defp do_notifier_action(_socket, action, _owner, channel) do
-    Logger.warn "unsupported action: #{inspect action}, channel.id: #{inspect channel.id}, channel.name: #{inspect channel.name}"
+    Logger.warn "unsupported action: #{inspect action}, channel.id: " <>
+      "#{inspect channel.id}, channel.name: #{inspect channel.name}"
   end
 
 end

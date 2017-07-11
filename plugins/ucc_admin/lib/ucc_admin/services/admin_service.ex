@@ -11,6 +11,7 @@ defmodule UccAdmin.AdminService do
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
+  alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
 
@@ -401,7 +402,8 @@ defmodule UccAdmin.AdminService do
   def get_args("rooms", user) do
     # view_a = String.to_atom view
     # mod = Module.concat Config, String.capitalize(view)
-    rooms = Repo.all(from c in Channel, order_by: [asc: c.name], preload: [:subscriptions, :messages])
+    rooms = Repo.all(from c in ChannelSchema, order_by: [asc: c.name],
+      preload: [:subscriptions, :messages])
     [user: user, rooms: rooms]
   end
   # defp get_args("message", user) do

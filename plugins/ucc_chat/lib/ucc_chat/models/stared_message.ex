@@ -1,22 +1,12 @@
 defmodule UccChat.StaredMessage do
-  use UccChat.Shared, :schema
+  use UccModel, schema: UccChat.Schema.StaredMessage
 
-  schema "stared_messages" do
-    belongs_to :user, UcxUcc.Accounts.User
-    belongs_to :message, UccChat.Message
-    belongs_to :channel, UccChat.Channel
-
-    timestamps(type: :utc_datetime)
-  end
-
-  @fields ~w(user_id message_id channel_id)a
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, @fields)
-    |> validate_required(@fields)
+  def count(user_id, message_id, channel_id) do
+    @schema
+    |> where([s], s.user_id == ^user_id and
+      s.message_id == ^message_id and
+      s.channel_id == ^channel_id)
+    |> select([s], count(s.id))
+    |> @repo.one
   end
 end

@@ -10,6 +10,7 @@ defmodule UccChat.Web.MessageChannelController do
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.User
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UccChat.Schema.Message, as: MessageSchema
 
   require Logger
 
@@ -20,12 +21,13 @@ defmodule UccChat.Web.MessageChannelController do
     user = Helpers.get_user user_id
     channel_id = assigns[:channel_id]
 
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
 
     cond do
       ChannelService.user_muted? user_id, channel_id ->
-        sys_msg = create_system_message(channel_id, ~g"You have been muted and cannot speak in this room")
+        sys_msg = create_system_message(channel_id,
+          ~g"You have been muted and cannot speak in this room")
         html = render_message(sys_msg)
         push_message(socket, sys_msg.id, user_id, html)
 
@@ -33,7 +35,9 @@ defmodule UccChat.Web.MessageChannelController do
         html = render_message(msg)
         push_message(socket, msg.id, user_id, html)
 
-      channel.read_only and not Permissions.has_permission?(user, "post-readonly", assigns.channel_id) ->
+      channel.read_only and
+        not Permissions.has_permission?(user, "post-readonly",
+        assigns.channel_id) ->
         push_error socket, ~g(You are not authorized to create a message)
 
       channel.archived ->
@@ -47,7 +51,8 @@ defmodule UccChat.Web.MessageChannelController do
         create_mentions(mentions, message.id, message.channel_id, body)
         update_direct_notices(channel, message)
         message_html = render_message(message)
-        broadcast_message(socket, message.id, message.user.id, message_html, body: body)
+        broadcast_message(socket, message.id, message.user.id,
+          message_html, body: body)
     end
     stop_typing(socket, user_id, channel_id)
     {:noreply, socket}
@@ -63,7 +68,7 @@ defmodule UccChat.Web.MessageChannelController do
     preloads = MessageService.preloads()
 
     list =
-      Message
+      MessageSchema
       |> where([m], m.timestamp < ^timestamp and m.channel_id == ^channel_id)
       |> Helpers.last_page(page_size)
       |> preload(^preloads)
@@ -75,14 +80,17 @@ defmodule UccChat.Web.MessageChannelController do
       list
       |> Enum.map(fn message ->
         previews = List.keyfind(previews, message.id, 0, {nil, []}) |> elem(1)
-        UccChat.Web.MessageView.render("message.html", user: user, message: message, previews: previews)
+        "message.html"
+        |> UccChat.Web.MessageView.render(user: user, message: message,
+          previews: previews)
         |> Helpers.safe_to_string
       end)
       |> to_string
 
     messages_html = String.replace(messages_html, "\n", "")
 
-    {:reply, {:ok, MessageService.messages_info_into(list, channel_id, user, %{html: messages_html})}, socket}
+    {:reply, {:ok, MessageService.messages_info_into(list, channel_id,
+      user, %{html: messages_html})}, socket}
   end
 
   def previous(%{assigns: assigns} = socket, params) do
@@ -94,7 +102,7 @@ defmodule UccChat.Web.MessageChannelController do
     page_size = Application.get_env :ucx_chat, :page_size, 75
     preloads = MessageService.preloads()
     list =
-      Message
+      MessageSchema
       |> where([m], m.timestamp > ^timestamp and m.channel_id == ^channel_id)
       |> limit(^page_size)
       |> preload(^preloads)
@@ -106,14 +114,18 @@ defmodule UccChat.Web.MessageChannelController do
       list
       |> Enum.map(fn message ->
         previews = List.keyfind(previews, message.id, 0, {nil, []}) |> elem(1)
-        UccChat.Web.MessageView.render("message.html", user: user, message: message, previews: previews)
+
+        "message.html"
+        |> UccChat.Web.MessageView.render(user: user, message: message,
+          previews: previews)
         |> Helpers.safe_to_string
       end)
       |> to_string
 
     messages_html = String.replace(messages_html, "\n", "")
 
-    {:reply, {:ok, MessageService.messages_info_into(list, channel_id, user, %{html: messages_html})}, socket}
+    {:reply, {:ok, MessageService.messages_info_into(list, channel_id,
+      user, %{html: messages_html})}, socket}
   end
 
   def surrounding(%{assigns: assigns} = socket, params) do
@@ -121,7 +133,7 @@ defmodule UccChat.Web.MessageChannelController do
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
 
-    list = MessageService.get_surrounding_messages(channel_id, timestamp, user)
+    list = Message.get_surrounding_messages(channel_id, timestamp, user)
 
     previews = MessageService.message_previews(user.id, list)
 
@@ -129,35 +141,42 @@ defmodule UccChat.Web.MessageChannelController do
       list
       |> Enum.map(fn message ->
         previews = List.keyfind(previews, message.id, 0, {nil, []}) |> elem(1)
-        UccChat.Web.MessageView.render("message.html", user: user, message: message, previews: previews)
+
+        "message.html"
+        |> UccChat.Web.MessageView.render(user: user, message: message,
+          previews: previews)
         |> Helpers.safe_to_string
       end)
       |> to_string
 
     messages_html = String.replace(messages_html, "\n", "")
 
-    {:reply, {:ok, MessageService.messages_info_into(list, channel_id, user, %{html: messages_html})}, socket}
+    {:reply, {:ok, MessageService.messages_info_into(list, channel_id,
+      user, %{html: messages_html})}, socket}
   end
 
   def last(%{assigns: assigns} = socket, _params) do
     user = Helpers.get(User, assigns[:user_id])
     channel_id = assigns[:channel_id]
 
-    list = MessageService.get_messages(channel_id, user)
+    list = Message.get_messages(channel_id, user)
 
     previews = MessageService.message_previews(user.id, list)
 
     messages_html =
       list
       |> Enum.map(fn message ->
-        UccChat.Web.MessageView.render("message.html", user: user, message: message, previews: previews)
+        "message.html"
+        |> UccChat.Web.MessageView.render(user: user, message: message,
+          previews: previews)
         |> Helpers.safe_to_string
       end)
       |> to_string
 
     messages_html = String.replace(messages_html, "\n", "")
 
-    {:reply, {:ok, MessageService.messages_info_into(list, channel_id, user, %{html: messages_html})}, socket}
+    {:reply, {:ok, MessageService.messages_info_into(list, channel_id,
+      user, %{html: messages_html})}, socket}
   end
 
   def update(%{assigns: assigns} = socket, params) do
@@ -169,8 +188,10 @@ defmodule UccChat.Web.MessageChannelController do
     message = Helpers.get(Message, id, preload: [:attachments])
     resp =
       case message.attachments do
-        [] -> update_message_body(message, value, user)
-        [att|_] -> update_attachment_description(att, message, value, user)
+        [] ->
+          update_message_body(message, value, user)
+        [att|_] ->
+          update_attachment_description(att, message, value, user)
       end
       |> case do
         {:ok, message} ->
@@ -187,13 +208,17 @@ defmodule UccChat.Web.MessageChannelController do
 
   def delete(%{assigns: assigns} = socket, params) do
     user = Helpers.get_user assigns.user_id
-    if user.id == params["message_id"] || Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
-      message = Helpers.get Message, params["message_id"], preload: [:attachments]
+    if user.id == params["message_id"] ||
+      Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
+      message = Helpers.get Message, params["message_id"],
+        preload: [:attachments]
       case MessageService.delete_message message do
         {:ok, _} ->
-          Phoenix.Channel.broadcast! socket, "code:update", %{selector: "li.message#" <> params["message_id"], action: "remove"}
+          Phoenix.Channel.broadcast! socket, "code:update",
+            %{selector: "li.message#" <> params["message_id"], action: "remove"}
         _ ->
-          Phoenix.Channel.push socket, "toastr:error", %{error: ~g(There was an error deleting that message)}
+          Phoenix.Channel.push socket, "toastr:error",
+            %{error: ~g(There was an error deleting that message)}
       end
     else
       push_error socket, ~g(You are not authorized to delete that message)
@@ -208,13 +233,11 @@ defmodule UccChat.Web.MessageChannelController do
   defp update_attachment_description(attachment, message, value, user) do
     Repo.transaction(fn ->
       message
-      |> Message.changeset(%{edited_id: user.id})
-      |> Repo.update
+      |> Message.update(%{edited_id: user.id})
       |> case do
         {:ok, message} ->
           attachment
-          |> Attachment.changeset(%{description: value})
-          |> Repo.update
+          |> Attachment.update(%{description: value})
           |> case do
             {:ok, _attachment} ->
               {:ok, message}
@@ -232,16 +255,15 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   defp update_message_body(message, value, user) do
-    message
-    |> Message.changeset(%{body: value, edited_id: user.id})
-    |> Repo.update
+    Message.update(message, %{body: value, edited_id: user.id})
   end
 
   def delete_attachment(%{assigns: assigns} = socket, params) do
     user = Helpers.get(User, assigns[:user_id])
     attachment = Helpers.get Attachment, params["id"], preload: [:message]
     message = attachment.message
-    if user.id == message.user_id || Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
+    if user.id == message.user_id ||
+      Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
 
       case AttachmentService.delete_attachment(attachment) do
         {:error, _} ->
@@ -249,17 +271,19 @@ defmodule UccChat.Web.MessageChannelController do
         _ -> nil
       end
       message = Repo.preload(message, [:attachments])
+
       if length(message.attachments) == 0 do
         Repo.delete message
-        Phoenix.Channel.broadcast! socket, "code:update", %{selector: "li.message#" <> attachment.message.id, action: "remove"}
+        Phoenix.Channel.broadcast! socket, "code:update",
+          %{selector: "li.message#" <> attachment.message.id, action: "remove"}
       else
         # broadcast edited message update
       end
-      Phoenix.Channel.broadcast! socket, "code:update", %{selector: "li[data-id='" <> attachment.id <> "']", action: "remove"}
+      Phoenix.Channel.broadcast! socket, "code:update",
+        %{selector: "li[data-id='" <> attachment.id <> "']", action: "remove"}
     else
       push_error socket, ~g(You are not authorized to delete that attachment)
     end
     {:reply, {:ok, %{}}, socket}
   end
-
 end

@@ -136,36 +136,33 @@ defmodule UccChat.Web.MessageView do
 
   def get_mb(chatd) do
     defaults =
-      [:blocked?, :read_only?, :archived?, :allowed_to_send?, :subscribed?, :can_join?]
+      [:blocked?, :read_only?, :archived?, :allowed_to_send?,
+        :subscribed?, :can_join?]
       |> Enum.map(&({&1, false}))
       |> Enum.into(%{})
 
     channel = chatd.channel
     private = channel.type != 0
 
-    subscribed =
-      Subscription
-      |> where([s], s.channel_id == ^(chatd.channel.id) and s.user_id == ^(chatd.user.id))
-      |> Repo.all
-      |> case do
-        [] -> false
-        _ -> true
-      end
     blocked = channel.blocked
     read_only = channel.read_only
     archived = channel.archived
-    can_join = !(private or read_only or blocked or archived)
+
     nm = chatd.active_room[:display_name]
     symbol = if channel.type == 2, do: "@" <> nm, else: "#" <> nm
+
     settings =
       [
-        blocked?: blocked, read_only?: read_only, archived?: archived,
+        blocked?: blocked,
+        read_only?: read_only,
+        archived?: archived,
         allowed_to_send?: !(blocked or read_only or archived),
-        can_join?: can_join, subscribed?: subscribed, symbol: symbol
+        can_join?: !(private or read_only or blocked or archived),
+        subscribed?: Subscription.subscribed?(chatd.channel.id, chatd.user.id),
+        symbol: symbol
       ]
       |> Enum.into(defaults)
 
-    # config = UcxUcc.Repo.one(UccChat.Config)
     config = UccSettings.get_all
 
     settings =

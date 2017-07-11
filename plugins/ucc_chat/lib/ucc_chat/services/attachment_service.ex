@@ -11,7 +11,7 @@ defmodule UccChat.AttachmentService do
     params = Map.delete params, "user_id"
     multi =
       Multi.new
-      |> Multi.insert(:message, Message.changeset(%Message{}, message_params))
+      |> Multi.insert(:message, Message.change(message_params))
       |> Multi.run(:attachment, &do_insert_attachment(&1, params))
 
     case Repo.transaction(multi) do
@@ -24,16 +24,18 @@ defmodule UccChat.AttachmentService do
   end
 
   defp do_insert_attachment(%{message: %{id: id} = message}, params) do
-    changeset = Attachment.changeset(%Attachment{}, Map.put(params, "message_id", id))
-    case Repo.insert changeset do
+    params
+    |> Map.put("message_id", id)
+    |> Attachment.create()
+    |> case do
       {:ok, attachment} ->
         {:ok, %{attachment: attachment, message: message}}
       error -> error
     end
   end
 
-  def delete_attachment(%Attachment{} = attachment) do
-    case Repo.delete attachment do
+  def delete_attachment(%UccChat.Schema.Attachment{} = attachment) do
+    case Attachment.delete attachment do
       {:ok, _} = res ->
         path = UccChat.File.storage_dir(attachment)
         File.rm_rf path
@@ -52,9 +54,7 @@ defmodule UccChat.AttachmentService do
   end
 
   def count(message_id) do
-    Repo.one from a in Attachment,
-      where: a.message_id == ^message_id,
-      select: count(a.id)
+    Attachment.count message_id
   end
 
   def allowed?(channel) do

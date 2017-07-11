@@ -21,16 +21,15 @@ defmodule UccChat.InvitationService do
             {:ok, invitation}
           {:error, changeset} ->
             changeset = case Repo.one from i in Invitation, where: i.email == ^email do
-              nil -> changeset
+              nil ->
+                changeset
               _invitation ->
                 add_error(changeset, :email, ~g"Invitation already sent.")
             end
             {:error, changeset}
         end
       _ ->
-        cs = cs
-        |> add_error(:email, ~g"User already has an account!")
-        {:error, cs}
+        {:error, add_error(cs, :email, ~g"User already has an account!")}
     end
   end
 
@@ -40,7 +39,8 @@ defmodule UccChat.InvitationService do
         {:error, ~g"Cound not find the Invitation"}
       invitation ->
         send_user_email :invitation, invitation,
-          UcxUcc.Web.Router.Helpers.invitation_url(UcxUcc.Web.Endpoint, :edit, invitation.token)
+          UcxUcc.Web.Router.Helpers.invitation_url(UcxUcc.Web.Endpoint,
+          :edit, invitation.token)
         {:ok, ~g"Invitation resent."}
     end
   end

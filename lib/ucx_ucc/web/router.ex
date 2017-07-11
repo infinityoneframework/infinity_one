@@ -42,7 +42,7 @@ defmodule UcxUcc.Web.Router do
     get "/phone", MasterController, :phone
   end
 
-  forward "/admin", UccAdmin.Web.Router
+  # forward "/admin", UccAdmin.Web.Router
   forward "/", UccChat.Web.Router
 
   # use Unbrella.Plugin.Router

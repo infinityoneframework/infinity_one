@@ -20,9 +20,7 @@ defmodule UccChat.AccountService do
   end
 
   def update_notification(notification, params) do
-    notification
-    |> Notification.changeset(params)
-    |> Repo.update
+    Notification.update(notification, params)
   end
 
   def update_emoji_recent(account, name) do

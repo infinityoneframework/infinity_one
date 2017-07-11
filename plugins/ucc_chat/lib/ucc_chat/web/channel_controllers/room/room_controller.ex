@@ -11,25 +11,29 @@ defmodule UccChat.Web.RoomChannelController do
     reply = if assigns.room == "lobby" do
       %{redirect: ChannelService.room_redirect(params["room_id"], params["display_name"])}
     else
-      ChannelService.open_room(assigns[:user_id], params["room_id"], assigns[:room], params["display_name"])
+      ChannelService.open_room(assigns[:user_id], params["room_id"],
+        assigns[:room], params["display_name"])
     end
     {:reply, {:ok, reply}, socket}
   end
 
   def favorite(socket, _param) do
     assigns = socket.assigns
-    resp = ChannelService.toggle_favorite(assigns[:user_id], assigns[:channel_id])
+    resp = ChannelService.toggle_favorite(assigns[:user_id],
+      assigns[:channel_id])
     {:reply, resp, socket}
   end
 
   # create a new direct
   def create(%{assigns: assigns} = socket, params) do
-    resp = ChannelService.add_direct(params["username"], assigns[:user_id], assigns[:channel_id])
+    resp = ChannelService.add_direct(params["username"], assigns[:user_id],
+      assigns[:channel_id])
     {:reply, resp, socket}
   end
 
   def hide(%{assigns: assigns} = socket, params) do
-    resp = case ChannelService.channel_command(socket, :hide, params["room"], assigns[:user_id], assigns[:channel_id]) do
+    resp = case ChannelService.channel_command(socket, :hide, params["room"],
+      assigns[:user_id], assigns[:channel_id]) do
       {:ok, _} ->
         {:ok, %{redirect: "/"}}
       {:error, error} ->
@@ -39,7 +43,8 @@ defmodule UccChat.Web.RoomChannelController do
   end
 
   def leave(%{assigns: assigns} = socket, params) do
-    resp = case ChannelService.channel_command(socket, :leave, params["room"], assigns[:user_id], nil) do
+    resp = case ChannelService.channel_command(socket, :leave, params["room"],
+      assigns[:user_id], nil) do
       {:ok, _} ->
         {:ok, %{}}
       {:error, error} ->
@@ -49,7 +54,8 @@ defmodule UccChat.Web.RoomChannelController do
   end
 
   def delete(%{assigns: assigns} = socket, params) do
-    resp = ChannelService.delete_channel(socket, params["room"], assigns.user_id)
+    resp = ChannelService.delete_channel(socket, params["room"],
+      assigns.user_id)
     {:reply, resp, socket}
   end
 
@@ -99,15 +105,21 @@ defmodule UccChat.Web.RoomChannelController do
   ]
   @message_list Enum.zip(@commands, @messages) |> Enum.into(%{})
 
-  def command(socket, %{"command" => command, "username" => username}) when command in @commands do
-    Logger.warn "RoomChannelController: command: #{command}, username: #{inspect username}, socket: #{inspect socket}"
+  def command(socket, %{"command" => command, "username" => username})
+    when command in @commands do
+    Logger.warn "RoomChannelController: command: #{command}, username: " <>
+      "#{inspect username}, socket: #{inspect socket}"
     user = Helpers.get_by! User, :username, username
 
     # resp = case ChannelService.user_command(:unmute, user, socket.assigns.user_id, socket.assigns.channel_id) do
-    resp = case ChannelService.user_command(socket, @command_list[command], user, socket.assigns.user_id, socket.assigns.channel_id) do
+    resp = case ChannelService.user_command(socket, @command_list[command],
+      user, socket.assigns.user_id, socket.assigns.channel_id) do
       {:ok, _msg} ->
         if message = @message_list[command] do
-          message = message |> String.replace("%%user%%", user.username) |> String.replace("%%room%%", socket.assigns.room)
+          message =
+            message
+            |> String.replace("%%user%%", user.username)
+            |> String.replace("%%room%%", socket.assigns.room)
           Phoenix.Channel.push socket, "toastr:success", %{message: message}
         end
         {:ok, %{}}
@@ -120,11 +132,13 @@ defmodule UccChat.Web.RoomChannelController do
   @commands ~w(join)
   @command_list Enum.zip(@commands, ~w(join)a) |> Enum.into(%{})
 
-  def command(socket, %{"command" => command, "username" => _username}) when command in @commands do
+  def command(socket, %{"command" => command, "username" => _username})
+    when command in @commands do
     # Logger.warn "RoomChannelController: item: #{inspect @command_list[command]}, command: #{command}, username: #{inspect username}, socket: #{inspect socket}"
 
     # resp = case ChannelService.user_command(:unmute, user, socket.assigns.user_id, socket.assigns.channel_id) do
-    resp = case ChannelService.channel_command(socket, @command_list[command], socket.assigns.room, socket.assigns.user_id, socket.assigns.channel_id) do
+    resp = case ChannelService.channel_command(socket, @command_list[command],
+      socket.assigns.room, socket.assigns.user_id, socket.assigns.channel_id) do
       {:ok, _msg} ->
         # if message = @message_list[command] do
         #   message = message |> String.replace("%%user%%", user.username) |> String.replace("%%room%%", socket.assigns.room)
@@ -138,7 +152,8 @@ defmodule UccChat.Web.RoomChannelController do
   end
 
   def command(socket, %{"command" => command, "username" => username}) do
-    Logger.warn "RoomChannelController: command: #{inspect command}, username: #{inspect username}"
+    Logger.warn "RoomChannelController: command: #{inspect command}, " <>
+      "username: #{inspect username}"
     {:reply, {:ok, %{}}, socket}
   end
 end
