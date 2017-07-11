@@ -8,7 +8,7 @@
   aside.steve.side-nav.primary-background-color.color-tertiary-font-color(role="navigation")
     .flex-nav.primary-background-color
       section
-        = render UccAdmin.Web.AdminView, "admin_flex.html", conn: @conn, chatd: @chatd, user: @user
+        = UccAdmin.Web.AdminView.render "admin_flex.html", conn: @conn, chatd: @chatd, user: @user
     span.arrow.close
 .sweet-container
 - flash_error = @conn.private[:phoenix_flash]["error"]

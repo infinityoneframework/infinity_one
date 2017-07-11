@@ -32,7 +32,6 @@ defmodule UccChat.Schema.Channel do
 
   @fields ~w(archived name type topic read_only blocked default user_id description active)a
 
-
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

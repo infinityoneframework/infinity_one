@@ -12,7 +12,10 @@ defmodule UccSettings do
       |> Application.get_env(:settings_modules, [])
       |> Enum.map(fn module ->
         if not Code.ensure_compiled?(module), do: raise("module #{module} not compiled")
-        Enum.map module.schema().__schema__(:fields), fn field ->
+
+        module.schema().__schema__(:fields)
+        |> Enum.reject(& &1 == :id)
+        |> Enum.map(fn field ->
           @field field
           @mod module
           def unquote(field)() do
@@ -21,7 +24,7 @@ defmodule UccSettings do
           def unquote(field)(config) do
             apply(@mod, @field, [config])
           end
-        end
+        end)
       end)
     end
   end
@@ -30,7 +33,11 @@ defmodule UccSettings do
   |> Application.get_env(:settings_modules, [])
   |> Enum.map(fn module ->
     if not Code.ensure_compiled?(module), do: raise("module #{module} not compiled")
-    Enum.map module.schema().__schema__(:fields), fn field ->
+
+    module.schema().__schema__(:fields)
+    |> Enum.reject(& &1 == :id)
+    |> Enum.map(fn field ->
+      # IO.inspect {module, field}, label: "{module, field}"
       @field field
       @mod module
       def unquote(field)() do
@@ -39,7 +46,7 @@ defmodule UccSettings do
       def unquote(field)(config) do
         apply(@mod, @field, [config])
       end
-    end
+    end)
   end)
 
   # Module.register_attribute(__MODULE__, :modules, persist: true, accumulate: true)
