@@ -8,7 +8,7 @@ defmodule UccChat.Web.MessageChannelController do
     AttachmentService
   }
   alias UcxUcc.Permissions
-  alias UcxUcc.Accounts.User
+  # alias UcxUcc.Accounts.User
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.Schema.Message, as: MessageSchema
 
@@ -59,7 +59,7 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   def index(%{assigns: assigns} = socket, params) do
-    user = Helpers.get(User, assigns[:user_id])
+    user = Helpers.get_user(assigns[:user_id], preload: [])
 
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
@@ -94,7 +94,7 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   def previous(%{assigns: assigns} = socket, params) do
-    user = Helpers.get(User, assigns[:user_id])
+    user = Helpers.get_user(assigns[:user_id], preload: [])
 
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
@@ -129,7 +129,7 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   def surrounding(%{assigns: assigns} = socket, params) do
-    user = Helpers.get(User, assigns[:user_id])
+    user = Helpers.get_user(assigns[:user_id], preload: [])
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
 
@@ -157,7 +157,7 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   def last(%{assigns: assigns} = socket, _params) do
-    user = Helpers.get(User, assigns[:user_id])
+    user = Helpers.get_user assigns[:user_id], preload: []
     channel_id = assigns[:channel_id]
 
     list = Message.get_messages(channel_id, user)
@@ -181,12 +181,12 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   def update(%{assigns: assigns} = socket, params) do
-    user = Helpers.get(User, assigns[:user_id])
+    user = Helpers.get_user assigns[:user_id], preload: []
     channel_id = assigns[:channel_id]
     id = params["id"]
 
     value = params["message"]
-    message = Helpers.get(Message, id, preload: [:attachments])
+    message = Message.get(id, preload: [:attachments])
     resp =
       case message.attachments do
         [] ->
@@ -211,8 +211,7 @@ defmodule UccChat.Web.MessageChannelController do
     user = Helpers.get_user assigns.user_id
     if user.id == params["message_id"] ||
       Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
-      message = Helpers.get Message, params["message_id"],
-        preload: [:attachments]
+      message = Message.get params["message_id"], preload: [:attachments]
       case MessageService.delete_message message do
         {:ok, _} ->
           Phoenix.Channel.broadcast! socket, "code:update",
@@ -260,8 +259,8 @@ defmodule UccChat.Web.MessageChannelController do
   end
 
   def delete_attachment(%{assigns: assigns} = socket, params) do
-    user = Helpers.get(User, assigns[:user_id])
-    attachment = Helpers.get Attachment, params["id"], preload: [:message]
+    user = Helpers.get_user assigns[:user_id], preload: []
+    attachment = Attachment.get params["id"], preload: [:message]
     message = attachment.message
     if user.id == message.user_id ||
       Permissions.has_permission?(user, "delete-message", assigns.channel_id) do

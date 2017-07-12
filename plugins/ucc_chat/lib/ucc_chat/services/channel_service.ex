@@ -186,8 +186,8 @@ defmodule UccChat.ChannelService do
   # Repo Multi
 
   def insert_channel!(%{user_id: user_id} = params) do
-    User
-    |> Helpers.get!(user_id, preload: [:roles])
+    user_id
+    |> Helpers.get_user!(preload: [:roles])
     |> insert_channel!(params)
   end
 
@@ -199,7 +199,7 @@ defmodule UccChat.ChannelService do
   end
 
   def insert_channel(%{user_id: user_id} = params) do
-    user = Helpers.get!(User, user_id, preload: [:roles])
+    user = Helpers.get_user!(user_id, preload: [:roles])
     insert_channel(user, params)
   end
 
@@ -520,7 +520,7 @@ defmodule UccChat.ChannelService do
   end
 
   def add_direct(username, user_id, channel_id) do
-    user_orig = Helpers.get(User, user_id)
+    user_orig = Helpers.get_user user_id, preload: []
     user_dest = Helpers.get_by(User, :username, username)
 
     name = user_orig.username <> "__" <> username
@@ -983,7 +983,7 @@ defmodule UccChat.ChannelService do
   # def notify_action(socket, action, resource, owner_id, channel_id)
 
   def notify_user_action2(socket, user, user_id, channel_id, fun) do
-    owner = Helpers.get(User, user_id)
+    owner = Helpers.get_user user_id, preload: []
     body = fun.(user.username, owner.username)
     broadcast_message2(socket, body, user_id, channel_id, system: true)
   end

@@ -10,7 +10,7 @@ defmodule UccChat.MessageService do
     SubscriptionService, MessageAgent, AttachmentService
   }
   alias UccChat.ServiceHelpers, as: Helpers
-  alias UccChat.Schema.Message, as: MessageSchema
+  # alias UccChat.Schema.Message, as: MessageSchema
 
   require UccChat.ChatConstants, as: CC
   require Logger
@@ -50,7 +50,7 @@ defmodule UccChat.MessageService do
   end
 
   def broadcast_updated_message(message, _opts \\ []) do
-    message = Helpers.get MessageSchema, message.id, preload: @preloads
+    message = Message.get message.id, preload: @preloads
     channel = Channel.get message.channel_id
     html =
       message

@@ -153,7 +153,7 @@ defmodule UccChat.Web.RoomChannel do
   def handle_in(ev = "message:get-body:" <> id, msg, socket) do
     debug ev, msg
 
-    message = Helpers.get Message, id, preload: [:attachments]
+    message = Message.get id, preload: [:attachments]
     body =
       case message.attachments do
         [] -> message.body

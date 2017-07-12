@@ -654,7 +654,7 @@ defmodule UccChat.Web.UserChannel do
         "#{inspect socket.assigns.room}, opens: #{inspect opens}"
     end
     %{channel_id: channel_id, msg: msg} = payload
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     with [sub] <- Repo.all(Subscription.get(channel_id, user_id)),
          # _ <- Logger.warn("update_direct_message unread: #{sub.unread}"),
          open  <- Map.get(sub, :open),

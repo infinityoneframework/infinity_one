@@ -10,7 +10,7 @@ defmodule UccChat.ReactionService do
     user = Helpers.get_user assigns.user_id
     emoji = params["reaction"]
 
-    message = Helpers.get Message, params["message_id"],
+    message = Message.get params["message_id"],
       preload: MessageService.preloads()
 
     case Enum.find message.reactions, &(&1.emoji == emoji) do
@@ -73,7 +73,7 @@ defmodule UccChat.ReactionService do
     username = user.username
     reaction
     |> reaction_user_ids
-    |> Enum.map(&(Helpers.get User, &1))
+    |> Enum.map(&Helpers.get_user(&1, preload: []))
     |> Enum.reject(&(is_nil &1))
     |> Enum.map(fn user ->
       case user.username do

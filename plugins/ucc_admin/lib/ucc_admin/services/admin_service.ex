@@ -231,7 +231,7 @@ defmodule UccAdmin.AdminService do
     debug ev, params
     assigns = socket.assigns
     current_user = Helpers.get_user!(assigns.user_id)
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     html =
       "room_info.html"
       |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: field)
@@ -242,7 +242,7 @@ defmodule UccAdmin.AdminService do
   def handle_in(ev = "channel-settings:cancel", %{"channel_id" => channel_id} = params, socket) do
     debug ev, params
     current_user = Helpers.get_user!(socket.assigns.user_id)
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     html =
       "room_info.html"
       |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: nil)
@@ -253,7 +253,7 @@ defmodule UccAdmin.AdminService do
   def handle_in(ev = "channel-settings:save", %{"channel_id" => channel_id} = params, socket) do
     debug ev, params
     current_user = Helpers.get_user!(socket.assigns.user_id)
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     html =
       "room_info.html"
       |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: nil)
