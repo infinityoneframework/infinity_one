@@ -157,7 +157,7 @@ defmodule UccChat.Web.SlashCommandChannelController do
          true <- String.match?(name, ~r/[a-z0-9\.\-_]/i) do
 
       target_channel =
-        case Helpers.get_by(Channel, :name, name) do
+        case Channel.get_by(name: name) do
           nil -> name
           channel -> channel
         end

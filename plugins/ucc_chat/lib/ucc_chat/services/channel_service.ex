@@ -437,7 +437,7 @@ defmodule UccChat.ChannelService do
       end)
     end
 
-    channel = Helpers.get_by! ChannelSchema, :name, room, preload: [:subscriptions]
+    channel = Channel.get_by! name: room, preload: [:subscriptions]
     # old_channel = Helpers.get_by! Channel, :name, old_room, preload: [:subscriptions]
 
     # {subscribed, hidden} = Channel.subscription_status(channel, user.id)
@@ -521,7 +521,7 @@ defmodule UccChat.ChannelService do
 
   def add_direct(username, user_id, channel_id) do
     user_orig = Helpers.get_user user_id, preload: []
-    user_dest = Helpers.get_by(User, :username, username)
+    user_dest = Helpers.get_user_by_name(username)
 
     name = user_orig.username <> "__" <> username
     # Logger.warn "name: #{inspect name}"
@@ -803,7 +803,7 @@ defmodule UccChat.ChannelService do
 
   def user_command(socket, command, name, user_id, channel_id)
     when command in @user_commands and is_binary(name) do
-    case Helpers.get_by(User, :username, name) do
+    case Helpers.get_user_by_name(name) do
       nil ->
         {:error, ~g"The user " <> "`@#{name}`" <> ~g" does not exists"}
       user ->

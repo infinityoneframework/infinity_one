@@ -79,7 +79,7 @@ defmodule UccChat.Web.ChannelController do
 
   def direct(conn, %{"name" => name}) do
     with user when not is_nil(user) <-
-         UccChat.ServiceHelpers.get_by(User, :username, name),
+         UccChat.ServiceHelpers.get_user_by_name(name),
          user_id <- Coherence.current_user(conn) |> Map.get(:id),
          false <- user.id == user_id do
 

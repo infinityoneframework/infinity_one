@@ -2,7 +2,7 @@ defmodule UccChat.Web.RoomChannelController do
   use UccChat.Web, :channel_controller
 
   alias UccChat.ChannelService
-  alias UcxUcc.Accounts.User
+  # alias UcxUcc.Accounts.User
   alias UccChat.ServiceHelpers, as: Helpers
   require Logger
 
@@ -109,7 +109,7 @@ defmodule UccChat.Web.RoomChannelController do
     when command in @commands do
     Logger.warn "RoomChannelController: command: #{command}, username: " <>
       "#{inspect username}, socket: #{inspect socket}"
-    user = Helpers.get_by! User, :username, username
+    user = Helpers.get_user_by_name username
 
     # resp = case ChannelService.user_command(:unmute, user, socket.assigns.user_id, socket.assigns.channel_id) do
     resp = case ChannelService.user_command(socket, @command_list[command],

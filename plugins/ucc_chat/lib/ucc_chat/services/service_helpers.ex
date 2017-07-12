@@ -35,31 +35,6 @@ defmodule UccChat.ServiceHelpers do
     Repo.one(from u in User, where: u.id == ^id, preload: ^preload)
   end
 
-  def get_by!(model, field, value, opts \\ []) do
-    model
-    |> get_by_q(field, value, opts)
-    |> Repo.one!
-  end
-
-  def get_by(model, field, value, opts \\ []) do
-    model
-    |> get_by_q(field, value, opts)
-    |> Repo.one
-  end
-
-  def get_all_by(model, field, value, opts \\ []) do
-    model
-    |> get_by_q(field, value, opts)
-    |> Repo.all
-  end
-
-  defp get_by_q(model, field, value, opts) do
-    preload = opts[:preload] || []
-    model
-    |> where([c], field(c, ^field) == ^value)
-    |> preload(^preload)
-  end
-
   def get_user_by_name(username, opts \\ [])
   def get_user_by_name(nil, _), do: nil
   def get_user_by_name(username, opts) do

@@ -354,7 +354,7 @@ defmodule UccChat.FlexBarService do
     {user, user_mode} =
       case opts["username"] do
         nil -> {Helpers.get_user!(user_id), false}
-        username -> {Helpers.get_by(User, :username, username, preload: [:roles]), true}
+        username -> {Helpers.get_user_by_name(username, preload: [:roles]), true}
       end
 
     users = get_all_channel_online_users(channel)

@@ -62,12 +62,25 @@ defmodule UccModel do
 
       @spec get_by(Keyword.t) :: Struct.t
       def get_by(opts) do
-        @repo.get_by @schema, opts
+        if preload = opts[:preload] do
+          # TODO: Fix this with a single query
+          @schema
+          |> @repo.get_by(Keyword.delete(opts, :preload))
+          |> @repo.preload(preload)
+        else
+          @repo.get_by @schema, opts
+        end
       end
 
       @spec get_by!(Keyword.t) :: Struct.t
       def get_by!(opts) do
-        @repo.get_by! @schema, opts
+        if preload = opts[:preload] do
+          @schema
+          |> @repo.get_by(Keyword.delete(opts, :preload))
+          |> @repo.preload(preload)
+        else
+          @repo.get_by! @schema, opts
+        end
       end
 
       @spec create(Keyword.t) :: {:ok, Struct.t} |
