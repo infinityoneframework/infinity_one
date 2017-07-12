@@ -307,7 +307,7 @@ defmodule UccChat.FlexBarService do
 
   def get_render_args("Info", user_id, channel_id, _, _)  do
     current_user = Helpers.get_user! user_id
-    channel = Helpers.get_channel(channel_id)
+    channel = Channel.get!(channel_id)
     [channel: settings_form_fields(channel, user_id),
      current_user: current_user, channel_type: channel.type]
   end
@@ -328,7 +328,7 @@ defmodule UccChat.FlexBarService do
 
   def get_render_args("Files List", user_id, channel_id, _, _)  do
     current_user = Helpers.get_user! user_id
-    channel = Helpers.get_channel(channel_id)
+    channel = Channel.get!(channel_id)
     attachments = (from a in AttachmentSchema,
       join: m in MessageSchema, on: a.message_id == m.id,
       order_by: [desc: m.timestamp],
@@ -339,7 +339,7 @@ defmodule UccChat.FlexBarService do
 
   def get_render_args("User Info", user_id, channel_id, _, _)  do
     current_user = Helpers.get_user! user_id
-    channel = Helpers.get_channel(channel_id)
+    channel = Channel.get!(channel_id)
     direct = Direct.get_by user_id: user_id, channel_id: channel_id
 
     user = Helpers.get_user_by_name(direct.users)
@@ -349,7 +349,7 @@ defmodule UccChat.FlexBarService do
 
   def get_render_args("Members List", user_id, channel_id, _message_id, opts) do
     current_user = Helpers.get_user!(user_id)
-    channel = Helpers.get_channel(channel_id, [users: :roles])
+    channel = Channel.get!(channel_id, preload: [users: :roles])
 
     {user, user_mode} =
       case opts["username"] do

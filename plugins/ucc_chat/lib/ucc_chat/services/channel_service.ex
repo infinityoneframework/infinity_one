@@ -490,7 +490,8 @@ defmodule UccChat.ChannelService do
   end
 
   def toggle_favorite(user_id, channel_id) do
-    cc = Helpers.get_channel_user(channel_id, user_id, preload: [:channel])
+    cc = Subscription.get_by_channel_id_and_user_id(channel_id, user_id,
+      preload: [:channel])
     cc_type =
       if cc.type == room_type(:stared) do
         cc.channel.type # change it back

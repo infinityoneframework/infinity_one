@@ -21,6 +21,15 @@ defmodule UccChat.Subscription do
     |> @repo.all
   end
 
+  def get_by_channel_id_and_user_id(channel_id, user_id, opts \\ []) do
+    preload = opts[:preload] || []
+
+    @schema
+    |> where([c], c.user_id == ^user_id and c.channel_id == ^channel_id)
+    |> preload(^preload)
+    |> @repo.one!
+  end
+
   def open_channel_count(user_id) when is_binary(user_id) do
     @repo.one from s in @schema,
       where: s.open == true and s.user_id == ^user_id,

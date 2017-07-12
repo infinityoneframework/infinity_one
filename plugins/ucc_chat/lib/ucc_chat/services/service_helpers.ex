@@ -1,7 +1,7 @@
 defmodule UccChat.ServiceHelpers do
   # use UccChat.Web, :service
   alias UccChat.{
-    Channel, Subscription, MessageService
+    Channel, MessageService
   }
 
   require UccChat.Web.SharedView
@@ -60,10 +60,6 @@ defmodule UccChat.ServiceHelpers do
     |> Repo.one
   end
 
-  def get_channel(channel_id, preload \\ []) do
-    Channel.get! channel_id, preload: preload
-  end
-
   def get_all_by(model, field, value, opts \\ []) do
     model
     |> get_by_q(field, value, opts)
@@ -75,15 +71,6 @@ defmodule UccChat.ServiceHelpers do
     model
     |> where([c], field(c, ^field) == ^value)
     |> preload(^preload)
-  end
-
-  def get_channel_user(channel_id, user_id, opts \\ []) do
-    preload = opts[:preload] || []
-
-    Subscription
-    |> where([c], c.user_id == ^user_id and c.channel_id == ^channel_id)
-    |> preload(^preload)
-    |> Repo.one!
   end
 
   def get_user_by_name(username, opts \\ [])
