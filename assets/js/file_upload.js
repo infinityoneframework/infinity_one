@@ -139,13 +139,13 @@ class FileUpload {
     })
   }
   validate_upload(file) {
-    let size = UcxChat.settings.maximum_file_upload_size_kb * 1024
+    let size = UccChat.settings.maximum_file_upload_size_kb * 1024
     if (file.size > size) {
       console.log('file sizes', file.size, size)
-      toastr.error('File size exceeds the ' + UcxChat.settings.maximum_file_upload_size_kb + 'KB maximum!')
+      toastr.error('File size exceeds the ' + UccChat.settings.maximum_file_upload_size_kb + 'KB maximum!')
       return false
     }
-    if (!UcxChat.fileUploadIsValidContentType(file.type)) {
+    if (!UccChat.fileUploadIsValidContentType(file.type)) {
       console.log('file.type', file.type)
       toastr.error('Restricted file type')
       return false

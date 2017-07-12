@@ -16,8 +16,10 @@ defmodule UccChat.Web do
   below.
   """
 
+
   def controller do
     quote do
+      Code.ensure_compiled(UccChat.Web.Router)
       use Phoenix.Controller, namespace: UccChat.Web
       import Plug.Conn
       import UccChat.Web.Router.Helpers
@@ -40,6 +42,7 @@ defmodule UccChat.Web do
 
   def view do
     quote do
+      Code.ensure_compiled(UccChat.Web.Router)
       use Phoenix.View, root: "plugins/ucc_chat/lib/ucc_chat/web/templates",
                         namespace: UccChat.Web
 

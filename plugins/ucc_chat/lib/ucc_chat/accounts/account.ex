@@ -1,7 +1,10 @@
 defmodule UccChat.Accounts.Account do
   use Unbrella.Plugin.Schema, UcxUcc.Accounts.Account
-  alias UcxUcc.Accounts.User
+
   import Ecto.Query
+
+  alias UcxUcc.Accounts.{User, Account}
+  alias UccChat.Schema.{Notification, AccountNotification}
 
   extend_schema UcxUcc.Accounts.Account do
     field :language, :string, default: "on"
@@ -30,8 +33,7 @@ defmodule UccChat.Accounts.Account do
     field :emoji_tone, :integer, default: 0
     field :emoji_recent, :string, default: ""
 
-    many_to_many :notifications, UccChat.Notification, join_through: UccChat.AccountNotification
-
+    many_to_many :notifications, Notification, join_through: AccountNotification
   end
 
   @fields [:language, :desktop_notification_enabled, :desktop_notification_duration] ++
@@ -53,7 +55,7 @@ defmodule UccChat.Accounts.Account do
 
   def get(user_id) do
     from u in User,
-      join: a in UcxUcc.Accounts.Account,
+      join: a in Account,
       on: u.account_id == a.id,
       where: u.id == ^user_id,
       select: a

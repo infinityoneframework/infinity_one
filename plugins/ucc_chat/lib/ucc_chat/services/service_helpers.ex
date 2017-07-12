@@ -1,7 +1,7 @@
 defmodule UccChat.ServiceHelpers do
   # use UccChat.Web, :service
   alias UccChat.{
-    Channel, Subscription, MessageService
+    Channel, MessageService
   }
 
   require UccChat.Web.SharedView
@@ -16,77 +16,23 @@ defmodule UccChat.ServiceHelpers do
 
   def default_user_preloads, do: @default_user_preload
 
-  def get_user!(%Phoenix.Socket{assigns: assigns}) do
-    get_user!(assigns[:user_id])
+  def get_user!(user, opts \\ [])
+  def get_user!(%Phoenix.Socket{assigns: assigns}, opts) do
+    get_user!(assigns[:user_id], opts)
+  end
+  def get_user!(id, opts) do
+    preload = opts[:preload] || @default_user_preload
+    Repo.one!(from u in User, where: u.id == ^id, preload: ^preload)
   end
 
-  def get_user!(id) do
-    Repo.one!(from u in User, where: u.id == ^id, preload: ^@default_user_preload)
+  def get_user(user, opts \\ [])
+  def get_user(%Phoenix.Socket{assigns: assigns}, opts) do
+    get_user(assigns[:user_id], opts)
   end
 
-  def get_user(%Phoenix.Socket{assigns: assigns}) do
-    get_user(assigns[:user_id])
-  end
-
-  def get_user(id, _opts \\ []) do
-    Repo.one(from u in User, where: u.id == ^id, preload: ^@default_user_preload)
-  end
-
-  def get!(model, id, opts \\ []) do
-    preload = opts[:preload] || []
-    model
-    |> where([c], c.id == ^id)
-    |> preload(^preload)
-    |> Repo.one!
-  end
-
-  def get(model, id, opts \\ []) do
-    preload = opts[:preload] || []
-    model
-    |> where([c], c.id == ^id)
-    |> preload(^preload)
-    |> Repo.one
-  end
-
-  def get_by!(model, field, value, opts \\ []) do
-    model
-    |> get_by_q(field, value, opts)
-    |> Repo.one!
-  end
-
-  def get_by(model, field, value, opts \\ []) do
-    model
-    |> get_by_q(field, value, opts)
-    |> Repo.one
-  end
-
-  def get_channel(channel_id, preload \\ []) do
-    Channel
-    |> where([c], c.id == ^channel_id)
-    |> preload(^preload)
-    |> Repo.one!
-  end
-
-  def get_all_by(model, field, value, opts \\ []) do
-    model
-    |> get_by_q(field, value, opts)
-    |> Repo.all
-  end
-
-  defp get_by_q(model, field, value, opts) do
-    preload = opts[:preload] || []
-    model
-    |> where([c], field(c, ^field) == ^value)
-    |> preload(^preload)
-  end
-
-  def get_channel_user(channel_id, user_id, opts \\ []) do
-    preload = opts[:preload] || []
-
-    Subscription
-    |> where([c], c.user_id == ^user_id and c.channel_id == ^channel_id)
-    |> preload(^preload)
-    |> Repo.one!
+  def get_user(id, opts) do
+    preload = opts[:preload] || @default_user_preload
+    Repo.one(from u in User, where: u.id == ^id, preload: ^preload)
   end
 
   def get_user_by_name(username, opts \\ [])
@@ -236,7 +182,7 @@ defmodule UccChat.ServiceHelpers do
   defp parse_name(<<ch::8>> <> tail, buff, acc), do: parse_name(tail, buff <> <<ch::8>>, acc)
 
   def broadcast_message(body, user_id, channel_id) do
-    channel = get! Channel, channel_id
+    channel = Channel.get! channel_id
     broadcast_message(body, channel.name, user_id, channel_id)
   end
 

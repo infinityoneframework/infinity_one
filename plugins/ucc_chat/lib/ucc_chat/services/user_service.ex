@@ -28,18 +28,8 @@ defmodule UccChat.UserService do
     User.all() |> Repo.all
   end
 
-  def open_channel_count(user_id) when is_binary(user_id) do
-    Repo.one from s in Subscription,
-      where: s.open == true and s.user_id == ^user_id,
-      select: count(s.id)
-  end
-
-  def open_channels(user_id) when is_binary(user_id) do
-    Repo.all from s in Subscription,
-      join: c in Channel, on: s.channel_id == c.id,
-      where: s.open == true and s.user_id == ^user_id,
-      select: c
-  end
+  defdelegate open_channel_count(user_id), to: Subscription
+  defdelegate open_channels(user_id), to: Subscription
 
   def delete_user(user) do
     Account
@@ -49,25 +39,18 @@ defmodule UccChat.UserService do
   end
 
   def deactivate_user(user) do
-    (from s in Subscription,
-      join: c in Channel, on: s.channel_id == c.id,
-      where: c.type == 2 and s.user_id == ^(user.id),
-      select: c)
-    |> Repo.all
-    |> Enum.each(fn channel ->
-      Repo.update Channel.changeset_update(channel, %{active: false})
-    end)
-    user
+    activate_deactivate_user(user, false)
   end
 
   def activate_user(user) do
-    (from s in Subscription,
-      join: c in Channel, on: s.channel_id == c.id,
-      where: c.type == 2 and s.user_id == ^(user.id),
-      select: c)
-    |> Repo.all
+    activate_deactivate_user(user, true)
+  end
+
+  defp activate_deactivate_user(user, state) do
+    user
+    |> Subscription.get_by_user_and_type(2)
     |> Enum.each(fn channel ->
-      Repo.update Channel.changeset_update(channel, %{active: true})
+      Channel.update(channel, %{active: state})
     end)
     user
   end
@@ -89,12 +72,10 @@ defmodule UccChat.UserService do
         |> Repo.insert!
 
         unless opts[:join_default_channels] == false do
-          (from c in Channel, where: c.default == true)
-          |> Repo.all
+          true
+          |> Channel.list_by_default
           |> Enum.each(fn ch ->
-            %Subscription{}
-            |> Subscription.changeset(%{channel_id: ch.id, user_id: user.id})
-            |> Repo.insert!
+            Subscription.create!(%{channel_id: ch.id, user_id: user.id})
           end)
         end
         {:ok, user}

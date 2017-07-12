@@ -1,12 +1,16 @@
 defmodule UccChat.MessagePopupService do
   use UccChat.Shared, :service
-  require Logger
-  alias UccChat.{Channel, Message, SlashCommands, PresenceAgent, Emoji}
+
+  import Ecto.Query
+
+  alias UccChat.{Channel, SlashCommands, PresenceAgent, Emoji}
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
   alias UccChat.Web.MessageView
+  alias UccChat.Schema.Message, as: MessageSchema
   # alias UccChat.ServiceHelpers, as: Helpers
-  import Ecto.Query
+
+  require Logger
 
   def handle_in("get:users" <> _mod, msg) do
     Logger.debug "get:users, msg: #{inspect msg}"
@@ -17,9 +21,19 @@ defmodule UccChat.MessagePopupService do
 
     if length(users) > 0 do
       data = users ++ [
-        %{system: true, username: "all", name: ~g"Notify all in this room", id: "all"},
-        %{system: true, username: "here", name: ~g"Notify active users in this room", id: "here"}
+        %{
+          system: true,
+          username: "all",
+          name: ~g"Notify all in this room", id: "all"
+        },
+        %{
+          system: true,
+          username: "here",
+          name: ~g"Notify active users in this room",
+          id: "here"
+        }
       ]
+
       chatd = %{open: true, title: ~g"People", data: data, templ: "popup_user.html"}
 
       html =
@@ -36,10 +50,16 @@ defmodule UccChat.MessagePopupService do
   def handle_in("get:channels" <> _mod, msg) do
     Logger.debug "get:channels, msg: #{inspect msg}"
     pattern = msg["pattern"] |> to_string
-    channels = get_channels_by_pattern(msg["channel_id"], msg["user_id"], "%" <> pattern <> "%")
+    channels = get_channels_by_pattern(msg["channel_id"], msg["user_id"],
+      "%" <> pattern <> "%")
 
     if length(channels) > 0 do
-      chatd = %{open: true, title: ~g"Channels", data: channels, templ: "popup_channel.html"}
+      chatd = %{
+        open: true,
+        title: ~g"Channels",
+        data: channels,
+        templ: "popup_channel.html"
+      }
 
       html =
         "popup.html"
@@ -74,18 +94,24 @@ defmodule UccChat.MessagePopupService do
     pattern = msg["pattern"] |> to_string
     Logger.warn "#{ev}, pattern: #{pattern} msg: #{inspect msg}"
 
-    commands = Emoji.commands(pattern)
-    if commands != [] do
-      chatd = %{open: true, title: "Emoji", data: commands, templ: "popup_emoji.html"}
 
-      html =
-        "popup_emoji.html"
-        |> MessageView.render(chatd: chatd)
-        |> Helpers.safe_to_string
+    case Emoji.commands(pattern) do
+      [] ->
+        {:ok, %{close: true}}
+      commands ->
+        chatd = %{
+          open: true,
+          title: "Emoji",
+          data: commands,
+          templ: "popup_emoji.html"
+        }
 
-      {:ok, %{html: html}}
-    else
-      {:ok, %{close: true}}
+        html =
+          "popup_emoji.html"
+          |> MessageView.render(chatd: chatd)
+          |> Helpers.safe_to_string
+
+        {:ok, %{html: html}}
     end
   end
 
@@ -122,12 +148,15 @@ defmodule UccChat.MessagePopupService do
     |> limit(^count)
     |> Repo.all
     |> Enum.reject(fn user -> User.has_role?(user, "bot", 0) end)
-    |> Enum.map(fn user -> %{id: user.id, username: user.username, status: PresenceAgent.get(user.id)} end)
+    |> Enum.map(fn user ->
+      %{id: user.id, username: user.username,
+        status: PresenceAgent.get(user.id)}
+    end)
   end
 
   def get_default_users(channel_id, user_id, pattern \\ "%") do
     user_ids =
-      Message
+      MessageSchema
       |> where([m], m.channel_id == ^channel_id and m.user_id != ^user_id)
       |> group_by([m], m.user_id)
       |> select([m], m.user_id)
@@ -143,7 +172,10 @@ defmodule UccChat.MessagePopupService do
     |> Enum.reject(fn user -> User.has_role?(user, "bot", 0) end)
     |> Enum.reverse
     |> Enum.take(5)
-    |> Enum.map(fn user -> %{username: user.username, id: user.id, status: PresenceAgent.get(user.id)} end)
+    |> Enum.map(fn user ->
+      %{username: user.username, id: user.id,
+        status: PresenceAgent.get(user.id)}
+    end)
   end
 
   # defp add_status(users) do

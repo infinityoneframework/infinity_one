@@ -29,7 +29,7 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
     style body { background-color: #04436A; }
 
   javascript:
-    window.UcxChat = {}
+    window.UccChat = {}
 
   body.global-font-family.color-primary-font-color
     #initial-page-loading.page-loading

@@ -1,7 +1,7 @@
 defmodule UccChat.Web.AttachmentController do
   use UccChat.Web, :controller
 
-  # alias UcxChat.{Channel, User, Direct, ChannelService}
+  # alias UccChat.{Channel, User, Direct, ChannelService}
   alias UccChat.{AttachmentService}
 
   require Logger

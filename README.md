@@ -78,7 +78,7 @@ And the bast part is that the data is safe with encrypted connections between yo
 * In the process of refactoring it to be extensible through plugins
 * We will be using it for a client framework with initial support for the chat app and our commerical WebRTC softphone (delerved as a plugin)
 * This is a work in progress and requires a lot of clean up before production release
-* I've experiemented with serveral diffent approaches of channel -> JS rendering, channel message routing, etc. I still need to pick an approach and refactor the other areas for consistency. 
+* I've experiemented with serveral diffent approaches of channel -> JS rendering, channel message routing, etc. I still need to pick an approach and refactor the other areas for consistency.
 
 <img src="priv/images/screen_shot_4.png" height="400px">
 
@@ -125,7 +125,7 @@ Config.changeset(config, %{file_upload: %FileUpload{} |> Map.from_struct}) |> Re
 ```
 ## Contributing
 
-We appreciate any contribution to UcxChat. Check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [CONTRIBUTING.md](CONTRIBUTING.md) guides for more information. We usually keep a list of features and bugs [in the issue tracker][1].
+We appreciate any contribution to UcxUcc. Check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [CONTRIBUTING.md](CONTRIBUTING.md) guides for more information. We usually keep a list of features and bugs [in the issue tracker][1].
 
   [1]: https://github.com/smpallen99/ucx_ucc/issues
 ## Acknowlegemets

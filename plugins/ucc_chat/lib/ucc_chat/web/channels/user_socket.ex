@@ -62,14 +62,22 @@ defmodule UccChat.Web.UserSocket do
 
   def push_message_box(socket, channel_id, user_id) do
     # if channel_id == assigns.channel_id do
-      Logger.warn "push_message_box #{channel_id}, #{user_id}, socket.assigns: #{inspect socket.assigns}"
-      html = MessageService.render_message_box(channel_id, user_id)
-      Phoenix.Channel.push socket, "code:update", %{html: html, selector: ".room-container footer.footer", action: "html"}
+      Logger.warn "push_message_box #{channel_id}, #{user_id}, " <>
+        "socket.assigns: #{inspect socket.assigns}"
+
+      Phoenix.Channel.push socket, "code:update", %{
+        html: MessageService.render_message_box(channel_id, user_id),
+        selector: ".room-container footer.footer",
+        action: "html"
+      }
     # end
   end
 
   def push_rooms_list_update(socket, channel_id, user_id) do
-    html = SideNavService.render_rooms_list(channel_id, user_id)
-    Phoenix.Channel.push socket, "code:update", %{html: html, selector: "aside.side-nav .rooms-list", action: "html"}
+    Phoenix.Channel.push socket, "code:update", %{
+      html: SideNavService.render_rooms_list(channel_id, user_id),
+      selector: "aside.side-nav .rooms-list",
+      action: "html"
+    }
   end
 end

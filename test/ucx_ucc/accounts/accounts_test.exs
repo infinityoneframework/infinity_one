@@ -3,6 +3,35 @@ defmodule UcxUcc.AccountsTest do
 
   alias UcxUcc.Accounts
 
+  describe "users" do
+    alias UcxUcc.Accounts.Role
+    alias UcxUcc.Accounts.User
+
+    test "add_role_to_user" do
+      _user_role = insert_role "user", %{scope: "global"}
+      admin_role = insert_role "admin", %{scope: "global"}
+      user = insert_user()
+      [role] = user.roles
+      assert role.name == "user"
+      Accounts.add_role_to_user user, admin_role
+      user = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles]
+      names = Enum.map user.roles, &(&1.name)
+      assert "user" in names
+      assert "admin" in names
+    end
+
+    test "add_role_to_user name" do
+      insert_role "user", %{scope: "global"}
+      insert_role "admin", %{scope: "global"}
+      user = insert_user()
+      Accounts.add_role_to_user user, "admin"
+      user = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles]
+      names = Enum.map user.roles, &(&1.name)
+      assert "user" in names
+      assert "admin" in names
+    end
+  end
+
   describe "roles" do
     alias UcxUcc.Accounts.Role
 

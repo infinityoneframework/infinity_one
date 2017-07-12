@@ -2,6 +2,7 @@ defmodule UcxUcc.Accounts.User do
   @moduledoc false
   use Coherence.Schema
   use Unbrella.Schema
+  # use Ecto.Schema
   import Ecto.Query
 
   @mod __MODULE__
@@ -85,9 +86,9 @@ defmodule UcxUcc.Accounts.User do
     |> Enum.sort
   end
 
-  def has_role?(user, role, scope \\ nil) do
+  def has_role?(user, role, scope  \\ "global") do
     Enum.any?(user.roles, fn
-      %{role: ^role, scope: ^scope} -> true
+      %{name: ^role, scope: ^scope} -> true
       _ -> false
     end)
   end

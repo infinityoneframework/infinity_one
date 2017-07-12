@@ -1,16 +1,15 @@
 defmodule UccChat.Web.ChannelController do
   use UccChat.Web, :controller
 
-  alias UccChat.{Channel, Direct, ChannelService}
-  alias UcxUcc.Accounts.User
-
   import Ecto.Query
 
   require Logger
-  require IEx
 
-  alias UccChat.Channel
-  alias UccChat.{MessageService, ChatDat}
+  alias UccChat.{ChatDat}
+  alias UccChat.{Message, Channel, ChannelService}
+  alias UcxUcc.Accounts.User
+  alias UccChat.Schema.Channel, as: ChannelSchema
+  alias UccChat.Schema.Direct, as: DirectSchema
 
   def index(conn, _params) do
     Logger.warn "index load"
@@ -18,16 +17,16 @@ defmodule UccChat.Web.ChannelController do
     user = Coherence.current_user(conn)
     channel = if user.open_id do
       Logger.warn "index load open id"
-      case Repo.get(Channel, user.open_id) do
+      case Channel.get(user.open_id) do
         nil ->
-          Repo.all(Channel) |> hd
+          Channel.list() |> hd
         channel ->
           channel
       end
     else
       Logger.warn "index load no open id"
       channel =
-        Channel
+        ChannelSchema
         |> Ecto.Query.first
         |> Repo.one
 
@@ -40,7 +39,7 @@ defmodule UccChat.Web.ChannelController do
     show(conn, channel)
   end
 
-  def show(conn, %Channel{} = channel) do
+  def show(conn, %ChannelSchema{} = channel) do
     user =
       conn
       |> Coherence.current_user
@@ -48,7 +47,7 @@ defmodule UccChat.Web.ChannelController do
 
     UccChat.PresenceAgent.load user.id
 
-    messages = MessageService.get_room_messages(channel.id, user)
+    messages = Message.get_room_messages(channel.id, user)
     # Logger.warn "message count #{length messages}"
 
     chatd =
@@ -64,10 +63,7 @@ defmodule UccChat.Web.ChannelController do
   end
 
   def show(conn, %{"name" => name}) do
-    Channel
-    |> where([c], c.name == ^name)
-    |> Repo.one
-    |> case do
+    case Channel.get_by(name: name) do
       nil ->
         conn
         |> put_flash(:error, "#{name} is an invalid channel name!")
@@ -82,12 +78,12 @@ defmodule UccChat.Web.ChannelController do
   end
 
   def direct(conn, %{"name" => name}) do
-    with user when not is_nil(user) <- UccChat.ServiceHelpers.get_by(User, :username, name),
+    with user when not is_nil(user) <-
+         UccChat.ServiceHelpers.get_user_by_name(name),
          user_id <- Coherence.current_user(conn) |> Map.get(:id),
          false <- user.id == user_id do
-      user_id
-      |> get_direct(name)
-      |> case do
+
+      case get_direct(user_id, name) do
         nil ->
           # create the direct and redirect
           ChannelService.add_direct(name, user_id, nil)
@@ -101,7 +97,7 @@ defmodule UccChat.Web.ChannelController do
     end
   end
   # def direct(conn, %{"name" => name}) do
-  #   case UcxChat.ServiceHelpers.get_by User, :username, name do
+  #   case UccChat.ServiceHelpers.get_by User, :username, name do
   #     nil ->
   #       redirect conn, to: "/"
   #     user ->
@@ -121,7 +117,7 @@ defmodule UccChat.Web.ChannelController do
   # end
 
   defp get_direct(user_id, name) do
-    (from d in Direct,
+    (from d in DirectSchema,
       where: d.user_id == ^user_id and like(d.users, ^"%#{name}%"),
       preload: [:channel])
     |> Repo.one

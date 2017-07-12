@@ -1,21 +1,10 @@
 defmodule UccChat.PinnedMessage do
-  use UccChat.Shared, :schema
+  use UccModel, schema: UccChat.Schema.PinnedMessage
 
-  schema "pinned_messages" do
-    belongs_to :message, UccChat.Message
-    belongs_to :channel, UccChat.Channel
-
-    timestamps(type: :utc_datetime)
-  end
-
-  @fields ~w(message_id channel_id)a
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, @fields)
-    |> validate_required(@fields)
+  def count(message_id) do
+    @schema
+    |> where([s], s.message_id == ^message_id)
+    |> select([s], count(s.id))
+    |> @repo.one
   end
 end

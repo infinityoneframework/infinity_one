@@ -1,7 +1,7 @@
 defmodule UccChat.Web.MessageController do
   use UccChat.Web, :controller
 
-  # alias UcxChat.Message
+  # alias UccChat.Message
 
   # def index(conn, _params) do
   #   messages = Repo.all(Message)

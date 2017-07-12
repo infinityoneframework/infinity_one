@@ -1,74 +1,64 @@
 defmodule UccChat.MessageCogService do
-  require Logger
+  # import Ecto.Query
+
   alias UccChat.{
     Message, Web.MessageView, StaredMessage, PinnedMessage, Web.FlexBarView
   }
   alias UcxUcc.Repo
   alias UccChat.ServiceHelpers, as: Helpers
-  import Ecto.Query
+  # alias UccChat.Schema.StaredMessage, as: StaredMessageSchema
+
+  require Logger
 
   def handle_in("open", %{"flex_tab" => true}, _) do
-    html = FlexBarView.render("flex_cog.html")
-    |> Helpers.safe_to_string
+    html =
+      "flex_cog.html"
+      |> FlexBarView.render()
+      |> Helpers.safe_to_string
     {nil, %{html: html}}
   end
 
   def handle_in("open", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
-    id = get_message_id msg["message_id"]
-    star_count =
-      StaredMessage
-      |> where([s], s.user_id == ^user_id and s.message_id == ^id and s.channel_id == ^channel_id)
-      |> select([s], count(s.id))
-      |> Repo.one
-    pin_count =
-      PinnedMessage
-      |> where([s], s.message_id == ^id)
-      |> select([s], count(s.id))
-      |> Repo.one
+    message_id = get_message_id msg["message_id"]
+    star_count = StaredMessage.count(user_id, message_id, channel_id)
+    pin_count = PinnedMessage.count(message_id)
     opts = [stared: star_count > 0, pinned: pin_count > 0]
-    Logger.warn "MessageCogService: open, msg: #{inspect msg}, id: #{inspect id}"
-    html = MessageView.render("message_cog.html", opts: opts)
-    |> Helpers.safe_to_string
+    Logger.warn "MessageCogService: open, msg: #{inspect msg}, message_id: #{inspect message_id}"
+
+    html =
+      "message_cog.html"
+      |> MessageView.render(opts: opts)
+      |> Helpers.safe_to_string
 
     {nil, %{html: html}}
   end
 
   def handle_in("star-message", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
     id = get_message_id msg["message_id"]
-    star =
-      %StaredMessage{}
-      |> StaredMessage.changeset(%{message_id: id, user_id: user_id, channel_id: channel_id})
-      |> Repo.insert!
+    star = StaredMessage.create!(%{message_id: id, user_id: user_id,
+      channel_id: channel_id})
     Logger.warn "star: #{inspect star}"
     {"update:stared", %{}}
   end
-
   def handle_in("unstar-message", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
     id = get_message_id msg["message_id"]
-    StaredMessage
-    |> where([s], s.user_id == ^user_id and s.message_id == ^id and s.channel_id == ^channel_id)
-    |> Repo.one!
-    |> Repo.delete!
+    StaredMessage.delete! StaredMessage.get_by(user_id: user_id,
+      message_id: id, channel_id: channel_id)
     {"update:stared", %{}}
   end
 
   def handle_in("pin-message", %{"user_id" => _user_id, "channel_id" => channel_id} = msg, _) do
     id = get_message_id msg["message_id"]
     message = Repo.get Message, id
-    pin =
-      %PinnedMessage{}
-      |> PinnedMessage.changeset(%{message_id: id, user_id: message.user_id, channel_id: channel_id})
-      |> Repo.insert!
+    pin = PinnedMessage.create!(%{message_id: id, user_id: message.user_id,
+      channel_id: channel_id})
     Logger.warn "pin: #{inspect pin}"
     {"update:pinned", %{}}
   end
 
   def handle_in("unpin-message", %{"user_id" => _user_id, "channel_id" => _channel_id} = msg, _) do
     id = get_message_id msg["message_id"]
-    PinnedMessage
-    |> where([s], s.message_id == ^id)
-    |> Repo.one!
-    |> Repo.delete!
+    PinnedMessage.delete PinnedMessage.get_by(message_id: id)
     {"update:pinned", %{}}
   end
   # def handle_in("edit-message", %{"user_id" => _user_id, "channel_id" => _channel_id}, _socket) do

@@ -2,7 +2,8 @@ defmodule UccChat.Web.ChannelRouter do
   use ChannelRouter
 
   alias UccChat.Web.{
-    TypingChannelController, SlashCommandChannelController, MessageChannelController,
+    TypingChannelController, SlashCommandChannelController,
+    MessageChannelController,
     RoomChannelController, RoomSettingChannelController
   }
   # @module __MODULE__
@@ -19,7 +20,7 @@ defmodule UccChat.Web.ChannelRouter do
   def match(:put, socket, ["slashcommand", command], params) do
     params = Map.put(params, "command", command)
     # can? socket, :execute, params, fn ->
-      apply(SlashCommandChannelController, :execute, [socket, params])
+    apply(SlashCommandChannelController, :execute, [socket, params])
     # end
   end
   # get "/room/:room_id", RoomChannelController, :show
@@ -27,7 +28,8 @@ defmodule UccChat.Web.ChannelRouter do
 
   def match(:delete, socket, ["attachment", id], params) do
     params = Map.put(params, "id", id)
-    apply(Web.MessageChannelController, :delete_attachment, [socket, params])
+    apply(Web.MessageChannelController, :delete_attachment,
+      [socket, params])
   end
   def match(:delete, socket, ["room", "has_unread"], params) do
     apply(RoomChannelController, :clear_has_unread, [socket, params])

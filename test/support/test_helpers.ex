@@ -12,6 +12,13 @@ defmodule UcxUcc.TestHelpers do
     strip_ts(schema1) == strip_ts(schema2)
   end
 
+  def insert_roles do
+    [admin: :global, moderator: :rooms, owner: :rooms, user: :global, bot: :global, guest: :global]
+    |> Enum.map(fn {role, scope} ->
+      Accounts.create_role %{name: to_string(role), scope: to_string(scope)}
+    end)
+  end
+
   def insert_roles(roles) do
     Enum.map(roles, fn role ->
       insert_role role
@@ -28,7 +35,10 @@ defmodule UcxUcc.TestHelpers do
 
   def insert_user(attrs \\ %{})
   def insert_user(attrs) do
-    role = Repo.one!(from r in Role, where: r.name == "user")
+    attrs = Enum.into attrs, %{}
+    role = attrs[:role] || Repo.one!(from r in Role, where: r.name == "user")
+    attrs = Map.delete attrs, :role
+
     changes = Map.merge(%{
       name: Faker.Name.name,
       username: Faker.Internet.user_name,
@@ -36,14 +46,24 @@ defmodule UcxUcc.TestHelpers do
       password: "secret",
       password_confirmation: "secret",
       }, to_map(attrs))
+
     user =
       %User{}
       |> User.changeset(changes)
       |> Repo.insert!()
+
     %UserRole{}
     |> UserRole.changeset(%{user_id: user.id, role_id: role.id})
     |> Repo.insert!
+
     Repo.preload user, [roles: :permissions]
+  end
+
+  def insert_role_user(role, attrs \\ %{}) do
+    Map.merge(%{
+      role: insert_role(role),
+    }, Enum.into(attrs, %{}))
+    |> insert_user
   end
 
   defp to_map(attrs) when is_list(attrs), do: Enum.into(attrs, %{})

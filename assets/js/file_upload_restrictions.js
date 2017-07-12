@@ -1,5 +1,5 @@
-UcxChat.fileUploadMediaWhiteList = function() {
-  var mediaTypeWhiteList = UcxChat.settings.accepted_media_types
+UccChat.fileUploadMediaWhiteList = function() {
+  var mediaTypeWhiteList = UccChat.settings.accepted_media_types
 
   if (!mediaTypeWhiteList || mediaTypeWhiteList === '*') {
     return;
@@ -9,9 +9,9 @@ UcxChat.fileUploadMediaWhiteList = function() {
   });
 };
 
-UcxChat.fileUploadIsValidContentType = function(type) {
+UccChat.fileUploadIsValidContentType = function(type) {
   var list, wildCardGlob, wildcards;
-  list = UcxChat.fileUploadMediaWhiteList();
+  list = UccChat.fileUploadMediaWhiteList();
   if (!list || _.contains(list, type)) {
     return true;
   } else {

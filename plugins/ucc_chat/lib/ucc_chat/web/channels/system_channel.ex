@@ -25,7 +25,9 @@ defmodule UccChat.Web.SystemChannel do
   def join(ev = CC.chan_system(), params, socket) do
     debug(ev, params)
     send(self(), :after_join)
-    :ok = UccChat.ChannelMonitor.monitor(:chan_system, self(), {__MODULE__, :leave, [socket.assigns.user_id]})
+
+    :ok = UccChat.ChannelMonitor.monitor(:chan_system, self(),
+      {__MODULE__, :leave, [socket.assigns.user_id]})
 
     {:ok, socket}
   end
@@ -80,7 +82,8 @@ defmodule UccChat.Web.SystemChannel do
 
   # default unknown handler
   def handle_in(event, params, socket) do
-    Logger.warn "SystemChannel.handle_in unknown event: #{inspect event}, params: #{inspect params}, assigns: #{inspect socket.assigns}"
+    Logger.warn "SystemChannel.handle_in unknown event: #{inspect event}, " <>
+      "params: #{inspect params}, assigns: #{inspect socket.assigns}"
     {:noreply, socket}
   end
 
@@ -109,10 +112,14 @@ defmodule UccChat.Web.SystemChannel do
     {:noreply, socket}
   end
 
-  def update_status(%{assigns: %{user_id: user_id, username: username}} = socket, status) do
+  def update_status(%{assigns: %{user_id: user_id, username: username}} =
+    socket, status) do
     case UccChat.PresenceAgent.get_and_update_presence(user_id, status) do
-      ^status -> Presence.update socket, user_id, %{status: status, username: username}
-      _ ->  nil
+      ^status ->
+        Presence.update socket, user_id,
+          %{status: status, username: username}
+      _ ->
+        nil
     end
   end
 end

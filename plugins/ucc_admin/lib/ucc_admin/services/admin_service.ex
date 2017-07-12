@@ -11,6 +11,7 @@ defmodule UccAdmin.AdminService do
   alias UcxUcc.Permissions
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
+  alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
 
@@ -154,11 +155,12 @@ defmodule UccAdmin.AdminService do
     debug ev, params
     assigns = socket.assigns
     current_user = Helpers.get_user!(assigns.user_id)
-    user = Helpers.get_by!(User, :username, name, preload: [:roles, :account])
+    user = Helpers.get_user_by_name(name, preload: [:roles, :account])
     user = struct(user, status: UccChat.PresenceAgent.get(user.id))
     html =
       "user_card.html"
-      |> FlexBarView.render(user: user, current_user: current_user, channel_id: nil, user_info: %{admin: true})
+      |> FlexBarView.render(user: user, current_user: current_user,
+        channel_id: nil, user_info: %{admin: true})
       |> safe_to_string
 
     {:reply, {:ok, %{html: html, title: "User Info"}}, socket}
@@ -208,29 +210,31 @@ defmodule UccAdmin.AdminService do
     debug ev, params
     assigns = socket.assigns
     current_user = Helpers.get_user!(assigns.user_id)
-    channel = Helpers.get_by!(Channel, :name, name)
+    channel = Channel.get_by!(name: name)
     html =
       "room_info.html"
-      |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: nil)
+      |> AdminView.render(channel: channel, current_user: current_user,
+        can_edit: true, editing: nil)
       |> safe_to_string
 
     {:reply, {:ok, %{html: html, title: "User Info"}}, socket}
   end
 
   def handle_in("flex:action:" <> action, %{"username" => username} = params, socket) do
-    resp = case Helpers.get_by(User, :username, username, preload: [:roles, :account]) do
-      nil ->
-        {:error, %{error: ~g(User ) <> username <> ~g( does not exist.)}}
-      user ->
-        flex_action(action, user, username, params, socket)
-    end
+    resp =
+      case Helpers.get_user_by_name(username, preload: [:roles, :account]) do
+        nil ->
+          {:error, %{error: ~g(User ) <> username <> ~g( does not exist.)}}
+        user ->
+          flex_action(action, user, username, params, socket)
+      end
     {:reply, resp, socket}
   end
   def handle_in(ev = "channel-settings:edit", %{"channel_id" => channel_id, "field" => field} = params, socket) do
     debug ev, params
     assigns = socket.assigns
     current_user = Helpers.get_user!(assigns.user_id)
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     html =
       "room_info.html"
       |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: field)
@@ -241,7 +245,7 @@ defmodule UccAdmin.AdminService do
   def handle_in(ev = "channel-settings:cancel", %{"channel_id" => channel_id} = params, socket) do
     debug ev, params
     current_user = Helpers.get_user!(socket.assigns.user_id)
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     html =
       "room_info.html"
       |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: nil)
@@ -252,7 +256,7 @@ defmodule UccAdmin.AdminService do
   def handle_in(ev = "channel-settings:save", %{"channel_id" => channel_id} = params, socket) do
     debug ev, params
     current_user = Helpers.get_user!(socket.assigns.user_id)
-    channel = Helpers.get!(Channel, channel_id)
+    channel = Channel.get!(channel_id)
     html =
       "room_info.html"
       |> AdminView.render(channel: channel, current_user: current_user, can_edit: true, editing: nil)
@@ -401,7 +405,8 @@ defmodule UccAdmin.AdminService do
   def get_args("rooms", user) do
     # view_a = String.to_atom view
     # mod = Module.concat Config, String.capitalize(view)
-    rooms = Repo.all(from c in Channel, order_by: [asc: c.name], preload: [:subscriptions, :messages])
+    rooms = Repo.all(from c in ChannelSchema, order_by: [asc: c.name],
+      preload: [:subscriptions, :messages])
     [user: user, rooms: rooms]
   end
   # defp get_args("message", user) do

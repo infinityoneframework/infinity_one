@@ -102,7 +102,7 @@ class Admin {
         this.userchan_push('cancel', {channel_id: channel_id})
       })
       .on('click', '#randomPassword', e => {
-        let new_password = UcxChat.randomString(12)
+        let new_password = UccChat.randomString(12)
         e.preventDefault()
         e.stopPropagation()
         if ($(e.currentTarget).hasClass('hide')) {

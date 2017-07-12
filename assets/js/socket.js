@@ -119,15 +119,15 @@ $(document).ready(function() {
   socket.onError( () => {
     console.log("!! there was an error with the connection!")
     handleOffLine()
-    UcxChat.onLine = false
+    UccChat.onLine = false
   })
   socket.onClose( () => {
     console.log("!! the connection dropped")
     handleOffLine()
-    UcxChat.onLine = false
+    UccChat.onLine = false
   })
 
-  UcxChat.onLine = true
+  UccChat.onLine = true
 
   if (flash_error != "")
     toastr.error(flash_error)
@@ -424,15 +424,15 @@ const offlineContent = `
   </div>`
 
 function handleOffLine() {
-  if (UcxChat.onLine) {
+  if (UccChat.onLine) {
     $('.connection-status').html('').append(offlineContent).removeClass('status-online')
 
-    UcxChat.onLine = false
+    UccChat.onLine = false
   }
 }
 function handleOnLine() {
-  if (!UcxChat.onLine) {
-    UcxChat.onLine = true
+  if (!UccChat.onLine) {
+    UccChat.onLine = true
     window.location.reload()
     $('.connection-status').html('').addClass('status-online')
   }

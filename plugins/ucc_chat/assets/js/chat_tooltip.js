@@ -1,4 +1,4 @@
-UcxChat.tooltip = {
+UccChat.tooltip = {
   source: null,
   opened: false,
 

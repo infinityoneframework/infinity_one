@@ -1,60 +1,21 @@
 defmodule UccChat.Message do
-  use UccChat.Shared, :schema
+  use UccModel, schema: UccChat.Schema.Message
+  use Timex
 
-  import Ecto.Changeset
+  alias UccChat.Schema.Channel
+
+  alias UccChat.{AppConfig, SubscriptionService,}
+  #   TypingAgent, Mention, Subscription,
+  #   Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
+  #   MessageAgent, AttachmentService
+  # }
+  alias UccChat.ServiceHelpers, as: Helpers
 
   require Logger
 
-  @mod __MODULE__
+  @preloads [:user, :edited_by, :attachments, :reactions]
 
-  schema "messages" do
-    field :body, :string
-    field :sequential, :boolean, default: false
-    field :timestamp, :string
-    field :type, :string, default: ""
-    field :expire_at, :utc_datetime
-    field :system, :boolean, default: false
-
-    belongs_to :user, UcxUcc.Accounts.User
-    belongs_to :channel, UccChat.Channel
-    belongs_to :edited_by, UcxUcc.Accounts.User, foreign_key: :edited_id
-
-    has_many :stars, UccChat.StaredMessage, on_delete: :delete_all
-    has_many :attachments, UccChat.Attachment, on_delete: :delete_all
-    has_many :reactions, UccChat.Reaction, on_delete: :delete_all
-
-    field :is_groupable, :boolean, virtual: true
-    field :t, :string, virtual: true
-    field :own, :boolean, virtual: true
-    field :is_temp, :boolean, virtual: true
-    field :chat_opts, :boolean, virtual: true
-    field :custom_class, :string, virtual: true
-    field :avatar, :string, virtual: true
-    field :new_day, :boolean, default: false, virtual: true
-    field :first_unread, :boolean, default: false, virtual: true
-
-    timestamps(type: :utc_datetime)
-  end
-
-  @fields [:body, :user_id, :channel_id, :sequential, :timestamp, :edited_id, :type, :expire_at, :system]
-  @required [:user_id]
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, @fields)
-    |> validate_required(@required)
-    |> add_timestamp
-  end
-
-  def add_timestamp(%{data: %{timestamp: nil}} = changeset) do
-    put_change(changeset, :timestamp, UccChat.ServiceHelpers.get_timestamp())
-  end
-  def add_timestamp(changeset) do
-    changeset
-  end
+  def preloads, do: @preloads
 
   def format_timestamp(%NaiveDateTime{} = dt) do
     {{yr, mo, day}, {hr, min, sec}} = NaiveDateTime.to_erl(dt)
@@ -64,12 +25,12 @@ defmodule UccChat.Message do
   def pad2(int), do: int |> to_string |> String.pad_leading(2, "0")
 
   def total_count do
-    from m in @mod, select: count(m.id)
+    from m in @schema, select: count(m.id)
   end
 
   def total_channels(type \\ 0) do
-    from m in @mod,
-      join: c in UccChat.Channel, on: m.channel_id == c.id,
+    from m in @schema,
+      join: c in Channel, on: m.channel_id == c.id,
       where: c.type == ^type,
       select: count(m.id)
   end
@@ -82,5 +43,104 @@ defmodule UccChat.Message do
     total_channels 2
   end
 
-end
+  def get_surrounding_messages(channel_id, ts, user) when ts in ["", nil] do
+    get_messages channel_id, user
+  end
+  def get_surrounding_messages(channel_id, timestamp, %{tz_offset: tz} = user) do
+    message = @repo.one from m in @schema,
+      where: m.timestamp == ^timestamp and m.channel_id == ^channel_id,
+      preload: ^@preloads
+    if message do
+      before_q = from m in @schema,
+        where: m.inserted_at < ^(message.inserted_at) and m.channel_id == ^channel_id,
+        order_by: [desc: :inserted_at],
+        limit: 50,
+        preload: ^@preloads
+      after_q = from m in @schema,
+        where: m.inserted_at > ^(message.inserted_at) and m.channel_id == ^channel_id,
+        limit: 50,
+        preload: ^@preloads
 
+      Enum.reverse(@repo.all(before_q)) ++ [message|@repo.all(after_q)]
+      |> new_days(tz || 0, [])
+    else
+      Logger.warn "did not find a message"
+      get_messages(channel_id, user)
+    end
+  end
+
+  def get_messages(channel_id, %{tz_offset: tz}) do
+    @schema
+    |> where([m], m.channel_id == ^channel_id)
+    |> Helpers.last_page
+    |> preload(^@preloads)
+    |> order_by([m], asc: m.inserted_at)
+    |> @repo.all
+    |> new_days(tz || 0, [])
+  end
+
+  def get_room_messages(channel_id, %{id: user_id} = user) do
+    page_size = AppConfig.page_size()
+    case SubscriptionService.get(channel_id, user_id) do
+      %{current_message: ""} -> nil
+      %{current_message: cm} ->
+        cnt1 = @repo.one from m in @schema,
+          where: m.channel_id == ^channel_id and m.timestamp >= ^cm,
+          select: count(m.id)
+        if cnt1 > page_size, do: cm, else: nil
+      _ -> nil
+    end
+    |> case do
+      nil ->
+        get_messages(channel_id, user)
+      ts ->
+        get_messsages_ge_ts(channel_id, user, ts)
+    end
+  end
+
+  def get_messsages_ge_ts(channel_id, %{tz_offset: tz}, ts) do
+    before_q = from m in @schema,
+      where: m.timestamp < ^ts,
+      order_by: [desc: :inserted_at],
+      limit: 25,
+      preload: ^@preloads
+
+    after_q = from m in @schema,
+      where: m.channel_id == ^channel_id and m.timestamp >= ^ts,
+      preload: ^@preloads
+
+    Enum.reverse(@repo.all before_q) ++ @repo.all(after_q)
+    |> new_days(tz || 0, [])
+  end
+
+  defp new_days([h|t], tz, []), do: new_days(t, tz, [Map.put(h, :new_day, true)])
+  defp new_days([h|t], tz, [last|_] = acc) do
+    dt1 = Timex.shift(h.inserted_at, hours: tz)
+    dt2 = Timex.shift(last.inserted_at, hours: tz)
+    h = if Timex.day(dt1) == Timex.day(dt2) do
+      h
+    else
+      Map.put(h, :new_day, true)
+    end
+    new_days t, tz, [h|acc]
+  end
+  defp new_days([], _, []), do: []
+  defp new_days([], _, acc), do: Enum.reverse(acc)
+
+  def last_message(channel_id) do
+    @schema
+    |> where([m], m.channel_id == ^channel_id)
+    |> order_by([m], asc: m.inserted_at)
+    |> last
+    |> @repo.one
+  end
+
+  def first_message(channel_id) do
+    @schema
+    |> where([m], m.channel_id == ^channel_id)
+    |> order_by([m], asc: m.inserted_at)
+    |> first
+    |> @repo.one
+  end
+
+end

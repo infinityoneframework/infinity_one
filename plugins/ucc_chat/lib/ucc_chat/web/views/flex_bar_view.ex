@@ -114,7 +114,7 @@ defmodule UccChat.Web.FlexBarView do
   def file_icon(:audio), do: "icon-play"
   def file_icon(_), do: "icon-docs"
 
-  def show_webrtc?(user, user_info) do
+  def show_webrtc?(_user, _user_info) do
     true
   end
               #   = radio_tag(settings, :desktop, id, text)

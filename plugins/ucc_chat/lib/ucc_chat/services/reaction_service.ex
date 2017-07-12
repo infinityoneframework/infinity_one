@@ -10,7 +10,8 @@ defmodule UccChat.ReactionService do
     user = Helpers.get_user assigns.user_id
     emoji = params["reaction"]
 
-    message = Helpers.get Message, params["message_id"], preload: MessageService.preloads()
+    message = Message.get params["message_id"],
+      preload: MessageService.preloads()
 
     case Enum.find message.reactions, &(&1.emoji == emoji) do
       nil ->
@@ -23,10 +24,8 @@ defmodule UccChat.ReactionService do
   end
 
   def insert_reaction(emoji, message_id, user_id) do
-    %Reaction{}
-    |> Reaction.changeset(%{emoji: emoji, message_id: message_id, user_ids: user_id, count: 1})
-    |> Repo.insert
-    |> case do
+    case Reaction.create(%{emoji: emoji, message_id: message_id,
+      user_ids: user_id, count: 1}) do
       {:ok, _} ->
         nil
       {:error, _cs} ->
@@ -54,9 +53,7 @@ defmodule UccChat.ReactionService do
     if user_ids == "" do
       Repo.delete reaction
     else
-      reaction
-      |> Reaction.changeset(%{count: count - 1, user_ids: user_ids})
-      |> Repo.update
+      Reaction.update(reaction, %{count: count - 1, user_ids: user_ids})
     end
   end
 
@@ -65,9 +62,7 @@ defmodule UccChat.ReactionService do
       (user_ids ++ [user_id])
       |> Enum.join(" ")
 
-    reaction
-    |> Reaction.changeset(%{count: count + 1, user_ids: user_ids})
-    |> Repo.update
+    Reaction.update(reaction, %{count: count + 1, user_ids: user_ids})
   end
 
   defp reaction_user_ids(reaction) do
@@ -78,7 +73,7 @@ defmodule UccChat.ReactionService do
     username = user.username
     reaction
     |> reaction_user_ids
-    |> Enum.map(&(Helpers.get User, &1))
+    |> Enum.map(&Helpers.get_user(&1, preload: []))
     |> Enum.reject(&(is_nil &1))
     |> Enum.map(fn user ->
       case user.username do
@@ -92,5 +87,4 @@ defmodule UccChat.ReactionService do
         Enum.join(rest, ", ") <> " and " <> first
     end
   end
-
 end

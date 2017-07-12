@@ -1,27 +1,9 @@
 defmodule UccChat.Attachment do
-  use UccChat.Shared, :schema
-  use Arc.Ecto.Schema
+  use UccModel, schema: UccChat.Schema.Attachment
 
-  schema "attachments" do
-    field :file, UccChat.File.Type
-    field :file_name, :string, default: ""
-    field :description, :string, default: ""
-    field :type, :string, default: ""
-    field :size, :integer, default: 0
-    belongs_to :channel, UccChat.Channel
-    belongs_to :message, UccChat.Message
-
-    timestamps(type: :utc_datetime)
+  def count(message_id) do
+    @repo.one from a in @schema,
+      where: a.message_id == ^message_id,
+      select: count(a.id)
   end
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-  """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:channel_id, :message_id, :file_name, :description, :type, :size])
-    |> cast_attachments(params, [:file])
-    |> validate_required([:file, :channel_id, :message_id])
-  end
-
 end
