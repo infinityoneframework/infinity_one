@@ -25,9 +25,9 @@ defmodule UccChat.SubscriptionService do
   end
 
   def get(channel_id, user_id, field) do
-    case Subscription.get_by(channel_id: channel_id, user_id: user_id) do
+    case get(channel_id, user_id) do
       nil ->
-        :error
+        nil
       sub ->
         Map.get sub, field
     end

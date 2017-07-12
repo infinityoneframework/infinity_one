@@ -33,8 +33,8 @@ defmodule UccChat.FlexBarService do
 
   def handle_in("show-all", params, socket) do
     users =
-      Channel
-      |> Helpers.get!(params["channel_id"], preload: [:users])
+      params["channel_id"]
+      |> Channel.get!(preload: [:users])
       |> get_channel_offline_users
 
     channel_id = params["channel_id"]
@@ -184,8 +184,10 @@ defmodule UccChat.FlexBarService do
     handle_open_close event, msg, fn msg ->
       args = get_render_args("Switch User", nil, nil, nil, nil)
 
-      html = FlexBarView.render(msg["templ"], args)
-      |> Helpers.safe_to_string
+      html =
+        msg["templ"]
+        |> FlexBarView.render(args)
+        |> Helpers.safe_to_string
 
       UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 

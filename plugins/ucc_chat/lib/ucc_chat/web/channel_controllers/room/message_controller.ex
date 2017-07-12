@@ -133,6 +133,7 @@ defmodule UccChat.Web.MessageChannelController do
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
 
+
     list = Message.get_surrounding_messages(channel_id, timestamp, user)
 
     previews = MessageService.message_previews(user.id, list)

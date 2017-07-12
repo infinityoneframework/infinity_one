@@ -424,7 +424,7 @@ defmodule UccChat.MessageService do
   def render_message_box(channel_id, user_id) do
     user = Helpers.get_user! user_id
     channel =
-      case Helpers.get(Channel, channel_id) do
+      case Channel.get(channel_id) do
         nil ->
           Channel.first
         channel ->

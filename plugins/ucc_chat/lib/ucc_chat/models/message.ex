@@ -43,7 +43,7 @@ defmodule UccChat.Message do
     total_channels 2
   end
 
-  def get_surrounding_messages(channel_id, "", user) do
+  def get_surrounding_messages(channel_id, ts, user) when ts in ["", nil] do
     get_messages channel_id, user
   end
   def get_surrounding_messages(channel_id, timestamp, %{tz_offset: tz} = user) do

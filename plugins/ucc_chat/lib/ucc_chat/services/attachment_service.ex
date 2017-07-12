@@ -45,7 +45,7 @@ defmodule UccChat.AttachmentService do
   end
 
   defp broadcast_message(message) do
-    channel = Helpers.get Channel, message.channel_id
+    channel = Channel.get message.channel_id
     html =
       message
       |> Repo.preload(MessageService.preloads())

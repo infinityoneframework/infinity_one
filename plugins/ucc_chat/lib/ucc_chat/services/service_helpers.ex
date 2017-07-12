@@ -61,10 +61,7 @@ defmodule UccChat.ServiceHelpers do
   end
 
   def get_channel(channel_id, preload \\ []) do
-    Channel
-    |> where([c], c.id == ^channel_id)
-    |> preload(^preload)
-    |> Repo.one!
+    Channel.get! channel_id, preload: preload
   end
 
   def get_all_by(model, field, value, opts \\ []) do
