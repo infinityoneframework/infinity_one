@@ -28,6 +28,8 @@ import * as sweet from "./sweetalert.min"
 import * as utils from "./utils"
 import FileUpload from "./file_upload"
 import MessageInput from './message_input'
+import webrtc from './ucc_webrtc'
+import * as device from './device_manager'
 window.moment = require('moment');
 require('./chat_dropzone')
 const chan_user = "user:"
@@ -41,6 +43,8 @@ let socket = new Socket("/socket", {params: {token: window.user_token, tz_offset
 window.userchan = false
 window.roomchan = false
 window.systemchan = false
+
+window.mscs = {}
 
 hljs.initHighlightingOnLoad();
 
@@ -114,6 +118,7 @@ $(document).ready(function() {
   new MessageInput()
   window.messageCog = new MessageCog()
   window.navMenu = new Menu()
+  window.ucc_webrtc = new webrtc()
 
   socket.connect()
   socket.onError( () => {
@@ -137,6 +142,12 @@ $(document).ready(function() {
   start_system_channel()
   start_user_channel()
   start_room_channel(typing)
+
+  // TODO: Make this discoverable
+  window.ucc_webrtc.start_channel(socket)
+
+  device.set_webrtc(ucc_webrtc)
+  device.enumerateDevices()
 
   $('body').on('submit', '.message-form', e => {
     if (debug) { console.log('message-form submit', e) }
