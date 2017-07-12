@@ -8,8 +8,7 @@ defmodule UccChat.Subscription do
   end
 
   def get_by_room(room, user_id) when is_binary(room) do
-    from s in @schema, join: c in Channel, on: c.id == s.channel_id,
-      where: c.name == ^room and s.user_id == ^user_id
+    @repo.one @schema.get_by_room room, user_id
   end
 
   def get(channel_id, user_id) do

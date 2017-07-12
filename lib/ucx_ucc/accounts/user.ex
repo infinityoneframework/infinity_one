@@ -88,7 +88,7 @@ defmodule UcxUcc.Accounts.User do
 
   def has_role?(user, role, scope  \\ "global") do
     Enum.any?(user.roles, fn
-      %{role: ^role, scope: ^scope} -> true
+      %{name: ^role, scope: ^scope} -> true
       _ -> false
     end)
   end

@@ -12,6 +12,13 @@ defmodule UcxUcc.TestHelpers do
     strip_ts(schema1) == strip_ts(schema2)
   end
 
+  def insert_roles do
+    [admin: :global, moderator: :rooms, owner: :rooms, user: :global, bot: :global, guest: :global]
+    |> Enum.map(fn {role, scope} ->
+      Accounts.create_role %{name: to_string(role), scope: to_string(scope)}
+    end)
+  end
+
   def insert_roles(roles) do
     Enum.map(roles, fn role ->
       insert_role role
