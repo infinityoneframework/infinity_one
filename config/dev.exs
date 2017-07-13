@@ -52,7 +52,7 @@ config :phoenix, :stacktrace_depth, 20
 
 # Finally import the config/dev.secret.exs
 # which should be versioned separately.
-if File.exists? "dev.secret.exs" do
+if File.exists? "config/dev.secret.exs" do
   import_config "dev.secret.exs"
 end
 

@@ -61,6 +61,6 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
-if File.exists? "prod.secret.exs" do
+if File.exists? "config/prod.secret.exs" do
   import_config "prod.secret.exs"
 end
