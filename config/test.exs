@@ -9,6 +9,13 @@ config :ucx_ucc, UcxUcc.Web.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-# Finally import the config/test.secret.exs
-# which should be versioned separately.
-import_config "test.secret.exs"
+config :ucx_ucc, UcxUcc.Web.Endpoint,
+  secret_key_base: "Z9j5A+lDlf1qG+i2ZhVavb0GKHDLkZb/MH7qVy95FM8s2T0d3AI7WU6gyWipUxVl"
+
+# Configure your database
+config :ucx_ucc, UcxUcc.Repo,
+  adapter: Ecto.Adapters.MySQL,
+  username: "root",
+  password: "Gt5de3aq1",
+  database: "ucx_ucc_prod",
+  pool_size: 15
