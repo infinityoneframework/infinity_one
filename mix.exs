@@ -39,7 +39,7 @@ defmodule UcxUcc.Mixfile do
       # {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
-      {:mariaex, ">= 0.0.0"},
+      {:mariaex, ">= 0.0.0", only: [:dev, :prod]},
       {:phoenix_html, "~> 2.6"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
@@ -68,6 +68,7 @@ defmodule UcxUcc.Mixfile do
       {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.7"},
       {:arc_ecto, "~> 0.6.0"},
+      {:postgrex, ">= 0.0.0", only: :test},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end

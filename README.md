@@ -1,5 +1,10 @@
 # UcxUcc - A Team Collaboration Suite
 
+[![Build Status](https://travis-ci.org/smpallen99/ucx_ucc.png?branch=master)](https://travis-ci.org/smpallen99/ucx_ucc) [![License][license-img]][license]
+
+[license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg
+[license]: http://opensource.org/licenses/MIT
+
 > <center><b>NOTE</b></center>
 >
 > This project is work in progress. It is not ready for demo yet. If you would like to demo a working version, please visit [Chat Demo](https://chat.spallen.com)
