@@ -8,9 +8,9 @@
 - else
   = if show_webrtc? @user, @user_info do
     .buttons-group
-      button.button.start-video-call.primary(aria-label="Start video call" data-click="")
+      button.button.start-video-call.primary.data-click(aria-label="Start video call" data-id="#{@user.id}")
         i.icon-videocam
-      button.button.start-audio-call.secondary(aria-label="Start audio call")
+      button.button.start-audio-call.secondary.data-click(aria-label="Start audio call" data-id="#{@user.id}")
         i.icon-phone
   = unless @current_user.id == @user.id or @user_info[:direct] do
     button.button.button-block.primary.pvt-msg
