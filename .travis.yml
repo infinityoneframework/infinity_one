@@ -1,0 +1,15 @@
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database coherence_test;' -U postgres
+language: elixir
+elixir:
+  - 1.4
+otp_release:
+  - 19.3
+sudo: false
+notification:
+  recipients:
+    - smpallen99@yahoo.com
+addons:
+  postgresql: "9.4"

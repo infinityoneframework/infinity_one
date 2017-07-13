@@ -4,7 +4,7 @@ defmodule UcxUcc.Accounts.UserRole do
 
   @scopes ~w(global rooms)
 
-  schema "accounts_users_roles" do
+  schema "users_roles" do
     field :scope, :binary_id, default: nil  # id of room
     belongs_to :user, UcxUcc.Accounts.User, type: :binary_id
     belongs_to :role, UcxUcc.Accounts.Role

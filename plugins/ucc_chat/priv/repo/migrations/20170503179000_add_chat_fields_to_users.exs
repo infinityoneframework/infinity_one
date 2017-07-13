@@ -3,11 +3,11 @@ defmodule UccChat.Repo.Migrations.AddChatFieldsToUsers do
 
   def change do
 
-    alter table(:accounts_users) do
+    alter table(:users) do
       add :open_id, references(:channels, on_delete: :nilify_all, type: :binary_id)
       add :chat_status, :string
     end
 
-    create index(:accounts_users, [:open_id])
+    create index(:users, [:open_id])
   end
 end

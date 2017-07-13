@@ -9,6 +9,10 @@ config :ucx_ucc, UcxUcc.Web.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-# Finally import the config/test.secret.exs
-# which should be versioned separately.
-import_config "test.secret.exs"
+config :ucx_ucc, UcxUcc.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "ucx_ucc_test",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox

@@ -4,7 +4,7 @@ defmodule UcxUcc.Permissions.Permission do
   alias UcxUcc.Accounts.{Role}
   alias UcxUcc.Permissions.{PermissionRole, Permission}
 
-  schema "permissions_permissions" do
+  schema "permissions" do
     field :name, :string
 
     many_to_many :roles, Role, join_through: PermissionRole

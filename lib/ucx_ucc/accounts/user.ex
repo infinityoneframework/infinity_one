@@ -10,7 +10,7 @@ defmodule UcxUcc.Accounts.User do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  schema "accounts_users" do
+  schema "users" do
     field :name, :string
     field :email, :string
     field :username, :string
