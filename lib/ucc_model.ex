@@ -127,6 +127,11 @@ defmodule UccModel do
         @repo.delete! get(id)
       end
 
+      # @spec delete_all() :: any
+      def delete_all do
+        @repo.delete_all @schema
+      end
+
       @spec first() :: Struct.t | nil
       def first do
         @schema |> first |> @repo.one
@@ -140,6 +145,7 @@ defmodule UccModel do
       defoverridable [
         delete: 1, delete!: 1, update: 2, update!: 2, create: 1, create!: 1,
         get_by: 1, get_by!: 1, get: 2, get!: 2, list: 0, change: 2, change: 1,
+        delete_all: 0
       ]
     end
   end

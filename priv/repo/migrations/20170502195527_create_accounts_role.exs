@@ -2,7 +2,7 @@ defmodule UcxUcc.Repo.Migrations.CreateUcxUcc.Accounts.Role do
   use Ecto.Migration
 
   def change do
-    create table(:accounts_roles) do
+    create table(:roles) do
       add :name, :string
       add :scope, :string, default: "global"
       add :description, :string
@@ -10,6 +10,6 @@ defmodule UcxUcc.Repo.Migrations.CreateUcxUcc.Accounts.Role do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:accounts_roles, [:name])
+    create unique_index(:roles, [:name])
   end
 end

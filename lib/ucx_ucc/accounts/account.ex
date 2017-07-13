@@ -7,7 +7,7 @@ defmodule UcxUcc.Accounts.Account do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "accounts_accounts" do
+  schema "accounts" do
     belongs_to :user, User
 
     timestamps(type: :utc_datetime)

@@ -4,9 +4,10 @@ alias Accounts.{User, Role, UserRole, Account}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
 
-Repo.delete_all Message
-Repo.delete_all Subscription
-Repo.delete_all Channel
+Message.delete_all
+Subscription.delete_all
+Channel.delete_all
+
 Repo.delete_all PermissionRole
 Repo.delete_all UserRole
 Repo.delete_all Permission
@@ -153,22 +154,14 @@ channels =
 
 [ch1, ch2] ++ Enum.take(channels, 3)
 |> Enum.each(fn ch ->
-  %Subscription{}
-  |> Subscription.changeset(%{channel_id: ch.id, user_id: u1.id})
-  |> Repo.insert!
-  %Subscription{}
-  |> Subscription.changeset(%{channel_id: ch.id, user_id: u2.id})
-  |> Repo.insert!
-  %Subscription{}
-  |> Subscription.changeset(%{channel_id: ch.id, user_id: u3.id})
-  |> Repo.insert!
+  Subscription.create!(%{channel_id: ch.id, user_id: u1.id})
+  Subscription.create!(%{channel_id: ch.id, user_id: u2.id})
+  Subscription.create!(%{channel_id: ch.id, user_id: u3.id})
 end)
 
 users
 |> Enum.each(fn c ->
-  %Subscription{}
-  |> Subscription.changeset(%{channel_id: ch1.id, user_id: c.id})
-  |> Repo.insert!
+  Subscription.create!(%{channel_id: ch1.id, user_id: c.id})
 end)
 
 chan_parts = ~w(biz sales tech foo home work product pbx phone iphone galaxy android slim user small big sand storm snow rain tv shows earth hail)
@@ -210,17 +203,13 @@ if add_messages do
   for _ <- 0..500 do
     for ch_id <- [ch1.id, ch2.id] ++ other_ch_ids do
       id = Enum.random user_ids
-      %Message{}
-      |> Message.changeset(%{channel_id: ch_id, user_id: id, body: Enum.random(messages)})
-      |> Repo.insert!
+      Message.create!(%{channel_id: ch_id, user_id: id, body: Enum.random(messages)})
     end
   end
 
   for _ <- 0..500 do
     id = Enum.random user_ids
-    %Message{}
-    |> Message.changeset(%{channel_id: ch1.id, user_id: id, body: Enum.random(messages)})
-    |> Repo.insert!
+    Message.create!(%{channel_id: ch1.id, user_id: id, body: Enum.random(messages)})
   end
 
   new_channel_users = [
@@ -235,15 +224,11 @@ if add_messages do
 
   new_channel_users
   |> Enum.each(fn {c, ch} ->
-    %Subscription{}
-    |> Subscription.changeset(%{channel_id: ch.id, user_id: c.id})
-    |> Repo.insert!
+    Subscription.create!(%{channel_id: ch.id, user_id: c.id})
   end)
 
   for _ <- 1..200 do
     {c, ch} = Enum.random new_channel_users
-    %Message{}
-    |> Message.changeset(%{channel_id: ch.id, user_id: c.id, body: Enum.random(messages)})
-    |> Repo.insert!
+    Message.create!(%{channel_id: ch.id, user_id: c.id, body: Enum.random(messages)})
   end
 end

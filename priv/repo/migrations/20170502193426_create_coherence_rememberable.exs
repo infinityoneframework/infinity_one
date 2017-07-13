@@ -7,7 +7,7 @@ defmodule UcxUcc.Repo.Migrations.CreateCoherenceRememberable do
       add :series_hash, :string
       add :token_hash, :string
       add :token_created_at, :utc_datetime
-      add :user_id, references(:accounts_users, on_delete: :delete_all, type: :binary_id)
+      add :user_id, references(:users, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end

@@ -3,7 +3,7 @@ defmodule UccChat.Repo.Migrations.AlterAccount do
 
   def change do
     IO.puts "altering account ......"
-    alter table(:accounts_accounts) do
+    alter table(:accounts) do
       add :language, :string, default: "en"
       add :desktop_notification_enabled, :boolean, default: true, null: false
       add :desktop_notification_duration, :integer
