@@ -26,4 +26,3 @@ import cc from './chat_channel'
 require('./notifications_form')
 require('./favico')
 require('./emoji')
-require('./live')

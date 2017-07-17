@@ -28,7 +28,6 @@ import * as sweet from "./sweetalert.min"
 import * as utils from "./utils"
 import FileUpload from "./file_upload"
 import MessageInput from './message_input'
-import Live from './live'
 window.moment = require('moment');
 require('./chat_dropzone')
 const chan_user = "user:"
@@ -115,7 +114,6 @@ $(document).ready(function() {
   new MessageInput()
   window.messageCog = new MessageCog()
   window.navMenu = new Menu()
-  window.ucc_live = new Live()
 
   socket.connect()
   socket.onError( () => {
@@ -139,7 +137,6 @@ $(document).ready(function() {
   start_system_channel()
   start_user_channel()
   start_room_channel(typing)
-  ucc_live.start_channel(socket, ucxchat.user_id, ucxchat.username)
 
   $('body').on('submit', '.message-form', e => {
     if (debug) { console.log('message-form submit', e) }
