@@ -4,6 +4,8 @@ defmodule UcxUcc.Web.UserSocket do
   alias UcxUcc.Repo
   require UccChat.ChatConstants, as: CC
 
+  use Rebel.Socket, channels: []
+
   require Logger
 
   ## Channels
@@ -11,6 +13,7 @@ defmodule UcxUcc.Web.UserSocket do
   channel CC.chan_user <> "*", UccChat.Web.UserChannel  # "user:"
   channel CC.chan_system <> "*", UccChat.Web.SystemChannel  # "system:"
   channel CC.chan_webrtc <> "*", UccWebrtc.Web.WebrtcChannel
+  channel "ui:*", UccChat.Web.UiChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -46,6 +49,7 @@ defmodule UcxUcc.Web.UserSocket do
         end
     end
   end
+  def connect(params, socket), do: super(params, socket)
 
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

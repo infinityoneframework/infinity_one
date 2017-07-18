@@ -40,3 +40,4 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
     = render @view_module, @view_template, assigns
   = render "translations.html"
   script(src='#{static_path(@conn, "/js/app.js")}')
+  = Rebel.Client.js(@conn, user_id: Coherence.current_user(@conn) |> Map.get(:id))

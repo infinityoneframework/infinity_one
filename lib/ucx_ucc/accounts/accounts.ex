@@ -39,6 +39,16 @@ defmodule UcxUcc.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user(id), do: Repo.get(User, id)
+
+
+  def username_by_user_id(id) do
+    case get_user id do
+      nil -> nil
+      user -> user.username
+    end
+  end
+
   @doc """
   Creates a user.
 

@@ -54,7 +54,8 @@ config :coherence,
   logged_out_url: "/",
   email_from_name: {:system, "COH_NAME"},
   email_from_email: {:system, "COH_EMAIL"},
-  opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
+  opts: [:invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
+  # opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
 
 config :coherence, UcxUcc.Coherence.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,

@@ -191,6 +191,7 @@ export function init_flexbar() {
     $('section.flex-tab').html(msg.html).parent().addClass('opened')
     $('.tab-button.active').removeClass('active')
     set_tab_button_active(msg.title)
+    Rebel.set_event_handlers('#flex-tabs')
   })
   userchan.on('flex:close', msg => {
     $('section.flex-tab').parent().removeClass('opened')
