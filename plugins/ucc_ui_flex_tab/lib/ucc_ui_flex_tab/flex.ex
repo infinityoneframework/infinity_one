@@ -1,5 +1,8 @@
-defmodule UccChat.Flex do
+defmodule UccUiFlexTab.Flex do
   # @mod __MODULE__
+  alias UcxUcc.TabBar
+
+  require Logger
 
   @default_callbacks %{}
 
@@ -72,43 +75,43 @@ defmodule UccChat.Flex do
       iex> Flex.toggle(fl, 1, "Info") |> Flex.open?(1)
       false
   """
-  def toggle(fl, ch, tab, params \\ %{}) do
+  def toggle(fl, socket, ch, tab, params \\ %{}) do
     open_tab = open_tab_name(fl, ch)
     if open_tab && open_tab == tab do
-      close(fl, ch, tab, params)
+      close(fl, socket, ch, tab, params)
     else
-      open(fl, ch, tab, params)
+      open(fl, socket, ch, tab, params)
     end
   end
 
   @doc """
   Open a tab using its previous state
   """
-  def open(fl, ch, tab, params) do
+  def open(fl, socket, ch, tab, params) do
     fl
     |> put_in([:o, ch], tab)
-    |> run_callback(ch, tab, get_in(fl, [:t, ch]), params, :open)
+    |> run_callback(socket, ch, tab, get_in(fl, [:t, ch]), params, :open)
   end
 
   @doc """
   Open a panel in a given flex tab
   """
-  def open(fl, ch, tab, panel, params) do
+  def open(fl, socket, ch, tab, panel, params) do
     fl =
       fl
       |> put_in([:o, ch], tab)
       |> put_t(ch, tab, panel)
 
-    run_callback(fl, ch, tab, get_in(fl, [:t, ch]), params, :open)
+    run_callback(fl, socket, ch, tab, get_in(fl, [:t, ch]), params, :open)
   end
 
   @doc """
   Close a flex tab, preserving its state
   """
-  def close(fl, ch, tab, params  \\ %{}) do
+  def close(fl, socket, ch, tab, params  \\ %{}) do
     fl
     |> put_in([:o, ch], nil)
-    |> run_callback(ch, tab, nil, params, :close)
+    |> run_callback(socket, ch, tab, nil, params, :close)
   end
 
   @doc """
@@ -131,9 +134,9 @@ defmodule UccChat.Flex do
       "Info"
   """
 
-  def show(fl, ch) do
+  def show(fl, socket, ch) do
     tab = get_in fl, [:o, ch]
-    run_callback(fl, ch, tab, get_in(fl, [:t, ch]), %{}, :open)
+    run_callback(fl, socket, ch, tab, get_in(fl, [:t, ch]), %{}, :open)
     fl
   end
 
@@ -156,20 +159,36 @@ defmodule UccChat.Flex do
     end
   end
 
-  defp run_callback(fl, ch, tab, panel, socket, state) do
-    case get_in fl, [:c, ch]  do
-      nil -> default_callbacks(tab).(state, ch, tab, panel, socket)
-    end
-    fl
+  defp run_callback(fl, %Phoenix.Socket{} = socket, ch, tab_name, panel, params, state) do
+    tab =
+      tab_name
+      |> to_string
+      |> TabBar.get_button!()
+
+    # IO.inspect tab, label: "----------- run_callback"
+    # require IEx
+    # IEx.pry
+
+    socket = Phoenix.Socket.assign socket, :flex, fl
+
+    apply tab.module, state, [socket, ch, tab, panel, params]
   end
 
-  defp default_callbacks(tab) do
-    case @default_callbacks[tab] do
-      nil -> &default_callback/5
-      other -> other
-    end
-  end
 
-  defp default_callback(state, ch, tab, panel, socket),
-    do: send(self(), {:flex, state, ch, tab, panel, socket})
+    # Logger.warn "run_callback tab_name: #{tab_name}, panel: #{inspect panel}" <>
+    #   " tab: #{inspect tab}"
+    # case get_in fl, [:c, ch]  do
+    #   nil -> default_callbacks(tab_name).(state, ch, tab_name, panel, socket)
+    # end
+    # fl
+
+  # defp default_callbacks(tab) do
+  #   case @default_callbacks[tab] do
+  #     nil -> &default_callback/5
+  #     other -> other
+  #   end
+  # end
+
+  # defp default_callback(state, ch, tab, panel, socket),
+  #   do: send(self(), {:flex, state, ch, tab, panel, socket})
 end

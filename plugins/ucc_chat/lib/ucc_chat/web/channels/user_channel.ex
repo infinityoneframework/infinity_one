@@ -9,11 +9,12 @@ defmodule UccChat.Web.UserChannel do
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.{Account, User}
   alias UccChat.{
-    Subscription, Flex, FlexBarService, ChannelService, Channel,
+    Subscription, FlexBarService, ChannelService, Channel,
     SideNavService, Web.AccountView, Web.FlexBarView, Web.UserSocket,
     ChannelService, SubscriptionService, InvitationService, UserService,
     EmojiService, Settings
   }
+  alias UccUiFlexTab.Flex
   alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
   alias UccChat.ServiceHelpers, as: Helpers

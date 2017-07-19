@@ -3,13 +3,17 @@ defmodule UcxUcc.Application do
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
-  def start(_type, _args) do
+  def start(type, args) do
     import Supervisor.Spec
 
     # allow plugin access by it name
     # i.e. Application.get_env(:ucc_ucx, :router)
 
+    UcxUcc.TabBar.initialize()
+
     Unbrella.apply_plugin_config()
+
+    Unbrella.start type, args
 
     children =
       Unbrella.application_children()
