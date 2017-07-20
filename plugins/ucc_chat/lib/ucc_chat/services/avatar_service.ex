@@ -52,6 +52,7 @@ defmodule UccChat.AvatarService do
     "/avatar/#{get_initials(username)}.svg"
   end
 
+  # Can be run from iex to generate a list of files.
   def gen_avatars do
     list = for ch <- ?a..?z, do: <<ch::8>>
     list = for ch1 <- list, ch2 <- list, do: ch1 <> ch2
