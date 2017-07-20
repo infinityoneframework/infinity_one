@@ -13,6 +13,16 @@ import * as utils from './utils'
 
 $(document).ready(function() {
 
+  $('body').on('keypress', '.setting-block input.editing', e => {
+    if(e.keyCode == 13) {
+      e.preventDefault()
+      e.stopPropagation()
+      $('.setting-block button.save').click()
+      return false
+    } else {
+      return true
+    }
+  })
   $('body').on('click', 'li.text .setting-block span.current-setting', function(e) {
     if ($(this).data('edit')) {
       cc.get('/room_settings/' + $(this).attr('data-edit'), {model: "settings"})

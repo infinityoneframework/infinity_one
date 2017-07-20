@@ -9,7 +9,7 @@ use Mix.Config
 config :ucx_ucc, UcxUcc.Web.Endpoint,
   http: [port: 4017],
   debug_errors: true,
-  code_reloader: true,
+  code_reloader: false,
   check_origin: false,
   watchers: [node: ["node_modules/.bin/brunch", "watch", "--stdin",
                     cd: Path.expand("../assets", __DIR__)]]
@@ -44,11 +44,13 @@ config :ucx_ucc, UcxUcc.Web.Endpoint,
   ]
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console,
+  level: :info,
+  format: "\n$time [$level] $levelpad$message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
-config :phoenix, :stacktrace_depth, 20
+config :phoenix, :stacktrace_depth, 30
 
 # Finally import the config/dev.secret.exs
 # which should be versioned separately.
