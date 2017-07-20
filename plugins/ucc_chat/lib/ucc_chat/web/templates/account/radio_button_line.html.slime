@@ -1,0 +1,9 @@
+.input-line(id="#{@id}" class="#{@class}")
+  label= @title
+  div
+    label
+      = radio_button @f, @field, "1", checked: Map.get(@schema, @field)
+      = @on
+    label
+      = radio_button @f, @field, "0", checked: !Map.get(@schema, @field)
+      = @off

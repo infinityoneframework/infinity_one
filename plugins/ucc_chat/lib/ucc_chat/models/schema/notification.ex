@@ -7,7 +7,7 @@ defmodule UccChat.Schema.Notification do
   schema "notifications" do
     embeds_one :settings, NotificationSetting
     belongs_to :channel, Channel
-    many_to_many :accounts, Account, join_through: AccountNotification
+    many_to_many :accounts, Account, join_through: AccountNotification, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

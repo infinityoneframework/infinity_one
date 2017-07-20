@@ -94,6 +94,13 @@ defmodule UccChat.ChannelTest do
     assert Channel.list() == []
   end
 
+  test "delete! id with notifications", %{channel: ch1, account: account} do
+    n = H.insert_notification ch1
+    H.insert_account_notification account, n
+    Channel.delete! ch1.id
+    assert Channel.list() == []
+  end
+
   test "delete! schema", %{channel: ch1} do
     Channel.delete! ch1
     assert Channel.list() == []

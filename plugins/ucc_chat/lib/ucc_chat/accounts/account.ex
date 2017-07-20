@@ -33,7 +33,7 @@ defmodule UccChat.Accounts.Account do
     field :emoji_tone, :integer, default: 0
     field :emoji_recent, :string, default: ""
 
-    many_to_many :notifications, Notification, join_through: AccountNotification
+    many_to_many :notifications, Notification, join_through: AccountNotification, on_delete: :delete_all
   end
 
   @fields [:language, :desktop_notification_enabled, :desktop_notification_duration] ++

@@ -1,5 +1,6 @@
 defmodule UccChat.Web.SharedView do
   use UcxUcc.Utils
+  use UcxUcc.Web.Gettext
   alias UcxUcc.Permissions
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
@@ -36,12 +37,30 @@ defmodule UccChat.Web.SharedView do
   def get_ftab_open_class(_), do: "opened"
 
   def get_room_notification_sounds do
-    [None: "none", "Use system preferences (Default)": "system_default", "Door (Default)": "door", Beep: "beep", Chelle: "chelle", Ding: "ding",
-     Droplet: "droplet", Highbell: "highbell", Seasons: "seasons"]
+    [
+      {~g"None", "none"},
+      {~g"Use system preferences (Default)", "system_default"},
+      {~g"Door (Default)", "door"},
+      {~g"Beep", "beep"},
+      {~g"Chelle", "chelle"},
+      {~g"Ding", "ding"},
+      {~g"Droplet", "droplet"},
+      {~g"Highbell", "highbell"},
+      {~g"Seasons", "seasons"}
+    ]
   end
   def get_message_notification_sounds do
-    [None: "none", "Use room and system preferences (Default)": "system_default", "Chime (Default)": "chime", Beep: "beep", Chelle: "chelle", Ding: "ding",
-     Droplet: "droplet", Highbell: "highbell", Seasons: "seasons"]
+    [
+      {~g"None", "none"},
+      {~g"Use room and system preferences (Default)", "system_default"},
+      {~g"Chime (Default)", "chime"},
+      {~g"Beep", "beep"},
+      {~g"Chelle", "chelle"},
+      {~g"Ding", "ding"},
+      {~g"Droplet", "droplet"},
+      {~g"Highbell", "highbell"},
+      {~g"Seasons", "seasons"}
+    ]
   end
 
   @regex1 ~r/^(.*?)(`(.*?)`)(.*?)$/
