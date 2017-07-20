@@ -1,2 +1,1 @@
-/ = raw UccSettings.content_side_nav_footer()
-a.class-1#id-1(href="#" data-id="1" rebel-click="test" style="color: white;") Test
+= raw UccSettings.content_side_nav_footer()

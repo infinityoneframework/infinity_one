@@ -2,7 +2,7 @@ defmodule UccChat.AvatarService do
   use UccChat.Shared, :service
 
   @background_colors ~w(F44336 E91E63 9C27B0 673AB7 3F51B5 2196F3 03A9F4 00BCD4 009688 4CAF50 8BC34A CDDC39 FFC107 FF9800 FF5722 795548 9E9E9E 607D8B)
-  @background_count length(@background_colors)
+  # @background_count length(@background_colors)
 
   def avatar_initials(username) do
     initials = get_initials(username)
@@ -32,7 +32,7 @@ defmodule UccChat.AvatarService do
     String.upcase(a) <> String.upcase(b)
   end
 
-  def get_color(username) do
+  def get_color(_username) do
     # use Bitwise
     # ch = case username do
     #   <<_::8, ch::8, _::bitstring>> -> ch

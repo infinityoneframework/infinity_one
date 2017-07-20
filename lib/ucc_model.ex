@@ -134,12 +134,18 @@ defmodule UccModel do
 
       @spec first() :: Struct.t | nil
       def first do
-        @schema |> first |> @repo.one
+        @schema
+        |> order_by(asc: :inserted_at)
+        |> first
+        |> @repo.one
       end
 
       @spec last() :: Struct.t | nil
       def last do
-        @schema |> last |> @repo.one
+        @schema
+        |> order_by(asc: :inserted_at)
+        |> last
+        |> @repo.one
       end
 
       defoverridable [

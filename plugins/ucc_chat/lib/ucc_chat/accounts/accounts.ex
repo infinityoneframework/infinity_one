@@ -1,6 +1,8 @@
 defmodule UccChat.Accounts do
 
   alias UccChat.PresenceAgent
+  alias UcxUcc.Accounts.Account
+  alias UcxUcc.Repo
 
   def get_all_channel_online_users(channel) do
     channel
@@ -28,5 +30,17 @@ defmodule UccChat.Accounts do
       user_mode: opts[:user_mode] || false,
       view_mode: opts[:view_mode] || false
     }
+  end
+
+  def get_account_by_user_id(user_id, opts \\ []) do
+    preload = opts[:preload]
+    account =
+      user_id
+      |> Account.get()
+      |> Repo.one()
+    case preload do
+      nil     -> account
+      preload -> Repo.preload account, preload
+    end
   end
 end
