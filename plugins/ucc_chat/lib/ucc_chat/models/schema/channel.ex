@@ -63,7 +63,7 @@ defmodule UccChat.Schema.Channel do
     changeset
     |> validate_required([:name, :user_id])
     |> validate_format(:name, ~r/^[a-z0-9\.\-_]+$/i)
-    |> validate_length(:name, min: 2, max: 25)
+    |> validate_length(:name, min: 2, max: 55)
   end
 
 end

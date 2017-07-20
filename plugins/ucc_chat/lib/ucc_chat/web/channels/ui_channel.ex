@@ -5,6 +5,7 @@ defmodule UccChat.Web.UiChannel do
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
+  import Rebel.Browser, warn: false
 
   alias UccChat.Flex, warn: false
 
@@ -23,6 +24,12 @@ defmodule UccChat.Web.UiChannel do
     current_user_id = socket.assigns.user_id
     user_id = sender["dataset"]["id"]
     Logger.warn "start audio curr_id: #{current_user_id}, user_id: #{user_id}"
+  end
+
+  def add_private(socket, sender) do
+    username = exec_js! socket, ~s{$('#{this(sender)}').parent().data('username')}
+    Logger.warn "add_private username: #{username}"
+    redirect_to socket, "/direct/#{username}"
   end
 
   defdelegate flex_tab_click(socket, sender),

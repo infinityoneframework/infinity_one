@@ -93,12 +93,12 @@ class RoomManager {
         $('aside .rooms-list').html(resp.side_nav_html)
       })
   }
-  add_private(elem) {
-    let username = elem.parent().attr('data-username')
-    if (debug) { console.log('pvt-msg button clicked...', username) }
-    console.log('location')
-    window.location = '/direct/' + username
-  }
+  // add_private(elem) {
+  //   let username = elem.parent().attr('data-username')
+  //   if (debug) { console.log('pvt-msg button clicked...', username) }
+  //   console.log('location')
+  //   window.location = '/direct/' + username
+  // }
   update(msg) {
     if(debug) { console.log('update...', msg) }
     let fname = msg.field_name
@@ -502,11 +502,11 @@ class RoomManager {
       e.preventDefault();
       this.toggle_favorite()
     })
-    .on('click', '.button.pvt-msg', e => {
-      if (debug) { console.log('click .button.pvt-msg') }
-      e.preventDefault();
-      this.add_private($(e.currentTarget))
-    })
+    // .on('click', '.button.pvt-msg', e => {
+    //   if (debug) { console.log('click .button.pvt-msg') }
+    //   e.preventDefault();
+    //   this.add_private($(e.currentTarget))
+    // })
     .on('click', 'button.set-owner', e => {
       let username = $(e.currentTarget).parent().attr('data-username')
       e.preventDefault()

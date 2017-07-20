@@ -13,7 +13,7 @@
       button.button.start-audio-call.secondary(rebel-click="start_audio_call" aria-label="Start audio call" data-id="#{@user.id}")
         i.icon-phone
   = unless @current_user.id == @user.id or @user_info[:direct] do
-    button.button.button-block.primary.pvt-msg
+    button.button.button-block.primary(rebel-click="add_private")
       span
         i.icon-chat
         = ~g"Conversation"
