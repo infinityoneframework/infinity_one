@@ -50,6 +50,7 @@ defmodule UccChat.Web.UiChannel do
 
   defdelegate flex_tab_click(socket, sender), to: UccUiFlexTab.FlexTabChannel
   defdelegate flex_call(socket, sender), to: UccUiFlexTab.FlexTabChannel
+  defdelegate flex_tab_item_click(socket, sender), to: UccUiFlexTab.FlexTabChannel
   # def flex_tab_click(socket, sender) do
   #   UccUiFlexTab.FlexTabChannel.flex_tab_click socket, sender
   # end

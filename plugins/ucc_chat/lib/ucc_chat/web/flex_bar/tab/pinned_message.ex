@@ -1,7 +1,7 @@
 defmodule UccChat.Web.FlexBar.Tab.PinnedMessage do
   use UccChat.Web.FlexBar.Helpers
 
-  alias UccChat.Schema.PinnedMessage, as: PinnedMessageSchema
+  alias UccChat.PinnedMessage
 
   def add_buttons do
     TabBar.add_button %{
@@ -18,11 +18,8 @@ defmodule UccChat.Web.FlexBar.Tab.PinnedMessage do
 
   def args(user_id, channel_id, _, _) do
     pinned =
-      PinnedMessageSchema
-      |> where([m], m.channel_id == ^channel_id)
-      |> preload([message: :user])
-      |> order_by([p], desc: p.inserted_at)
-      |> Repo.all
+      channel_id
+      |> PinnedMessage.get_by_channel_id()
       |> do_messages_args(user_id, channel_id)
 
     [pinned: pinned]

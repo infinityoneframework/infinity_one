@@ -165,30 +165,8 @@ defmodule UccUiFlexTab.Flex do
       |> to_string
       |> TabBar.get_button!()
 
-    # IO.inspect tab, label: "----------- run_callback"
-    # require IEx
-    # IEx.pry
-
     socket = Phoenix.Socket.assign socket, :flex, fl
 
     apply tab.module, state, [socket, ch, tab, panel, params]
   end
-
-
-    # Logger.warn "run_callback tab_name: #{tab_name}, panel: #{inspect panel}" <>
-    #   " tab: #{inspect tab}"
-    # case get_in fl, [:c, ch]  do
-    #   nil -> default_callbacks(tab_name).(state, ch, tab_name, panel, socket)
-    # end
-    # fl
-
-  # defp default_callbacks(tab) do
-  #   case @default_callbacks[tab] do
-  #     nil -> &default_callback/5
-  #     other -> other
-  #   end
-  # end
-
-  # defp default_callback(state, ch, tab, panel, socket),
-  #   do: send(self(), {:flex, state, ch, tab, panel, socket})
 end

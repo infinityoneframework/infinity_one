@@ -23,8 +23,12 @@ defmodule UccChat.Web.FlexBar.Tab.UserInfo do
 
     user = Helpers.get_user_by_name(direct.users)
     user_info = user_info(channel, direct: true)
-    [user: user, current_user: current_user, channel_id: channel_id,
-     user_info: user_info]
+    [
+      user: user,
+      current_user: current_user,
+      channel_id: channel_id,
+      user_info: user_info
+    ]
   end
 end
 

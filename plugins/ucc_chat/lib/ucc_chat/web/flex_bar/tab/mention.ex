@@ -1,8 +1,6 @@
 defmodule UccChat.Web.FlexBar.Tab.Mention do
   use UccChat.Web.FlexBar.Helpers
-  alias UccChat.Schema.Mention, as: MentionSchema
-
-  alias UccChat.Channel
+  alias UccChat.Mention
 
   def add_buttons do
     TabBar.add_button %{
@@ -17,12 +15,10 @@ defmodule UccChat.Web.FlexBar.Tab.Mention do
     }
   end
 
-  def args(user_id, channel_id, _, opts) do
+  def args(user_id, channel_id, _, _) do
     mentions =
-      MentionSchema
-      |> where([m], m.user_id == ^user_id and m.channel_id == ^channel_id)
-      |> preload([:user, :message])
-      |> Repo.all
+      user_id
+      |> Mention.get_by_user_id_and_channel_id(channel_id)
       |> do_messages_args(user_id, channel_id)
 
     [mentions: mentions]

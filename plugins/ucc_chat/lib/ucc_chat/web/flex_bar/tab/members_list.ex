@@ -3,6 +3,7 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
 
   alias UccChat.Channel
   alias UccChat.Web.FlexBarView
+  alias UccChat.Accounts
 
   require Logger
 
@@ -25,11 +26,13 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
 
     {user, user_mode} =
       case opts["username"] do
-        nil -> {Helpers.get_user!(user_id), false}
-        username -> {Helpers.get_user_by_name(username, preload: [:roles]), true}
+        nil ->
+          {Helpers.get_user!(user_id), false}
+        username ->
+          {Helpers.get_user_by_name(username, preload: [:roles]), true}
       end
 
-    users = get_all_channel_online_users(channel)
+    users = Accounts.get_all_channel_online_users(channel)
 
     total_count = channel.users |> length
 
@@ -42,14 +45,22 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
      channel_id: channel_id, current_user: current_user]
   end
 
-  def flex_show_all(socket, sender) do
-    # Logger.error "flex_show_all sender: #{inspect sender}"
+  def user_args(user_id, channel_id, username) do
+    channel = Channel.get!(channel_id, preload: [users: :roles])
+    [
+      user: Helpers.get_user_by_name(username, preload: [:roles]),
+      user_info: user_info(channel, user_mode: true, view_mode: true),
+      channel_id: channel_id,
+      current_user: Helpers.get_user!(user_id)
+    ]
+  end
 
+  def flex_show_all(socket, sender) do
     channel_id = exec_js!(socket, "ucxchat.channel_id")
     users =
       channel_id
       |> Channel.get!(preload: [:users])
-      |> get_channel_offline_users
+      |> Accounts.get_channel_offline_users
 
     html =
       for user <- users do
@@ -60,21 +71,16 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
 
     socket
     |> exec_update_fun(sender, "flex_show_online")
-    # |> Query.update(data: "fun", set: "flex_show_online", on: this(sender))
-    |> Query.insert(html, append: ".list-view ul.lines")
-    |> Query.update(:text, set: ~g(Show only online), on: this(sender))
+    |> insert(html, append: ".list-view ul.lines")
+    |> update(:text, set: ~g(Show only online), on: this(sender))
     |> exec_update_showing_count
-
-    |> IO.inspect(label: "exec_js return")
-
   end
 
   def flex_show_online(socket, sender) do
     socket
     |> exec_update_fun(sender, "flex_show_all")
-    # |> Query.update(data: "fun", set: "flex_show_all", on: this(sender))
-    |> Query.delete(".list-view ul.lines li.status-offline")
-    |> Query.update(:text, set: ~g(Show all), on: this(sender))
+    |> delete(".list-view ul.lines li.status-offline")
+    |> update(:text, set: ~g(Show all), on: this(sender))
     |> exec_update_showing_count
     socket
   end
@@ -83,6 +89,24 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
     exec_js(socket,
       "$('.showing-cnt').text($('.list-view ul.lines li').length)")
     socket
+  end
+
+  def flex_user_open(socket, sender) do
+    user_id = socket.assigns[:user_id]
+    channel_id = socket.assigns[:channel_id]
+
+    html = Phoenix.View.render_to_string View, "user_card.html",
+      user_args(user_id, channel_id, sender["dataset"]["username"])
+
+    socket
+    |> update(:html, set: html, on: "#flex-user-card-details")
+
+    socket
+  end
+
+  def view_all(socket, _sender) do
+    update(socket, :class, toggle: "animated-hidden",
+      on: ".flex-tab-container .user-view")
   end
 end
 

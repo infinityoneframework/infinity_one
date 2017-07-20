@@ -1,9 +1,7 @@
 defmodule UccChat.Web.FlexBar.Tab.FilesList do
   use UccChat.Web.FlexBar.Helpers
 
-  alias UccChat.Channel
-  alias UccChat.Schema.Message, as: MessageSchema
-  alias UccChat.Schema.Attachement, as: AttachmentSchema
+  alias UccChat.Attachment
 
   def add_buttons do
     TabBar.add_button %{
@@ -19,14 +17,10 @@ defmodule UccChat.Web.FlexBar.Tab.FilesList do
   end
 
   def args(user_id, channel_id, _, _) do
-    current_user = Helpers.get_user! user_id
-    channel = Channel.get!(channel_id)
-    attachments = (from a in AttachmentSchema,
-      join: m in MessageSchema, on: a.message_id == m.id,
-      order_by: [desc: m.timestamp],
-      where: a.channel_id == ^(channel.id))
-    |> Repo.all
-    [current_user: current_user, attachments: attachments]
+    [
+      current_user: Helpers.get_user!(user_id),
+      attachments: Attachment.get_attachments_by_channel_id(channel_id)
+    ]
   end
 end
 

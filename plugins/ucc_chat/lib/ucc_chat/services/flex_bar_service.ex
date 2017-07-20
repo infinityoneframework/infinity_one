@@ -317,7 +317,6 @@ defmodule UccChat.FlexBarService do
     notification =
       current_user.account
       |> Notification.get_notification(channel_id)
-      |> Repo.one
       |> case do
         nil -> AccountService.new_notification(current_user.account.id, channel_id)
         notification -> notification

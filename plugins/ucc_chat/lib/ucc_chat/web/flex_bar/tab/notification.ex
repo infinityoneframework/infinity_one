@@ -1,8 +1,6 @@
 defmodule UccChat.Web.FlexBar.Tab.Notification do
   use UccChat.Web.FlexBar.Helpers
 
-  alias UccChat.Schema.PinnedMessage, as: PinnedMessageSchema
-
   alias UccChat.Notification
   alias UccChat.AccountService
 
@@ -24,11 +22,11 @@ defmodule UccChat.Web.FlexBar.Tab.Notification do
     notification =
       current_user.account
       |> Notification.get_notification(channel_id)
-      |> Repo.one
       |> case do
         nil ->
           AccountService.new_notification(current_user.account.id, channel_id)
-        notification -> notification
+        notification ->
+          notification
       end
 
     [notification: notification, editing: nil]

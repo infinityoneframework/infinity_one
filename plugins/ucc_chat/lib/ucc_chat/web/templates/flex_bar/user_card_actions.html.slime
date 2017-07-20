@@ -50,7 +50,7 @@
       button.button.button-block.danger.remove-user
         span= ~g"Remove from room"
     = if @user_info[:view_mode] do
-      button.button.back
+      button.button.back(rebel-click="flex_call" data-fun="view_all" data-id="members-list")
         span
           = ~g"View All"
           i.icon-angle-right

@@ -14,26 +14,34 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
   def flex_tab_click(socket, sender) do
     channel_id = exec_js!(socket, "ucxchat.channel_id")
-    Logger.warn "flex_tab_click id #{sender["dataset"]["id"]}, #{inspect channel_id}, assigns: #{inspect socket.assigns}"
-    Logger.warn inspect(sender, label: "Sender")
     socket
     |> assign(:channel_id, channel_id)
     |> toggle_flex(sender["dataset"]["id"], sender)
   end
 
+  def flex_tab_item_click(socket, sender) do
+    channel_id = exec_js!(socket, "ucxchat.channel_id")
+    socket
+    |> assign(:channel_id, channel_id)
+    |> open_item_flex(sender["dataset"]["id"], sender)
+  end
+
   def flex_call(socket, sender) do
-    Logger.error "......... sender: #{inspect sender}"
     tab = TabBar.get_button(sender["dataset"]["id"])
     fun = sender["dataset"]["fun"] |> String.to_atom()
     apply tab.module, fun, [socket, sender]
-    # channel_id = exec_js!(socket, "ucxchat.channel_id")
-    # FlexBarService.handle_in sender["dataset"]["id"], %{"channel_id" => channel_id}, socket
   end
 
-  defp toggle_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, params) do
-    # assign(socket, :flex, Flex.toggle(fl, assigns[:channel_id], tab, params))
-    Flex.toggle(fl, socket, assigns[:channel_id], tab, params)
-    |> IO.inspect(label: "toggle_flex socket")
+  defp toggle_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, sender) do
+    Flex.toggle(fl, socket, assigns[:channel_id], tab, sender)
+  end
+
+  defp open_item_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, sender) do
+    dataset = sender["dataset"]
+    button = TabBar.get_button dataset["id"]
+    key = dataset["key"]
+    panel = %{"templ" => button.template, key => dataset[key]}
+    Flex.open(fl, socket, assigns[:channel_id], tab, panel, sender)
   end
 
 end
