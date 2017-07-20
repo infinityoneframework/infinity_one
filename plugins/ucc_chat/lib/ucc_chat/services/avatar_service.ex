@@ -33,17 +33,32 @@ defmodule UccChat.AvatarService do
   end
 
   def get_color(username) do
-    use Bitwise
-    ch = case username do
-      <<_::8, ch::8, _::bitstring>> -> ch
-      <<ch::8, _::bitstring>> -> ch
-      _ -> ?a
+    # use Bitwise
+    # ch = case username do
+    #   <<_::8, ch::8, _::bitstring>> -> ch
+    #   <<ch::8, _::bitstring>> -> ch
+    #   _ -> ?a
+    # end
+
+    # len = String.length(username) ^^^ (ch &&& 0x53)
+
+    # inx = rem(len, @background_count)
+
+    # Enum.at(@background_colors, inx)
+    Enum.random @background_colors
+  end
+
+  def avatar_url(username) do
+    "/avatar/#{get_initials(username)}.svg"
+  end
+
+  def gen_avatars do
+    list = for ch <- ?a..?z, do: <<ch::8>>
+    list = for ch1 <- list, ch2 <- list, do: ch1 <> ch2
+    for name <- list do
+      File.write "assets/static/avatar/#{name}.svg",
+        UccChat.Web.AvatarView.render("show.xml",
+          color: get_color(name), initials: get_initials(name))
     end
-
-    len = String.length(username) ^^^ (ch &&& 0x53)
-
-    inx = rem(len, @background_count)
-
-    Enum.at(@background_colors, inx)
   end
 end

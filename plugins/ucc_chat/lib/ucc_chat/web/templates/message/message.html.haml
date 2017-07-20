@@ -11,7 +11,7 @@
           - if @user.avatar_url do
             .avatar-image(style="background-image:url(#{@user.avatar_url});")
           - else
-            .avatar-image(style="background-image:url(/avatar/#{username});")
+            .avatar-image(style="background-image:url(#{avatar_url(username)});")
   - else
     - if emoji = emoji(@message) do
       %button.thumb.user-card-message(data-username="#{username}" tabindex="1")
@@ -23,7 +23,7 @@
           - if @user.avatar_url do
             .avatar-image(style="background-image:url(#{@user.avatar_url});")
           - else
-            .avatar-image(style="background-image:url(/avatar/#{username});")
+            .avatar-image(style="background-image:url(#{avatar_url(username)});")
   - if alias? = alias?(@message) do
     %button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
       = alias?

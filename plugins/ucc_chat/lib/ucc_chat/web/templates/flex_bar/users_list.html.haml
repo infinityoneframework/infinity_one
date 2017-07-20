@@ -15,4 +15,3 @@
       - for user <- @users do
         = render "users_list_item.html", user: user, channel_id: @channel_id
   .content#flex-user-card-details
-    /= render "user_card.html", user_info: @user_info, user: @user, channel_id: @channel_id, current_user: @current_user

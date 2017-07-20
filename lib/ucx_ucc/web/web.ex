@@ -36,6 +36,7 @@ defmodule UcxUcc.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      import UccChat.AvatarService, only: [avatar_url: 1]
       import UcxUcc.Web.Router.Helpers
       import UcxUcc.Web.ErrorHelpers
       use UcxUcc.Web.Gettext

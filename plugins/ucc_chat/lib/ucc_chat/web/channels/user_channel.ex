@@ -9,12 +9,11 @@ defmodule UccChat.Web.UserChannel do
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.{Account, User}
   alias UccChat.{
-    Subscription, FlexBarService, ChannelService, Channel,
-    SideNavService, Web.AccountView, Web.FlexBarView, Web.UserSocket,
+    Subscription, ChannelService, Channel,
+    SideNavService, Web.AccountView, Web.UserSocket,
     ChannelService, SubscriptionService, InvitationService, UserService,
     EmojiService, Settings
   }
-  alias UccUiFlexTab.Flex
   alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
   alias UccChat.ServiceHelpers, as: Helpers
@@ -66,7 +65,6 @@ defmodule UccChat.Web.UserChannel do
       socket
       |> struct(assigns: Map.merge(new_assigns, socket.assigns))
       |> assign(:subscribed, socket.assigns[:subscribed] || [])
-      |> assign(:flex, Flex.new())
       |> assign(:user_state, "active")
 
     socket =
@@ -156,35 +154,35 @@ defmodule UccChat.Web.UserChannel do
     {:noreply, socket}
   end
 
-  def handle_in("flex:open:User Info" = ev, params, socket) do
-    debug ev, params, "assigns: #{inspect socket.assigns}"
-    # TODO: what is this?
-    args = %{"args" => %{"templ" => "users_list.html",
-      "username" => "steve.pallen"}}
-    {:noreply, toggle_flex(socket, "User Info", args)}
-    # {:noreply, open_flex_item(socket, "User Info", args)}
-  end
+  # def handle_in("flex:open:User Info" = ev, params, socket) do
+  #   debug ev, params, "assigns: #{inspect socket.assigns}"
+  #   # TODO: what is this?
+  #   args = %{"args" => %{"templ" => "users_list.html",
+  #     "username" => "steve.pallen"}}
+  #   {:noreply, toggle_flex(socket, "User Info", args)}
+  #   # {:noreply, open_flex_item(socket, "User Info", args)}
+  # end
 
-  def handle_in("flex:open:" <> tab = ev, params, socket) do
-    debug ev, params, "assigns: #{inspect socket.assigns}"
-    {:noreply, toggle_flex(socket, tab, params)}
-  end
-  def handle_in("flex:item:open:" <> tab = ev, params, socket) do
-    debug ev, params, "assigns: #{inspect socket.assigns}"
-    {:noreply, open_flex_item(socket, tab, params)}
-  end
+  # def handle_in("flex:open:" <> tab = ev, params, socket) do
+  #   debug ev, params, "assigns: #{inspect socket.assigns}"
+  #   {:noreply, toggle_flex(socket, tab, params)}
+  # end
+  # def handle_in("flex:item:open:" <> tab = ev, params, socket) do
+  #   debug ev, params, "assigns: #{inspect socket.assigns}"
+  #   {:noreply, open_flex_item(socket, tab, params)}
+  # end
 
-  def handle_in("flex:close" = ev, params, socket) do
-    debug ev, params
-    {:noreply, socket}
-  end
+  # def handle_in("flex:close" = ev, params, socket) do
+  #   debug ev, params
+  #   {:noreply, socket}
+  # end
 
-  def handle_in("flex:view_all:" <> tab = ev, params,
-    %{assigns: assigns} = socket) do
-    debug ev, params
-    fl = assigns[:flex] |> Flex.view_all(assigns[:channel_id], tab)
-    {:noreply, assign(socket, :flex, fl)}
-  end
+  # def handle_in("flex:view_all:" <> tab = ev, params,
+  #   %{assigns: assigns} = socket) do
+  #   debug ev, params
+  #   fl = assigns[:flex] |> Flex.view_all(assigns[:channel_id], tab)
+  #   {:noreply, assign(socket, :flex, fl)}
+  # end
 
   def handle_in("side_nav:open" = ev, %{"page" => "account"} = params,
     socket) do
@@ -333,10 +331,10 @@ defmodule UccChat.Web.UserChannel do
     AdminService.handle_in(link, params, socket)
   end
 
-  def handle_in(ev = "flex:member-list:" <> action, params, socket) do
-    debug ev, params
-    FlexBarService.handle_in action, params, socket
-  end
+  # def handle_in(ev = "flex:member-list:" <> action, params, socket) do
+  #   debug ev, params
+  #   FlexBarService.handle_in action, params, socket
+  # end
 
   def handle_in(ev = "update:currentMessage", params, socket) do
     debug ev, params
@@ -387,11 +385,11 @@ defmodule UccChat.Web.UserChannel do
     end
   end
 
-  def handle_in(ev = "notifications_form:" <> _action, params,
-    %{assigns: assigns} = socket) do
-    debug ev, params, inspect(assigns)
-    FlexBarService.handle_in(ev, params, socket)
-  end
+  # def handle_in(ev = "notifications_form:" <> _action, params,
+  #   %{assigns: assigns} = socket) do
+  #   debug ev, params, inspect(assigns)
+  #   FlexBarService.handle_in(ev, params, socket)
+  # end
 
   # default unknown handler
   def handle_in(event, params, socket) do
@@ -449,99 +447,100 @@ defmodule UccChat.Web.UserChannel do
     {:noreply, socket}
   end
 
-  def handle_info(%Broadcast{topic: _, event: "user:action" = event,
-    payload: %{action: "owner"} = payload}, %{assigns: assigns} = socket) do
-    debug event, payload
-    current_user = Helpers.get_user! assigns.user_id
-    user = Helpers.get_user! payload.user_id
-    channel = Channel.get!(assigns.channel_id)
-    user_info = FlexBarService.user_info channel, view_mode: true
-    if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
-      html1 =
-        Helpers.render(FlexBarView, "user_card_actions.html",
-          current_user: current_user, channel_id: assigns.channel_id,
-          user: user, user_info: user_info)
-      push socket, "code:update", %{html: html1,
-        selector: ~s(.user-view nav[data-username="#{user.username}"]),
-        action: "html"}
-    end
-    {:noreply, socket}
-  end
+  # TODO: Need to get this over to the new UI channels
+  # def handle_info(%Broadcast{topic: _, event: "user:action" = event,
+  #   payload: %{action: "owner"} = payload}, %{assigns: assigns} = socket) do
+  #   debug event, payload
+  #   current_user = Helpers.get_user! assigns.user_id
+  #   user = Helpers.get_user! payload.user_id
+  #   channel = Channel.get!(assigns.channel_id)
+  #   # user_info = FlexBarService.user_info channel, view_mode: true
+  #   # if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
+  #   #   html1 =
+  #   #     Helpers.render(FlexBarView, "user_card_actions.html",
+  #   #       current_user: current_user, channel_id: assigns.channel_id,
+  #   #       user: user, user_info: user_info)
+  #   #   push socket, "code:update", %{html: html1,
+  #   #     selector: ~s(.user-view nav[data-username="#{user.username}"]),
+  #   #     action: "html"}
+  #   # end
+  #   {:noreply, socket}
+  # end
 
-  def handle_info(%Broadcast{topic: _, event: "user:action" = event, payload:
-    %{action: action} = payload}, %{assigns: assigns} = socket)
-    when action in ~w(block) do
-    debug event, payload, "assigns: #{inspect assigns}"
-    current_user = Helpers.get_user! assigns.user_id
-    user = Helpers.get_user! payload.user_id
-    channel = Channel.get!(assigns.channel_id)
-    if Flex.open? assigns.flex, assigns.channel_id, "User Info" do
-      # debug event, payload, action <> " open"
-      user_info = FlexBarService.user_info channel, direct: true
-      html1 =
-        Helpers.render(FlexBarView, "user_card_actions.html",
-          current_user: current_user, channel_id: assigns.channel_id,
-          user: user, user_info: user_info)
-      push socket, "code:update", %{html: html1,
-        selector: ~s(.user-view nav[data-username="#{user.username}"]),
-        action: "html"}
-    else
-      # debug event, payload, "closed"
-    end
-    {:noreply, socket}
-  end
+  # def handle_info(%Broadcast{topic: _, event: "user:action" = event, payload:
+  #   %{action: action} = payload}, %{assigns: assigns} = socket)
+  #   when action in ~w(block) do
+  #   debug event, payload, "assigns: #{inspect assigns}"
+  #   current_user = Helpers.get_user! assigns.user_id
+  #   user = Helpers.get_user! payload.user_id
+  #   channel = Channel.get!(assigns.channel_id)
+  #   if Flex.open? assigns.flex, assigns.channel_id, "User Info" do
+  #     # debug event, payload, action <> " open"
+  #     user_info = FlexBarService.user_info channel, direct: true
+  #     html1 =
+  #       Helpers.render(FlexBarView, "user_card_actions.html",
+  #         current_user: current_user, channel_id: assigns.channel_id,
+  #         user: user, user_info: user_info)
+  #     push socket, "code:update", %{html: html1,
+  #       selector: ~s(.user-view nav[data-username="#{user.username}"]),
+  #       action: "html"}
+  #   else
+  #     # debug event, payload, "closed"
+  #   end
+  #   {:noreply, socket}
+  # end
 
-  def handle_info(%Broadcast{topic: _, event: "user:action" = event, payload:
-    %{action: action} = payload}, %{assigns: assigns} = socket)
-    when action in ~w(mute moderator owner) do
-    debug event, payload
-    current_user = Helpers.get_user! assigns.user_id
-    user = Helpers.get_user! payload.user_id
-    channel = Channel.get!(assigns.channel_id)
-    if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
-      # debug event, payload, action <> " open"
-      user_info = FlexBarService.user_info channel, view_mode: true
-      html1 =
-        Helpers.render(FlexBarView, "user_card_actions.html",
-          current_user: current_user, channel_id: assigns.channel_id,
-          user: user, user_info: user_info)
-      push socket, "code:update", %{html: html1,
-        selector: ~s(.user-view nav[data-username="#{user.username}"]),
-        action: "html"}
+  # def handle_info(%Broadcast{topic: _, event: "user:action" = event, payload:
+  #   %{action: action} = payload}, %{assigns: assigns} = socket)
+  #   when action in ~w(mute moderator owner) do
+  #   debug event, payload
+  #   current_user = Helpers.get_user! assigns.user_id
+  #   user = Helpers.get_user! payload.user_id
+  #   channel = Channel.get!(assigns.channel_id)
+  #   if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
+  #     # debug event, payload, action <> " open"
+  #     user_info = FlexBarService.user_info channel, view_mode: true
+  #     html1 =
+  #       Helpers.render(FlexBarView, "user_card_actions.html",
+  #         current_user: current_user, channel_id: assigns.channel_id,
+  #         user: user, user_info: user_info)
+  #     push socket, "code:update", %{html: html1,
+  #       selector: ~s(.user-view nav[data-username="#{user.username}"]),
+  #       action: "html"}
 
-      if action == "mute" do
-        html2 =
-          Helpers.render(FlexBarView, "users_list_item.html",
-            channel_id: assigns.channel_id, user: user)
-        push socket, "code:update", %{html: html2,
-          selector: ~s(.user-card-room[data-status-name="#{user.username}"]),
-          action: "html"}
-      end
-    else
-      # debug event, payload, "closed"
-    end
-    {:noreply, socket}
-  end
+  #     if action == "mute" do
+  #       html2 =
+  #         Helpers.render(FlexBarView, "users_list_item.html",
+  #           channel_id: assigns.channel_id, user: user)
+  #       push socket, "code:update", %{html: html2,
+  #         selector: ~s(.user-card-room[data-status-name="#{user.username}"]),
+  #         action: "html"}
+  #     end
+  #   else
+  #     # debug event, payload, "closed"
+  #   end
+  #   {:noreply, socket}
+  # end
 
-  def handle_info(%Broadcast{topic: _, event: "user:action" = event,
-    payload: %{action: "removed"} = payload}, %{assigns: assigns} = socket) do
-    debug event, payload, "assigns: #{inspect assigns}"
-    # current_user = Helpers.get_user! assigns.user_id
-    user = Helpers.get_user! payload.user_id
-    if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
-      debug event, payload, "removed open"
+  # def handle_info(%Broadcast{topic: _, event: "user:action" = event,
+  #   payload: %{action: "removed"} = payload}, %{assigns: assigns} = socket) do
+  #   debug event, payload, "assigns: #{inspect assigns}"
+  #   # current_user = Helpers.get_user! assigns.user_id
+  #   user = Helpers.get_user! payload.user_id
+  #   if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
+  #     debug event, payload, "removed open"
 
-      push socket, "code:update", %{selector:
-        ~s(.user-card-room[data-status-name='#{user.username}']),
-        action: "remove"}
-      push socket, "code:update", %{selector:
-        ".flex-tab-container .user-view", action: "addClass",
-        html: "animated-hidden"}
-    else
-      debug event, payload, "closed"
-    end
-    {:noreply, socket}
-  end
+  #     push socket, "code:update", %{selector:
+  #       ~s(.user-card-room[data-status-name='#{user.username}']),
+  #       action: "remove"}
+  #     push socket, "code:update", %{selector:
+  #       ".flex-tab-container .user-view", action: "addClass",
+  #       html: "animated-hidden"}
+  #   else
+  #     debug event, payload, "closed"
+  #   end
+  #   {:noreply, socket}
+  # end
   def handle_info(%Broadcast{topic: _, event: "user:action" = event,
     payload: %{action: "unhide"} = payload}, %{assigns: assigns} = socket) do
     debug event, payload, "assigns: #{inspect assigns}"
@@ -556,18 +555,21 @@ defmodule UccChat.Web.UserChannel do
     %{assigns: %{user: user} = assigns} = socket) do
 
     debug event, payload, "assigns: #{inspect assigns}"
-    old_channel_id = assigns[:channel_id]
+    # old_channel_id = assigns[:channel_id]
     channel_id = payload[:channel_id]
-    socket = %{assigns: assigns} = assign(socket, :channel_id, channel_id)
-    fl = assigns[:flex]
-    cond do
-      Flex.open?(fl, channel_id) ->
-        Flex.show(fl, channel_id)
-      old_channel_id && Flex.open?(fl, old_channel_id) ->
-        push socket, "flex:close", %{}
-      true ->
-        nil
-    end
+    socket = %{assigns: _assigns} = assign(socket, :channel_id, channel_id)
+
+    # TODO: Need to tell the UI channel that the room is opened
+
+    # fl = assigns[:flex]
+    # cond do
+    #   Flex.open?(fl, channel_id) ->
+    #     Flex.show(fl, channel_id)
+    #   old_channel_id && Flex.open?(fl, old_channel_id) ->
+    #     push socket, "flex:close", %{}
+    #   true ->
+    #     nil
+    # end
     # UserSocket.push_message_box(socket, socket.assigns.channel_id, socket.assigns.user_id)
     {:noreply, socket}
   end
@@ -585,41 +587,41 @@ defmodule UccChat.Web.UserChannel do
     end
   end
 
-  def handle_info({:flex, :open, ch, "Notifications" = tab, nil, params} = msg,
-    socket) do
-    debug inspect(msg), "Notifications"
-    {resp, socket} =
-      case FlexBarService.handle_flex_callback(:open, ch, tab, nil,
-        socket, params) do
-        %{notification: notify} = resp ->
-          {Map.delete(resp, :notification),
-           assign(socket, :notification, notify)}
-        resp ->
-          {resp, socket}
-      end
-    push socket, "flex:open", Enum.into([title: tab], resp)
-    {:noreply, socket}
-  end
+  # def handle_info({:flex, :open, ch, "Notifications" = tab, nil, params} = msg,
+  #   socket) do
+  #   debug inspect(msg), "Notifications"
+  #   {resp, socket} =
+  #     case FlexBarService.handle_flex_callback(:open, ch, tab, nil,
+  #       socket, params) do
+  #       %{notification: notify} = resp ->
+  #         {Map.delete(resp, :notification),
+  #          assign(socket, :notification, notify)}
+  #       resp ->
+  #         {resp, socket}
+  #     end
+  #   push socket, "flex:open", Enum.into([title: tab], resp)
+  #   {:noreply, socket}
+  # end
 
-  def handle_info({:flex, :open, ch, tab, nil, params} = msg, socket) do
-    debug inspect(msg), "nil"
-    resp =
-      FlexBarService.handle_flex_callback(:open, ch, tab, nil, socket, params)
-    push socket, "flex:open", Enum.into([title: tab], resp)
-    {:noreply, socket}
-  end
-  def handle_info({:flex, :open, ch, tab, args, params} = msg, socket) do
-    debug inspect(msg), "args"
-    resp = FlexBarService.handle_flex_callback(:open, ch, tab, args[tab],
-      socket, params)
-    push socket, "flex:open", Enum.into([title: tab], resp)
-    {:noreply, socket}
-  end
-  def handle_info({:flex, :close, _ch, _tab, _, _params} = msg, socket) do
-    debug inspect(msg), ""
-    push socket, "flex:close", %{}
-    {:noreply, socket}
-  end
+  # def handle_info({:flex, :open, ch, tab, nil, params} = msg, socket) do
+  #   debug inspect(msg), "nil"
+  #   resp =
+  #     FlexBarService.handle_flex_callback(:open, ch, tab, nil, socket, params)
+  #   push socket, "flex:open", Enum.into([title: tab], resp)
+  #   {:noreply, socket}
+  # end
+  # def handle_info({:flex, :open, ch, tab, args, params} = msg, socket) do
+  #   debug inspect(msg), "args"
+  #   resp = FlexBarService.handle_flex_callback(:open, ch, tab, args[tab],
+  #     socket, params)
+  #   push socket, "flex:open", Enum.into([title: tab], resp)
+  #   {:noreply, socket}
+  # end
+  # def handle_info({:flex, :close, _ch, _tab, _, _params} = msg, socket) do
+  #   debug inspect(msg), ""
+  #   push socket, "flex:close", %{}
+  #   {:noreply, socket}
+  # end
 
   def handle_info({:update_mention, payload, user_id} = ev, socket) do
     debug "upate_mention", ev
@@ -710,16 +712,16 @@ defmodule UccChat.Web.UserChannel do
 
   # assigns[:flex] %{open: %{channel_id => "Info"} }
 
-  defp toggle_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, params) do
-    assign socket, :flex, Flex.toggle(fl, assigns[:channel_id], tab, params)
-  end
+  # defp toggle_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, params) do
+  #   assign socket, :flex, Flex.toggle(fl, assigns[:channel_id], tab, params)
+  # end
 
-  defp open_flex_item(%{assigns: %{flex: fl} = assigns} = socket,
-    tab, params) do
-    debug inspect(fl), tab, inspect(params)
-    assign socket, :flex, Flex.open(fl, assigns[:channel_id], tab,
-      params["args"], params)
-  end
+  # defp open_flex_item(%{assigns: %{flex: fl} = assigns} = socket,
+  #   tab, params) do
+  #   debug inspect(fl), tab, inspect(params)
+  #   assign socket, :flex, Flex.open(fl, assigns[:channel_id], tab,
+  #     params["args"], params)
+  # end
 
   defp update_rooms_list(%{assigns: assigns} = socket) do
     debug "", inspect(assigns)
