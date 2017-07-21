@@ -1,0 +1,2 @@
+button.button.cancel(type="button")= ~g"Cancel"
+button.button.primary.save(type="button")= ~g"Save"

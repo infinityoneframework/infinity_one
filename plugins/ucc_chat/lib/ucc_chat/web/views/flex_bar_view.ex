@@ -109,6 +109,16 @@ defmodule UccChat.Web.FlexBarView do
     end
   end
 
+  def notification_item(title) do
+    "notification_item.html"
+    |> render(title: title)
+    |> Phoenix.HTML.raw()
+  end
+
+  def notification_save_cancel do
+    render "notification_save_cancel.html"
+  end
+
   def file_icon(:image), do: "icon-picture"
   def file_icon(:video), do: "icon-video"
   def file_icon(:audio), do: "icon-play"
