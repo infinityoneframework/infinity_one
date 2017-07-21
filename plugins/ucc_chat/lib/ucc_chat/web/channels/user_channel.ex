@@ -12,7 +12,7 @@ defmodule UccChat.Web.UserChannel do
     Subscription, ChannelService, Channel,
     SideNavService, Web.AccountView, Web.UserSocket,
     ChannelService, SubscriptionService, InvitationService, UserService,
-    EmojiService, Settings
+    EmojiService, Settings, FlexBarService
   }
   alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
@@ -388,11 +388,11 @@ defmodule UccChat.Web.UserChannel do
     end
   end
 
-  # def handle_in(ev = "notifications_form:" <> _action, params,
-  #   %{assigns: assigns} = socket) do
-  #   debug ev, params, inspect(assigns)
-  #   FlexBarService.handle_in(ev, params, socket)
-  # end
+  def handle_in(ev = "notifications_form:" <> _action, params,
+    %{assigns: assigns} = socket) do
+    debug ev, params, inspect(assigns)
+    FlexBarService.handle_in(ev, params, socket)
+  end
 
   # default unknown handler
   def handle_in(event, params, socket) do
