@@ -18,7 +18,6 @@ defmodule UcxUcc.Accounts.User do
     field :avatar_url, :string
     field :tz_offset, :integer
     field :alias, :string
-    field :chat_status, :string
     field :tag_line, :string
     field :uri, :string
     field :active, :boolean
@@ -31,7 +30,7 @@ defmodule UcxUcc.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @all_params ~w(name email username tz_offset alias chat_status tag_line uri active avatar_url)a
+  @all_params ~w(name email username tz_offset alias tag_line uri active avatar_url)a
   @required  ~w(name email username)a
 
   def changeset(model, params \\ %{}) do
@@ -44,6 +43,7 @@ defmodule UcxUcc.Accounts.User do
     |> unique_constraint(:username)
     |> unique_constraint(:email)
     |> validate_coherence(params)
+    |> plugin_changesets(params, __MODULE__)
   end
 
   def changeset(model, params, :password) do

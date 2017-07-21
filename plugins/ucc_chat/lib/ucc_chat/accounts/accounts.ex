@@ -1,6 +1,6 @@
 defmodule UccChat.Accounts do
 
-  alias UccChat.PresenceAgent
+  alias UccChat.{PresenceAgent, Channel, Subscription}
   alias UcxUcc.Accounts.Account
   alias UcxUcc.Repo
 
@@ -42,5 +42,16 @@ defmodule UccChat.Accounts do
       nil     -> account
       preload -> Repo.preload account, preload
     end
+  end
+
+  def insert_user_default_channels(%{user: user} = changes, _params, opts) do
+    if opts[:join_default_channels] do
+      [default: true]
+      |> Channel.list_by()
+      |> Enum.each(fn ch ->
+        Subscription.insert!(%{channel_id: ch.id, user_id: user.id})
+      end)
+    end
+    {:ok, changes}
   end
 end

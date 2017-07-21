@@ -12,6 +12,7 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
   """
   use UcxUcc.Coherence.Web, :controller
 
+  alias UcxUcc.Accounts.User
   require Logger
 
   @type schema :: Ecto.Schema.t
@@ -53,15 +54,13 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
   """
   @spec create(conn, params) :: conn
   def create(conn, %{"registration" => registration_params} = params) do
-    user_schema = Config.user_schema
-    cs = Helpers.changeset(:registration, user_schema, user_schema.__struct__, registration_params)
-    case Config.repo.insert(cs) do
-      {:ok, user} ->
+    case UcxUcc.UserService.insert_user(registration_params) do
+      {:ok, %{user: user}} ->
         conn
-        |> send_confirmation(user, user_schema)
-        |> redirect_or_login(user, params, Config.allow_unconfirmed_access_for)
-      {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        |> send_confirmation(user, User)
+        |> redirect(to: logged_out_url(conn))
+      {:error, :user, error, _} ->
+        render conn, "new.html", changeset: error
     end
   end
 

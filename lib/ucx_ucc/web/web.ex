@@ -16,6 +16,13 @@ defmodule UcxUcc.Web do
   below.
   """
 
+  def service do
+    quote do
+      import Ecto.Query
+      use UcxUcc.Web.Gettext
+    end
+  end
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: UcxUcc.Web

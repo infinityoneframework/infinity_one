@@ -8,10 +8,10 @@ defmodule UccChat.Accounts.User do
   Code.ensure_compiled(Message)
 
   extend_schema UcxUcc.Accounts.User do
-
     field :status, :string, default: "offline", virtual: true
     field :subscription_hidden, :boolean, virtual: true
 
+    field :chat_status, :string, default: ""
     belongs_to :open, Channel, foreign_key: :open_id
 
     has_many :subscriptions, Subscription, on_delete: :nilify_all

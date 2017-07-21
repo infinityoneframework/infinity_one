@@ -7,7 +7,7 @@ defmodule UccChat.Accounts.Account do
   alias UccChat.Schema.{Notification, AccountNotification}
 
   extend_schema UcxUcc.Accounts.Account do
-    field :language, :string, default: "on"
+    field :language, :string, default: "en"
     field :desktop_notification_enabled, :boolean, default: true
     field :desktop_notification_duration, :integer
     field :unread_alert, :boolean, default: true

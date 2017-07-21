@@ -243,6 +243,7 @@ defmodule UccChat.Web.UserChannel do
       |> Helpers.get_user!
       |> Map.get(:account)
       |> Account.changeset(params)
+      |> IO.inspect(label: "account_preferences changeset")
       |> Repo.update
       |> case do
         {:ok, _account} ->
@@ -263,6 +264,7 @@ defmodule UccChat.Web.UserChannel do
       socket
       |> Helpers.get_user!
       |> User.changeset(params)
+      |> IO.inspect(label: "account profile changeset")
       |> Repo.update
       |> case do
         {:ok, _account} ->
@@ -273,6 +275,7 @@ defmodule UccChat.Web.UserChannel do
       end
     {:reply, resp, socket}
   end
+
   @links ~w(preferences profile)
   def handle_in(ev = "account_link:click:" <> link, params, socket)
     when link in @links do
