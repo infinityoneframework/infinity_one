@@ -20,6 +20,7 @@ defmodule UccChat.ChannelService do
   alias UcxUcc.Permissions
   alias UccChat.ServiceHelpers, as: Helpers
   alias Ecto.Multi
+  alias UcxUcc.UccPubSub
 
   require UccChat.ChatConstants, as: CC
   require Logger
@@ -36,7 +37,14 @@ defmodule UccChat.ChannelService do
   #   end
   # end
   def create_subscription(%ChannelSchema{} = channel, user_id) do
-    Subscription.create(%{user_id: user_id, channel_id: channel.id})
+    case Subscription.create(%{user_id: user_id, channel_id: channel.id}) do
+      {:ok, _} = ok ->
+        UccPubSub.broadcast "user:" <> user_id, "new:subscription",
+          %{channel_id: channel.id}
+        ok
+      other ->
+        other
+    end
   end
 
   @doc """
@@ -395,7 +403,8 @@ defmodule UccChat.ChannelService do
     {name, "offline"}
   end
 
-  def favorite_room?(chatd, channel_id) do
+
+  def favorite_room?(%{} = chatd, channel_id) do
     with room_types <- chatd.rooms,
          stared when not is_nil(stared) <-
             Enum.find(room_types, &(&1[:type] == :stared)),
@@ -405,6 +414,11 @@ defmodule UccChat.ChannelService do
     else
       _ -> false
     end
+  end
+
+  def favorite_room?(user_id, channel_id) do
+    {cc, user} = get_subscription_and_user(user_id, channel_id)
+    cc.type == room_type(:stared)
   end
 
   def get_chan_type(3, _), do: :stared
@@ -490,8 +504,8 @@ defmodule UccChat.ChannelService do
   end
 
   def toggle_favorite(user_id, channel_id) do
-    cc = Subscription.get_by_channel_id_and_user_id(channel_id, user_id,
-      preload: [:channel])
+    {cc, user} = get_subscription_and_user(user_id, channel_id)
+
     cc_type =
       if cc.type == room_type(:stared) do
         cc.channel.type # change it back
@@ -499,17 +513,11 @@ defmodule UccChat.ChannelService do
         room_type(:stared) # star it
       end
 
-    user = Repo.one!(from u in User, where: u.id == ^user_id,
-      preload: [:account])
-
     Subscription.update!(cc, %{type: cc_type})
 
     chatd = ChatDat.new user, cc.channel, []
 
-    messages_html =
-      "messages_header.html"
-      |> UccChat.Web.MasterView.render(chatd: chatd)
-      |> Helpers.safe_to_string
+    messages_html = render_messages_header chatd
 
     side_nav_html =
       "rooms_list.html"
@@ -517,6 +525,20 @@ defmodule UccChat.ChannelService do
       |> Helpers.safe_to_string
 
     {:ok, %{messages_html: messages_html, side_nav_html: side_nav_html}}
+  end
+
+  defp get_subscription_and_user(user_id, channel_id) do
+    cc = Subscription.get_by_channel_id_and_user_id(channel_id, user_id,
+      preload: [:channel])
+    user = Repo.one!(from u in User, where: u.id == ^user_id,
+      preload: [:account])
+   {cc, user}
+  end
+
+  def render_messages_header(chatd) do
+    "messages_header.html"
+    |> UccChat.Web.MasterView.render(chatd: chatd)
+    |> Helpers.safe_to_string
   end
 
   def add_direct(username, user_id, channel_id) do
@@ -1182,6 +1204,9 @@ defmodule UccChat.ChannelService do
       subs ->
         Repo.delete! subs
         UserChannel.leave_room(user_id, channel.name)
+        UccPubSub.broadcast "user:" <> user_id, "delete:subscription",
+          %{channel_id: channel.id}
+
         unless UccSettings.hide_user_leave() do
           # here
           # broadcast_message("Has left the channel.", channel.name, user_id, channel.id, system: true, sequential: false)

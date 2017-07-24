@@ -118,19 +118,6 @@ defmodule UccChat.Web.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in(ev = "flex_bar:click:" <> mod, msg, socket) do
-    debug ev, msg
-    resp = UccChat.FlexBarService.handle_click(mod, msg)
-    {:reply, resp, socket}
-  end
-
-  def handle_in(ev = "flex_bar:" <> mod, msg, socket) do
-    debug ev, msg
-    # Logger.debug "flex-bar mod: #{inspect mod}, msg: #{inspect msg}"
-    resp = UccChat.FlexBarService.handle_in(mod, msg)
-    {:reply, resp, socket}
-  end
-
   def handle_in(ev = "message_popup:" <> cmd, msg, socket) do
     debug ev, msg
     resp = UccChat.MessagePopupService.handle_in(cmd, msg)

@@ -47,6 +47,10 @@ defmodule UcxUcc.UccPubSub do
     GenServer.cast @name, {:subscribe, pid, topic, event, meta}
   end
 
+  def unsubscribe(pid) when is_pid(pid) do
+    GenServer.cast @name, {:unsubscribe, pid}
+  end
+
   def unsubscribe(topic) do
     unsubscribe self(), topic
   end
@@ -105,7 +109,11 @@ defmodule UcxUcc.UccPubSub do
     {:noreply, state}
   end
 
-  def handle_call({:unsubscribe, pid, topic}, _, state) do
+  def handle_cast({:unsubscribe, pid}, state) when is_pid(pid) do
+    {:noreply, unsubscribe_pid(pid, state)}
+  end
+
+  def handle_call({:unsubscribe, _pid, topic}, _, state) do
     subs =
       Enum.reject state.subscriptions, fn
         {^topic, _} -> true
@@ -114,7 +122,7 @@ defmodule UcxUcc.UccPubSub do
     {:reply, :ok, struct(state, subscriptions: subs)}
   end
 
-  def handle_call({:unsubscribe, pid, topic, event}, _, state) do
+  def handle_call({:unsubscribe, _pid, topic, event}, _, state) do
     subs =
       Enum.reject state.subscriptions, fn
         {^topic, ^event} -> true
@@ -127,8 +135,26 @@ defmodule UcxUcc.UccPubSub do
     {:reply, state, state}
   end
 
+  def handle_info({:DOWN, _, :process, pid, {:shutdown, _} = reason}, state) do
+    Logger.info "unsubscribing pid: #{inspect pid} for #{inspect reason}"
+    {:noreply, unsubscribe_pid(pid, state)}
+  end
+
   ################
   # Private
+
+  def unsubscribe_pid(pid, state) do
+    subs =
+      for {key, values} <- state.subscriptions, into: %{} do
+        new_list =
+          Enum.reject values, fn
+            {^pid, _} -> true
+            _         -> false
+          end
+        {key, new_list}
+      end
+    struct state, subscriptions: subs
+  end
 
   defp broadcast_to_list(list, topic, event, payload) do
     Enum.each(list, fn

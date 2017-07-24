@@ -2,6 +2,14 @@ defmodule UccChat.Web.UserChannel do
   use UccLogger
   use UccChat.Web, :channel
   use UcxUcc
+  # use Rebel.Channel, name: "user", controllers: [
+  #   UccChat.Web.ChannelController,
+  # ]
+  alias UcxUcc.UccPubSub
+
+  import Rebel.Core, warn: false
+  import Rebel.Query, warn: false
+  import Rebel.Browser, warn: false
   # alias UccChat.Presence
 
   import Ecto.Query
@@ -11,15 +19,14 @@ defmodule UccChat.Web.UserChannel do
   alias UcxUcc.Accounts.{Account, User}
   alias UccChat.{
     Subscription, ChannelService, Channel,
-    SideNavService, Web.AccountView, Web.UserSocket,
-    ChannelService, SubscriptionService, InvitationService, UserService,
-    EmojiService, Settings, FlexBarService
+    SideNavService, Web.AccountView, Web.UserSocket, Web.MasterView,
+    Web.SharedView, ChannelService, SubscriptionService, InvitationService,
+    UserService, EmojiService, Settings, FlexBarService, MessageService
   }
   alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
-  alias UcxUcc.UccPubSub
 
   require UccChat.ChatConstants, as: CC
 
@@ -52,29 +59,9 @@ defmodule UccChat.Web.UserChannel do
     "get:subscribed"
   ]
 
-  def join(CC.chan_user() <>  user_id, params, socket) do
+  def join(CC.chan_user() <>  user_id = event, params, socket) do
     trace(CC.chan_user() <> user_id, params)
-    send(self(), :after_join)
-
-    new_assigns =
-      params
-      |> Enum.map(fn {k,v} ->
-        {String.to_atom(k), v}
-      end)
-      |> Enum.into(%{})
-
-    socket =
-      socket
-      |> struct(assigns: Map.merge(new_assigns, socket.assigns))
-      |> assign(:subscribed, socket.assigns[:subscribed] || [])
-      |> assign(:user_state, "active")
-
-    socket =
-      Repo.all(from s in SubscriptionSchema, where: s.user_id == ^user_id,
-        preload: [:channel, {:user, :roles}])
-      |> Enum.map(&(&1.channel.name))
-      |> subscribe(socket)
-
+    send(self(), {:after_join, params})
     {:ok, socket}
   end
 
@@ -367,13 +354,6 @@ defmodule UccChat.Web.UserChannel do
     end
   end
 
-  def handle_in(ev = "notifications_form:" <> _action, params,
-    %{assigns: assigns} = socket) do
-
-    trace ev, params, inspect(assigns)
-    FlexBarService.handle_in(ev, params, socket)
-  end
-
   # default unknown handler
   def handle_in(event, params, socket) do
     Logger.warn "UserChannel.handle_in unknown event: #{inspect event}, " <>
@@ -384,8 +364,29 @@ defmodule UccChat.Web.UserChannel do
   ###############
   # Info messages
 
-  def handle_info(:after_join, socket) do
-    trace "after_join", socket.assigns
+  def handle_info({:after_join, params}, socket) do
+    trace "after_join", socket.assigns, inspect(params)
+    user_id = socket.assigns.user_id
+
+    new_assigns =
+      params
+      |> Enum.map(fn {k,v} ->
+        {String.to_atom(k), v}
+      end)
+      |> Enum.into(%{})
+
+    socket =
+      socket
+      |> struct(assigns: Map.merge(new_assigns, socket.assigns))
+      |> assign(:subscribed, socket.assigns[:subscribed] || [])
+      |> assign(:user_state, "active")
+
+    socket =
+      Repo.all(from s in SubscriptionSchema, where: s.user_id == ^user_id,
+        preload: [:channel, {:user, :roles}])
+      |> Enum.map(&(&1.channel.name))
+      |> subscribe(socket)
+
     {:noreply, socket}
   end
 
@@ -608,4 +609,43 @@ defmodule UccChat.Web.UserChannel do
       push socket, "update:alerts", %{}
     end
   end
+  def new_subscription(_event, payload, socket) do
+    channel_id = payload.channel_id
+    user_id = socket.assigns.user_id
+
+    socket
+    |> update_rooms_list(user_id, channel_id)
+    |> update_messages_header(user_id, channel_id, true)
+  end
+
+  def delete_subscription(_event, payload, socket) do
+    channel_id = payload.channel_id
+    user_id = socket.assigns.user_id
+    socket
+    |> update_rooms_list(user_id, channel_id)
+    |> update_message_box(user_id, channel_id)
+    |> update_messages_header(user_id, channel_id, false)
+  end
+
+  defp update_rooms_list(socket, user_id, channel_id) do
+    Rebel.Query.update socket, :html,
+      set: SideNavService.render_rooms_list(channel_id, user_id),
+      on: "aside.side-nav .rooms-list"
+    socket
+  end
+
+  defp update_message_box(socket, user_id, channel_id) do
+    Rebel.Query.update socket, :html,
+      set: MessageService.render_message_box(channel_id, user_id),
+      on: ".room-container footer.footer"
+    socket
+  end
+
+  defp update_messages_header(socket, user_id, channel_id, show) do
+    html = Phoenix.View.render_to_string MasterView, "favorite_icon.html",
+      show: show, favorite: false
+    Rebel.Core.async_js socket, ~s/$('section.messages-container .toggle-favorite').replaceWith('#{html}')/
+    socket
+  end
+
 end

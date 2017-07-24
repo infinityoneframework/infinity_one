@@ -6,21 +6,9 @@ defmodule UccChat.Console do
   * ca
   * ftab
   """
-  alias UcxUcc.TabBar.Agent, as: CA
-    # import Ecto.Query
   alias UccChat.{Subscription}
   alias UcxUcc.Repo
-
-
-  @doc """
-  Get TabBar.Agent state
-  """
-  def ca, do: CA.get
-
-  @doc """
-  Get ftab state for a given user_id, channel_id
-  """
-  def ftab(user_id, channel_id), do: CA.get_ftab(user_id, channel_id)
+  alias UcxUcc.UccPubSub
 
   @doc """
   Clear all last_read subscription fields
@@ -28,5 +16,31 @@ defmodule UccChat.Console do
   def clear_last_read do
     Subscription
     |> Repo.update_all(set: [last_read: "", current_message: ""])
+  end
+
+  @doc """
+  Get UccPubSub state.
+  """
+  def pubsub do
+    UccPubSub.state
+  end
+
+  @doc """
+  Get pubsub items
+
+  ## Arguments
+
+  * `:keys`
+  * `:values`
+  * `:subs`
+  """
+  def pubsub(:subs) do
+    pubsub() |> Map.get(:subscriptions)
+  end
+  def pubsub(:keys) do
+    pubsub(:subs) |> Map.keys
+  end
+  def pubsub(:values) do
+    pubsub(:subs) |> Map.values
   end
 end

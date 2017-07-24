@@ -50,7 +50,7 @@ config :ucx_ucc, :ucc_tracer_level, :warn
 config :logger, :console,
   level: :info,
   format: "\n$time [$level]$levelpad$metadata$message\n",
-  metadata: [:module, :function]
+  metadata: [:module, :function, :line]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

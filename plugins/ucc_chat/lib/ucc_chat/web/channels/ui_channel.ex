@@ -16,9 +16,14 @@ defmodule UccChat.Web.UiChannel do
 
   def join(event, payload, socket) do
     trace "join", payload, inspect(socket.assigns)
+    user_id = socket.assigns.user_id
 
-    subscribe_callback "user:" <> socket.assigns.user_id,
-      "room:join", {UccUiFlexTab.FlexTabChannel, :room_join}
+    subscribe_callback "user:" <> user_id, "room:join",
+      {UccUiFlexTab.FlexTabChannel, :room_join}
+    subscribe_callback "user:" <> user_id, "new:subscription",
+      {UccChat.Web.UserChannel, :new_subscription}
+    subscribe_callback "user:" <> user_id, "delete:subscription",
+      {UccChat.Web.UserChannel, :delete_subscription}
 
     super event, payload,
       UccUiFlexTab.FlexTabChannel.do_join(socket, event, payload)

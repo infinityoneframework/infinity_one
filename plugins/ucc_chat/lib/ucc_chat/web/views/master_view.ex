@@ -4,6 +4,7 @@ defmodule UccChat.Web.MasterView do
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChat.Web.MessageView
   alias UccUiFlexTab.Web.TabBarView
+  alias UccChat.Web.SharedView
 
   require IEx
 
@@ -12,7 +13,11 @@ defmodule UccChat.Web.MasterView do
 
   def embedded_version, do: false
   def unread, do: false
-  def show_toggle_favorite, do: true
+
+  def show_toggle_favorite(chatd) do
+    SharedView.subscribed? chatd.user.id, chatd.channel.id
+  end
+
   def get_user_status(_), do: "offline"
 
   def container_bars_show(_channel) do
@@ -169,6 +174,7 @@ defmodule UccChat.Web.MasterView do
       _ -> "icon-star-empty"
     end
   end
+
   def get_fav_icon_label(chatd) do
     case ChatDat.get_channel_data(chatd) do
       %{type: :stared} ->
@@ -177,6 +183,11 @@ defmodule UccChat.Web.MasterView do
         {"icon-star-empty", "Favorite"}
     end
   end
+
+  def favorite_room?(chatd) do
+    ChatDat.get_channel_data(chatd)[:type] == :stared
+  end
+
   def favorite_room?(%User{} = user, %ChannelSchema{} = channel) do
     ChannelService.favorite_room?(user, channel)
   end

@@ -9,7 +9,6 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
-  import Phoenix.Socket
 
   alias UcxUcc.TabBar
   alias TabBar.Ftab

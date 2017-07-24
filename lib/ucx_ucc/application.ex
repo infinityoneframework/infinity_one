@@ -30,7 +30,6 @@ defmodule UcxUcc.Application do
       supervisor(UcxUcc.Web.Endpoint, []),
       supervisor(UcxUcc.Web.Presence, []),
       worker(UcxUcc.Permissions, []),
-      worker(UcxUcc.TabBar.Agent, []),
       worker(UcxUcc.UccPubSub, []),
     ] ++ children
 

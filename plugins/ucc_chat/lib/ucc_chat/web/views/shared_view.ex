@@ -4,6 +4,7 @@ defmodule UccChat.Web.SharedView do
   alias UcxUcc.Permissions
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
+  alias UccChat.Subscription
 
   require Logger
 
@@ -141,9 +142,15 @@ defmodule UccChat.Web.SharedView do
   def content_home_title do
     "test"
   end
+
   def content_home_body do
     "test"
   end
+
+  def subscribed?(user_id, channel_id) do
+    Subscription.subscribed?(channel_id, user_id)
+  end
+
   defmacro gt(text, opts \\ []) do
     quote do
       gettext(unquote(text), unquote(opts))

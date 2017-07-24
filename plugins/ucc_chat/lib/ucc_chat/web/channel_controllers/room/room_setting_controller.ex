@@ -4,7 +4,7 @@ defmodule UccChat.Web.RoomSettingChannelController do
   import Phoenix.Channel
   # import UccChat.NotifierService
 
-  alias UccChat.{Subscription, Web.FlexBarView, Channel, FlexBarService, ChannelService}
+  alias UccChat.{Subscription, Web.FlexBarView, Channel, ChannelService}
   alias UccChat.ServiceHelpers, as: Helpers
 
   require UccChat.ChatConstants, as: CC
@@ -19,20 +19,6 @@ defmodule UccChat.Web.RoomSettingChannelController do
       "channel_form_text_input.html"
       |> FlexBarView.render(field: %{name: field_name, value: value})
       |> Helpers.safe_to_string
-
-    {:reply, {:ok, %{html: html}}, socket}
-  end
-
-  def cancel(%{assigns: assigns} = socket, params) do
-    channel = Channel.get(assigns[:channel_id])
-    field = FlexBarService.get_setting_form_field(params["field_name"],
-      channel, assigns[:user_id])
-
-    html =
-      field[:type]
-      |> FlexBarView.flex_form_input(field)
-      |> Enum.map(&Helpers.safe_to_string/1)
-      |> Enum.join
 
     {:reply, {:ok, %{html: html}}, socket}
   end

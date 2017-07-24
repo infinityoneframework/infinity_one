@@ -398,7 +398,9 @@ function start_room_channel(typing) {
   main.run()
   roomManager.updateMentionsMarksOfRoom()
 
-  Rebel.set_event_handlers('#flex-tabs')
+  if (window.Rebel) {
+    window.Rebel.set_event_handlers('#flex-tabs')
+  }
 
   navMenu.close()
 }

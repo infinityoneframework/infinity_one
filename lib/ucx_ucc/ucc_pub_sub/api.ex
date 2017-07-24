@@ -1,7 +1,5 @@
 defmodule UcxUcc.UccPubSub.Api do
 
-  alias UcxUcc.UccPubSub
-
   defmacro __using__(_) do
     quote do
       import unquote(__MODULE__)

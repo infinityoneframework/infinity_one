@@ -1,0 +1,6 @@
+- class = if @show, do: "", else: "hidden"
+a.toggle-favorite(href="#favorite" class='#{class}')
+  = if @favorite do
+    i(class="icon-star favorite-room pending-color" aria-label="#{~g(Unfavorite)}")
+  - else
+    i(class="icon-star-empty" aria-label="#{~g(Favorite)}")

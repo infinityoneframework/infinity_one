@@ -223,7 +223,7 @@ class RoomHistoryManager {
         if (message_id) {
           scroll_to($('#' + message_id), -200)
         } else {
-          console.error('invalid timestamp', timestamp)
+          console.warn('invalid timestamp', timestamp)
         }
         if (resp.has_more_next) {
           this.setHasMoreNext = true
