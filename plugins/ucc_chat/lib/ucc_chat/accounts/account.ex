@@ -7,7 +7,7 @@ defmodule UccChat.Accounts.Account do
   alias UccChat.Schema.{Notification, AccountNotification}
 
   extend_schema UcxUcc.Accounts.Account do
-    field :language, :string, default: "on"
+    field :language, :string, default: "en"
     field :desktop_notification_enabled, :boolean, default: true
     field :desktop_notification_duration, :integer
     field :unread_alert, :boolean, default: true
@@ -33,7 +33,7 @@ defmodule UccChat.Accounts.Account do
     field :emoji_tone, :integer, default: 0
     field :emoji_recent, :string, default: ""
 
-    many_to_many :notifications, Notification, join_through: AccountNotification
+    many_to_many :notifications, Notification, join_through: AccountNotification, on_delete: :delete_all
   end
 
   @fields [:language, :desktop_notification_enabled, :desktop_notification_duration] ++

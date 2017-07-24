@@ -1,0 +1,74 @@
+:video_avaliable
+:video_active
+:overlay
+:main_video_url
+:self_video_url
+:main_video_username
+:self
+:screen_share_enabled
+:audio_and_video_enabled
+:audio_enabled
+:video_enabled
+:remote_video_items
+:connected
+:state_text
+:id
+:screen_share_available
+:screen_share_enabled
+
+= if @webrtc.video_avaliable do
+  = if @webrtc.video_active do
+    .webrtc-video(class='<%= if @webrtc.overlay, do: "webrtc-video-overlay background-transparent-darker" %>')
+      .main-video.background-transparent-darker
+        - class = if @webrtc.main_video_url == @webrtc.self_video_url, do: " video-flip", else: ""
+        video(src="#{@webrtc.main_video_url}" autoplay muted="true" class="webrtc-video-element#{class}")
+        .background-transparent-darker= @webrtc.main_video_username
+      .videos
+        = if @webrtc.self_video_url do
+          .video-item.background-transparent-darker(data-username="{@webrtc.self}")
+            - class = if @webrtc.screen_share_enabled, do: "", else: " video-flip"
+            video(src="#{@webrtc.self_video_url}" autoplay muted="true" class="webrtc-video-element#{class}")
+            = unless @webrtc.audio_and_video_enabled do
+              .video-muted-overlay.background-transparent-darker
+                = unless @webrtc.audio_enabled do
+                  button
+                    i.icon-mute
+                = unless @webrtc.video_enabled do
+                  button
+                    i.icon-eye-off
+            .background-transparent-darker= ~g(you)
+        = for item <- @webrtc.remote_video_items do
+          - class = if item.connected, do: "", else: " state-overlay background-transparent-darker-before"
+          .video-item.background-transparent-darker(class="#{class}" data-state-text="#{item.state_text}" data-username="#{item.id}")
+            video.webrtc-video-element(src="#{item.url}" autoplay)
+            .background-transparent-darker=  username_by_user_id id
+      .buttons-group
+        = if @webrtc.video_active do
+          button.button.stop-call
+            i.icon-stop
+            = ~g"Stop"
+          = if @webrtc.audio_enabled do
+            button.button.disable-audio(title="#{~g'Mute'}" aria-label="#{~g'Mute'}")
+              i.icon-mute
+          - else
+            button.button.enable-audio(title="#{~g'Unmute'}" aria-label="#{~g'Unmute'}")
+              i.icon-mic
+          = if @web_rtc.video_enabled do
+            button.button.disable-video
+              i.icon-eye-off
+          - else
+            button.button.enable-video
+              i.icon-eye
+          = if @webrtc.screen_share_available do
+            = if @webrtc.screen_share_enabled do
+              button.button.disable-screen-share
+                i.icon-desktop
+            - else
+              button.button.enable-screen-share
+                i.icon-desktop
+          = if @webrtc.overlay_enabled do
+            button.button.disable-overlay
+              i.icon-resize-small
+          - else
+            button.button.enable-overlay
+              i.icon-resize-full-alt

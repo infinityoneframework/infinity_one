@@ -12,6 +12,7 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
   """
   use UcxUcc.Coherence.Web, :controller
 
+  alias UcxUcc.Accounts.User
   require Logger
 
   @type schema :: Ecto.Schema.t
@@ -52,27 +53,25 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
   this option is enabled.
   """
   @spec create(conn, params) :: conn
-  def create(conn, %{"registration" => registration_params} = params) do
-    user_schema = Config.user_schema
-    cs = Helpers.changeset(:registration, user_schema, user_schema.__struct__, registration_params)
-    case Config.repo.insert(cs) do
-      {:ok, user} ->
+  def create(conn, %{"registration" => registration_params}) do
+    case UcxUcc.UserService.insert_user(registration_params) do
+      {:ok, %{user: user}} ->
         conn
-        |> send_confirmation(user, user_schema)
-        |> redirect_or_login(user, params, Config.allow_unconfirmed_access_for)
-      {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        |> send_confirmation(user, User)
+        |> redirect(to: logged_out_url(conn))
+      {:error, :user, error, _} ->
+        render conn, "new.html", changeset: error
     end
   end
 
-  defp redirect_or_login(conn, _user, params, 0) do
-    redirect_to(conn, :registration_create, params)
-  end
-  defp redirect_or_login(conn, user, params, _) do
-    conn
-    |> Helpers.login_user(user, params)
-    |> redirect_to(:session_create, params)
-  end
+  # defp redirect_or_login(conn, _user, params, 0) do
+  #   redirect_to(conn, :registration_create, params)
+  # end
+  # defp redirect_or_login(conn, user, params, _) do
+  #   conn
+  #   |> Helpers.login_user(user, params)
+  #   |> redirect_to(:session_create, params)
+  # end
 
   @doc """
   Show the registration page.

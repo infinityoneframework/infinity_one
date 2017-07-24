@@ -4,4 +4,5 @@ defmodule UccChat.ChatConstants do
   define chan_room,             "room:"
   define chan_user,             "user:"
   define chan_system,           "system:"
+  define chan_webrtc,           "webrtc:"
 end

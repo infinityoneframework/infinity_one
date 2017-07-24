@@ -6,14 +6,14 @@ defmodule UccChat.Console do
   * ca
   * ftab
   """
-  alias UccChat.UserAgent, as: CA
+  alias UcxUcc.TabBar.Agent, as: CA
     # import Ecto.Query
   alias UccChat.{Subscription}
   alias UcxUcc.Repo
 
 
   @doc """
-  Get UserAgent state
+  Get TabBar.Agent state
   """
   def ca, do: CA.get
 

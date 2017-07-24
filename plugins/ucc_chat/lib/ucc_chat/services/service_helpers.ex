@@ -172,6 +172,28 @@ defmodule UccChat.ServiceHelpers do
     end
   end
 
+  @doc """
+  Convert form parameters returned by Drab into controller type params
+  map.
+
+    # Examples
+
+      iex> UccChat.ServiceHelpers.normalize_params %{"_csrf" =>
+      ...> "1234", "user[id]" => "42", "user[email]" => "test@test.com",
+      ...> "user[account][id]" => "99", "user[account][address][street]" =>
+      ...> "123 Any Street"}
+      %{"_csrf" => "1234",
+      "user" => %{"account" => %{"address" => %{"street" => "123 Any Street"},
+      "id" => "99"}, "email" => "test@test.com", "id" => "42"}}
+  """
+  def normalize_params(params) do
+    Enum.reduce(params, "", fn {k, v}, acc ->
+      acc <> k <> "=" <> v <> "&"
+    end)
+    |> String.trim_trailing("&")
+    |> Plug.Conn.Query.decode()
+  end
+
   defp parse_name(string), do: parse_name(string, "", [])
 
   defp parse_name("", "", acc), do: acc

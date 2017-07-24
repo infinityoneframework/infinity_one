@@ -1,7 +1,7 @@
 defmodule UcxUcc.TestHelpers do
   alias FakerElixir, as: Faker
   alias UcxUcc.{Repo, Accounts}
-  alias Accounts.{User, Role, UserRole}
+  alias Accounts.{User, Role, UserRole, Account}
   import Ecto.Query
 
   def strip_ts(schema) do
@@ -36,7 +36,14 @@ defmodule UcxUcc.TestHelpers do
   def insert_user(attrs \\ %{})
   def insert_user(attrs) do
     attrs = Enum.into attrs, %{}
-    role = attrs[:role] || Repo.one!(from r in Role, where: r.name == "user")
+    role =
+      case attrs[:role] || Repo.one(from r in Role, where: r.name == "user") do
+        %Role{} = role ->
+          role
+        _ ->
+          insert_role("user")
+      end
+
     attrs = Map.delete attrs, :role
 
     changes = Map.merge(%{
@@ -57,6 +64,16 @@ defmodule UcxUcc.TestHelpers do
     |> Repo.insert!
 
     Repo.preload user, [roles: :permissions]
+  end
+
+  def insert_account(user, attrs \\ %{}) do
+    attrs = Enum.into attrs, %{}
+    changes = Map.merge(%{
+      user_id: user.id
+      }, to_map(attrs))
+
+    {:ok, account} = Accounts.create_account changes
+    Repo.preload account, [:user]
   end
 
   def insert_role_user(role, attrs \\ %{}) do

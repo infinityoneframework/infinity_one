@@ -1,5 +1,8 @@
 defmodule UccChat.Web.ChannelController do
   use UccChat.Web, :controller
+  use Rebel.Controller, channels: [
+    UccChat.Web.UiChannel
+  ]
 
   import Ecto.Query
 
@@ -10,6 +13,13 @@ defmodule UccChat.Web.ChannelController do
   alias UcxUcc.Accounts.User
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChat.Schema.Direct, as: DirectSchema
+
+  plug :put_user_id_session
+
+  def put_user_id_session(conn, _) do
+    current_user = Coherence.current_user conn
+    put_session conn, :current_user_id, current_user.id
+  end
 
   def index(conn, _params) do
     Logger.warn "index load"

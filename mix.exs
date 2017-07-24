@@ -27,8 +27,27 @@ defmodule UcxUcc.Mixfile do
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["plugins", "plugins/lib", "lib", "test/support"]
-  defp elixirc_paths(_),     do: ["plugins", "plugins/lib", "lib"]
+  defp elixirc_paths(:test) do
+    paths =
+      plugins()
+      |> Enum.map(&Path.join(["plugins", &1, "test", "support"]))
+      |> List.flatten
+
+    elixirc_paths(nil) ++ ["test/support" | paths]
+  end
+  defp elixirc_paths(_) do
+    paths =
+      plugins()
+      |> Enum.map(&Path.join(["plugins", &1, "lib"]))
+      |> List.flatten()
+    paths ++ ["lib"]
+  end
+
+  defp plugins do
+    "plugins"
+    |> File.ls!()
+    |> Enum.filter(&File.dir?(Path.join("plugins", &1)))
+  end
 
   # Specifies your project dependencies.
   #
@@ -44,8 +63,8 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:phoenix_haml, "~> 0.2"},
-      {:unbrella, github: "smpallen99/unbrella"},
-      # {:unbrella, path: "../unbrella"},
+      # {:unbrella, github: "smpallen99/unbrella"},
+      {:unbrella, path: "../unbrella"},
       {:coherence, github: "smpallen99/coherence", branch: "phx-1.3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.6.0"},
@@ -65,10 +84,12 @@ defmodule UcxUcc.Mixfile do
       {:excoveralls, "~> 0.5", only: :test},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:phoenix_slime, "~> 0.9"},
-      {:slime, "~> 1.0", override: true},
+      # {:slime, "~> 1.0", override: true},
+      {:slime, github: "slime-lang/slime", override: true},
       {:inflex, "~> 1.7"},
       {:arc_ecto, "~> 0.6.0"},
       {:postgrex, ">= 0.0.0", only: :test},
+      {:rebel, path: "../rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
@@ -83,6 +104,7 @@ defmodule UcxUcc.Mixfile do
     ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
+     # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
      "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
   end
 end

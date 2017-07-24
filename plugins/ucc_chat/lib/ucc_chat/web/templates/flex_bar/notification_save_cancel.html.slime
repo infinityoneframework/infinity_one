@@ -1,0 +1,2 @@
+button.button.cancel(type="button" rebel-click="flex_form_cancel")= ~g"Cancel"
+button.button.primary.save(type="button" rebel-click="flex_form_save")= ~g"Save"

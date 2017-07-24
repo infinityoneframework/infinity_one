@@ -46,6 +46,5 @@
           -#   %input(type="file" name="upload[file]")
           -#   %button(type="submit")
         %footer.footer.border-component-color
-          = render UccChat.Web.MessageView, "message_box.html", chatd: @chatd, mb: get_mb(@chatd)
-      = render "flex_tab_bar.html", chatd: @chatd
-
+          = render MessageView, "message_box.html", chatd: @chatd, mb: get_mb(@chatd)
+      = render TabBarView, "index.html", chatd: @chatd

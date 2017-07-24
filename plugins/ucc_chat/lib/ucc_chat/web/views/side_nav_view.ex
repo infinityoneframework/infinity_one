@@ -1,7 +1,7 @@
 defmodule UccChat.Web.SideNavView do
   use UccChat.Web, :view
   require Logger
-
+  import UccChat.AvatarService, only: [avatar_url: 1]
   def chat_room_item_li_class(item) do
     acc = "link-room-#{item[:name]} background-transparent-darker-hover"
     with acc <- if(item[:open], do: acc <> " active", else: acc),
@@ -33,10 +33,6 @@ defmodule UccChat.Web.SideNavView do
     user = Repo.preload(user, [:roles])
     list = ~w(view-statistics  view-room-administration view-user-administration view-privileged-setting)
     UcxUcc.Permissions.has_at_least_one_permission?(user, list)
-  end
-
-  def avatar_url(username) do
-    "/avatar/#{username}"
   end
 
   def username(chatd), do: chatd.user.username

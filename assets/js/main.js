@@ -1,6 +1,4 @@
 
-import * as flexbar from './flex_bar'
-
 // $(document).ready(function() {
 //   $('body').on('click', 'a.toggle-favorite', e => {
 //     e.preventDefault();
@@ -14,7 +12,7 @@ import * as flexbar from './flex_bar'
 
 export function run() {
   update_mentions()
-  update_flexbar()
+  // update_flexbar()
   roomManager.updateMentionsMarksOfRoom()
 }
 export function update_mentions(id) {
@@ -26,9 +24,9 @@ export function update_mentions(id) {
   $(selector).addClass('mention-link-me background-primary-action-color')
 }
 
-export function update_flexbar() {
-  flexbar.update_flexbar()
-}
+// export function update_flexbar() {
+//   flexbar.update_flexbar()
+// }
 
 window.mentions = update_mentions
 

@@ -42,6 +42,19 @@ defmodule UccModel do
         @repo.all @schema
       end
 
+
+      @spec list_by(Keyword.t) :: List.t
+      def list_by(opts) do
+        {preload, opts} = Keyword.pop(opts, :preload, [])
+
+        opts
+        |> Enum.reduce(@schema, fn {k, v}, query ->
+          where(query, [b], field(b, ^k) == ^v)
+        end)
+        |> preload(^preload)
+        |> @repo.all
+      end
+
       @spec get(id, Keyword.t) :: Struct.t
       def get(id, opts \\ []) do
         if preload = opts[:preload] do
@@ -134,12 +147,18 @@ defmodule UccModel do
 
       @spec first() :: Struct.t | nil
       def first do
-        @schema |> first |> @repo.one
+        @schema
+        |> order_by(asc: :inserted_at)
+        |> first
+        |> @repo.one
       end
 
       @spec last() :: Struct.t | nil
       def last do
-        @schema |> last |> @repo.one
+        @schema
+        |> order_by(asc: :inserted_at)
+        |> last
+        |> @repo.one
       end
 
       defoverridable [

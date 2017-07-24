@@ -37,18 +37,24 @@ config :ucx_ucc, UcxUcc.Web.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
-      ~r{lib/ucx_ucc/web/templates/.*(eex|haml)$},
+      ~r{lib/ucx_ucc/web/templates/.*(eex|haml|slim|slime)$},
       ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
-      ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml)$},
+      ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml|slim|slime)$},
     ]
   ]
 
+config :ucx_ucc, :ucc_tracer_modules, :all
+config :ucx_ucc, :ucc_tracer_level, :warn
+
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console,
+  level: :info,
+  format: "\n$time [$level]$levelpad$metadata$message\n",
+  metadata: [:module, :function]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
-config :phoenix, :stacktrace_depth, 20
+config :phoenix, :stacktrace_depth, 30
 
 # Finally import the config/dev.secret.exs
 # which should be versioned separately.

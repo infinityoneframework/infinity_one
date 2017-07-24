@@ -31,6 +31,8 @@ defmodule UcxUcc.Web.Router do
 
   scope "/", UcxUcc.Web  do
     pipe_through :protected
+
+    get "/logout", Coherence.SessionController, :delete
     coherence_routes :protected
   end
 

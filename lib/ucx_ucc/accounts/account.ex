@@ -18,6 +18,7 @@ defmodule UcxUcc.Accounts.Account do
     account
     |> cast(attrs, [:user_id])
     |> validate_required([:user_id])
+    |> plugin_changesets(attrs, Account)
   end
 
   import Ecto.Query

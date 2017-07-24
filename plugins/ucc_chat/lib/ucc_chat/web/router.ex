@@ -20,14 +20,22 @@ defmodule UccChat.Web.Router do
     plug Coherence.Authentication.Session, protected: true
   end
 
+  pipeline :avatar do
+    plug :accepts, ~w(json html)
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
 
   scope "/", UccChat.Web do
+    pipe_through :avatar
+    get "/avatar/:username", AvatarController, :show
+  end
+
+  scope "/", UccChat.Web do
     pipe_through :protected
 
-    get "/avatar/:username", AvatarController, :show
     get "/", HomeController, :index
     get "/home", HomeController, :index
     get "/channels/:name", ChannelController, :show

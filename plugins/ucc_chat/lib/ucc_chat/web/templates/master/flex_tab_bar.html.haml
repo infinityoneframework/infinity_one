@@ -1,7 +1,7 @@
 - channel = @chatd.channel
-- open_tab = UccChat.UserAgent.get_ftab(@chatd.user, channel.id)
+- open_tab = UcxUcc.TabBar.Agent.get_ftab(@chatd.user, channel.id)
 - flex_tabs = get_flex_tabs(@chatd, open_tab)
-.flex-tab-container.border-component-color
+.flex-tab-container#flex-tabs.border-component-color
   %section.flex-tab.content-background-color
   .flex-tab-bar.content-background-color(role="toolbar")
     .tab-button.hidden(title="Visitor Info")

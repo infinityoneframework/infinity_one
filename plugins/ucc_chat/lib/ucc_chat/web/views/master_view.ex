@@ -2,6 +2,9 @@ defmodule UccChat.Web.MasterView do
   use UccChat.Web, :view
   alias UccChat.{ChannelService, ChatDat}
   alias UccChat.Schema.Channel, as: ChannelSchema
+  alias UccChat.Web.MessageView
+  alias UccUiFlexTab.Web.TabBarView
+
   require IEx
 
   def get_admin_class(_user), do: ""

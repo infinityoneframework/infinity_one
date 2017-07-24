@@ -16,6 +16,13 @@ defmodule UcxUcc.Web do
   below.
   """
 
+  def service do
+    quote do
+      import Ecto.Query
+      use UcxUcc.Web.Gettext
+    end
+  end
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: UcxUcc.Web
@@ -36,6 +43,7 @@ defmodule UcxUcc.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      import UccChat.AvatarService, only: [avatar_url: 1]
       import UcxUcc.Web.Router.Helpers
       import UcxUcc.Web.ErrorHelpers
       use UcxUcc.Web.Gettext

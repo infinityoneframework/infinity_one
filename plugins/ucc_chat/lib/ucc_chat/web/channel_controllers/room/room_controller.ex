@@ -8,12 +8,14 @@ defmodule UccChat.Web.RoomChannelController do
 
   def show(%{assigns: assigns} = socket, params) do
     # Logger.warn "room channel_controller params: #{inspect params}, socket.assigns: #{inspect socket.assigns}"
-    reply = if assigns.room == "lobby" do
-      %{redirect: ChannelService.room_redirect(params["room_id"], params["display_name"])}
-    else
-      ChannelService.open_room(assigns[:user_id], params["room_id"],
-        assigns[:room], params["display_name"])
-    end
+    reply =
+      if assigns.room == "lobby" do
+        %{redirect: ChannelService.room_redirect(params["room_id"], params["display_name"])}
+      else
+        resp = ChannelService.open_room(assigns[:user_id], params["room_id"],
+          assigns[:room], params["display_name"])
+        resp
+      end
     {:reply, {:ok, reply}, socket}
   end
 
@@ -71,25 +73,6 @@ defmodule UccChat.Web.RoomChannelController do
     {:noreply, socket}
   end
 
-  # def command(socket, %{"command" => "set-owner", "username" => username}) do
-  #   Logger.warn "RoomChannelController: command: set-owner, username: #{inspect username}"
-
-  #   {:noreply, socket}
-  # end
-
-  # def command(socket, %{"command" => "mute-user", "username" => username}) do
-  #   Logger.warn "RoomChannelController: command: mute-user, username: #{inspect username}, socket: #{inspect socket}"
-  #   user = Helpers.get_by! User, :username, username
-
-  #   resp = case ChannelService.user_command(socket, :mute, user, socket.assigns.user_id, socket.assigns.channel_id) do
-  #     {:ok, msg} ->
-  #       # push socket, "toastr:success", %{message: }
-  #       {:ok, %{}}
-  #     {:error, error} ->
-  #       {:error, %{error: error}}
-  #   end
-  #   {:reply, resp, socket}
-  # end
   @commands ~w(mute-user unmute-user set-moderator unset-moderator set-owner unset-owner remove-user block-user unblock-user)
   @command_list Enum.zip(@commands, ~w(mute unmute set_moderator unset_moderator set_owner unset_owner remove_user block_user unblock_user)a) |> Enum.into(%{})
   @messages [
@@ -111,21 +94,21 @@ defmodule UccChat.Web.RoomChannelController do
       "#{inspect username}, socket: #{inspect socket}"
     user = Helpers.get_user_by_name username
 
-    # resp = case ChannelService.user_command(:unmute, user, socket.assigns.user_id, socket.assigns.channel_id) do
-    resp = case ChannelService.user_command(socket, @command_list[command],
-      user, socket.assigns.user_id, socket.assigns.channel_id) do
-      {:ok, _msg} ->
-        if message = @message_list[command] do
-          message =
-            message
-            |> String.replace("%%user%%", user.username)
-            |> String.replace("%%room%%", socket.assigns.room)
-          Phoenix.Channel.push socket, "toastr:success", %{message: message}
-        end
-        {:ok, %{}}
-      {:error, error} ->
-        {:error, %{error: error}}
-    end
+    resp =
+      case ChannelService.user_command(socket, @command_list[command],
+        user, socket.assigns.user_id, socket.assigns.channel_id) do
+        {:ok, _msg} ->
+          if message = @message_list[command] do
+            message =
+              message
+              |> String.replace("%%user%%", user.username)
+              |> String.replace("%%room%%", socket.assigns.room)
+            Phoenix.Channel.push socket, "toastr:success", %{message: message}
+          end
+          {:ok, %{}}
+        {:error, error} ->
+          {:error, %{error: error}}
+      end
     {:reply, resp, socket}
   end
 

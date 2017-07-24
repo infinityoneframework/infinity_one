@@ -1,6 +1,7 @@
 defmodule UccChat.Web.MessageView do
   use UccChat.Web, :view
   import Phoenix.HTML.Tag, only: [content_tag: 2, content_tag: 3, tag: 1]
+  import UccChat.AvatarService, only: [avatar_url: 1]
 
   alias UccChat.{Message, Subscription, AttachmentService}
   alias UccChat.ServiceHelpers, as: Helpers

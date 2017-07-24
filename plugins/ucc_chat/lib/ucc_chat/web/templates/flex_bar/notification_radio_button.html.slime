@@ -1,0 +1,4 @@
+= for {id, text} <- @options do
+  label
+    = radio_button @fp, @field, id
+    = text

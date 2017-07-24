@@ -2,14 +2,16 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: "js/app.js"
+      // joinTo: "js/app.js"
 
       // To use a separate vendor.js bundle, specify two files path
       // http://brunch.io/docs/config#-files-
-      // joinTo: {
-      //  "js/app.js": /^(web\/static\/js)/,
-      //  "js/vendor.js": /^(web\/static\/vendor)|(deps)/
-      // }
+      joinTo: {
+       "js/app.js": /^(js|..\/deps|node_modules)/,
+       "js/adapter.js": ["vendor/adapter.js"],
+       "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"]
+       // "js/vendor.js": /^(web\/static\/vendor)|(deps)/
+      }
       //
       // To change the order of concatenation of files, explicitly mention here
       // order: {
@@ -87,7 +89,7 @@ exports.config = {
 
   npm: {
     enabled: true,
-    whitelist: ["highlight.js"],
+    // whitelist: ["highlight.js"],
     styles: {
       // toastr: ["toastr.css"],
       "highlight.js": ['styles/default.css']
@@ -101,3 +103,4 @@ exports.config = {
     }
   }
 };
+console.log('brunch ........');

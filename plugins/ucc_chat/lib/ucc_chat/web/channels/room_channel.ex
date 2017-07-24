@@ -2,8 +2,8 @@ defmodule UccChat.Web.RoomChannel do
   @moduledoc """
   Handle incoming and outgoing Subscription messages
   """
-  use UccChat.Web.ChannelApi
   use UccChat.Web, :channel
+  use UccLogger
 
   alias UccChat.{Subscription, Channel, Message}
   alias UccChat.{Web.UserSocket}
@@ -12,7 +12,6 @@ defmodule UccChat.Web.RoomChannel do
   alias UcxUcc.Web.Endpoint
 
   require UccChat.ChatConstants, as: CC
-  require Logger
 
   ############
   # API
@@ -102,7 +101,8 @@ defmodule UccChat.Web.RoomChannel do
 
   def handle_in(pattern, %{"params" => params, "ucxchat" =>  ucxchat} = msg,
     socket) do
-    debug pattern, msg
+    # debug pattern, msg
+    trace pattern, msg
     user = Helpers.get_user! socket.assigns.user_id
     if authorized? socket, String.split(pattern, "/"), params, ucxchat, user do
       UccChat.Web.ChannelRouter.route(socket, pattern, params, ucxchat)

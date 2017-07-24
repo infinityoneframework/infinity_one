@@ -101,7 +101,7 @@ create_user = fn name, email, password, admin ->
     |> User.changeset(params)
     |> Repo.insert!
 
-  User.confirm! user
+  Coherence.ControllerHelpers.confirm! user
 
   role_id = case admin do
     true -> roles["admin"]
@@ -200,14 +200,15 @@ if add_messages do
 
   user_ids = [u1.id, u2.id, u3.id]
   other_ch_ids = Enum.take(channels, 3) |> Enum.map(&(&1.id))
-  for _ <- 0..500 do
+  num_messages = 20 # 500
+  for _ <- 0..num_messages do
     for ch_id <- [ch1.id, ch2.id] ++ other_ch_ids do
       id = Enum.random user_ids
       Message.create!(%{channel_id: ch_id, user_id: id, body: Enum.random(messages)})
     end
   end
 
-  for _ <- 0..500 do
+  for _ <- 0..num_messages do
     id = Enum.random user_ids
     Message.create!(%{channel_id: ch1.id, user_id: id, body: Enum.random(messages)})
   end
@@ -227,8 +228,10 @@ if add_messages do
     Subscription.create!(%{channel_id: ch.id, user_id: c.id})
   end)
 
-  for _ <- 1..200 do
+  for _ <- 1..num_messages do
     {c, ch} = Enum.random new_channel_users
     Message.create!(%{channel_id: ch.id, user_id: c.id, body: Enum.random(messages)})
   end
 end
+
+UccSettings.init_all()

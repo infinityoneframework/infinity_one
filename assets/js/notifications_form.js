@@ -6,6 +6,7 @@ class NotificationsForm {
   }
 
   register_events() {
+    return
     console.log("Registering NotificatinsForm events")
     $('body')
       .on('click', '.notifications i[data-edit]', e => {
