@@ -1,6 +1,7 @@
 defmodule UccChat.Web.UserChannel do
   use UccLogger
   use UccChat.Web, :channel
+  use UcxUcc
   # alias UccChat.Presence
 
   import Ecto.Query
@@ -163,36 +164,6 @@ defmodule UccChat.Web.UserChannel do
     {:noreply, socket}
   end
 
-  # def handle_in("flex:open:User Info" = ev, params, socket) do
-  #   debug ev, params, "assigns: #{inspect socket.assigns}"
-  #   # TODO: what is this?
-  #   args = %{"args" => %{"templ" => "users_list.html",
-  #     "username" => "steve.pallen"}}
-  #   {:noreply, toggle_flex(socket, "User Info", args)}
-  #   # {:noreply, open_flex_item(socket, "User Info", args)}
-  # end
-
-  # def handle_in("flex:open:" <> tab = ev, params, socket) do
-  #   debug ev, params, "assigns: #{inspect socket.assigns}"
-  #   {:noreply, toggle_flex(socket, tab, params)}
-  # end
-  # def handle_in("flex:item:open:" <> tab = ev, params, socket) do
-  #   debug ev, params, "assigns: #{inspect socket.assigns}"
-  #   {:noreply, open_flex_item(socket, tab, params)}
-  # end
-
-  # def handle_in("flex:close" = ev, params, socket) do
-  #   debug ev, params
-  #   {:noreply, socket}
-  # end
-
-  # def handle_in("flex:view_all:" <> tab = ev, params,
-  #   %{assigns: assigns} = socket) do
-  #   debug ev, params
-  #   fl = assigns[:flex] |> Flex.view_all(assigns[:channel_id], tab)
-  #   {:noreply, assign(socket, :flex, fl)}
-  # end
-
   def handle_in("side_nav:open" = ev, %{"page" => "account"} = params,
     socket) do
     trace ev, params
@@ -286,6 +257,7 @@ defmodule UccChat.Web.UserChannel do
   @links ~w(preferences profile)
   def handle_in(ev = "account_link:click:" <> link, params, socket)
     when link in @links do
+
     trace ev, params
     user = Helpers.get_user(socket.assigns.user_id)
     user_cs = User.changeset(user, %{})
@@ -397,6 +369,7 @@ defmodule UccChat.Web.UserChannel do
 
   def handle_in(ev = "notifications_form:" <> _action, params,
     %{assigns: assigns} = socket) do
+
     trace ev, params, inspect(assigns)
     FlexBarService.handle_in(ev, params, socket)
   end
@@ -502,42 +475,6 @@ defmodule UccChat.Web.UserChannel do
       {:noreply, socket}
     end
   end
-
-  # def handle_info({:flex, :open, ch, "Notifications" = tab, nil, params} = msg,
-  #   socket) do
-  #   debug inspect(msg), "Notifications"
-  #   {resp, socket} =
-  #     case FlexBarService.handle_flex_callback(:open, ch, tab, nil,
-  #       socket, params) do
-  #       %{notification: notify} = resp ->
-  #         {Map.delete(resp, :notification),
-  #          assign(socket, :notification, notify)}
-  #       resp ->
-  #         {resp, socket}
-  #     end
-  #   push socket, "flex:open", Enum.into([title: tab], resp)
-  #   {:noreply, socket}
-  # end
-
-  # def handle_info({:flex, :open, ch, tab, nil, params} = msg, socket) do
-  #   debug inspect(msg), "nil"
-  #   resp =
-  #     FlexBarService.handle_flex_callback(:open, ch, tab, nil, socket, params)
-  #   push socket, "flex:open", Enum.into([title: tab], resp)
-  #   {:noreply, socket}
-  # end
-  # def handle_info({:flex, :open, ch, tab, args, params} = msg, socket) do
-  #   debug inspect(msg), "args"
-  #   resp = FlexBarService.handle_flex_callback(:open, ch, tab, args[tab],
-  #     socket, params)
-  #   push socket, "flex:open", Enum.into([title: tab], resp)
-  #   {:noreply, socket}
-  # end
-  # def handle_info({:flex, :close, _ch, _tab, _, _params} = msg, socket) do
-  #   debug inspect(msg), ""
-  #   push socket, "flex:close", %{}
-  #   {:noreply, socket}
-  # end
 
   def handle_info({:update_mention, payload, user_id} = ev, socket) do
     trace "upate_mention", ev

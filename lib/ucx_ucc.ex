@@ -11,9 +11,10 @@ defmodule UcxUcc do
   end
 
   defmacro deprecated(message \\ "") do
-    name = __CALLER__.function
+    function = __CALLER__.function
     quote do
-      Logger.error "!!! #{__MODULE__}.#{unquote(name)} #{unquote(message)} is deprecated!"
+      {name, arity} = unquote(function)
+      Logger.error "!!! #{__MODULE__}.#{name}/#{arity} #{unquote(message)} is deprecated!"
     end
   end
 end

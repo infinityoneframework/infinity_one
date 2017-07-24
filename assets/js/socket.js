@@ -20,7 +20,6 @@ import RoomHistoryManager from "./room_history_manager"
 import DesktopNotification from "./desktop_notification"
 import Menu from './menu'
 import * as main from "./main"
-// import * as flexbar from "./flex_bar"
 import * as cc from "./chat_channel"
 import hljs from "highlight.js"
 import toastr from 'toastr'
@@ -392,9 +391,6 @@ function start_room_channel(typing) {
     message_preview(msg)
   })
 
-  // if (!window.flexbar) {
-  //   flexbar.init_flexbar()
-  // }
   roomManager.clear_unread()
   roomManager.new_room()
   roomHistoryManager.scroll_new_window()

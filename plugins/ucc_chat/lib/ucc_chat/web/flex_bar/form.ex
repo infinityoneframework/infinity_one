@@ -14,7 +14,9 @@ defmodule UccChat.Web.FlexBar.Form do
 
     Logger.warn "flex_form edit tab_name: #{tab_name}, control: #{control} sender: #{inspect sender}"
     tab = TabBar.get_button(tab_name)
-    apply tab.module, :open, [socket, nil, tab, nil, %{"editing" => control}]
+    user_id = socket.assigns.user_id
+    channel_id = Helpers.get_channel_id socket
+    apply tab.module, :open, [socket, user_id, channel_id, tab, %{"editing" => control}]
   end
 
   def flex_form(socket, sender) do
@@ -25,7 +27,7 @@ defmodule UccChat.Web.FlexBar.Form do
   def flex_form_save(socket, %{"form" => %{"id" => _tab_name} = form} = sender) do
     trace "flex_form_save", sender
 
-    assigns = socket.assigns
+    assigns = Rebel.get_assigns socket
 
     resource_key = assigns[:resource_key]
     resource_params = ServiceHelpers.normalize_params(form)[to_string(resource_key)]
@@ -52,7 +54,9 @@ defmodule UccChat.Web.FlexBar.Form do
   def flex_form_cancel(socket, %{"form" => %{"id" => tab_name}} = sender) do
     trace "flex_form_cancel", sender
     tab = TabBar.get_button(tab_name)
-    apply tab.module, :open, [socket, nil, tab, nil, %{}]
+    user_id = socket.assigns.user_id
+    channel_id = Helpers.get_channel_id socket
+    apply tab.module, :open, [socket, user_id, channel_id, tab, %{}]
   end
 end
 

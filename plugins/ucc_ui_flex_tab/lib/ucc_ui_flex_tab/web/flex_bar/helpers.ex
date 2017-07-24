@@ -20,7 +20,7 @@ defmodule UccUiFlexTab.Web.FlexBar.Helpers do
         case tab.template do
           "" -> socket
           templ ->
-            {args, socket} = args socket, user_id, channel_id, nil, %{}
+            {args, socket} = args socket, user_id, channel_id, nil, args
             # IO.inspect args, label: "... args"
             html = Phoenix.View.render_to_string(tab.view, templ, args)
 

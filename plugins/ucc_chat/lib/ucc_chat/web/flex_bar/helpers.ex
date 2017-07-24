@@ -69,5 +69,9 @@ defmodule UccChat.Web.FlexBar.Helpers do
     socket
   end
 
+  def get_channel_id(socket) do
+    exec_js! socket, "window.ucxchat.channel_id"
+  end
+
 end
 

@@ -30,10 +30,13 @@ defmodule UccChat.Web.FlexBar.Tab.Notification do
           notification
       end
 
-    socket =
+    assigns =
       socket
-      |> Phoenix.Socket.assign(:notification, notification)
-      |> Phoenix.Socket.assign(:resource_key, :notification)
+      |> Rebel.get_assigns()
+      |> Map.put(:notification, notification)
+      |> Map.put(:resource_key, :notification)
+
+    Rebel.put_assigns(socket, assigns)
 
     {[notification: notification, editing: editing], socket}
   end
@@ -41,7 +44,6 @@ defmodule UccChat.Web.FlexBar.Tab.Notification do
   def play(socket, _sender) do
     play_sound socket, socket.assigns.notification.settings.audio
   end
-
 
   def change_audio(socket, sender) do
     play_sound socket, sender["value"]
