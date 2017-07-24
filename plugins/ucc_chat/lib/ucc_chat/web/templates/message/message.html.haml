@@ -44,10 +44,10 @@
         %i.icon-edit(aria-label="Edited")
         %button.thumb.thumb-small.user-card-message(data-username="#{edited[:edited_by]}" tabindex="1")
           .avatar
-            - if @user.avatar_url do
-              .avatar-image(style="background-image:url(#{@user.avatar_url});")
+            - if url = @message.edited_by.avatar_url do
+              .avatar-image(style="background-image:url(#{url});")
             - else
-              .avatar-image(style="background-image:url(/avatar/#{username});")
+              .avatar-image(style="background-image:url(#{avatar_url(@message.edited_by.username)});")
     - if is_private(@message) do
       %span.private Only you can see this message
     %div(class="message-cog-container #{hide_cog(@message)}")

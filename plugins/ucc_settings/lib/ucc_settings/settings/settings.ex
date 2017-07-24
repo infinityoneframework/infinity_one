@@ -33,6 +33,10 @@ defmodule UccSettings.Settings do
         struct new(), opts
       end
 
+      def key do
+        UccSettings.Utils.module_key __MODULE__
+      end
+
       @doc """
       Initialize the database with the configured defaults.
       """
@@ -101,6 +105,11 @@ defmodule UccSettings.Settings do
           |> Map.get(unquote(name))
         end
 
+        def unquote(name)(%UccSettings{} = config) do
+          config
+          |> Map.get(key())
+          |> Map.get(unquote(name))
+        end
         def unquote(name)(config) do
           config
           |> Map.get(unquote(name))
