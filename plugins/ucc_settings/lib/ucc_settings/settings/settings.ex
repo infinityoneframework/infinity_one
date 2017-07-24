@@ -105,13 +105,14 @@ defmodule UccSettings.Settings do
           |> Map.get(unquote(name))
         end
 
-        def unquote(name)(%UccSettings{} = config) do
+        def unquote(name)(%@schema{} = config) do
           config
-          |> Map.get(key())
           |> Map.get(unquote(name))
         end
+
         def unquote(name)(config) do
           config
+          |> Map.get(key())
           |> Map.get(unquote(name))
         end
       end)

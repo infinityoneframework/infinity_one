@@ -151,6 +151,23 @@ defmodule UcxUcc.TabBar do
   end
 
   @doc """
+  Get all tabs for a given user.
+
+  ## Examples
+
+      iex> UcxUcc.TabBar.open_ftab 1, 2, "test", nil
+      iex> UcxUcc.TabBar.open_ftab 1, 3, "other", %{one: 1}
+      iex> UcxUcc.TabBar.open_ftab 2, 3, "other", %{one: 2}
+      iex> UcxUcc.TabBar.get_ftabs(1) |> Enum.sort
+      [{"other", %{one: 1}}, {"test", nil}]
+  """
+  def get_ftabs(user_id) do
+    @name
+    |> :ets.match({{:ftab, {user_id, :"_"}}, :"$2"})
+    |> List.flatten
+  end
+
+  @doc """
   Close all ftabs for a given user.
 
   ## Examples

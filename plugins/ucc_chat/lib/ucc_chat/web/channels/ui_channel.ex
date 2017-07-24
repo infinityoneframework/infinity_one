@@ -49,7 +49,7 @@ defmodule UccChat.Web.UiChannel do
     redirect_to socket, "/direct/#{username}"
   end
 
-  handle_callback("user:" <>  user_id)
+  handle_callback("user:" <>  _user_id)
 
   defdelegate flex_tab_click(socket, sender),
     to: UccUiFlexTab.FlexTabChannel

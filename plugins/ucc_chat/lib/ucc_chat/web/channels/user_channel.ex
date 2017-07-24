@@ -20,8 +20,8 @@ defmodule UccChat.Web.UserChannel do
   alias UccChat.{
     Subscription, ChannelService, Channel,
     SideNavService, Web.AccountView, Web.UserSocket, Web.MasterView,
-    Web.SharedView, ChannelService, SubscriptionService, InvitationService,
-    UserService, EmojiService, Settings, FlexBarService, MessageService
+    ChannelService, SubscriptionService, InvitationService,
+    UserService, EmojiService, Settings, MessageService
   }
   alias UccAdmin.AdminService
   alias UcxUcc.Web.Endpoint
@@ -59,7 +59,7 @@ defmodule UccChat.Web.UserChannel do
     "get:subscribed"
   ]
 
-  def join(CC.chan_user() <>  user_id = event, params, socket) do
+  def join(CC.chan_user() <>  user_id, params, socket) do
     trace(CC.chan_user() <> user_id, params)
     send(self(), {:after_join, params})
     {:ok, socket}
@@ -615,7 +615,7 @@ defmodule UccChat.Web.UserChannel do
 
     socket
     |> update_rooms_list(user_id, channel_id)
-    |> update_messages_header(user_id, channel_id, true)
+    |> update_messages_header(true)
   end
 
   def delete_subscription(_event, payload, socket) do
@@ -624,7 +624,7 @@ defmodule UccChat.Web.UserChannel do
     socket
     |> update_rooms_list(user_id, channel_id)
     |> update_message_box(user_id, channel_id)
-    |> update_messages_header(user_id, channel_id, false)
+    |> update_messages_header(false)
   end
 
   defp update_rooms_list(socket, user_id, channel_id) do
@@ -641,7 +641,7 @@ defmodule UccChat.Web.UserChannel do
     socket
   end
 
-  defp update_messages_header(socket, user_id, channel_id, show) do
+  defp update_messages_header(socket, show) do
     html = Phoenix.View.render_to_string MasterView, "favorite_icon.html",
       show: show, favorite: false
     Rebel.Core.async_js socket, ~s/$('section.messages-container .toggle-favorite').replaceWith('#{html}')/
