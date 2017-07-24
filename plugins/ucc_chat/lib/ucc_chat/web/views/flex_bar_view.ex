@@ -109,9 +109,9 @@ defmodule UccChat.Web.FlexBarView do
     end
   end
 
-  def notification_item(title) do
-    "notification_item.html"
-    |> render(title: title)
+  def notification_radio_button(fp, field, options) do
+    "notification_radio_button.html"
+    |> render(fp: fp, field: field, options: options)
     |> Phoenix.HTML.raw()
   end
 

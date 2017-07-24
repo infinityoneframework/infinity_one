@@ -1,5 +1,6 @@
 defmodule UccChat.Web.MessageChannelController do
   use UccChat.Web, :channel_controller
+  use UccLogger
 
   import UccChat.MessageService
 

@@ -1,13 +1,7 @@
 defmodule UccChat.NotificationSetting do
   use UccModel, schema: UccChat.Schema.NotificationSetting
 
-  def option_text(options, name) do
-    options
-    |> Enum.into(%{})
-    |> Map.get(name)
-  end
-
-  def options(:audio), do: [
+  @audio_options [
     {"none", "None"},
     {"system_default", "Use account preferences (Default)"},
     {"chime", "Chime"},
@@ -18,6 +12,18 @@ defmodule UccChat.NotificationSetting do
     {"highbell", "Highbell"},
     {"seasons", "Seasons"}
   ]
+
+  @audio_options_select Enum.map(@audio_options, &{elem(&1, 1), elem(&1, 0)})
+
+  def option_text(options, name) do
+    options
+    |> Enum.into(%{})
+    |> Map.get(name)
+  end
+
+  def options_select(:audio), do: @audio_options_select
+
+  def options(:audio),        do: @audio_options
 
   def options(field) when field in ~w(desktop mobile)a, do: [
     {"all", "All messages"},

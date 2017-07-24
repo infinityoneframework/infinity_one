@@ -1,5 +1,5 @@
 defmodule UccChat.Web.UserChannel do
-  use UccChat.Web.ChannelApi
+  use UccLogger
   use UccChat.Web, :channel
   # alias UccChat.Presence
 
@@ -18,9 +18,9 @@ defmodule UccChat.Web.UserChannel do
   alias UcxUcc.Web.Endpoint
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
+  alias UcxUcc.UccPubSub
 
   require UccChat.ChatConstants, as: CC
-  require Logger
 
   def join_room(user_id, room) do
     # Logger.debug ("...join_room user_id: #{inspect user_id}")
@@ -47,11 +47,12 @@ defmodule UccChat.Web.UserChannel do
     "room:leave",
     "room:mention",
     "user:state",
-    "direct:new"
+    "direct:new",
+    "get:subscribed"
   ]
 
   def join(CC.chan_user() <>  user_id, params, socket) do
-    debug(CC.chan_user() <> user_id, params)
+    trace(CC.chan_user() <> user_id, params)
     send(self(), :after_join)
 
     new_assigns =
@@ -79,17 +80,25 @@ defmodule UccChat.Web.UserChannel do
   ###############
   # Outgoing Incoming Messages
 
+  def handle_out("get:subscribed" = ev, msg, socket) do
+    trace ev, msg
+    Kernel.send msg.pid, {:subscribed, socket.assigns[:subscribed]}
+    {:noreply, socket}
+  end
+
   def handle_out("room:join", msg, socket) do
+    trace "room:join", msg
     %{room: room} = msg
-    UserSocket.push_message_box(socket, socket.assigns.channel_id,
-      socket.assigns.user_id)
+    user_id = socket.assigns.user_id
+    UserSocket.push_message_box(socket, socket.assigns.channel_id, user_id)
     update_rooms_list(socket)
     clear_unreads(room, socket)
     {:noreply, subscribe([room], socket)}
   end
+
   def handle_out("room:leave" = ev, msg, socket) do
     %{room: room} = msg
-    debug ev, msg, "assigns: #{inspect socket.assigns}"
+    trace ev, msg, "assigns: #{inspect socket.assigns}"
     # UserSocket.push_message_box(socket, socket.assigns.channel_id, socket.assigns.user_id)
     socket.endpoint.unsubscribe(CC.chan_room <> room)
     update_rooms_list(socket)
@@ -110,12 +119,12 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_user_state(%{state: "idle"}, socket) do
-    debug "idle", ""
+    trace "idle", ""
     push socket, "focus:change", %{state: false, msg: "idle"}
     assign socket, :user_state, "idle"
   end
   def handle_user_state(%{state: "active"}, socket) do
-    debug "active", ""
+    trace "active", ""
     push socket, "focus:change", %{state: true, msg: "active"}
     clear_unreads(socket)
     assign socket, :user_state, "active"
@@ -138,7 +147,7 @@ defmodule UccChat.Web.UserChannel do
   # Incoming Messages
 
   def handle_in(ev = "reaction:" <> action, params, socket) do
-    debug ev, params
+    trace ev, params
     case UccChat.ReactionService.select(action, params, socket) do
       nil -> {:noreply, socket}
       res -> {:reply, res, socket}
@@ -150,7 +159,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_in("subscribe" = ev, params, socket) do
-    debug ev, params, "assigns: #{inspect socket.assigns}"
+    trace ev, params, "assigns: #{inspect socket.assigns}"
     {:noreply, socket}
   end
 
@@ -186,7 +195,7 @@ defmodule UccChat.Web.UserChannel do
 
   def handle_in("side_nav:open" = ev, %{"page" => "account"} = params,
     socket) do
-    debug ev, params
+    trace ev, params
 
     user = Helpers.get_user!(socket)
     account_cs = Account.changeset(user.account, %{})
@@ -199,7 +208,7 @@ defmodule UccChat.Web.UserChannel do
     {:reply, {:ok, %{html: html}}, socket}
   end
   def handle_in("side_nav:open" = ev, %{"page" => "admin"} = params, socket) do
-    debug ev, params
+    trace ev, params
 
     user = Helpers.get_user!(socket)
 
@@ -213,27 +222,27 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_in("side_nav:more_channels" = ev, params, socket) do
-    debug ev, params
+    trace ev, params
 
     html = SideNavService.render_more_channels(socket.assigns.user_id)
     {:reply, {:ok, %{html: html}}, socket}
   end
 
   def handle_in("side_nav:more_users" = ev, params, socket) do
-    debug ev, params
+    trace ev, params
 
     html = SideNavService.render_more_users(socket.assigns.user_id)
     {:reply, {:ok, %{html: html}}, socket}
   end
 
   def handle_in("side_nav:close" = ev, params, socket) do
-    debug ev, params
+    trace ev, params
 
     {:noreply, socket}
   end
 
   def handle_in("account:preferences:save" = ev, params, socket) do
-    debug ev, params, "assigns: #{inspect socket.assigns}"
+    trace ev, params, "assigns: #{inspect socket.assigns}"
     params =
       params
       |> Helpers.normalize_form_params
@@ -243,7 +252,6 @@ defmodule UccChat.Web.UserChannel do
       |> Helpers.get_user!
       |> Map.get(:account)
       |> Account.changeset(params)
-      |> IO.inspect(label: "account_preferences changeset")
       |> Repo.update
       |> case do
         {:ok, _account} ->
@@ -255,7 +263,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_in("account:profile:save" = ev, params, socket) do
-    debug ev, params, "assigns: #{inspect socket.assigns}"
+    trace ev, params, "assigns: #{inspect socket.assigns}"
     params =
       params
       |> Helpers.normalize_form_params
@@ -264,7 +272,6 @@ defmodule UccChat.Web.UserChannel do
       socket
       |> Helpers.get_user!
       |> User.changeset(params)
-      |> IO.inspect(label: "account profile changeset")
       |> Repo.update
       |> case do
         {:ok, _account} ->
@@ -279,7 +286,7 @@ defmodule UccChat.Web.UserChannel do
   @links ~w(preferences profile)
   def handle_in(ev = "account_link:click:" <> link, params, socket)
     when link in @links do
-    debug ev, params
+    trace ev, params
     user = Helpers.get_user(socket.assigns.user_id)
     user_cs = User.changeset(user, %{})
     account_cs = Account.changeset(user.account, %{})
@@ -291,7 +298,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_in(ev = "mode:set:" <> mode, params, socket) do
-    debug ev, params
+    trace ev, params
     mode = if mode == "im", do: true, else: false
     user = Helpers.get_user!(socket)
 
@@ -312,7 +319,7 @@ defmodule UccChat.Web.UserChannel do
 
   @links ~w(info general chat_general message permissions layout users rooms file_upload)
   def handle_in(ev = "admin_link:click:" <> link, params, socket) when link in @links do
-    debug ev, params
+    trace ev, params
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
@@ -321,7 +328,7 @@ defmodule UccChat.Web.UserChannel do
 
   def handle_in(ev = "admin_link:click:webrtc" , params, socket) do
     link = "webrtc"
-    debug ev, params
+    trace ev, params
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content",
@@ -330,7 +337,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_in(ev = "admin:" <> link, params, socket) do
-    debug ev, params
+    trace ev, params
     AdminService.handle_in(link, params, socket)
   end
 
@@ -340,7 +347,7 @@ defmodule UccChat.Web.UserChannel do
   # end
 
   def handle_in(ev = "update:currentMessage", params, socket) do
-    debug ev, params
+    trace ev, params
 
     value = params["value"] || "0"
     assigns = socket.assigns
@@ -359,7 +366,7 @@ defmodule UccChat.Web.UserChannel do
   end
   def handle_in(ev = "get:currentMessage", params,
     %{assigns: assigns} = socket) do
-    debug ev, params
+    trace ev, params
     channel = Channel.get_by name: params["room"]
     if channel do
       res =
@@ -374,7 +381,7 @@ defmodule UccChat.Web.UserChannel do
     end
   end
   def handle_in(ev = "last_read", params, %{assigns: assigns} = socket) do
-    debug ev, params
+    trace ev, params
     SubscriptionService.update assigns, %{last_read: params["last_read"]}
     {:noreply, socket}
   end
@@ -390,7 +397,7 @@ defmodule UccChat.Web.UserChannel do
 
   def handle_in(ev = "notifications_form:" <> _action, params,
     %{assigns: assigns} = socket) do
-    debug ev, params, inspect(assigns)
+    trace ev, params, inspect(assigns)
     FlexBarService.handle_in(ev, params, socket)
   end
 
@@ -405,13 +412,22 @@ defmodule UccChat.Web.UserChannel do
   # Info messages
 
   def handle_info(:after_join, socket) do
-    debug "after_join", socket.assigns
+    trace "after_join", socket.assigns
+    {:noreply, socket}
+  end
+
+  def handle_info(%Broadcast{topic: _, event: "get:subscribed",
+    payload: payload}, socket) do
+
+    trace "get:subscribed", payload
+
+    send payload["pid"], {:subscribed, socket.assigns[:subscribed]}
     {:noreply, socket}
   end
 
   def handle_info(%Broadcast{topic: _, event: "room:update:name" = event,
     payload: payload}, socket) do
-    debug event, payload
+    trace event, payload
     push socket, event, payload
     # socket.endpoint.unsubscribe(CC.chan_room <> payload[:old_name])
     {:noreply, assign(socket, :subscribed,
@@ -420,12 +436,12 @@ defmodule UccChat.Web.UserChannel do
   end
   def handle_info(%Broadcast{topic: _, event: "room:update:list" = event,
     payload: payload}, socket) do
-    debug event, payload
+    trace event, payload
     {:noreply, update_rooms_list(socket)}
   end
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
-    debug event, ""  #socket.assigns
+    trace event, ""  #socket.assigns
     assigns = socket.assigns
 
     if room in assigns.subscribed do
@@ -450,103 +466,9 @@ defmodule UccChat.Web.UserChannel do
     {:noreply, socket}
   end
 
-  # TODO: Need to get this over to the new UI channels
-  # def handle_info(%Broadcast{topic: _, event: "user:action" = event,
-  #   payload: %{action: "owner"} = payload}, %{assigns: assigns} = socket) do
-  #   debug event, payload
-  #   current_user = Helpers.get_user! assigns.user_id
-  #   user = Helpers.get_user! payload.user_id
-  #   channel = Channel.get!(assigns.channel_id)
-  #   # user_info = FlexBarService.user_info channel, view_mode: true
-  #   # if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
-  #   #   html1 =
-  #   #     Helpers.render(FlexBarView, "user_card_actions.html",
-  #   #       current_user: current_user, channel_id: assigns.channel_id,
-  #   #       user: user, user_info: user_info)
-  #   #   push socket, "code:update", %{html: html1,
-  #   #     selector: ~s(.user-view nav[data-username="#{user.username}"]),
-  #   #     action: "html"}
-  #   # end
-  #   {:noreply, socket}
-  # end
-
-  # def handle_info(%Broadcast{topic: _, event: "user:action" = event, payload:
-  #   %{action: action} = payload}, %{assigns: assigns} = socket)
-  #   when action in ~w(block) do
-  #   debug event, payload, "assigns: #{inspect assigns}"
-  #   current_user = Helpers.get_user! assigns.user_id
-  #   user = Helpers.get_user! payload.user_id
-  #   channel = Channel.get!(assigns.channel_id)
-  #   if Flex.open? assigns.flex, assigns.channel_id, "User Info" do
-  #     # debug event, payload, action <> " open"
-  #     user_info = FlexBarService.user_info channel, direct: true
-  #     html1 =
-  #       Helpers.render(FlexBarView, "user_card_actions.html",
-  #         current_user: current_user, channel_id: assigns.channel_id,
-  #         user: user, user_info: user_info)
-  #     push socket, "code:update", %{html: html1,
-  #       selector: ~s(.user-view nav[data-username="#{user.username}"]),
-  #       action: "html"}
-  #   else
-  #     # debug event, payload, "closed"
-  #   end
-  #   {:noreply, socket}
-  # end
-
-  # def handle_info(%Broadcast{topic: _, event: "user:action" = event, payload:
-  #   %{action: action} = payload}, %{assigns: assigns} = socket)
-  #   when action in ~w(mute moderator owner) do
-  #   debug event, payload
-  #   current_user = Helpers.get_user! assigns.user_id
-  #   user = Helpers.get_user! payload.user_id
-  #   channel = Channel.get!(assigns.channel_id)
-  #   if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
-  #     # debug event, payload, action <> " open"
-  #     user_info = FlexBarService.user_info channel, view_mode: true
-  #     html1 =
-  #       Helpers.render(FlexBarView, "user_card_actions.html",
-  #         current_user: current_user, channel_id: assigns.channel_id,
-  #         user: user, user_info: user_info)
-  #     push socket, "code:update", %{html: html1,
-  #       selector: ~s(.user-view nav[data-username="#{user.username}"]),
-  #       action: "html"}
-
-  #     if action == "mute" do
-  #       html2 =
-  #         Helpers.render(FlexBarView, "users_list_item.html",
-  #           channel_id: assigns.channel_id, user: user)
-  #       push socket, "code:update", %{html: html2,
-  #         selector: ~s(.user-card-room[data-status-name="#{user.username}"]),
-  #         action: "html"}
-  #     end
-  #   else
-  #     # debug event, payload, "closed"
-  #   end
-  #   {:noreply, socket}
-  # end
-
-  # def handle_info(%Broadcast{topic: _, event: "user:action" = event,
-  #   payload: %{action: "removed"} = payload}, %{assigns: assigns} = socket) do
-  #   debug event, payload, "assigns: #{inspect assigns}"
-  #   # current_user = Helpers.get_user! assigns.user_id
-  #   user = Helpers.get_user! payload.user_id
-  #   if Flex.open? assigns.flex, assigns.channel_id, "Members List" do
-  #     debug event, payload, "removed open"
-
-  #     push socket, "code:update", %{selector:
-  #       ~s(.user-card-room[data-status-name='#{user.username}']),
-  #       action: "remove"}
-  #     push socket, "code:update", %{selector:
-  #       ".flex-tab-container .user-view", action: "addClass",
-  #       html: "animated-hidden"}
-  #   else
-  #     debug event, payload, "closed"
-  #   end
-  #   {:noreply, socket}
-  # end
   def handle_info(%Broadcast{topic: _, event: "user:action" = event,
     payload: %{action: "unhide"} = payload}, %{assigns: assigns} = socket) do
-    debug event, payload, "assigns: #{inspect assigns}"
+    trace event, payload, "assigns: #{inspect assigns}"
 
     UserSocket.push_rooms_list_update(socket, payload.channel_id,
       payload.user_id)
@@ -557,29 +479,20 @@ defmodule UccChat.Web.UserChannel do
     payload: %{user: user} = payload},
     %{assigns: %{user: user} = assigns} = socket) do
 
-    debug event, payload, "assigns: #{inspect assigns}"
+    trace event, payload, "assigns: #{inspect assigns}"
     # old_channel_id = assigns[:channel_id]
     channel_id = payload[:channel_id]
     socket = %{assigns: _assigns} = assign(socket, :channel_id, channel_id)
 
-    # TODO: Need to tell the UI channel that the room is opened
+    UccPubSub.broadcast "user:" <> assigns.user_id, "room:join",
+      %{channel_id: channel_id}
 
-    # fl = assigns[:flex]
-    # cond do
-    #   Flex.open?(fl, channel_id) ->
-    #     Flex.show(fl, channel_id)
-    #   old_channel_id && Flex.open?(fl, old_channel_id) ->
-    #     push socket, "flex:close", %{}
-    #   true ->
-    #     nil
-    # end
-    # UserSocket.push_message_box(socket, socket.assigns.channel_id, socket.assigns.user_id)
     {:noreply, socket}
   end
 
   def handle_info(%Broadcast{topic: _, event: "room:delete" = event,
     payload: payload}, socket) do
-    debug event, payload
+    trace event, payload
     room = payload.room
     if Enum.any?(socket.assigns[:subscribed], &(&1 == room)) do
       update_rooms_list(socket)
@@ -627,7 +540,7 @@ defmodule UccChat.Web.UserChannel do
   # end
 
   def handle_info({:update_mention, payload, user_id} = ev, socket) do
-    debug "upate_mention", ev
+    trace "upate_mention", ev
     if UserService.open_channel_count(socket.assigns.user_id) > 1 do
       opens = UserService.open_channels(socket.assigns.user_id)
       Logger.error "found more than one open, room: " <>
@@ -653,7 +566,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   def handle_info({:update_direct_message, payload, user_id} = ev, socket) do
-    debug "upate_direct_message", ev, socket.assigns.user_state
+    trace "upate_direct_message", ev, socket.assigns.user_state
     if UserService.open_channel_count(socket.assigns.user_id) > 1 do
       opens = UserService.open_channels(socket.assigns.user_id)
       Logger.error "found more than one open, room: " <>
@@ -701,7 +614,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   defp subscribe(channels, socket) do
-    # debug inspect(channels), ""
+    # trace inspect(channels), ""
     Enum.reduce channels, socket, fn channel, acc ->
       subscribed = acc.assigns[:subscribed]
       if channel in subscribed do
@@ -713,21 +626,8 @@ defmodule UccChat.Web.UserChannel do
     end
   end
 
-  # assigns[:flex] %{open: %{channel_id => "Info"} }
-
-  # defp toggle_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, params) do
-  #   assign socket, :flex, Flex.toggle(fl, assigns[:channel_id], tab, params)
-  # end
-
-  # defp open_flex_item(%{assigns: %{flex: fl} = assigns} = socket,
-  #   tab, params) do
-  #   debug inspect(fl), tab, inspect(params)
-  #   assign socket, :flex, Flex.open(fl, assigns[:channel_id], tab,
-  #     params["args"], params)
-  # end
-
   defp update_rooms_list(%{assigns: assigns} = socket) do
-    debug "", inspect(assigns)
+    trace "", inspect(assigns)
     html = SideNavService.render_rooms_list(assigns[:channel_id],
       assigns[:user_id])
     push socket, "update:rooms", %{html: html}

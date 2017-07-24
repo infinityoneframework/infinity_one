@@ -49,7 +49,7 @@ defmodule UccChat.Accounts do
       [default: true]
       |> Channel.list_by()
       |> Enum.each(fn ch ->
-        Subscription.insert!(%{channel_id: ch.id, user_id: user.id})
+        Subscription.create!(%{channel_id: ch.id, user_id: user.id})
       end)
     end
     {:ok, changes}

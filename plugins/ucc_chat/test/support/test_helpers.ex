@@ -3,9 +3,11 @@ defmodule UccChat.TestHelpers do
   # alias UcxUcc.{Repo, Accounts}
   # alias Accounts.{User, Role, UserRole}
   alias UccChat.{ChannelService, Subscription}
-  alias UcxUcc.{Accounts, Repo}
+  alias UcxUcc.{Repo}
   alias UcxUcc.TestHelpers
   alias UccChat.{Notification, AccountNotification}
+
+  Code.ensure_compiled UcxUcc.TestHelpers
 
   # import Ecto.Query
 

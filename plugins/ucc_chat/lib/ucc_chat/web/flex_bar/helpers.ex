@@ -4,7 +4,7 @@ defmodule UccChat.Web.FlexBar.Helpers do
 
   defmacro __using__(_) do
     quote do
-      use UcxUcc.Web.FlexBar.Helpers
+      use UccUiFlexTab.Web.FlexBar.Helpers
 
       import unquote(__MODULE__)
 
@@ -16,6 +16,7 @@ defmodule UccChat.Web.FlexBar.Helpers do
 
   alias UccChat.ServiceHelpers, as: Helpers
   alias UcxUcc.Permissions
+  import Rebel.{Core, Query, Browser}, warn: false
 
   def do_messages_args(collection, user_id, channel_id) do
     collection
@@ -61,6 +62,11 @@ defmodule UccChat.Web.FlexBar.Helpers do
     view_mode = opts[:view_mode] || false
 
     %{direct: direct, show_admin: show_admin, blocked: channel.blocked, user_mode: user_mode, view_mode: view_mode}
+  end
+
+  def toastr(socket, action, message) when action in ~w(success warning error)a do
+    exec_js socket, "window.toastr.#{action}('#{message}')"
+    socket
   end
 
 end

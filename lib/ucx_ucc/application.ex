@@ -29,9 +29,9 @@ defmodule UcxUcc.Application do
       # Start the endpoint when the application starts
       supervisor(UcxUcc.Web.Endpoint, []),
       supervisor(UcxUcc.Web.Presence, []),
-      worker(UcxUcc.Permissions, [])
-      # Start your own worker by calling: UcxUcc.Worker.start_link(arg1, arg2, arg3)
-      # worker(UcxUcc.Worker, [arg1, arg2, arg3]),
+      worker(UcxUcc.Permissions, []),
+      worker(UcxUcc.TabBar.Agent, []),
+      worker(UcxUcc.UccPubSub, []),
     ] ++ children
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

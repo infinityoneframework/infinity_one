@@ -1,4 +1,0 @@
-li
-  label= @title
-  div
-    = @fun.()

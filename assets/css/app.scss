@@ -240,3 +240,13 @@ html.rtl .attachment .attachment-download-icon {
 img.bot-img {
   height: 200px
 }
+section.flex-tab-container {
+  form .current-setting {
+    i {
+      [data-play],
+      [data-edit] {
+        cursor: pointer;
+      }
+    }
+  }
+}

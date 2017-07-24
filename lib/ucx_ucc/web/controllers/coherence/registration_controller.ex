@@ -53,7 +53,7 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
   this option is enabled.
   """
   @spec create(conn, params) :: conn
-  def create(conn, %{"registration" => registration_params} = params) do
+  def create(conn, %{"registration" => registration_params}) do
     case UcxUcc.UserService.insert_user(registration_params) do
       {:ok, %{user: user}} ->
         conn
@@ -64,14 +64,14 @@ defmodule UcxUcc.Web.Coherence.RegistrationController do
     end
   end
 
-  defp redirect_or_login(conn, _user, params, 0) do
-    redirect_to(conn, :registration_create, params)
-  end
-  defp redirect_or_login(conn, user, params, _) do
-    conn
-    |> Helpers.login_user(user, params)
-    |> redirect_to(:session_create, params)
-  end
+  # defp redirect_or_login(conn, _user, params, 0) do
+  #   redirect_to(conn, :registration_create, params)
+  # end
+  # defp redirect_or_login(conn, user, params, _) do
+  #   conn
+  #   |> Helpers.login_user(user, params)
+  #   |> redirect_to(:session_create, params)
+  # end
 
   @doc """
   Show the registration page.

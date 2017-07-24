@@ -1,47 +1,88 @@
 defmodule UccUiFlexTab.FlexTabChannel do
-  import Rebel.Core
-  import Rebel.Query
+  @moduledoc """
+  Processes Rebel handlers for flex tab related events.
+
+  The UccChat.Web.UiController processes a number of Rebel events. The
+  flex tab related event handlers are delegated to this module.
+  """
+  use UccLogger
+
+  import Rebel.Core, warn: false
+  import Rebel.Query, warn: false
   import Phoenix.Socket
 
-  alias UccUiFlexTab.Flex
   alias UcxUcc.TabBar
+  alias TabBar.Ftab
 
-  require Logger
+  @type socket :: Phoenix.Socket.t
+  @type sender :: Map.t
 
+  @doc false
   def do_join(socket, _event, _payload) do
-    assign(socket, :flex, Flex.new())
+    socket
   end
 
+  @doc """
+  Hander for tab button clicks.
+
+  Handles toggling the tab window.
+  """
+  @spec flex_tab_click(socket, sender) :: socket
   def flex_tab_click(socket, sender) do
-    channel_id = exec_js!(socket, "ucxchat.channel_id")
-    socket
-    |> assign(:channel_id, channel_id)
-    |> toggle_flex(sender["dataset"]["id"], sender)
+    channel_id = get_channel_id(socket)
+    user_id = socket.assigns.user_id
+    Rebel.put_assigns socket, :channel_id, channel_id
+    tab_id = sender["dataset"]["id"]
+    tab = TabBar.get_button tab_id
+
+    Ftab.toggle socket.assigns.user_id, channel_id, sender["dataset"]["id"],
+      nil, fn
+       :open, {_, args} -> apply(tab.module, :open, [socket, user_id, channel_id, tab, args])
+       :close, nil -> apply(tab.module, :close, [socket])
+     end
   end
 
-  def flex_tab_item_click(socket, sender) do
-    channel_id = exec_js!(socket, "ucxchat.channel_id")
-    socket
-    |> assign(:channel_id, channel_id)
-    |> open_item_flex(sender["dataset"]["id"], sender)
-  end
+  @doc """
+  Redirect rebel calls to the configured module and function.
 
+  This function is called for rebel-handler="flex_call". The element
+  must have a data-id="tab_name" and a data-fun="function_name".
+
+  This results in the function `function_name` called on the module
+  defined in the button definition.
+  """
+  @spec flex_call(socket, sender) :: socket
   def flex_call(socket, sender) do
     tab = TabBar.get_button(sender["dataset"]["id"])
     fun = sender["dataset"]["fun"] |> String.to_atom()
     apply tab.module, fun, [socket, sender]
   end
 
-  defp toggle_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, sender) do
-    Flex.toggle(fl, socket, assigns[:channel_id], tab, sender)
+  @doc """
+  Callback when a new room is opened.
+
+  Checks to see if a was previously open for the room. If so, the
+  tab is reopened.
+  """
+  @spec room_join(String.t, Map.t, socket) :: socket
+  def room_join(event, payload, socket) do
+    trace event, payload
+    user_id = socket.assigns.user_id
+    channel_id = payload[:channel_id]
+    socket = Phoenix.Socket.assign(socket, :channel_id, channel_id)
+    Rebel.put_assigns socket, :channel_id, channel_id
+
+    Ftab.reload(user_id, channel_id, fn
+      :open, {name, args} ->
+        tab = TabBar.get_button name
+        apply tab.module, :open, [socket, user_id, channel_id, tab, args]
+      :ok, nil ->
+        socket
+    end)
   end
 
-  defp open_item_flex(%{assigns: %{flex: fl} = assigns} = socket, tab, sender) do
-    dataset = sender["dataset"]
-    button = TabBar.get_button dataset["id"]
-    key = dataset["key"]
-    panel = %{"templ" => button.template, key => dataset[key]}
-    Flex.open(fl, socket, assigns[:channel_id], tab, panel, sender)
+  defp get_channel_id(socket) do
+    exec_js!(socket, "ucxchat.channel_id")
   end
 
 end

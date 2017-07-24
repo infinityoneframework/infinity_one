@@ -3,8 +3,8 @@ defmodule UcxUcc.UserService do
   # alias UcxChat.ServiceHelpers, as: Helpers
   alias UcxUcc.{Repo, Accounts}
   alias Accounts.{User, Account}
-  alias UccChat.Schema.Channel, as: ChannelSchema
-  alias UccChat.Subscription
+  # alias UccChat.Schema.Channel, as: ChannelSchema
+  # alias UccChat.Subscription
   alias Ecto.Multi
 
   require Logger

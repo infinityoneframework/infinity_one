@@ -1,6 +1,6 @@
 defmodule UccAdmin.AdminService do
   use UccChat.Shared, :service
-  use UccChat.Web.ChannelApi
+  use UccLogger
 
   alias UccChat.{Message, Channel, UserService, Web.FlexBarView}
   alias UccAdmin.Web.{AdminView}
@@ -12,8 +12,6 @@ defmodule UccAdmin.AdminService do
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
   alias UccChat.Schema.Channel, as: ChannelSchema
-
-  require Logger
 
   def handle_in("save:general", params, socket) do
     params =

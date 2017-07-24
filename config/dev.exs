@@ -9,7 +9,7 @@ use Mix.Config
 config :ucx_ucc, UcxUcc.Web.Endpoint,
   http: [port: 4017],
   debug_errors: true,
-  code_reloader: false,
+  code_reloader: true,
   check_origin: false,
   watchers: [node: ["node_modules/.bin/brunch", "watch", "--stdin",
                     cd: Path.expand("../assets", __DIR__)]]
@@ -37,16 +37,20 @@ config :ucx_ucc, UcxUcc.Web.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
-      ~r{lib/ucx_ucc/web/templates/.*(eex|haml)$},
+      ~r{lib/ucx_ucc/web/templates/.*(eex|haml|slim|slime)$},
       ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
-      ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml)$},
+      ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml|slim|slime)$},
     ]
   ]
+
+config :ucx_ucc, :ucc_tracer_modules, :all
+config :ucx_ucc, :ucc_tracer_level, :warn
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console,
   level: :info,
-  format: "\n$time [$level] $levelpad$message\n"
+  format: "\n$time [$level]$levelpad$metadata$message\n",
+  metadata: [:module, :function]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

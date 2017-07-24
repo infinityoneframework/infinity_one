@@ -1,6 +1,6 @@
 defmodule UccChat.EmojiService do
   use UccChat.Shared, :service
-  use UccChat.Web.ChannelApi
+  use UccLogger
 
   alias UccChat.{Emoji, Web.EmojiView, AccountService}
   alias UcxUcc.Accounts.Account

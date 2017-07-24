@@ -28,7 +28,7 @@ defmodule UccWebrtc.Web.WebrtcChannel do
   # Incoming message handlers
 
   def handle_in("client:" <> current_user, %{"type" => "offer",
-    "user_id" => user_id, "offer" => offer} = msg, socket) do
+    "user_id" => user_id, "offer" => offer}, socket) do
     Logger.debug "Sending offer to #{user_id}"
 
     offer["sdp"]
@@ -47,7 +47,7 @@ defmodule UccWebrtc.Web.WebrtcChannel do
   end
 
   def handle_in("client:" <> current_user, %{"type" => "answer",
-    "user_id" => user_id, "answer" => answer} = msg, socket) do
+    "user_id" => user_id, "answer" => answer}, socket) do
     Logger.debug "Sending answer to #{user_id}"
     # Logger.debug "answer #{name} #{inspect answer}"
     answer["sdp"]
@@ -66,7 +66,7 @@ defmodule UccWebrtc.Web.WebrtcChannel do
   end
 
   def handle_in("client:" <> _current_user, %{"type" => "leave",
-    "user_id" => user_id} = msg, socket) do
+    "user_id" => user_id}, socket) do
     Logger.debug "Disconnecting from  #{user_id}"
 
     # case State.get nm do
@@ -79,7 +79,7 @@ defmodule UccWebrtc.Web.WebrtcChannel do
     {:noreply, assign(socket, :webrtc_dest, nil)}
   end
 
-  def handle_in("client:" <> current_user, %{"type" => "candidate",
+  def handle_in("client:" <> _current_user, %{"type" => "candidate",
       "user_id" => user_id, "candidate" => candidate} = msg, socket) do
 
     Logger.debug "Sending candidate to #{user_id}: #{inspect candidate}"
@@ -105,12 +105,8 @@ defmodule UccWebrtc.Web.WebrtcChannel do
     UcxUcc.Web.Endpoint.broadcast "webrtc:" <> name, "webrtc:" <> message, data
   end
 
-  defp do_broadcast(socket, name, message, data) do
-    broadcast socket, "webrtc:" <> name, "webrtc:" <> message, data
-  end
+  # defp do_broadcast(socket, name, message, data) do
+  #   broadcast socket, "webrtc:" <> name, "webrtc:" <> message, data
+  # end
 
-  # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
-  end
 end

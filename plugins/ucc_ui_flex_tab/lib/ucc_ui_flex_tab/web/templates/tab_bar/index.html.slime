@@ -1,5 +1,3 @@
-- channel = @chatd.channel
-/ - open_tab = UccChat.UserAgent.get_ftab(@chatd.user, channel.id)
 .flex-tab-container#flex-tabs.border-component-color
   section.flex-tab.content-background-color
   .flex-tab-bar.content-background-color(role="toolbar")
@@ -8,6 +6,6 @@
         i.icon-info-circled
     = for tab <- buttons() do
       = if visible? tab, "channel" do
-        div(class="tab-button#{tab[:display]}" title="#{tab[:title]}" data-id="#{tab[:id]}" rebel-click="flex_tab_click")
-          button(aria-label="#{tab[:title]}")
-            i(class="#{tab[:icon]}")
+        div(class="tab-button" title="#{tab.title}" data-id="#{tab.id}" rebel-click="flex_tab_click")
+          button(aria-label="#{tab.title}")
+            i(class="#{tab.icon}")

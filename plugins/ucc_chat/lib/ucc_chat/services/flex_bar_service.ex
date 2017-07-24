@@ -4,7 +4,7 @@ defmodule UccChat.FlexBarService do
   import Phoenix.Socket, only: [assign: 3]
 
   alias UccChat.{Web.FlexBarView,
-    UserAgent, Direct, Channel, Notification, AccountService
+    Direct, Channel, Notification, AccountService
   }
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
@@ -14,6 +14,7 @@ defmodule UccChat.FlexBarService do
   alias UccChat.Schema.PinnedMessage, as: PinnedMessageSchema
   # alias UccChat.Schema.SharedMessage, as: SharedMesageSchema
   alias UccChat.Schema.Mention, as: MentionSchema
+  alias UcxUcc.TabBar.Agent
   # alias UccChat.ServiceHelpers, as: Helpers
 
   require Logger
@@ -21,13 +22,13 @@ defmodule UccChat.FlexBarService do
 
   def handle_in("close" = _event, msg) do
     # Logger.warn "FlexBarService.close msg: #{inspect msg}"
-    UserAgent.close_ftab(msg["user_id"], msg["channel_id"])
+    Agent.close_ftab(msg["user_id"], msg["channel_id"])
     {:ok, %{}}
   end
 
   def handle_in("get_open" = _event, msg) do
     Logger.debug "FlexBarService.get_open msg: #{inspect msg}"
-    ftab = UserAgent.get_ftab(msg["user_id"], msg["channel_id"])
+    ftab = Agent.get_ftab(msg["user_id"], msg["channel_id"])
     {:ok, %{ftab: ftab}}
   end
 
@@ -152,7 +153,7 @@ defmodule UccChat.FlexBarService do
         |> FlexBarView.render(args)
         |> Helpers.safe_to_string
 
-      UserAgent.open_ftab(msg["user_id"], channel_id, event, nil)
+      Agent.open_ftab(msg["user_id"], channel_id, event, nil)
 
       %{html: html}
     end
@@ -171,7 +172,7 @@ defmodule UccChat.FlexBarService do
 
       view = if msg["username"], do: {"username", msg["username"]}, else: nil
 
-      UserAgent.open_ftab(msg["user_id"], channel_id, event, view)
+      Agent.open_ftab(msg["user_id"], channel_id, event, view)
 
       %{html: html}
     end
@@ -189,7 +190,7 @@ defmodule UccChat.FlexBarService do
         |> FlexBarView.render(args)
         |> Helpers.safe_to_string
 
-      UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
+      Agent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
       %{html: html}
     end
@@ -206,7 +207,7 @@ defmodule UccChat.FlexBarService do
         |> FlexBarView.render(args)
         |> Helpers.safe_to_string
 
-      UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
+      Agent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
       %{html: html}
     end
@@ -223,7 +224,7 @@ defmodule UccChat.FlexBarService do
         |> FlexBarView.render(args)
         |> Helpers.safe_to_string
 
-      UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
+      Agent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
       %{html: html}
     end
@@ -238,7 +239,7 @@ defmodule UccChat.FlexBarService do
         |> FlexBarView.render(args)
         |> Helpers.safe_to_string
 
-      UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
+      Agent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
       %{html: html}
     end
@@ -254,7 +255,7 @@ defmodule UccChat.FlexBarService do
         |> FlexBarView.render(args)
         |> Helpers.safe_to_string
 
-      UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
+      Agent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
       %{html: html}
     end
@@ -267,16 +268,16 @@ defmodule UccChat.FlexBarService do
   #     html = FlexBarView.render(msg["templ"], args)
   #     |> Helpers.safe_to_string
 
-  #     UserAgent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
+  #     Agent.open_ftab(msg["user_id"], msg["channel_id"], event, nil)
 
   #     %{html: html}
   #   end
   # end
 
   def handle_open_close(event, msg, fun) do
-    case UserAgent.get_ftab(msg["user_id"], msg["channel_id"]) do
+    case Agent.get_ftab(msg["user_id"], msg["channel_id"]) do
       %{title: ^event} ->
-        UserAgent.close_ftab(msg["user_id"], msg["channel_id"])
+        Agent.close_ftab(msg["user_id"], msg["channel_id"])
         {:ok, %{close: true}}
       _ ->
         {:ok, Map.put(fun.(msg), :open, true)}

@@ -27,8 +27,27 @@ defmodule UcxUcc.Mixfile do
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["plugins", "plugins/lib", "lib", "test/support"]
-  defp elixirc_paths(_),     do: ["plugins", "plugins/lib", "lib"]
+  defp elixirc_paths(:test) do
+    paths =
+      plugins()
+      |> Enum.map(&Path.join(["plugins", &1, "test", "support"]))
+      |> List.flatten
+
+    elixirc_paths(nil) ++ ["test/support" | paths]
+  end
+  defp elixirc_paths(_) do
+    paths =
+      plugins()
+      |> Enum.map(&Path.join(["plugins", &1, "lib"]))
+      |> List.flatten()
+    paths ++ ["lib"]
+  end
+
+  defp plugins do
+    "plugins"
+    |> File.ls!()
+    |> Enum.filter(&File.dir?(Path.join("plugins", &1)))
+  end
 
   # Specifies your project dependencies.
   #
@@ -85,6 +104,7 @@ defmodule UcxUcc.Mixfile do
     ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
+     # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
      "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
   end
 end

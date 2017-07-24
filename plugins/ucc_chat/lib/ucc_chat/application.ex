@@ -1,24 +1,22 @@
-# defmodule UccChat.Application do
-#   use Application
+defmodule UccChat.Application do
 
-#   # See http://elixir-lang.org/docs/stable/elixir/Application.html
-#   # for more information on OTP Applications
-#   def start(_type, _args) do
-#     import Supervisor.Spec
+  def children do
+    import Supervisor.Spec
 
-#     # Define workers and child supervisors to be supervised
-#     children = [
-#       # Start the Ecto repository
-#       supervisor(UccChat.Repo, []),
-#       # Start the endpoint when the application starts
-#       supervisor(UccChat.Web.Endpoint, []),
-#       # Start your own worker by calling: UccChat.Worker.start_link(arg1, arg2, arg3)
-#       # worker(UccChat.Worker, [arg1, arg2, arg3]),
-#     ]
+    [
+      # supervisor(UccChat.Presence, []),
+      worker(UccChat.TypingAgent, []),
+      worker(UccChat.MessageAgent, []),
+      # worker(UccChat.UserAgent, []),
+      worker(UccChat.PresenceAgent, []),
+      # worker(UccChat.Robot.Adapters.UccChat, []),
+      worker(UccChat.Robot, []),
+      worker(UccChat.ChannelMonitor, [:chan_system]),
+    ]
+  end
 
-#     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-#     # for other strategies and supported options
-#     opts = [strategy: :one_for_one, name: UccChat.Supervisor]
-#     Supervisor.start_link(children, opts)
-#   end
-# end
+  def start(_type, _args) do
+    UccChat.Web.FlexBar.Defaults.add_buttons()
+  end
+
+end

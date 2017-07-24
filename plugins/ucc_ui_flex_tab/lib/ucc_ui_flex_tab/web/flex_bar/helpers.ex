@@ -1,4 +1,8 @@
-defmodule UcxUcc.Web.FlexBar.Helpers do
+defmodule UccUiFlexTab.Web.FlexBar.Helpers do
+  @moduledoc """
+
+
+  """
   defmacro __using__(_) do
     quote do
       use UcxUcc.Web.Gettext
@@ -8,16 +12,19 @@ defmodule UcxUcc.Web.FlexBar.Helpers do
       import Rebel.Core
 
       alias UcxUcc.TabBar
+      alias TabBar.Ftab
 
-      def open(socket, _ch, tab, panel, params) do
-        user_id = socket.assigns[:user_id]
-        channel_id = socket.assigns[:channel_id]
-        case tab[:template] do
-          nil -> %{}
+      require Logger
+
+      def open(socket, user_id, channel_id, tab, args) do
+        case tab.template do
+          "" -> socket
           templ ->
-            args = args user_id, channel_id, panel, params
+            {args, socket} = args socket, user_id, channel_id, nil, %{}
+            # IO.inspect args, label: "... args"
             html = Phoenix.View.render_to_string(tab.view, templ, args)
 
+            # Logger.warn "html: #{html}"
             js = [
               "$('section.flex-tab').parent().addClass('opened')",
               "$('.tab-button.active').removeClass('active')",
@@ -27,11 +34,12 @@ defmodule UcxUcc.Web.FlexBar.Helpers do
             socket
             |> update(:html, set: html, on: "section.flex-tab")
             |> exec_js(js)
+
+            socket
         end
-        socket
       end
 
-      def close(socket, _ch, _tab, _panel, _params) do
+      def close(socket) do
         exec_js(socket, """
           $('section.flex-tab').parent().removeClass('opened')
           $('.tab-button.active').removeClass('active')
@@ -39,16 +47,16 @@ defmodule UcxUcc.Web.FlexBar.Helpers do
         socket
       end
 
-      def args(_, _, _, _), do: []
+      def args(socket, _, _, _, _), do: {[], socket}
 
-      defoverridable [open: 5, close: 5, args: 4]
+      defoverridable [open: 5, close: 1, args: 5]
     end
   end
 
   import Rebel.Core
 
   def set_tab_button_active_js(id) do
-    get_tab_button_js(id) <> ".hasClass('active')"
+    get_tab_button_js(id) <> ".addClass('active')"
   end
 
   def get_tab_button_js(id) do

@@ -4,23 +4,24 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
   alias UccChat.Channel
   alias UccChat.Web.FlexBarView
   alias UccChat.Accounts
+  alias TabBar.Ftab
+  alias TabBar.Tab
 
   require Logger
 
   def add_buttons do
-    TabBar.add_button %{
-      module: __MODULE__,
-      groups: ~w[channel group im],
-      id: "members-list",
-      title: ~g"Members List",
-      icon: "icon-users",
-      view: View,
-      template: "users_list.html",
-      order: 40
-    }
+    TabBar.add_button Tab.new(
+      __MODULE__,
+      ~w[channel group im],
+      "members-list",
+      ~g"Members List",
+      "icon-users",
+      View,
+      "users_list.html",
+      40)
   end
 
-  def args(user_id, channel_id, _, opts) do
+  def args(socket, user_id, channel_id, _, opts) do
     current_user = Helpers.get_user!(user_id)
     channel = Channel.get!(channel_id, preload: [users: :roles])
 
@@ -41,18 +42,35 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
       |> user_info(user_mode: user_mode, view_mode: true)
       |> Map.put(:total_count, total_count)
 
-    [users: users, user: user, user_info: user_info,
-     channel_id: channel_id, current_user: current_user]
+    {[users: users, user: user, user_info: user_info,
+     channel_id: channel_id, current_user: current_user], socket}
   end
 
-  def user_args(user_id, channel_id, username) do
+  def user_args(socket, user_id, channel_id, username) do
     channel = Channel.get!(channel_id, preload: [users: :roles])
-    [
+    {[
       user: Helpers.get_user_by_name(username, preload: [:roles]),
       user_info: user_info(channel, user_mode: true, view_mode: true),
       channel_id: channel_id,
       current_user: Helpers.get_user!(user_id)
-    ]
+    ], socket}
+  end
+
+  def open(socket, user_id, channel_id, tab, nil) do
+    super(socket, user_id, channel_id, tab, nil)
+  end
+
+  def open(socket, user_id, channel_id, tab, args) do
+    Logger.warn "args: #{inspect args}"
+    username = args["username"]
+
+    {args, socket} = user_args(socket, user_id, channel_id, username)
+
+    html = Phoenix.View.render_to_string View, "user_card.html", args
+
+    socket
+    |> super(user_id, channel_id, tab, nil)
+    |> update(:html, set: html, on: "#flex-user-card-details")
   end
 
   def flex_show_all(socket, sender) do
@@ -93,15 +111,15 @@ defmodule UccChat.Web.FlexBar.Tab.MembersList do
 
   def flex_user_open(socket, sender) do
     user_id = socket.assigns[:user_id]
-    channel_id = socket.assigns[:channel_id]
+    channel_id = Rebel.get_assigns(socket, :channel_id)
+    username = sender["dataset"]["username"]
 
-    html = Phoenix.View.render_to_string View, "user_card.html",
-      user_args(user_id, channel_id, sender["dataset"]["username"])
+    tab = TabBar.get_button "members-list"
 
-    socket
-    |> update(:html, set: html, on: "#flex-user-card-details")
-
-    socket
+    Ftab.open user_id, channel_id, "members-list", %{"username" => username},
+      fn :open, {_, args} ->
+        apply tab.module, :open, [socket, user_id, channel_id, tab, args]
+      end
   end
 
   def view_all(socket, _sender) do

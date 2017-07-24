@@ -1,6 +1,7 @@
 defmodule UccChat.Web.SystemChannel do
   use Phoenix.Channel
-  use UccChat.Web.ChannelApi
+  use UccLogger
+
   alias UcxUcc.Web.Presence
   alias UccChat.Web.UserChannel
   alias UccChat.ServiceHelpers, as: Helpers
@@ -18,12 +19,10 @@ defmodule UccChat.Web.SystemChannel do
   # alias UccChat.ServiceHelpers, as: Helpers
   require UccChat.ChatConstants, as: CC
 
-  require Logger
-
   intercept ["presence_diff"]
 
   def join(ev = CC.chan_system(), params, socket) do
-    debug(ev, params)
+    trace(ev, params)
     send(self(), :after_join)
 
     :ok = UccChat.ChannelMonitor.monitor(:chan_system, self(),
@@ -33,13 +32,12 @@ defmodule UccChat.Web.SystemChannel do
   end
 
   def leave(pid, user_id) do
-    Logger.warn "user_id: #{inspect user_id} left the channel"
     UcxUcc.Web.Presence.untrack(pid, CC.chan_system(), user_id)
     UccChat.PresenceAgent.unload(user_id)
   end
 
   def handle_out(ev = "presence_diff", params, socket) do
-    debug(ev, params)
+    trace(ev, params)
     # Logger.warn "presence_diff params: #{inspect params}, assigns: #{inspect socket.assigns}"
     push socket, ev, params
     {:noreply, socket}
@@ -49,7 +47,7 @@ defmodule UccChat.Web.SystemChannel do
   # handle_in
 
   def handle_in(ev = "status:set:" <> status, params, socket) do
-    debug ev, params
+    trace ev, params
     # Logger.warn "status:set socket: #{inspect socket}"
     UccChat.PresenceAgent.put(socket.assigns.user_id, status)
     update_status socket, status
@@ -57,13 +55,13 @@ defmodule UccChat.Web.SystemChannel do
     {:noreply, socket}
   end
   def handle_in(ev = "state:blur", params, socket) do
-    debug ev, params
+    trace ev, params
     # TODO: move this blur timer to a configuration item
     ref = Process.send_after self(), :blur_timeout, @blur_timer
     {:noreply, assign(socket, :blur_ref, ref)}
   end
   def handle_in(ev = "state:focus", params, socket) do
-    debug ev, params
+    trace ev, params
     # TODO: move this blur timer to a configuration item
     socket =
       case socket.assigns[:blur_ref] do
@@ -82,7 +80,7 @@ defmodule UccChat.Web.SystemChannel do
 
   # default unknown handler
   def handle_in(event, params, socket) do
-    Logger.warn "SystemChannel.handle_in unknown event: #{inspect event}, " <>
+    Logger.error "SystemChannel.handle_in unknown event: #{inspect event}, " <>
       "params: #{inspect params}, assigns: #{inspect socket.assigns}"
     {:noreply, socket}
   end

@@ -2,25 +2,31 @@ defmodule UccChat.Web.FlexBar.Tab.FilesList do
   use UccChat.Web.FlexBar.Helpers
 
   alias UccChat.Attachment
+  alias UcxUcc.TabBar.Tab
 
+  # def new(module, groups, id, title, icon, view, template, order) do
+  @type socket :: Phoenix.Socket.t
+  @type id :: String.t
+
+  @spec add_buttons() :: any
   def add_buttons do
-    TabBar.add_button %{
-      module: __MODULE__,
-      groups: ~w[channel group direct im],
-      id: "uploaded-files-list",
-      title: ~g"Room uploaded file list",
-      icon: "icon-attach",
-      view: View,
-      template: "files_list.html",
-      order: 60
-    }
+    TabBar.add_button Tab.new(
+      __MODULE__,
+      ~w[channel group direct im],
+      "uploaded-files-list",
+      ~g"Room uploaded file list",
+      "icon-attach",
+      View,
+      "files_list.html",
+      60)
   end
 
-  def args(user_id, channel_id, _, _) do
-    [
+  @spec args(socket, id, id, any, any) :: {List.t, socket}
+  def args(socket, user_id, channel_id, _, _) do
+    {[
       current_user: Helpers.get_user!(user_id),
       attachments: Attachment.get_attachments_by_channel_id(channel_id)
-    ]
+    ], socket}
   end
 end
 
