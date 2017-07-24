@@ -63,8 +63,8 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:phoenix_haml, "~> 0.2"},
-      # {:unbrella, github: "smpallen99/unbrella"},
-      {:unbrella, path: "../unbrella"},
+      {:unbrella, github: "smpallen99/unbrella"},
+      # {:unbrella, path: "../unbrella"},
       {:coherence, github: "smpallen99/coherence", branch: "phx-1.3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.6.0"},
@@ -89,7 +89,7 @@ defmodule UcxUcc.Mixfile do
       {:inflex, "~> 1.7"},
       {:arc_ecto, "~> 0.6.0"},
       {:postgrex, ">= 0.0.0", only: :test},
-      {:rebel, path: "../rebel"},
+      {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
