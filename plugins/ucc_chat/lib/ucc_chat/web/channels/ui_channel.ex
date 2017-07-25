@@ -94,30 +94,35 @@ defmodule UccChat.Web.UiChannel do
     |> broadcast_open_info_flex_box(user_id, channel_id)
 
     # broadcast info box on user channel
-    socket
-    |> update_rooms_list(user_id, channel_id)
-    |> update_message_box(user_id, channel_id)
-    |> update_messages_header(true)
+    # socket
+    # |> update_rooms_list(user_id, channel_id)
+    # |> update_message_box(user_id, channel_id)
+    # |> update_messages_header(true)
   end
 
   defp do_room_update(socket, {:name, }, user_id, channel_id) do
     # broadcast message header on room channel
     # broadcast room entry on user channel
+    socket
   end
   defp do_room_update(socket, {:topic, }, user_id, channel_id) do
     # breoadcast message header on room channel
+    socket
   end
   defp do_room_update(socket, {:type, }, user_id, channel_id) do
     # breoadcast message header on room channel
     # broadcast room entry on user channel
     # broadcast message box on room channel
+    socket
   end
   defp do_room_update(socket, {:read_only, }, user_id, channel_id) do
     # broadcast message box on room channel
+    socket
   end
   defp do_room_update(socket, {:archived, }, user_id, channel_id) do
     # broadcast room entry on user channel
     # broadcast message box on room channel
+    socket
   end
   defp do_room_update(socket, _field, _user_id, _channel_id) do
     socket
@@ -125,7 +130,7 @@ defmodule UccChat.Web.UiChannel do
 
   defp broadcast_open_info_flex_box(socket, user_id, channel_id) do
     # on user channel
-
+    socket
   end
 
   defp update_rooms_list(socket, user_id, channel_id) do
