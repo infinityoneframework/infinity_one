@@ -609,43 +609,5 @@ defmodule UccChat.Web.UserChannel do
       push socket, "update:alerts", %{}
     end
   end
-  def new_subscription(_event, payload, socket) do
-    channel_id = payload.channel_id
-    user_id = socket.assigns.user_id
-
-    socket
-    |> update_rooms_list(user_id, channel_id)
-    |> update_messages_header(true)
-  end
-
-  def delete_subscription(_event, payload, socket) do
-    channel_id = payload.channel_id
-    user_id = socket.assigns.user_id
-    socket
-    |> update_rooms_list(user_id, channel_id)
-    |> update_message_box(user_id, channel_id)
-    |> update_messages_header(false)
-  end
-
-  defp update_rooms_list(socket, user_id, channel_id) do
-    Rebel.Query.update socket, :html,
-      set: SideNavService.render_rooms_list(channel_id, user_id),
-      on: "aside.side-nav .rooms-list"
-    socket
-  end
-
-  defp update_message_box(socket, user_id, channel_id) do
-    Rebel.Query.update socket, :html,
-      set: MessageService.render_message_box(channel_id, user_id),
-      on: ".room-container footer.footer"
-    socket
-  end
-
-  defp update_messages_header(socket, show) do
-    html = Phoenix.View.render_to_string MasterView, "favorite_icon.html",
-      show: show, favorite: false
-    Rebel.Core.async_js socket, ~s/$('section.messages-container .toggle-favorite').replaceWith('#{html}')/
-    socket
-  end
 
 end

@@ -1,6 +1,17 @@
-input.content-background-color.editing(type="text" name="#{@field[:name]}" value="#{@field[:value]}")
-.buttons.secondary-background-color
-  button.button.cancel(type="button")
-    i.icon-cancel
-  button.button.primary.save(type="button")
-    i.icon-ok.success-color
+li(class="#{@field[:ltype] || @field[:type]}")
+  = label @f, @field[:name], @field[:label]
+  .setting-block
+    = if @editing == @field[:name] do
+      = text_input @f, @field[:name], class: "content-background-color editing"
+      .buttons.secondary-background-color
+        button.button.cancel(type="button" rebel-click="flex_form_cancel")
+          i.icon-cancel
+        button.button.save(type="button" rebel-click="flex_form_save")
+          i.icon-ok.success-color
+    - else
+      span(data-edit="#{@field[:name]}" rebel-click="flex_form")
+        span.current-setting(data-edit="#{@field[:name]}")= @field[:value]
+        button.button.edit(type="button")
+          i.icon-pencil(data-edit="#{@field[:name]}")
+
+

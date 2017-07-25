@@ -1,0 +1,6 @@
+li.boolean
+  label= @field[:label]
+  .setting-block
+    .input.checkbox.toggle(rebel-click="flex_form_toggle" data-id="channel_#{@field[:name]}")
+      = toggle_tag @f, "channel", @field, "rebel-change": "flex_form_checkbox_change"
+      label(for="#{@field[:name]}")

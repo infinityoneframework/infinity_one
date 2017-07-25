@@ -16,6 +16,25 @@ defmodule UccUiFlexTab.Web.FlexBar.Helpers do
 
       require Logger
 
+      @type socket :: Phoenix.Socket.t
+      @type id     :: String.t
+      @type tab    :: UcxUcc.TabBar.Tab.t
+      @type args   :: Map.t | nil
+
+      @doc """
+      Open a tab window.
+
+      Fetches the args (override-able), renders the template and updates
+      the browser with some javascript.
+
+      Override to add custom behaviour, like:
+
+          def open(socket, user_id, channel_id, tab, args) do
+            # Some custom code
+            super(socket, user_id, channel_id, tab, args)
+          end
+      """
+      @spec open(socket, id, id, tab, args) :: socket
       def open(socket, user_id, channel_id, tab, args) do
         case tab.template do
           "" -> socket
@@ -39,6 +58,20 @@ defmodule UccUiFlexTab.Web.FlexBar.Helpers do
         end
       end
 
+      @doc """
+      Close a tab.
+
+      Default behaviour is to just close hide the window with javascript.
+      You can override to customize the behaviour. Don't forget to call
+
+          def close(socket) do
+            # Custom code ...
+            super(socket)
+          end
+
+      at the end of your override.
+      """
+      @spec close(socket) :: socket
       def close(socket) do
         exec_js(socket, """
           $('section.flex-tab').parent().removeClass('opened')
@@ -47,9 +80,23 @@ defmodule UccUiFlexTab.Web.FlexBar.Helpers do
         socket
       end
 
+      @doc """
+      Get the args for an open.
+
+      Override to implement.
+      """
+      @spec args(socket, id, id, any, map | nil) :: {Keyword.t, socket}
       def args(socket, _, _, _, _), do: {[], socket}
 
-      defoverridable [open: 5, close: 1, args: 5]
+      @doc """
+      Callback when a form has been successfully updated
+
+      Override to implement the callback.
+      """
+      @spec notify_update_success(socket, tab, map, map) :: socket
+      def notify_update_success(socket, tab, _sender, _opts), do: socket
+
+      defoverridable [open: 5, close: 1, args: 5, notify_update_success: 4]
     end
   end
 

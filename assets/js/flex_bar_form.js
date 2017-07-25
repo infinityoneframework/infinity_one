@@ -23,6 +23,7 @@ $(document).ready(function() {
       return true
     }
   })
+  return;
   $('body').on('click', 'li.text .setting-block span.current-setting', function(e) {
     if ($(this).data('edit')) {
       cc.get('/room_settings/' + $(this).attr('data-edit'), {model: "settings"})

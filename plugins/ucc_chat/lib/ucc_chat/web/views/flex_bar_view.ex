@@ -36,51 +36,61 @@ defmodule UccChat.Web.FlexBarView do
     end
   end
 
-  def flex_form_line(field) do
-    content_tag :li, class: field[:type] do
-      [
-        content_tag :label do
-          field[:label]
-        end,
-        content_tag :div, class: "setting-block" do
-          flex_form_input field[:type], field
-        end
-      ]
+  def flex_form_line(f, field, editing, type \\ nil)
+  def flex_form_line(f, field, editing, 2) do
+    if field[:name] == :topic do
+      flex_form_line f, field, editing
     end
   end
-
-  def flex_form_input(:boolean, field) do
-    content_tag :div, class: "input checkbox toggle" do
-      [
-        with opts <- [class: field[:name], type: :checkbox, name: field[:name], id: field[:name]],
-             opts <- if(field[:read_only], do: [{:disabled, true}|opts], else: opts),
-             opts <- if(field[:value], do: [{:checked, true}|opts], else: opts) do
-          content_tag :input, opts do
-          end
-        end,
-        content_tag :label, for: field[:name] do
-        end
-      ]
-    end
+  def flex_form_line(f, %{type: type} = field, editing, _) do
+    render "channel_form_#{type}_input.html", field: field, f: f, editing: editing
   end
 
-  def flex_form_input(:text, %{read_only: true} = field) do
-    content_tag :span, class: "current-setting", "data-edit": "false" do
-      field[:value]
-    end
-  end
+  # def flex_form_line(field) do
+  #   content_tag :li, class: field[:type] do
+  #     [
+  #       content_tag :label do
+  #         field[:label]
+  #       end,
+  #       content_tag :div, class: "setting-block" do
+  #         flex_form_input field[:type], field
+  #       end
+  #     ]
+  #   end
+  # end
 
-  def flex_form_input(:text, field) do
-    [
-      content_tag :span, class: "current-setting", "data-edit": field[:name] do
-        field[:value]
-      end,
-      content_tag :button, class: "button edit", type: "button" do
-        content_tag :i, class: "icon-pencil", "data-edit": field[:name] do
-        end
-      end
-    ]
-  end
+  # def flex_form_input(:boolean, field) do
+  #   content_tag :div, class: "input checkbox toggle" do
+  #     [
+  #       with opts <- [class: field[:name], type: :checkbox, name: field[:name], id: field[:name]],
+  #            opts <- if(field[:read_only], do: [{:disabled, true}|opts], else: opts),
+  #            opts <- if(field[:value], do: [{:checked, true}|opts], else: opts) do
+  #         content_tag :input, opts do
+  #         end
+  #       end,
+  #       content_tag :label, for: field[:name] do
+  #       end
+  #     ]
+  #   end
+  # end
+
+  # def flex_form_input(:text, %{read_only: true} = field) do
+  #   content_tag :span, class: "current-setting", "data-edit": "false" do
+  #     field[:value]
+  #   end
+  # end
+
+  # def flex_form_input(:text, field) do
+  #   [
+  #     content_tag :span, class: "current-setting", "data-edit": field[:name] do
+  #       field[:value]
+  #     end,
+  #     content_tag :button, class: "button edit", type: "button" do
+  #       content_tag :i, class: "icon-pencil", "data-edit": field[:name] do
+  #       end
+  #     end
+  #   ]
+  # end
 
   def get_user_card_class(%{admin: true}) do
     "user-view"
@@ -107,6 +117,14 @@ defmodule UccChat.Web.FlexBarView do
         text
       ]
     end
+  end
+
+  def toggle_tag(f, model, field, opts \\ []) do
+    checked = Map.get f.data, field[:name]
+    :input
+    |> content_tag("", [class: "#{field[:name]}", id: "#{model}_#{field[:name]}",
+      type: "checkbox", name: "#{model}[#{field[:name]}]", checked: checked] ++ opts)
+    |> Phoenix.HTML.raw
   end
 
   def notification_radio_button(fp, field, options) do

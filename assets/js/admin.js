@@ -88,16 +88,16 @@ class Admin {
         let page = $(this).closest('section').data('page')
         $('a.admin-link[data-link="' + page + '"]').click()
       })
-      .on('click', '.list-view.channel-settings span[data-edit]', (e) => {
+      .on('click', 'section.admin .list-view.channel-settings span[data-edit]', (e) => {
         let channel_id = $(e.currentTarget).closest('[data-id]').data('id')
         this.userchan_push('edit', {channel_id: channel_id, field: $(e.currentTarget).data('edit')})
       })
-      .on('click', '.channel-settings button.save', e => {
+      .on('click', 'section.admin .channel-settings button.save', e => {
         let channel_id = $(e.currentTarget).closest('[data-id]').data('id')
         let params = $('.channel-settings form').serializeArray()
         this.userchan_push('save', {channel_id: channel_id, params: params})
       })
-      .on('click', '.channel-settings button.cancel', e => {
+      .on('click', 'section.admin .channel-settings button.cancel', e => {
         let channel_id = $(e.currentTarget).closest('[data-id]').data('id')
         this.userchan_push('cancel', {channel_id: channel_id})
       })
@@ -115,7 +115,7 @@ class Admin {
           $(e.currentTarget).text('Hide Pswd').addClass('hide')
         }
       })
-      .on('click', 'form.user button.save', e => {
+      .on('click', 'section.admin form.user button.save', e => {
         userchan.push('admin:save:user', $('form.user').serializeArray())
           .receive("ok", resp => {
             if (resp.success) {
@@ -135,7 +135,7 @@ class Admin {
             }
           })
       })
-      .on('click', 'form.user button.cancel', e => {
+      .on('click', 'section.admin form.user button.cancel', e => {
         this.close_edit_form($('form.user').data('username'))
       })
   }

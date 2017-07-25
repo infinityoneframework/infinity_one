@@ -84,4 +84,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
     exec_js!(socket, "ucxchat.channel_id")
   end
 
+  def room_update(event, payload, socket) do
+
+  end
 end
