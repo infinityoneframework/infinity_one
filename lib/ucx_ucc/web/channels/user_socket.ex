@@ -13,7 +13,7 @@ defmodule UcxUcc.Web.UserSocket do
   channel CC.chan_user <> "*", UccChat.Web.UserChannel  # "user:"
   channel CC.chan_system <> "*", UccChat.Web.SystemChannel  # "system:"
   channel CC.chan_webrtc <> "*", UccWebrtc.Web.WebrtcChannel
-  channel "ui:*", UccChat.Web.UiChannel
+  # channel "ui:*", UccChat.Web.UiChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -30,7 +30,7 @@ defmodule UcxUcc.Web.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(%{"token" => token, "tz_offset" => tz_offset}, socket) do
+  def connect(%{"token" => token, "tz_offset" => tz_offset} = payload, socket) do
     # Logger.warn "socket connect params: #{inspect params}, socket: #{inspect socket}"
     case Coherence.verify_user_token(socket, token, &assign/3) do
       {:error, _} -> :error
@@ -39,13 +39,16 @@ defmodule UcxUcc.Web.UserSocket do
           nil ->
             :error
           {user_id, username} ->
-            {
-              :ok,
+            socket =
               socket
               |> assign(:user_id, user_id)
               |> assign(:username, username)
               |> assign(:tz_offset, tz_offset)
-            }
+            if payload["__rebel_return"] do
+              super payload, socket
+            else
+              {:ok, socket}
+            end
         end
     end
   end

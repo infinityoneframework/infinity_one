@@ -2,33 +2,54 @@ defmodule UccChat.Web.UserChannel do
   use UccLogger
   use UccChat.Web, :channel
   use UcxUcc
-  # use Rebel.Channel, name: "user", controllers: [
-  #   UccChat.Web.ChannelController,
-  # ]
-  alias UcxUcc.UccPubSub
+  use UcxUcc.UccPubSub
+  use Rebel.Channel, name: "user", controllers: [
+    UccChat.Web.ChannelController,
+  ], intercepts: [
+    "room:join",
+    "room:leave",
+    "room:mention",
+    "user:state",
+    "direct:new",
+    "get:subscribed"
+  ]
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
   import Rebel.Browser, warn: false
-  # alias UccChat.Presence
-
-  import Ecto.Query
+  import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.{Account, User}
+  alias UccAdmin.AdminService
+  alias UcxUcc.Web.Endpoint
+  alias UccChat.ServiceHelpers, as: Helpers
+  alias UccChat.Schema.Subscription, as: SubscriptionSchema
+  alias UccUiFlexTab.FlexTabChannel
+  alias UccChat.Web.FlexBar.Form
   alias UccChat.{
     Subscription, ChannelService, Channel,
     SideNavService, Web.AccountView, Web.UserSocket, Web.MasterView,
     ChannelService, SubscriptionService, InvitationService,
     UserService, EmojiService, Settings, MessageService
   }
-  alias UccAdmin.AdminService
-  alias UcxUcc.Web.Endpoint
-  alias UccChat.ServiceHelpers, as: Helpers
-  alias UccChat.Schema.Subscription, as: SubscriptionSchema
 
   require UccChat.ChatConstants, as: CC
+
+  onconnect :on_connect
+  onload :page_loaded
+
+  def on_connect(socket) do
+    Logger.error "on_connect, assigns: #{inspect socket.assigns}"
+    exec_js socket, "window.start_channels()"
+    socket
+  end
+
+  def page_loaded(socket) do
+    Logger.error "page_loaded, assigns: #{inspect socket.assigns}"
+    socket
+  end
 
   def join_room(user_id, room) do
     # Logger.debug ("...join_room user_id: #{inspect user_id}")
@@ -59,10 +80,15 @@ defmodule UccChat.Web.UserChannel do
     "get:subscribed"
   ]
 
-  def join(CC.chan_user() <>  user_id, params, socket) do
-    trace(CC.chan_user() <> user_id, params)
-    send(self(), {:after_join, params})
-    {:ok, socket}
+  def join(CC.chan_user() <>  user_id = event, payload, socket) do
+    trace(event, payload)
+    send(self(), {:after_join, payload})
+    super event, payload, FlexTabChannel.do_join(socket, event, payload)
+  end
+
+  def join(other, params, socket) do
+    Logger.error "another join #{other}"
+    super other, params, socket
   end
 
   ###############
@@ -387,6 +413,16 @@ defmodule UccChat.Web.UserChannel do
       |> Enum.map(&(&1.channel.name))
       |> subscribe(socket)
 
+    subscribe_callback "user:" <> user_id, "room:join",
+      {FlexTabChannel, :room_join}
+    subscribe_callback "user:" <> user_id, "new:subscription",
+      :new_subscription
+    subscribe_callback "user:" <> user_id, "delete:subscription",
+      :delete_subscription
+    subscribe_callback "user:" <> user_id, "room:update",
+      :room_update
+
+
     {:noreply, socket}
   end
 
@@ -533,6 +569,8 @@ defmodule UccChat.Web.UserChannel do
     {:noreply, socket}
   end
 
+  handle_callback("user:" <>  _user_id)
+
   ###############
   # Helpers
 
@@ -609,5 +647,131 @@ defmodule UccChat.Web.UserChannel do
       push socket, "update:alerts", %{}
     end
   end
+
+  def start_video_call(socket, sender) do
+    current_user_id = socket.assigns.user_id
+    user_id = sender["dataset"]["id"]
+    Logger.warn "start video curr_id: #{current_user_id}, user_id: #{user_id}"
+    socket
+  end
+
+  def start_audio_call(socket, sender) do
+    current_user_id = socket.assigns.user_id
+    user_id = sender["dataset"]["id"]
+    Logger.warn "start audio curr_id: #{current_user_id}, user_id: #{user_id}"
+    socket
+  end
+
+  def add_private(socket, sender) do
+    trace "add_private", sender
+    username = exec_js! socket, ~s{$('#{this(sender)}').parent().data('username')}
+    redirect_to socket, "/direct/#{username}"
+  end
+
+
+  def new_subscription(_event, payload, socket) do
+    channel_id = payload.channel_id
+    user_id = socket.assigns.user_id
+
+    socket
+    |> update_rooms_list(user_id, channel_id)
+    |> update_messages_header(true)
+  end
+
+  def delete_subscription(_event, payload, socket) do
+    channel_id = payload.channel_id
+    user_id = socket.assigns.user_id
+    socket
+    |> update_rooms_list(user_id, channel_id)
+    |> update_message_box(user_id, channel_id)
+    |> update_messages_header(false)
+  end
+
+  def room_update(_event, payload, socket) do
+    trace "room_update", payload
+    channel_id = payload.channel_id
+    user_id = socket.assigns.user_id
+    socket
+    |> do_room_update(payload[:field], user_id, channel_id)
+    |> broadcast_open_info_flex_box(user_id, channel_id)
+
+    # broadcast info box on user channel
+    # socket
+    # |> update_rooms_list(user_id, channel_id)
+    # |> update_message_box(user_id, channel_id)
+    # |> update_messages_header(true)
+  end
+
+  defp do_room_update(socket, {:name, }, user_id, channel_id) do
+    # broadcast message header on room channel
+    # broadcast room entry on user channel
+    socket
+  end
+  defp do_room_update(socket, {:topic, }, user_id, channel_id) do
+    # breoadcast message header on room channel
+    socket
+  end
+  defp do_room_update(socket, {:type, }, user_id, channel_id) do
+    # breoadcast message header on room channel
+    # broadcast room entry on user channel
+    # broadcast message box on room channel
+    socket
+  end
+  defp do_room_update(socket, {:read_only, }, user_id, channel_id) do
+    # broadcast message box on room channel
+    socket
+  end
+  defp do_room_update(socket, {:archived, }, user_id, channel_id) do
+    # broadcast room entry on user channel
+    # broadcast message box on room channel
+    socket
+  end
+  defp do_room_update(socket, _field, _user_id, _channel_id) do
+    socket
+  end
+
+  defp broadcast_open_info_flex_box(socket, user_id, channel_id) do
+    # on user channel
+    socket
+  end
+
+  defp update_rooms_list(socket, user_id, channel_id) do
+    update socket, :html,
+      set: SideNavService.render_rooms_list(channel_id, user_id),
+      on: "aside.side-nav .rooms-list"
+    socket
+  end
+
+  defp broadcast_rooms_list(socket, user_id, channel_id) do
+    socket
+  end
+
+  defp update_message_box(socket, user_id, channel_id) do
+    update socket, :html,
+      set: MessageService.render_message_box(channel_id, user_id),
+      on: ".room-container footer.footer"
+    socket
+  end
+
+  defp update_messages_header(socket, show) do
+    html = Phoenix.View.render_to_string MasterView, "favorite_icon.html",
+      show: show, favorite: false
+    async_js socket,
+      ~s/$('section.messages-container .toggle-favorite').replaceWith('#{html}')/
+    socket
+  end
+
+  defdelegate flex_tab_click(socket, sender),
+    to: FlexTabChannel
+  defdelegate flex_call(socket, sender),
+    to: FlexTabChannel
+  defdelegate flex_form(socket, sender),
+    to: Form
+  defdelegate flex_form_save(socket, sender),
+    to: Form
+  defdelegate flex_form_cancel(socket, sender),
+    to: Form
+  defdelegate flex_form_toggle(socket, sender),
+    to: Form
 
 end

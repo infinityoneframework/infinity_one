@@ -39,6 +39,12 @@ const debug = false;
 
 let socket = new Socket("/socket", {params: {token: window.user_token, tz_offset: new Date().getTimezoneOffset() / -60}})
 
+// window.UccChat = {
+//   userchan: false,
+//   roomchan: false,
+//   systemchan: false,
+// }
+
 window.userchan = false
 window.roomchan = false
 window.systemchan = false
@@ -138,15 +144,6 @@ $(document).ready(function() {
 
   $('textarea.message-form-text').focus()
 
-  start_system_channel()
-  start_user_channel()
-  start_room_channel(typing)
-
-  // TODO: Make this discoverable
-  window.ucc_webrtc.start_channel(socket)
-
-  device.set_webrtc(ucc_webrtc)
-  device.enumerateDevices()
 
   $('body').on('submit', '.message-form', e => {
     if (debug) { console.log('message-form submit', e) }
@@ -205,6 +202,21 @@ $(document).ready(function() {
   utils.remove_page_loading()
 })
 
+window.start_channels = function() {
+  console.warn('running the channel timeout funs', window.Rebel.channels.user.channel )
+  start_system_channel()
+
+  window.userchan = window.Rebel.channels.user.channel
+  window.start_user_chan()
+  start_room_channel(typing)
+
+  // TODO: Make this discoverable
+  // window.ucc_webrtc.start_channel(socket)
+
+  // device.set_webrtc(ucc_webrtc)
+  // device.enumerateDevices()
+}
+
 function start_system_channel() {
   systemchan = socket.channel(chan_system, {user: ucxchat.username, channel_id: ucxchat.channel_id})
   let chan = systemchan
@@ -233,12 +245,12 @@ function start_system_channel() {
     })
 }
 
-function start_user_channel() {
-  userchan = socket.channel(chan_user + ucxchat.user_id, {user: ucxchat.username, channel_id: ucxchat.channel_id})
-  let chan = userchan
+function start_user_channel(chan) {
+  // userchan = socket.channel(chan_user + ucxchat.user_id, {user: ucxchat.username, channel_id: ucxchat.channel_id})
+  // let chan = userchan
 
-  chan.onError( () => true )
-  chan.onClose( () => true )
+  // chan.onError( () => true )
+  // chan.onClose( () => true )
 
   chan.on('room:update:name', resp => {
     if (debug) { console.log('room:update', resp) }
@@ -289,11 +301,17 @@ function start_user_channel() {
     roomManager.update_burger_alert()
   })
 
-  chan.join()
-    .receive("ok", resp => { console.log('Joined user successfully', resp)})
-    .receive("error", resp => { console.log('Unable to user lobby', resp)})
+  console.log('finished starting user channel')
+  // chan.join()
+  //   .receive("ok", resp => { console.log('Joined user successfully', resp)})
+  //   .receive("error", resp => { console.log('Unable to user lobby', resp)})
 
   chan.push('subscribe', {})
+}
+
+window.start_user_chan = function() {
+  console.log('starting ...')
+  start_user_channel(window.Rebel.channels.user.channel)
 }
 
 function message_preview(msg) {
