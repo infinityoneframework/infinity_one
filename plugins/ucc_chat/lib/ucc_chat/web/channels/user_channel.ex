@@ -581,8 +581,8 @@ defmodule UccChat.Web.UserChannel do
 
   defp subscribe(channels, socket) do
     # trace inspect(channels), ""
-    Logger.warn "channels: #{inspect channels}"
-    Logger.warn "subscribed: #{inspect socket.assigns[:subscribed]}"
+    # Logger.warn "channels: #{inspect channels}"
+    # Logger.warn "subscribed: #{inspect socket.assigns[:subscribed]}"
     Enum.reduce channels, socket, fn channel, acc ->
       subscribed = acc.assigns[:subscribed]
       if channel in subscribed do
@@ -660,7 +660,6 @@ defmodule UccChat.Web.UserChannel do
     redirect_to socket, "/direct/#{username}"
   end
 
-
   def new_subscription(_event, payload, socket) do
     channel_id = payload.channel_id
     user_id = socket.assigns.user_id
@@ -694,31 +693,33 @@ defmodule UccChat.Web.UserChannel do
     # |> update_messages_header(true)
   end
 
-  defp do_room_update(socket, {:name, }, user_id, channel_id) do
+  defp do_room_update(socket, {:name, _}, user_id, channel_id) do
     # broadcast message header on room channel
     # broadcast room entry on user channel
     socket
   end
-  defp do_room_update(socket, {:topic, }, user_id, channel_id) do
+  defp do_room_update(socket, {:topic, _}, user_id, channel_id) do
     # breoadcast message header on room channel
+    Logger.warn ":topic, assigns: #{inspect socket.assigns}"
     socket
   end
-  defp do_room_update(socket, {:type, }, user_id, channel_id) do
+  defp do_room_update(socket, {:type, _}, user_id, channel_id) do
     # breoadcast message header on room channel
     # broadcast room entry on user channel
     # broadcast message box on room channel
     socket
   end
-  defp do_room_update(socket, {:read_only, }, user_id, channel_id) do
+  defp do_room_update(socket, {:read_only, _}, user_id, channel_id) do
     # broadcast message box on room channel
     socket
   end
-  defp do_room_update(socket, {:archived, }, user_id, channel_id) do
+  defp do_room_update(socket, {:archived, _}, user_id, channel_id) do
     # broadcast room entry on user channel
     # broadcast message box on room channel
     socket
   end
-  defp do_room_update(socket, _field, _user_id, _channel_id) do
+  defp do_room_update(socket, field, _user_id, _channel_id) do
+    Logger.warn "field: #{inspect field}, assigns: #{inspect socket.assigns}"
     socket
   end
 
