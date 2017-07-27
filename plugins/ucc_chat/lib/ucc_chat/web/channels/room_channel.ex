@@ -44,12 +44,13 @@ defmodule UccChat.Web.RoomChannel do
   end
 
   def join(ev = CC.chan_room <> room, msg, socket) do
-    debug ev, msg
+    trace ev, msg
     send self(), {:after_join, room, msg}
     {:ok, socket}
   end
 
   def handle_info({:after_join, room, msg}, socket) do
+    trace room, msg
     channel = Channel.get_by!(name: room)
     broadcast! socket, "user:entered", %{user: msg["user"],
       channel_id: channel.id}

@@ -5,8 +5,13 @@ const send_button = `
     <i class='icon-paper-plane' aria-label='send'></i>
   </div>`
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.messageInput = new MessageInput(ucc_chat)
+})
+
 class MessageInput {
-  constructor() {
+  constructor(ucc_chat) {
+    this.ucc_chat = ucc_chat
     this.empty = true
     this.register_events()
     this.save = undefined
@@ -41,5 +46,3 @@ class MessageInput {
     })
   }
 }
-
-export default MessageInput

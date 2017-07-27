@@ -3,8 +3,13 @@ import * as flex from './flex_bar'
 
 const reset_i = '<i class="icon-ccw secondary-font-color color-error-contrast"></i>'
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.admin = new Admin(ucc_chat)
+})
+
 class Admin {
-  constructor() {
+  constructor(ucc_chat) {
+    this.ucc_chat = ucc_chat
     this.modifed = false
     this.register_events(this)
   }

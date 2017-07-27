@@ -1,13 +1,19 @@
-import * as utils from './utils'
-import * as cc from "./chat_channel"
+console.log('typing.js loading')
+
+// import * as cc from "./chat_channel"
 
 const debug = false;
 
+window.UccChat.on_load(function(ucc_chat) {
+  ucc_chat.typing = new Typing(ucc_chat)
+})
+
 class Typing {
 
-  constructor(typing) {
-    this.typing = typing
+  constructor(ucc_chat) {
+    this.typing = ucc_chat.typing
     this.timer = undefined
+    this.ucxchat = ucc_chat.ucxchat
   }
 
   get is_typing() { return this.typing; }
@@ -25,17 +31,18 @@ class Typing {
   start_typing() {
     if (!this.is_typing) {
       this.is_typing = true
-      this.timer_ref = setTimeout(this.typing_timer_timeout, 15000, this, ucxchat.channel_id, ucxchat.user_id)
-      cc.post("/typing")
+      this.timer_ref = setTimeout(this.typing_timer_timeout, 15000, this, this.ucxchat.channel_id, this.ucxchat.user_id)
+      // cc.post("/typing")
     }
   }
   update_typing(typing) {
     if (debug) { console.log('Typing.update_typing', typing) }
+    let ucxchat = this.ucc_chat.ucxchat
 
     if (typing.indexOf(ucxchat.username) < 0) {
       this.do_update_typing(false, typing)
     } else {
-      utils.remove(typing, ucxchat.username)
+      ucc_chat.utils.remove(typing, ucxchat.username)
       this.do_update_typing(true, typing)
     }
   }
@@ -72,11 +79,11 @@ class Typing {
         // assume they cleared the textedit and did not send
         this_ref.is_typing = false
         this_ref.timer_ref = undefined
-        roomchan.push("/typing/stop", {ucxchat: {method: "delete"}, channel_id: channel_id, user_id: user_id, room: ucxchat.room})
+        this.ucc_chat.roomchan.push("/typing/stop", {ucxchat: {method: "delete"},
+          channel_id: channel_id, user_id: user_id, room: this.ucc_chat.ucxchat.room})
       }
     } else {
       this_ref.timer_ref = setTimeout(this.typing_timer_timeout, 15000, this_ref, channel_id, user_id)
     }
   }
 }
-export default Typing

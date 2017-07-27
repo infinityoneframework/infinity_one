@@ -11,15 +11,17 @@ exports.config = {
        "js/adapter.js": ["vendor/adapter.js"],
        "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"]
        // "js/vendor.js": /^(web\/static\/vendor)|(deps)/
-      }
+      },
       //
       // To change the order of concatenation of files, explicitly mention here
-      // order: {
-      //   before: [
-      //     "web/static/vendor/js/jquery-2.1.1.js",
-      //     "web/static/vendor/js/bootstrap.min.js"
-      //   ]
-      // }
+      order: {
+        before: [
+          "js/ucc_chat.js"
+        ],
+        after: [
+          "js/typing.js"
+        ]
+      }
     },
     stylesheets: {
       joinTo: {
@@ -103,4 +105,3 @@ exports.config = {
     }
   }
 };
-console.log('brunch ........');

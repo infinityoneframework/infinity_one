@@ -4,8 +4,13 @@ require('./file_upload_restrictions.js')
 
 const debug = true
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.fileUpload = new FileUpload(ucc_chat)
+})
+
 class FileUpload {
-  constructor() {
+  constructor(ucc_chat) {
+    this.ucc_chat = ucc_chat
     this.register_events()
   }
   readAsDataURL(file, callback) {

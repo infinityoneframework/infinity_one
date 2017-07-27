@@ -1,8 +1,12 @@
 const debug = true
 
-class DesktopNotification {
-  constructor() {
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.desktop_notifier = new DesktopNotification(ucc_chat)
+})
 
+class DesktopNotification {
+  constructor(ucc_chat) {
+    this.ucc_chat = ucc_chat
   }
 
   notify(name, body, duration) {

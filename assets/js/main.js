@@ -1,32 +1,21 @@
+(function(){
+  var Main = {
+    run: function(ucc_chat) {
+      this.update_mentions(ucc_chat)
+    // update_flexbar()
+      ucc_chat.roomManager.updateMentionsMarksOfRoom()
+    },
+    update_mentions: function(ucc_chat, id) {
+      let username = ucc_chat.ucxchat.username;
+      let selector = `.mention-link[data-username="${username}"]`
+      if (id)
+        selector = '#' + id + ' ' + selector
 
-// $(document).ready(function() {
-//   $('body').on('click', 'a.toggle-favorite', e => {
-//     e.preventDefault();
-//     RoomManager.toggle_favorite()
-//   })
-//   $('body').on('click', '.button.pvt-msg', function(e) {
-//     e.preventDefault();
-//     RoomManager.add_private($(this))
-//   })
-// })
+      $(selector).addClass('mention-link-me background-primary-action-color')
+    }
+  }
 
-export function run() {
-  update_mentions()
-  // update_flexbar()
-  roomManager.updateMentionsMarksOfRoom()
-}
-export function update_mentions(id) {
-  let username = ucxchat.username;
-  let selector = `.mention-link[data-username="${username}"]`
-  if (id)
-    selector = '#' + id + ' ' + selector
-
-  $(selector).addClass('mention-link-me background-primary-action-color')
-}
-
-// export function update_flexbar() {
-//   flexbar.update_flexbar()
-// }
-
-window.mentions = update_mentions
+  window.mentions = Main.update_mentions
+  window.UccChat.main = Main
+})();
 

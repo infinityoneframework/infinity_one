@@ -2,11 +2,17 @@ import * as cc from "./chat_channel"
 import * as utils from "./utils"
 import Messages from "./messages"
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.messageCog = new MessageCog(ucc_chat)
+})
+
 class MessageCog {
-  constructor() {
+  constructor(ucx_chat) {
+    this.ucx_chat = ucx_chat
     this.register_events()
     this.original_text
   }
+
   close_cog(selector) {
     $(selector).closest('.message-dropdown').remove()
   }
@@ -119,5 +125,3 @@ class MessageCog {
     })
   }
 }
-
-export default MessageCog

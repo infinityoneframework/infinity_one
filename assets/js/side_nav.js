@@ -2,6 +2,10 @@ import toastr from 'toastr'
 import * as cc from './chat_channel'
 import RoomManager from './room_manager'
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.sideNav = new SideNav(ucc_chat)
+})
+
 class SideNav {
   constructor() {
     this.register_events()

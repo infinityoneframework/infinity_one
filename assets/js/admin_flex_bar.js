@@ -6,9 +6,14 @@ import * as sweet from './sweet'
 window.toastr = toastr
 const debug = false;
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.adminFlexBar = new AdminFlexBar(ucc_chat)
+})
+
 class AdminFlexBar {
-  constructor() {
-    this.current = undefined;
+  constructor(ucc_chat) {
+    this.ucc_chat = ucc_chat
+    this.current = undefined
     this.register_event_handers(this)
   }
 

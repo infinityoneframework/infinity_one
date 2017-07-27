@@ -1,3 +1,7 @@
+console.log('main.js loading')
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.navMenu = new Menu()
+})
 
 class Menu {
   constructor() {
@@ -37,4 +41,4 @@ class Menu {
   }
 }
 
-export default Menu
+// export default Menu

@@ -41,13 +41,15 @@ defmodule UccChat.Web.UserChannel do
   onload :page_loaded
 
   def on_connect(socket) do
-    Logger.error "on_connect, assigns: #{inspect socket.assigns}"
-    exec_js socket, "window.start_channels()"
+    Logger.warn "self: #{inspect self()}"
+    Logger.info "on_connect, assigns: #{inspect socket.assigns}"
+    Logger.warn "on_connect channel_pid: #{inspect socket.channel_pid}"
+    exec_js socket, "window.UccChat.run()"
     socket
   end
 
   def page_loaded(socket) do
-    Logger.error "page_loaded, assigns: #{inspect socket.assigns}"
+    Logger.info "page_loaded, assigns: #{inspect socket.assigns}"
     socket
   end
 
@@ -71,14 +73,14 @@ defmodule UccChat.Web.UserChannel do
       %{state: state})
   end
 
-  intercept [
-    "room:join",
-    "room:leave",
-    "room:mention",
-    "user:state",
-    "direct:new",
-    "get:subscribed"
-  ]
+  # intercept [
+  #   "room:join",
+  #   "room:leave",
+  #   "room:mention",
+  #   "user:state",
+  #   "direct:new",
+  #   "get:subscribed"
+  # ]
 
   def join(CC.chan_user() <>  user_id = event, payload, socket) do
     trace(event, payload)
@@ -591,6 +593,8 @@ defmodule UccChat.Web.UserChannel do
 
   defp subscribe(channels, socket) do
     # trace inspect(channels), ""
+    Logger.warn "channels: #{inspect channels}"
+    Logger.warn "subscribed: #{inspect socket.assigns[:subscribed]}"
     Enum.reduce channels, socket, fn channel, acc ->
       subscribed = acc.assigns[:subscribed]
       if channel in subscribed do

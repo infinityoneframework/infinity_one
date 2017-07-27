@@ -1,7 +1,5 @@
 import * as cc from "./chat_channel"
 import hljs from "highlight.js"
-import * as utils from "./utils"
-import * as main from "./main"
 
 const debug = true;
 
@@ -11,8 +9,10 @@ class Messages {
 
   static new_message(msg) {
     let html = msg.html
+    let ucc_chat = window.UccChat
+    let ucxchat = ucc_chat.ucxchat
 
-    let at_bottom = roomManager.at_bottom
+    let at_bottom = ucc_chat.roomManager.at_bottom
     if (debug) console.log('new_message', msg)
     $('.messages-box .wrapper > ul').append(html)
 
@@ -29,15 +29,15 @@ class Messages {
     if (ucxchat.user_id == msg.user_id) {
       if (debug) { console.log('adding own to', msg.id, $('#' + msg.id)) }
       $('#' + msg.id).addClass("own")
-      main.run()
+      ucc_chat.main.run()
     }
-    main.update_mentions(msg.id)
+    ucc_chat.main.update_mentions(ucc_chat, msg.id)
 
     if (at_bottom || msg.user_id == ucxchat.user_id) {
-      utils.scroll_bottom()
+      ucc_chat.utils.scroll_bottom()
     }
 
-    roomManager.new_message(msg.id, msg.user_id)
+    ucc_chat.roomManager.new_message(msg.id, msg.user_id)
   }
   static update_message(msg) {
     $('#' + msg.id).replaceWith(msg.html)
@@ -55,8 +55,8 @@ class Messages {
   }
 
   static send_message(msg) {
-    let user = window.ucxchat.user_id
-    let ucxchat = window.ucxchat
+    let ucxchat = window.UccChat.ucxchat
+    let user = ucxchat.user_id
     if (msg.update) {
       cc.put("/messages/" + msg.update, {message: msg.value.trim(), user_id: user})
         .receive("ok", resp => {
@@ -87,11 +87,11 @@ class Messages {
           // console.log('slash command resp', resp )
           if (resp.html) {
             $('.messages-box .wrapper > ul').append(resp.html)
-            utils.scroll_bottom()
+            ucc_chat.utils.scroll_bottom()
           }
         })
 
-      roomManager.remove_unread()
+      ucc_chat.roomManager.remove_unread()
 
     } else if (!utils.empty_string(msg.trim())) {
       cc.post("/messages", {message: msg.trim(), user_id: user})
@@ -105,7 +105,7 @@ class Messages {
           }
         })
 
-      roomManager.remove_unread()
+      ucc_chat.roomManager.remove_unread()
     }
 
     $('.message-form-text').val('')

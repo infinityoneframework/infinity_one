@@ -26,6 +26,9 @@ export function create() {
   return(webrtc)
 }
 
+UccChat.on_load(function(ucc_chat) {
+  ucc_chat.webrtc = new Webrtc(ucc_chat)
+})
 // function checkForWake() {
 //   setInterval(function() {
 //     if (mscs.webrtc.connectionClosed()) {
