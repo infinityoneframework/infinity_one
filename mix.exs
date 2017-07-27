@@ -89,8 +89,8 @@ defmodule UcxUcc.Mixfile do
       {:inflex, "~> 1.7"},
       {:arc_ecto, "~> 0.6.0"},
       {:postgrex, ">= 0.0.0", only: :test},
-      {:rebel, path: "../rebel"},
-      # {:rebel, github: "smpallen99/rebel"},
+      # {:rebel, path: "../rebel"},
+      {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
     ]
   end
