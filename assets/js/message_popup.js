@@ -1,5 +1,4 @@
 import * as cc from './chat_channel'
-import * as utils from './utils'
 
 const debug = true;
 
@@ -16,10 +15,15 @@ const application_matches = {
 }
 const application_command_chars   = {users: "@", slashcommands: "/", channels: "#", emojis: ":"}
 
+window.UccChat.on_load(function(ucc_chat) {
+  ucc_chat.messagePopup = new MessagePopup(ucc_chat)
+})
+
 class MessagePopup {
 
-  constructor() {
+  constructor(ucc_chat) {
     // this.open = undefined;
+    this.ucc_chat = ucc_chat;
     this.application = undefined;
     this.match = undefined
     this.command_char = undefined;

@@ -41,9 +41,6 @@ defmodule UccChat.Web.UserChannel do
   onload :page_loaded
 
   def on_connect(socket) do
-    Logger.warn "self: #{inspect self()}"
-    Logger.info "on_connect, assigns: #{inspect socket.assigns}"
-    Logger.warn "on_connect channel_pid: #{inspect socket.channel_pid}"
     exec_js socket, "window.UccChat.run()"
     socket
   end
@@ -72,15 +69,6 @@ defmodule UccChat.Web.UserChannel do
     Endpoint.broadcast!(CC.chan_user() <> "#{user_id}", "user:state",
       %{state: state})
   end
-
-  # intercept [
-  #   "room:join",
-  #   "room:leave",
-  #   "room:mention",
-  #   "user:state",
-  #   "direct:new",
-  #   "get:subscribed"
-  # ]
 
   def join(CC.chan_user() <>  user_id = event, payload, socket) do
     trace(event, payload)
@@ -615,8 +603,8 @@ defmodule UccChat.Web.UserChannel do
   end
 
   defp clear_unreads(%{assigns: %{channel_id: channel_id}} = socket) do
-    Logger.warn "clear_unreads/1: channel_id: #{inspect channel_id}, " <>
-      "socket.assigns.user_id: #{inspect socket.assigns.user_id}"
+    # Logger.warn "clear_unreads/1: channel_id: #{inspect channel_id}, " <>
+    #   "socket.assigns.user_id: #{inspect socket.assigns.user_id}"
     channel_id
     |> Channel.get
     |> Map.get(:name)
@@ -628,7 +616,7 @@ defmodule UccChat.Web.UserChannel do
   end
 
   defp clear_unreads(room, %{assigns: assigns} = socket) do
-    Logger.warn "room: #{inspect room}, assigns: #{inspect assigns}"
+    # Logger.warn "room: #{inspect room}, assigns: #{inspect assigns}"
     ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, false)
     push socket, "code:update", %{selector: ".link-room-" <> room,
       html: "has-unread", action: "removeClass"}

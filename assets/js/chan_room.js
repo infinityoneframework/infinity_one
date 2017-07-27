@@ -1,14 +1,16 @@
  // window.Rebel.channels.user.channel
 
 console.log('... chan_room.js loading')
-UccChat.on_connect(function(ucc_chat, socket) {
+function start_room_channel(ucc_chat, socket) {
   console.log('chan_room connect')
   let ucxchat = ucc_chat.ucxchat
   let room = ucxchat.room
+  let debug = ucc_chat.debug
+  let typing = ucc_chat.typing
   // Now that you are connected, you can join channels with a topic:
   let chan = socket.channel(ucc_chat.chan_room + room, {user: ucxchat.username, user_id: ucxchat.user_id})
 
-  if (ucc_chat.debug) { console.log('start socket', ucxchat) }
+  if (debug) { console.log('start socket', ucxchat) }
 
   chan.onError( () => true )
   chan.onClose( () => true )
@@ -96,4 +98,12 @@ UccChat.on_connect(function(ucc_chat, socket) {
 
   ucc_chat.navMenu.close()
 
+}
+
+UccChat.on_connect(function(ucc_chat, socket) {
+  start_room_channel(ucc_chat, socket)
+
+  $('body').on('restart-socket', () => {
+    start_room_channel(ucc_chat, socket)
+  })
 })

@@ -1,19 +1,25 @@
-import toastr from 'toastr'
 import * as cc from './chat_channel'
-import RoomManager from './room_manager'
 
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.sideNav = new SideNav(ucc_chat)
 })
 
 class SideNav {
-  constructor() {
+  constructor(ucc_chat) {
+    this.ucc_chat = ucc_chat
     this.register_events()
   }
 
+  get userchan() { return this.ucc_chat.userchan }
+  get systemchan() { return this.ucc_chat.systemchan }
+  get roomManager() { return this.ucc_chat.roomManager }
+  get roomHistoryManager() {return this.ucc_chat.roomHistoryManager }
+  get navMenu() { return this.ucc_chat.navMenu }
+  get desktop_notifier() { return this.ucc_chat.desktop_notifier }
+
   more_channels() {
     // console.log('cliecked more channels')
-    userchan.push('side_nav:more_channels')
+    this.userchan.push('side_nav:more_channels')
       .receive("ok", resp => {
          $('.flex-nav section').html(resp.html).parent().removeClass('animated-hidden')
          $('.arrow').toggleClass('close', 'bottom')
@@ -21,7 +27,7 @@ class SideNav {
   }
   more_users() {
     // console.log('cliecked more channels')
-    userchan.push('side_nav:more_users')
+    this.userchan.push('side_nav:more_users')
       .receive("ok", resp => {
          $('.flex-nav section').html(resp.html).parent().removeClass('animated-hidden')
          $('.arrow').toggleClass('close', 'bottom')
@@ -30,7 +36,7 @@ class SideNav {
   channel_link_click(elem) {
     let name = elem.attr('href').replace('/channels/', '')
     // console.log('channel link click', name)
-    roomManager.open_room(name, name, function() {
+    this.roomManager.open_room(name, name, function() {
       $('.flex-nav').addClass('animated-hidden')
       $('.arrow').toggleClass('close', 'bottom')
     })
@@ -77,11 +83,12 @@ class SideNav {
   }
 
   register_events() {
+
     this.bind_scroll_event()
     $('body')
     .on('click', 'button.test-notifications', e => {
       e.preventDefault()
-      desktop_notifier.notify('Desktop Notification Test', 'This is a desktop notification.', 5)
+      this.desktop_notifier.notify('Desktop Notification Test', 'This is a desktop notification.', 5)
       // console.log('test notifications')
       return false
     })
@@ -124,49 +131,49 @@ class SideNav {
     })
     .on('click', 'button.account-link', (e) => {
       e.preventDefault()
-      roomHistoryManager.cache_room()
+      this.roomHistoryManager.cache_room()
       $('.main-content-cache').html($('.main-content').html())
-      userchan.push('side_nav:open', {page: $(e.currentTarget).attr('id')})
+      this.userchan.push('side_nav:open', {page: $(e.currentTarget).attr('id')})
         .receive("ok", resp => {
           $('.flex-nav section').html(resp.html)
           console.log('resp from side_nav:open')
-          navMenu.open()
+          this.navMenu.open()
         })
       $('div.flex-nav').removeClass('animated-hidden')
       this.set_nav_top_icon('close')
     })
     .on('click', 'nav.options button.status', (e) =>  {
       e.preventDefault()
-      systemchan.push('status:set:' + $(e.currentTarget).data('status'), {})
+      this.systemchan.push('status:set:' + $(e.currentTarget).data('status'), {})
     })
     .on('click', '.flex-nav header', (e) => {
       e.preventDefault()
-      userchan.push('side_nav:close', {})
+      this.userchan.push('side_nav:close', {})
       // console.log('.flex-nav header clicked')
       $('div.flex-nav').addClass('animated-hidden')
       this.set_nav_top_icon('bottom')
       if ($('.main-content-cache').html() != '') {
         $('.main-content').html($('.main-content-cache').html())
         $('.main-content-cache').html('')
-        roomHistoryManager.restore_cached_room()
+        this.roomHistoryManager.restore_cached_room()
       }
       SideNav.hide_account_box_menu()
     })
     .on('click', '.account-link', e => {
       console.log('account link click')
       e.preventDefault()
-      userchan.push('account_link:click:' + $(e.currentTarget).data('link'), {})
-      navMenu.close()
+      this.userchan.push('account_link:click:' + $(e.currentTarget).data('link'), {})
+      this.navMenu.close()
     })
     .on('click', '.admin-link', e => {
       console.log('admin link click')
       e.preventDefault()
-      userchan.push('admin_link:click:' + $(e.currentTarget).data('link'), {})
+      this.userchan.push('admin_link:click:' + $(e.currentTarget).data('link'), {})
       navMenu.close()
     })
     .on('submit', '#account-preferences-form', e => {
       e.preventDefault()
-      userchan.push('account:preferences:save', $(e.currentTarget).serializeArray())
+      this.userchan.push('account:preferences:save', $(e.currentTarget).serializeArray())
         .receive("ok", resp => {
           if (resp.success) {
             toastr.success(resp.success)
@@ -177,7 +184,7 @@ class SideNav {
     })
     .on('submit', '#account-profile-form', e => {
       e.preventDefault()
-      userchan.push('account:profile:save', $(e.currentTarget).serializeArray())
+      this.userchan.push('account:profile:save', $(e.currentTarget).serializeArray())
         .receive("ok", resp => {
           if (resp.success) {
             toastr.success(resp.success)

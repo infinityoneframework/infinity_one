@@ -178,18 +178,18 @@ window.UccChat = {
       }
     })
     .on('keypress', '.message-form-text', e => {
-      if (debug) { console.log('message-form-text keypress', e) }
+      if (this.debug) { console.log('message-form-text keypress', e) }
       if (e.keyCode == 13 && e.shiftKey) {
         return true
       }
       if(e.keyCode == 13) {
-        if (this.message_popup.handle_enter()) {
+        if (this.messagePopup.handle_enter()) {
           // console.log('return ', $('.message-form-text').hasClass('editing'))
           if ($('.message-form-text').hasClass('editing')) {
             // console.log('editing submit...', $('li.message.editing').attr('id'))
             this.Messages.send_message({update: $('li.message.editing').attr('id'), value: $('.message-form-text').val()})
           } else {
-            thisMessages.send_message($('.message-form-text').val())
+            this.Messages.send_message($('.message-form-text').val())
           }
         }
         this.typing.clear()
@@ -204,9 +204,6 @@ window.UccChat = {
 
       this.typing.start_typing()
       return true
-    })
-    .on('restart-socket', () => {
-      this.start_room_channel(typing)
     })
 
     this.navMenu.setup()
@@ -238,6 +235,7 @@ require('./utils')
 require('./chan_user')
 require('./chan_system')
 require('./chan_room')
+require('./messages')
 
 import * as cc from "./chat_channel"
 import * as sweet from "./sweetalert.min"

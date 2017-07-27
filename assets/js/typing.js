@@ -13,6 +13,7 @@ class Typing {
   constructor(ucc_chat) {
     this.typing = ucc_chat.typing
     this.timer = undefined
+    this.ucc_chat = ucc_chat
     this.ucxchat = ucc_chat.ucxchat
   }
 
@@ -37,7 +38,7 @@ class Typing {
   }
   update_typing(typing) {
     if (debug) { console.log('Typing.update_typing', typing) }
-    let ucxchat = this.ucc_chat.ucxchat
+    let ucxchat = this.ucxchat
 
     if (typing.indexOf(ucxchat.username) < 0) {
       this.do_update_typing(false, typing)

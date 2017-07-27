@@ -25,7 +25,7 @@ class RoomManager {
     if (this.view_elem) {
       this.rect = this.view_elem.getBoundingClientRect()
       this.focus = false
-      this.unread = ucxchat.unread
+      this.unread = this.ucc_chat.ucxchat.unread
       this.unread_list = []
       this.new_message_ref = undefined
       this.at_bottom = true
@@ -60,6 +60,8 @@ class RoomManager {
   get is_unread() { return this.unread; }
   set is_unread(val) { this.unread = val; }
 
+  get userchan() { return this.ucc_chat.userchan }
+
   render_room(resp) {
     if (debug) { console.log('render_room resp', resp) }
     let ucxchat = this.ucc_chat.ucxchat
@@ -93,7 +95,7 @@ class RoomManager {
     $('.link-room-' + ucxchat.room).addClass("active")
     this.ucc_chat.utils.scroll_bottom()
     this.ucc_chat.roomchan.leave()
-    socket.restart_socket()
+    this.ucc_chat.restart_socket()
   }
   toggle_favorite() {
     if (debug) { console.log('toggle_favorite') }
@@ -294,7 +296,7 @@ class RoomManager {
 
   send_last_read() {
     let ts = $(container + ' li[id]:last').data('timestamp')
-    userchan.push('last_read', {last_read: ts})
+    this.userchan.push('last_read', {last_read: ts})
   }
 
   push_channel(message, args={}) {
@@ -348,7 +350,7 @@ class RoomManager {
   }
 
   bind_history_manager_scroll_event() {
-    if (!ucxchat.channel_id) {
+    if (!this.ucc_chat.ucxchat.channel_id) {
       return false
     }
     $('.messages-box .wrapper').bind('scroll', _.throttle((e) => {

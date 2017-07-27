@@ -23,8 +23,6 @@ defmodule UccChat.Web.ChannelController do
   end
 
   def index(conn, _params) do
-    Logger.warn "index load"
-
     user = Coherence.current_user(conn)
     channel = if user.open_id do
       Logger.warn "index load open id"

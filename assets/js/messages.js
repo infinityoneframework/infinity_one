@@ -3,6 +3,10 @@ import hljs from "highlight.js"
 
 const debug = true;
 
+window.UccChat.on_load(function(ucc_chat) {
+  ucc_chat.Messages = Messages
+})
+
 class Messages {
   constructor() {
   }
@@ -29,7 +33,7 @@ class Messages {
     if (ucxchat.user_id == msg.user_id) {
       if (debug) { console.log('adding own to', msg.id, $('#' + msg.id)) }
       $('#' + msg.id).addClass("own")
-      ucc_chat.main.run()
+      ucc_chat.main.run(ucc_chat)
     }
     ucc_chat.main.update_mentions(ucc_chat, msg.id)
 
@@ -55,7 +59,8 @@ class Messages {
   }
 
   static send_message(msg) {
-    let ucxchat = window.UccChat.ucxchat
+    let ucc_chat = window.UccChat
+    let ucxchat = ucc_chat.ucxchat
     let user = ucxchat.user_id
     if (msg.update) {
       cc.put("/messages/" + msg.update, {message: msg.value.trim(), user_id: user})
@@ -66,7 +71,7 @@ class Messages {
             $('.messages-box').children('.wrapper').children('ul').children(':last-child').find('pre').each(function(i, block) {
               hljs.highlightBlock(block)
             })
-            utils.scroll_bottom()
+            ucc_chat.utils.scroll_bottom()
             // console.log('got response from send message')
           }
         })
@@ -93,7 +98,7 @@ class Messages {
 
       ucc_chat.roomManager.remove_unread()
 
-    } else if (!utils.empty_string(msg.trim())) {
+    } else if (!ucc_chat.utils.empty_string(msg.trim())) {
       cc.post("/messages", {message: msg.trim(), user_id: user})
         .receive("ok", resp => {
           if (resp.html) {
