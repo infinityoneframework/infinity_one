@@ -3,6 +3,7 @@ defmodule UccChat.Web.ChannelController do
   use Rebel.Controller, channels: [
     # UccChat.Web.UiChannel,
     UccChat.Web.UserChannel,
+    UccChat.Web.RoomChannel,
   ]
 
   import Ecto.Query

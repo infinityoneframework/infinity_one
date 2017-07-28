@@ -5,6 +5,15 @@ defmodule UccChat.Web.RoomChannel do
   use UccChat.Web, :channel
   use UccLogger
 
+  use Rebel.Channel, name: "room", controllers: [
+    UccChat.Web.ChannelController,
+  ], intercepts: [
+    "user:action",
+    "room:state_change",
+    "room:update:list",
+    "room:delete"
+  ]
+
   alias UccChat.{Subscription, Channel, Message}
   alias UccChat.{Web.UserSocket}
   alias UccChat.ServiceHelpers, as: Helpers
@@ -15,13 +24,6 @@ defmodule UccChat.Web.RoomChannel do
 
   ############
   # API
-
-  intercept [
-    "user:action",
-    "room:state_change",
-    "room:update:list",
-    "room:delete"
-  ]
 
   def user_join(nil), do: Logger.warn "join for nil username"
   def user_join(username, room) do
@@ -38,18 +40,25 @@ defmodule UccChat.Web.RoomChannel do
   ############
   # Socket stuff
 
-  def join(CC.chan_room <> "lobby", msg, socket) do
+  def join(ev = CC.chan_room <> "lobby", msg, socket) do
     Logger.info "user joined lobby msg: #{inspect msg}, socket: #{inspect socket}"
-    {:ok, socket}
+    super ev, msg, socket
+    # {:ok, socket}
   end
 
   def join(ev = CC.chan_room <> room, msg, socket) do
     trace ev, msg
     send self(), {:after_join, room, msg}
-    {:ok, socket}
+    super ev, msg, socket
+    # {:ok, socket}
+  end
+
+  def topic(_broadcasting, _controller, _request_path, conn_assigns) do
+    conn_assigns.chatd.active_room.name
   end
 
   def handle_info({:after_join, room, msg}, socket) do
+    # room = String.split(room, "/") |> List.last
     trace room, msg
     channel = Channel.get_by!(name: room)
     broadcast! socket, "user:entered", %{user: msg["user"],

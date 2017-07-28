@@ -81,6 +81,10 @@ defmodule UccChat.Web.UserChannel do
     super other, params, socket
   end
 
+  def topic(_broadcasting, _controller, _request_path, conn_assigns) do
+    conn_assigns[:current_user] |> Map.get(:id)
+  end
+
   ###############
   # Outgoing Incoming Messages
 
