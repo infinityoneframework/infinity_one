@@ -1,3 +1,3 @@
-defmodule UccWebrtc.Web.LayoutViewTest do
-  use UccWebrtc.Web.ConnCase, async: true
+defmodule UccWebrtcWeb.LayoutViewTest do
+  use UccWebrtcWeb.ConnCase, async: true
 end

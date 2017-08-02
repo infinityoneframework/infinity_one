@@ -1,3 +1,3 @@
-defmodule UccChat.Web.LayoutViewTest do
-  use UccChat.Web.ConnCase, async: true
+defmodule UccChatWeb.LayoutViewTest do
+  use UccChatWeb.ConnCase, async: true
 end

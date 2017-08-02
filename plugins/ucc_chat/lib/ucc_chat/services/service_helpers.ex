@@ -1,11 +1,11 @@
 defmodule UccChat.ServiceHelpers do
-  # use UccChat.Web, :service
+  # use UccChatWeb, :service
   alias UccChat.{
     Channel, MessageService
   }
 
-  require UccChat.Web.SharedView
-  use UcxUcc.Web.Gettext
+  require UccChatWeb.SharedView
+  use UcxUccWeb.Gettext
 
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.{User}
@@ -97,9 +97,9 @@ defmodule UccChat.ServiceHelpers do
     errors
     |> Enum.map(fn {k, {msg, opts}} ->
       error = if count = opts[:count] do
-        Gettext.dngettext(UcxUcc.Web.Gettext, "errors", msg, msg, count, opts)
+        Gettext.dngettext(UcxUccWeb.Gettext, "errors", msg, msg, count, opts)
       else
-        Gettext.dgettext(UcxUcc.Web.Gettext, "errors", msg, opts)
+        Gettext.dgettext(UcxUccWeb.Gettext, "errors", msg, opts)
       end
       {k, error}
     end)
@@ -120,7 +120,7 @@ defmodule UccChat.ServiceHelpers do
   def month(12), do: ~g"December"
 
   def response_message(channel_id, body) do
-    # body = UccChat.Web.MessageView.render("message_response_body.html", message: message)
+    # body = UccChatWeb.MessageView.render("message_response_body.html", message: message)
     # |> Phoenix.HTML.safe_to_string
 
     bot_id = get_bot_id()
@@ -219,7 +219,7 @@ defmodule UccChat.ServiceHelpers do
     header = if opts[:confirm], do: opts[:header] || ~g"Are you sure?"
     opts = Map.put(opts, :header, header)
 
-    html = UccChat.Web.MasterView.render("sweet.html", opts: Map.put(opts, :show, true))
+    html = UccChatWeb.MasterView.render("sweet.html", opts: Map.put(opts, :show, true))
     |> safe_to_string
     Phoenix.Channel.push socket, "sweet:open", %{html: html}
   end

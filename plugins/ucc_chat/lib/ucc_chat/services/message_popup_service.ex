@@ -6,7 +6,7 @@ defmodule UccChat.MessagePopupService do
   alias UccChat.{Channel, SlashCommands, PresenceAgent, Emoji}
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
-  alias UccChat.Web.MessageView
+  alias UccChatWeb.MessageView
   alias UccChat.Schema.Message, as: MessageSchema
   # alias UccChat.ServiceHelpers, as: Helpers
 

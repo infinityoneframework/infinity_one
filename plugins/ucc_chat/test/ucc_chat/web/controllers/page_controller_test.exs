@@ -1,5 +1,5 @@
-defmodule UccChat.Web.PageControllerTest do
-  use UccChat.Web.ConnCase
+defmodule UccChatWeb.PageControllerTest do
+  use UccChatWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"

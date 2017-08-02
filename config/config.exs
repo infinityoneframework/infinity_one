@@ -10,11 +10,11 @@ config :ucx_ucc,
   ecto_repos: [UcxUcc.Repo]
 
 # Configures the endpoint
-config :ucx_ucc, UcxUcc.Web.Endpoint,
+config :ucx_ucc, UcxUccWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "wsFrikxHW07+ALSOPyI681jvpAdnRTQHyrfCwfd0gQlIEfqKegAvSGTVnaTzVSqH",
-  render_errors: [view: UcxUcc.Web.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: UcxUcc.PubSub,
+  render_errors: [view: UcxUccWeb.ErrorView, accepts: ~w(html json)],
+  pubsub: [name: UcxUccWeb.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
@@ -45,19 +45,20 @@ config :coherence,
   user_schema: UcxUcc.Accounts.User,
   repo: UcxUcc.Repo,
   module: UcxUcc,
-  router: UcxUcc.Web.Router,
+  web_module: UcxUccWeb,
+  router: UcxUccWeb.Router,
   login_field: :username,
   user_token: true,
   use_binary_id: true,
   require_current_password: false,
-  messages_backend: UcxUcc.Coherence.Messages,
+  messages_backend: UcxUccWeb.Coherence.Messages,
   logged_out_url: "/",
   email_from_name: {:system, "COH_NAME"},
   email_from_email: {:system, "COH_EMAIL"},
   opts: [:invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
   # opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
 
-config :coherence, UcxUcc.Coherence.Mailer,
+config :coherence, UcxUccWeb.Coherence.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: {:system, "SENDGRID_API_KEY"}
 # %% End Coherence Configuration %%

@@ -1,9 +1,9 @@
 defmodule UccChat.MessageCogService do
   # import Ecto.Query
 
-  alias UccChat.{
-    Message, Web.MessageView, StaredMessage, PinnedMessage, Web.FlexBarView
-  }
+  alias UccChat.{Message, StaredMessage, PinnedMessage}
+  alias UccChatWeb.{MessageView, FlexBarView}
+
   alias UcxUcc.Repo
   alias UccChat.ServiceHelpers, as: Helpers
   # alias UccChat.Schema.StaredMessage, as: StaredMessageSchema
@@ -65,7 +65,7 @@ defmodule UccChat.MessageCogService do
 
   # end
   def handle_in("delete-message", msg, socket) do
-    UccChat.Web.MessageChannelController.delete socket, msg
+    UccChatWeb.MessageChannelController.delete socket, msg
   end
 
   # def handle_in("jump-to-message", msg, _) do

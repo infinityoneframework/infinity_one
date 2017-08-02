@@ -54,12 +54,12 @@ defmodule UcxUcc.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, github: "phoenixframework/phoenix", override: true},
+      {:phoenix, "~> 1.3", override: true},
       # {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
       {:mariaex, ">= 0.0.0", only: [:dev, :prod]},
-      {:phoenix_html, "~> 2.6"},
+      {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:phoenix_haml, "~> 0.2"},
@@ -87,7 +87,6 @@ defmodule UcxUcc.Mixfile do
       # {:slime, "~> 1.0", override: true},
       {:slime, github: "slime-lang/slime", override: true},
       {:inflex, "~> 1.7"},
-      {:arc_ecto, "~> 0.6.0"},
       {:postgrex, ">= 0.0.0", only: :test},
       {:rebel, path: "../rebel"},
       # {:rebel, github: "smpallen99/rebel"},

@@ -4,7 +4,7 @@ config :unbrella, :plugins, ucc_chat: [
   module: UccChat,
   application: UccChat.Application,
   schemas: [UccChat.Accounts.Account, UccChat.Accounts.User],
-  router: UccChat.Web.Router,
+  router: UccChatWeb.Router,
   page_size: 150,
   defer: true,
   emoji_one: [
@@ -45,10 +45,10 @@ config :ucx_ucc, UccChat.Robot, [
 #   ecto_repos: [UccChat.Repo]
 
 # # Configures the endpoint
-# config :ucc_chat, UccChat.Web.Endpoint,
+# config :ucc_chat, UccChatWeb.Endpoint,
 #   url: [host: "localhost"],
 #   secret_key_base: "6t0nS1VfAfJly5M6DwTo4u9XNXvbfJulh69nHEbLw7uTFfyCyBEfVGkRw1iEA7eo",
-#   render_errors: [view: UccChat.Web.ErrorView, accepts: ~w(html json)],
+#   render_errors: [view: UccChatWeb.ErrorView, accepts: ~w(html json)],
 #   pubsub: [name: UccChat.PubSub,
 #            adapter: Phoenix.PubSub.PG2]
 

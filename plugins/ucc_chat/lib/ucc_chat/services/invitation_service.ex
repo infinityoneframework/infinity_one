@@ -13,7 +13,7 @@ defmodule UccChat.InvitationService do
     case Repo.one from u in User, where: u.email == ^email do
       nil ->
         token = random_string 48
-        url = UcxUcc.Web.Router.Helpers.invitation_url(UcxUcc.Web.Endpoint, :edit, token)
+        url = UcxUccWeb.Router.Helpers.invitation_url(UcxUccWeb.Endpoint, :edit, token)
         cs = put_change(cs, :token, token)
         case Repo.insert cs do
           {:ok, invitation} ->
@@ -39,7 +39,7 @@ defmodule UccChat.InvitationService do
         {:error, ~g"Cound not find the Invitation"}
       invitation ->
         send_user_email :invitation, invitation,
-          UcxUcc.Web.Router.Helpers.invitation_url(UcxUcc.Web.Endpoint,
+          UcxUccWeb.Router.Helpers.invitation_url(UcxUccWeb.Endpoint,
           :edit, invitation.token)
         {:ok, ~g"Invitation resent."}
     end

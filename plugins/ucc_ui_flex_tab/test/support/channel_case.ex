@@ -1,4 +1,4 @@
-defmodule UccUiFlexTab.Web.ChannelCase do
+defmodule UccUiFlexTabWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,7 +21,7 @@ defmodule UccUiFlexTab.Web.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint UccUiFlexTab.Web.Endpoint
+      @endpoint UccUiFlexTabWeb.Endpoint
     end
   end
 

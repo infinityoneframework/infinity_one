@@ -1,4 +1,4 @@
-defmodule UcxUcc.Web.ConnCase do
+defmodule UcxUccWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -19,10 +19,10 @@ defmodule UcxUcc.Web.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
-      import UcxUcc.Web.Router.Helpers
+      import UcxUccWeb.Router.Helpers
 
       # The default endpoint for testing
-      @endpoint UcxUcc.Web.Endpoint
+      @endpoint UcxUccWeb.Endpoint
     end
   end
 

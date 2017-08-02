@@ -1,0 +1,25 @@
+.tooltip
+  .content
+  .tooltip-arrow
+
+#user-card-popover
+#ucx-chat.menu-nav
+  .connection-status.status-online
+
+.wrapper
+  = UcxUccWeb.SidebarView.render "show.html", nav_dat: @conn
+  .main-panel
+    = render @view_module, @view_template, @assigns
+  .fixed-plugin
+    .dropdown.show-dropdown
+      %a(href="#" data-toggle="dropdown")
+        %i.material-icons.md-48 settings
+        - # <i class="fa fa-cog fa-2x"></i>
+      <%=# render "fixed_plugin.html" %>
+  .fixed-plugin2
+    .dropdown.show-dropdown
+      %a(href="#" data-toggle="dropdown")
+        %i.fa.fa-users.fa-lg
+
+.sweet-container
+%div.main-content-cache.hidden

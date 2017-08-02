@@ -27,8 +27,8 @@ defmodule UcxUcc.Application do
       # Start the Ecto repository
       supervisor(UcxUcc.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(UcxUcc.Web.Endpoint, []),
-      supervisor(UcxUcc.Web.Presence, []),
+      supervisor(UcxUccWeb.Endpoint, []),
+      supervisor(UcxUccWeb.Presence, []),
       worker(UcxUcc.Permissions, []),
       worker(UcxUcc.UccPubSub, []),
     ] ++ children

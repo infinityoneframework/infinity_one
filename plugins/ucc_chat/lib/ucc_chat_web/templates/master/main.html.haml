@@ -1,0 +1,37 @@
+.tooltip
+  .content
+  .tooltip-arrow
+
+#user-card-popover
+#ucx-chat.menu-nav
+  .connection-status.status-online
+    = # connection status
+  .main-content.content-background-color(style="transform: translateX(0px);")
+    = #{{#if modal}}main-modal{{/if}}">
+    = render "room.html", chatd: @chatd, conn: @conn
+
+  %div.main-content-cache.hidden
+  = render UccChatWeb.SideNavView, "show.html", conn: @conn, chatd: @chatd
+= UccChatWeb.EmojiView.render("emoji_picker.html", account: @chatd.user.account)
+.sweet-container
+  =# render "sweet.html"
+- flash_error = @conn.private[:phoenix_flash]["error"]
+:javascript
+  window.UccChat = {}
+  window.user_token = '<%= Coherence.user_token(@conn) %>'
+  window.ucxchat = {
+    room_route: '<%= @chatd.room_route %>',
+    room: '<%= @chatd.channel.name %>',
+    channel_id: '<%= @chatd.channel.id %>',
+    username: '<%= @chatd.user.username %>',
+    user_id: '<%= @chatd.user.id %>',
+    display_name: '<%= @chatd.active_room[:display_name] %>',
+    env: '<%= UcxUcc.env() %>'
+  };
+  <%= Phoenix.HTML.raw get_chat_settings(@chatd.channel) %>
+
+  let myPanel = $('.messages-box .wrapper')
+  myPanel.scrollTop(myPanel[0].scrollHeight - myPanel.height());
+  window.flash_error = '<%= flash_error %>'
+
+

@@ -2,8 +2,9 @@ defmodule UccAdmin.AdminService do
   use UccChat.Shared, :service
   use UccLogger
 
-  alias UccChat.{Message, Channel, UserService, Web.FlexBarView}
-  alias UccAdmin.Web.{AdminView}
+  alias UccChat.{Message, Channel, UserService}
+  alias UccChatWeb.FlexBarView
+  alias UccAdminWeb.{AdminView}
   alias UccChat.Settings, as: ChatSettings
   alias ChatSettings.{FileUpload, Layout}
   alias ChatSettings.ChatGeneral

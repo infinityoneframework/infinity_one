@@ -58,7 +58,7 @@ defmodule UccChat.AvatarService do
     list = for ch1 <- list, ch2 <- list, do: ch1 <> ch2
     for name <- list do
       File.write "assets/static/avatar/#{name}.svg",
-        UccChat.Web.AvatarView.render("show.xml",
+        UccChatWeb.AvatarView.render("show.xml",
           color: get_color(name), initials: get_initials(name))
     end
   end

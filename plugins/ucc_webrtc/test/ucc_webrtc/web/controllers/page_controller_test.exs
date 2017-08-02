@@ -1,5 +1,5 @@
-defmodule UccWebrtc.Web.PageControllerTest do
-  use UccWebrtc.Web.ConnCase
+defmodule UccWebrtcWeb.PageControllerTest do
+  use UccWebrtcWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"

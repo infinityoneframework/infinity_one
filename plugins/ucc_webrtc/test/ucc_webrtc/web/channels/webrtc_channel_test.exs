@@ -1,7 +1,7 @@
-defmodule UccWebrtc.Web.WebrtcChannelTest do
-  use UccWebrtc.Web.ChannelCase
+defmodule UccWebrtcWeb.WebrtcChannelTest do
+  use UccWebrtcWeb.ChannelCase
 
-  alias UccWebrtc.Web.WebrtcChannel
+  alias UccWebrtcWeb.WebrtcChannel
 
   setup do
     {:ok, _, socket} =

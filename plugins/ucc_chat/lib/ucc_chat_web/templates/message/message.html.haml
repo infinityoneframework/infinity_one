@@ -1,0 +1,82 @@
+- username = get_username @message
+- reactions = Enum.sort @message.reactions, &(&1.inserted_at < &2.inserted_at)
+= get_message_wrapper_opts(@message, @user)
+  - if @message.avatar do
+    - if avatar = avatar_from_username(@message) do
+      %button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+        = avatar
+    - else
+      %button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+        .avatar
+          - if @user.avatar_url do
+            .avatar-image(style="background-image:url(#{@user.avatar_url});")
+          - else
+            .avatar-image(style="background-image:url(#{avatar_url(username)});")
+  - else
+    - if emoji = emoji(@message) do
+      %button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+        .avatar
+          = emoji
+    - else
+      %button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+        .avatar
+          - if @user.avatar_url do
+            .avatar-image(style="background-image:url(#{@user.avatar_url});")
+          - else
+            .avatar-image(style="background-image:url(#{avatar_url(username)});")
+  - if alias? = alias?(@message) do
+    %button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
+      = alias?
+      %span.message-alias.border-component-color.color-info-font-color= "@#{username}"
+  - else
+    %button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
+      = username
+  %span.info.border-component-color.color-info-font-color
+    - # Logger.error "===== message: #{inspect @message}"
+    - unless @message.type == "d" do
+      - for tag <- role_tags(@message) do
+        %span.role-tag.background-info-font-color(data-role="#{tag}")= tag
+    - if is_bot(@message) do
+      %span.is-bot.background-info-font-color BOT
+    %span.time(title="#{get_date_time(@message, @user)}")= get_time(@message, @user)
+    - if edited = edited(@message, @user) do
+      %span.edited(title="edited at #{edited[:edit_time]} by #{edited[:edited_by]}")
+        %i.icon-edit(aria-label="Edited")
+        %button.thumb.thumb-small.user-card-message(data-username="#{edited[:edited_by]}" tabindex="1")
+          .avatar
+            - if url = @message.edited_by.avatar_url do
+              .avatar-image(style="background-image:url(#{url});")
+            - else
+              .avatar-image(style="background-image:url(#{avatar_url(@message.edited_by.username)});")
+    - if is_private(@message) do
+      %span.private Only you can see this message
+    %div(class="message-cog-container #{hide_cog(@message)}")
+      %i.icon-cog.message-cog(aria-label="Actions")
+  - info = get_info_class(@message)
+  %div{class: "body color-primary-font-color #{info}" dir: "auto"}
+    = format_message_body(@message)
+    -# - if Application.get_env(:ucx_chat, :debug) do
+    -#   %span(style="float: right;")= @message.timestamp
+    - for attachment <- @message.attachments  do
+      = render UccChatWeb.AttachmentView, "attachment.html", attachment: UccChatWeb.AttachmentView.get_attachment(attachment)
+    - previews = @previews
+    - if previews != [] do
+      - for {_, html} <- previews, html != nil and html != "" do
+        = raw html
+
+  %ul(class="actionLinks#{hide_action_links(@message)}")
+    - for action_link <- action_links(@message) do
+      %li.color-primary-action-color
+        %span.action-link(data-actionlink="#{action_link.id}")
+          - if action_link.icon do
+            %i{class: action_link.icon}
+          - if action_link.i18n_label do
+            = action_link.i18n_label
+          - else
+            = action_link.label
+  %ul{class: "reactions#{hide_reactions(@message)}"}
+    - for reaction <- reactions do
+      = render "reaction.html", reaction: reaction, user: @user
+    %li.add-reaction(title="#{~g(Add a reaction)}")
+      %span.icon-people-plus
+</li>

@@ -13,7 +13,7 @@ defmodule UccChat.SideNavService do
     chatd = ChatDat.new(user, channel)
 
     "rooms_list.html"
-    |> UccChat.Web.SideNavView.render(chatd: chatd)
+    |> UccChatWeb.SideNavView.render(chatd: chatd)
     |> Helpers.safe_to_string
   end
 
@@ -22,7 +22,7 @@ defmodule UccChat.SideNavService do
     channels = ChannelService.get_side_nav_rooms user
 
     "list_combined_flex.html"
-    |> UccChat.Web.SideNavView.render(channels: channels, current_user: user)
+    |> UccChatWeb.SideNavView.render(channels: channels, current_user: user)
     |> Helpers.safe_to_string
   end
 
@@ -50,7 +50,7 @@ defmodule UccChat.SideNavService do
       end)
 
     "list_users_flex.html"
-    |> UccChat.Web.SideNavView.render(users: users, current_user: user)
+    |> UccChatWeb.SideNavView.render(users: users, current_user: user)
     |> Helpers.safe_to_string
   end
 end

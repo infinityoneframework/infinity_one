@@ -7,8 +7,8 @@ defmodule UccChat.Shared do
       alias UcxUcc.Accounts.{User, UserRole}
       alias UccChat.{Web.RoomChannel, Web.UserChannel}
       alias UccChat.ServiceHelpers, as: Helpers
-      require UccChat.Web.SharedView
-      use UcxUcc.Web.Gettext
+      require UccChatWeb.SharedView
+      use UcxUccWeb.Gettext
       import Phoenix.HTML, only: [safe_to_string: 1]
     end
   end
@@ -16,7 +16,7 @@ defmodule UccChat.Shared do
   def schema do
     quote do
       use Ecto.Schema
-      use UcxUcc.Web.Gettext
+      use UcxUccWeb.Gettext
 
       import Ecto
       import Ecto.Changeset

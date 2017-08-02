@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
-config :ucx_ucc, UcxUcc.Web.Endpoint,
+config :ucx_ucc, UcxUccWeb.Endpoint,
   http: [port: 4017],
   debug_errors: true,
   code_reloader: true,
@@ -31,7 +31,7 @@ config :ucx_ucc, UcxUcc.Web.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :ucx_ucc, UcxUcc.Web.Endpoint,
+config :ucx_ucc, UcxUccWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},

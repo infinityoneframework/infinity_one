@@ -80,7 +80,7 @@ defmodule Constants do
     case Regex.run ~r/-define\((.+),(.+)\)\./, line do
       nil -> nil
       [_, name, value] ->
-        {String.strip(name) |> String.downcase |> String.to_atom, String.strip(value) |> parse_value}
+        {String.trim(name) |> String.downcase |> String.to_atom, String.trim(value) |> parse_value}
       _ -> nil
     end
   end

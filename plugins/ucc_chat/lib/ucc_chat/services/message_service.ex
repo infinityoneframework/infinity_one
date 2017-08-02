@@ -5,10 +5,10 @@ defmodule UccChat.MessageService do
 
   alias Ecto.Multi
   alias UccChat.{
-    Message, TypingAgent, Mention, Subscription,
-    Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
-    SubscriptionService, MessageAgent, AttachmentService
+    Message, TypingAgent, Mention, Subscription, ChatDat, Channel,
+    ChannelService, SubscriptionService, MessageAgent, AttachmentService
   }
+  alias UccChatWeb.{MessageView, UserChannel}
   alias UccChat.ServiceHelpers, as: Helpers
   # alias UccChat.Schema.Message, as: MessageSchema
 
@@ -76,7 +76,7 @@ defmodule UccChat.MessageService do
 
     html = render_message message
     resp = create_broadcast_message(message.id, channel.name, html)
-    UcxUcc.Web.Endpoint.broadcast! CC.chan_room <> channel.name,
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
       "message:new", resp
   end
 
@@ -84,7 +84,7 @@ defmodule UccChat.MessageService do
     message = create_system_message(channel.id, body)
     html = render_message message
     resp = create_broadcast_message(message.id, channel.name, html)
-    UcxUcc.Web.Endpoint.broadcast! CC.chan_room <> channel.name,
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
       "message:new", resp
   end
   def broadcast_system_message(channel_id, user_id, body) do
@@ -101,7 +101,7 @@ defmodule UccChat.MessageService do
   end
   def broadcast_message(id, room, user_id, html, opts) do
     event = opts[:event] || "new"
-    UcxUcc.Web.Endpoint.broadcast! CC.chan_room <> room, "message:" <> event,
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:" <> event,
       create_broadcast_message(id, user_id, html, opts)
   end
 
@@ -265,7 +265,7 @@ defmodule UccChat.MessageService do
   end
   defp broadcast_link_preview(html, room, message_id) do
     # Logger.warn "broadcasting a preview: room: #{inspect room}, message_id: #{inspect message_id}, html: #{inspect html}"
-    UcxUcc.Web.Endpoint.broadcast! CC.chan_room <> room, "message:preview",
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:preview",
       %{html: html, message_id: message_id}
   end
 
@@ -278,7 +278,7 @@ defmodule UccChat.MessageService do
           for {url, html} <- html_list, is_nil(html) do
             spawn fn ->
               html = MessageAgent.put_preview url, create_link_preview(url, message.id)
-              UcxUcc.Web.Endpoint.broadcast!(CC.chan_user <> user_id, "message:preview",
+              UcxUccWeb.Endpoint.broadcast!(CC.chan_user <> user_id, "message:preview",
                 %{html: html, message_id: message.id})
             end
           end
@@ -303,7 +303,7 @@ defmodule UccChat.MessageService do
 
   def update_typing(channel_id, room) do
     typing = TypingAgent.get_typing_names(channel_id)
-    UcxUcc.Web.Endpoint.broadcast(CC.chan_room <> room,
+    UcxUccWeb.Endpoint.broadcast(CC.chan_room <> room,
       "typing:update", %{typing: typing})
   end
 

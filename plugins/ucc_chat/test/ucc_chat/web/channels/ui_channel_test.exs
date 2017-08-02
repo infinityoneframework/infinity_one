@@ -1,7 +1,7 @@
-defmodule UccChat.Web.UiChannelTest do
-  use UccChat.Web.ChannelCase
+defmodule UccChatWeb.UiChannelTest do
+  use UccChatWeb.ChannelCase
 
-  alias UccChat.Web.UiChannel
+  alias UccChatWeb.UiChannel
 
   setup do
     {:ok, _, socket} =

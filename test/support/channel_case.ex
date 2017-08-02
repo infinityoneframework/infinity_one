@@ -1,4 +1,4 @@
-defmodule UcxUcc.Web.ChannelCase do
+defmodule UcxUccWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,7 +21,7 @@ defmodule UcxUcc.Web.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint UcxUcc.Web.Endpoint
+      @endpoint UcxUccWeb.Endpoint
     end
   end
 

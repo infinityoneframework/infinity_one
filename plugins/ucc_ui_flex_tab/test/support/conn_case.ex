@@ -1,4 +1,4 @@
-defmodule UccUiFlexTab.Web.ConnCase do
+defmodule UccUiFlexTabWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -19,10 +19,10 @@ defmodule UccUiFlexTab.Web.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
-      import UccUiFlexTab.Web.Router.Helpers
+      import UccUiFlexTabWeb.Router.Helpers
 
       # The default endpoint for testing
-      @endpoint UccUiFlexTab.Web.Endpoint
+      @endpoint UccUiFlexTabWeb.Endpoint
     end
   end
 

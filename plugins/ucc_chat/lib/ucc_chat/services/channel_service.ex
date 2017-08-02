@@ -12,9 +12,9 @@ defmodule UccChat.ChannelService do
 
   alias UccChat.{
     Channel, Subscription, MessageService, UserService,
-    ChatDat, Direct, Mute, Web.UserChannel, SideNavService,
-    Message
+    ChatDat, Direct, Mute, SideNavService, Message
   }
+  alias UccChatWeb.UserChannel
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.{User, UserRole}
   alias UcxUcc.Permissions
@@ -417,7 +417,7 @@ defmodule UccChat.ChannelService do
   end
 
   def favorite_room?(user_id, channel_id) do
-    {cc, user} = get_subscription_and_user(user_id, channel_id)
+    {cc, _user} = get_subscription_and_user(user_id, channel_id)
     cc.type == room_type(:stared)
   end
 
@@ -484,7 +484,7 @@ defmodule UccChat.ChannelService do
     #   |> Helpers.safe_to_string
     html =
       "room.html"
-      |> UccChat.Web.MasterView.render(chatd: chatd)
+      |> UccChatWeb.MasterView.render(chatd: chatd)
       |> Helpers.safe_to_string
 
     side_nav_html = SideNavService.render_rooms_list(channel.id, user_id )
@@ -521,7 +521,7 @@ defmodule UccChat.ChannelService do
 
     side_nav_html =
       "rooms_list.html"
-      |> UccChat.Web.SideNavView.render(chatd: chatd)
+      |> UccChatWeb.SideNavView.render(chatd: chatd)
       |> Helpers.safe_to_string
 
     {:ok, %{messages_html: messages_html, side_nav_html: side_nav_html}}
@@ -537,7 +537,7 @@ defmodule UccChat.ChannelService do
 
   def render_messages_header(chatd) do
     "messages_header.html"
-    |> UccChat.Web.MasterView.render(chatd: chatd)
+    |> UccChatWeb.MasterView.render(chatd: chatd)
     |> Helpers.safe_to_string
   end
 
@@ -564,12 +564,12 @@ defmodule UccChat.ChannelService do
 
     messages_html =
       "messages_header.html"
-      |> UccChat.Web.MasterView.render(chatd: chatd)
+      |> UccChatWeb.MasterView.render(chatd: chatd)
       |> Helpers.safe_to_string
 
     side_nav_html =
       "rooms_list.html"
-      |> UccChat.Web.SideNavView.render(chatd: chatd)
+      |> UccChatWeb.SideNavView.render(chatd: chatd)
       |> Helpers.safe_to_string
 
     {:ok, %{
@@ -606,7 +606,7 @@ defmodule UccChat.ChannelService do
       })
     end
 
-    UcxUcc.Web.Endpoint.broadcast! CC.chan_user() <> to_string(user_dest.id),
+    UcxUccWeb.Endpoint.broadcast! CC.chan_user() <> to_string(user_dest.id),
       "direct:new", %{room: channel.name}
     channel
   end
@@ -999,7 +999,7 @@ defmodule UccChat.ChannelService do
 
   def format_binary_msg(n1, n2, operation) do
     ~g"User" <> " <em class='username'>#{n1}</em> " <>
-      Gettext.gettext(UcxUcc.Web.Gettext, operation) <> " " <> ~g"by" <>
+      Gettext.gettext(UcxUccWeb.Gettext, operation) <> " " <> ~g"by" <>
       " <em class='username'>#{n2}</em>."
   end
   # def notify_action(socket, action, resource, owner_id, channel_id)

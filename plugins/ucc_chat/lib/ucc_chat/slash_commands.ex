@@ -1,6 +1,6 @@
 defmodule UccChat.SlashCommands do
   import Phoenix.HTML.Tag
-  use UcxUcc.Web.Gettext
+  use UcxUccWeb.Gettext
 
   @default_count 10
 

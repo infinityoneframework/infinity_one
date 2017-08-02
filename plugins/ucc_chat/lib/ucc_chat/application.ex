@@ -16,7 +16,7 @@ defmodule UccChat.Application do
   end
 
   def start(_type, _args) do
-    UccChat.Web.FlexBar.Defaults.add_buttons()
+    UccChatWeb.FlexBar.Defaults.add_buttons()
   end
 
 end

@@ -1,5 +1,5 @@
 defmodule UcxUcc.UserService do
-  use UcxUcc.Web, :service
+  use UcxUccWeb, :service
   # alias UcxChat.ServiceHelpers, as: Helpers
   alias UcxUcc.{Repo, Accounts}
   alias Accounts.{User, Account}

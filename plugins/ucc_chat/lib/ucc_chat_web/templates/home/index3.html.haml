@@ -1,0 +1,57 @@
+.tooltip
+  .content
+  .tooltip-arrow
+
+#user-card-popover
+#ucx-chat.menu-nav
+  .connection-status.status-online
+
+.wrapper
+  = UccChatWeb.SideNavView.render "show.html", chatd: @chatd, conn: @conn
+  .main-panel
+    %nav.navbar.navbar-transparent.navbar-absolute
+      .container-fluid
+        .navbar-minimize
+          %button#minimizeSidebar.btn.btn-round.btn-white.btn-fill.btn-just-icon
+            %i.material-icons.visible-on-sidebar-regular more_vert
+            %i.material-icons.visible-on-sidebar-mini view_list
+        .navbar-header
+          %button.navbar-toggle(type="button" data-toggle="collapse")
+            %span.sr-only "Toggle navigation"
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
+          %a.navbar-brand(href="#")
+            = content_home_title()
+            .ripple-container
+        .collapse.navbar-collapse
+          %ul.nav.navbar.navbar-right
+    .content
+      .container-fluid
+        .row
+          .col-md-12
+            = content_home_body()
+    %footer.footer
+
+.sweet-container
+%div.main-content-cache.hidden
+
+- flash_error = @conn.private[:phoenix_flash]["error"]
+:javascript
+  window.UccChat = {}
+  window.user_token = '<%= Coherence.user_token(@conn) %>'
+  window.ucxchat = {
+    room_route: '<%= @chatd.room_route %>',
+    room: 'lobby', channel_id: undefined,
+    username: '<%= @chatd.user.username %>',
+    user_id: '<%= @chatd.user.id %>',
+    display_name: ""
+  };
+
+  window.chat_settings = {
+    link_preview: false,
+    use_emojis: true
+  };
+
+  let myPanel = $('.page-container')
+  window.flash_error = '<%= flash_error %>'

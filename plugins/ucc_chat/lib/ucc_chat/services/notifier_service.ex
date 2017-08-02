@@ -1,6 +1,6 @@
 defmodule UccChat.NotifierService do
   use UccChat.Shared, :service
-  use UcxUcc.Web.Gettext
+  use UcxUccWeb.Gettext
 
   require Logger
 
