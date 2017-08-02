@@ -3,7 +3,7 @@ defmodule UccChat.Mixfile do
 
   def project do
     [
-      app: :ucc_chat, 
+      app: :ucc_chat,
       version: "0.1.0"
     ]
     # [app: :ucc_chat,

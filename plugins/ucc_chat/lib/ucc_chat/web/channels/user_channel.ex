@@ -11,7 +11,7 @@ defmodule UccChat.Web.UserChannel do
     "room:mention",
     "user:state",
     "direct:new",
-    "get:subscribed"
+    "get:subscribed",
   ]
 
   import Rebel.Core, warn: false
@@ -29,11 +29,12 @@ defmodule UccChat.Web.UserChannel do
   alias UccUiFlexTab.FlexTabChannel
   alias UccChat.Web.FlexBar.Form
   alias UccChat.{
-    Subscription, ChannelService, Channel,
+    Subscription, ChannelService, Channel, Web.RoomChannel,
     SideNavService, Web.AccountView, Web.UserSocket, Web.MasterView,
     ChannelService, SubscriptionService, InvitationService,
-    UserService, EmojiService, Settings, MessageService
+    UserService, EmojiService, Settings, MessageService, ChatDat
   }
+  alias Rebel.SweetAlert
 
   require UccChat.ChatConstants, as: CC
 
@@ -49,6 +50,43 @@ defmodule UccChat.Web.UserChannel do
     Logger.info "page_loaded, assigns: #{inspect socket.assigns}"
     socket
   end
+
+  def topic_click(socket, sender) do
+    SweetAlert.swal_modal socket, "My Title", "are you sure?", "warning",
+      [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
+      confirm: fn result ->
+        Logger.warn "sweet confirmed! #{inspect result}"
+        SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
+          timer: 2000, showConfirmButton: false
+        Logger.warn "sweet notice complete!"
+      end,
+      cancel: fn result ->
+        Logger.warn "sweet canceled! result: #{inspect result}"
+        SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
+          timer: 2000, showConfirmButton: false
+        Logger.warn "sweet notice complete!"
+      end
+    # Logger.warn "res: #{inspect res}"
+    socket
+  end
+
+  # def topic_click(socket, sender) do
+  #   case SweetAlert.swal socket, "warning", "My Title", "are you sure?",
+  #     showCancelButton: true, closeOnConfirm: false, closeOnCancel: false,
+  #     confirm_function: true do
+
+  #     {:ok, %{"result" => "confirmed"}} ->
+  #       Logger.warn "sweet confirmed!"
+  #       SweetAlert.swal socket, "success", "Confirmed!", "Your action was confirmed"
+  #       Logger.warn "sweet notice complete!"
+  #     {:ok, %{"result" => "canceled"}} ->
+  #       Logger.warn "sweet canceled!"
+  #       SweetAlert.swal socket, "error", "Canceled!", "Your action was canceled"
+  #       Logger.warn "sweet notice complete!"
+  #   end
+  #   # Logger.warn "res: #{inspect res}"
+  #   socket
+  # end
 
   def join_room(user_id, room) do
     # Logger.debug ("...join_room user_id: #{inspect user_id}")
@@ -387,6 +425,7 @@ defmodule UccChat.Web.UserChannel do
   def handle_info({:after_join, params}, socket) do
     trace "after_join", socket.assigns, inspect(params)
     user_id = socket.assigns.user_id
+    channel = Channel.get params["channel_id"]
 
     new_assigns =
       params
@@ -400,6 +439,7 @@ defmodule UccChat.Web.UserChannel do
       |> struct(assigns: Map.merge(new_assigns, socket.assigns))
       |> assign(:subscribed, socket.assigns[:subscribed] || [])
       |> assign(:user_state, "active")
+      |> assign(:room, channel.name)
 
     socket =
       Repo.all(from s in SubscriptionSchema, where: s.user_id == ^user_id,
@@ -688,23 +728,21 @@ defmodule UccChat.Web.UserChannel do
     user_id = socket.assigns.user_id
     socket
     |> do_room_update(payload[:field], user_id, channel_id)
-    |> broadcast_open_info_flex_box(user_id, channel_id)
-
-    # broadcast info box on user channel
-    # socket
-    # |> update_rooms_list(user_id, channel_id)
-    # |> update_message_box(user_id, channel_id)
-    # |> update_messages_header(true)
   end
 
-  defp do_room_update(socket, {:name, _}, user_id, channel_id) do
+  defp do_room_update(socket, {:name, new_room}, user_id, channel_id) do
+    room = socket.assigns.room
+    RoomChannel.broadcast_name_change(room, new_room, user_id, channel_id)
     # broadcast message header on room channel
     # broadcast room entry on user channel
     socket
   end
-  defp do_room_update(socket, {:topic, _}, user_id, channel_id) do
-    # breoadcast message header on room channel
-    Logger.warn ":topic, assigns: #{inspect socket.assigns}"
+  defp do_room_update(socket, {:topic, data}, user_id, channel_id) do
+    RoomChannel.broadcast_room_field(socket.assigns.room, "topic", data)
+    socket
+  end
+  defp do_room_update(socket, {:description, data}, user_id, channel_id) do
+    RoomChannel.broadcast_room_field(socket.assigns.room, "description", data)
     socket
   end
   defp do_room_update(socket, {:type, _}, user_id, channel_id) do
@@ -724,11 +762,6 @@ defmodule UccChat.Web.UserChannel do
   end
   defp do_room_update(socket, field, _user_id, _channel_id) do
     Logger.warn "field: #{inspect field}, assigns: #{inspect socket.assigns}"
-    socket
-  end
-
-  defp broadcast_open_info_flex_box(socket, user_id, channel_id) do
-    # on user channel
     socket
   end
 
@@ -758,17 +791,11 @@ defmodule UccChat.Web.UserChannel do
     socket
   end
 
-  defdelegate flex_tab_click(socket, sender),
-    to: FlexTabChannel
-  defdelegate flex_call(socket, sender),
-    to: FlexTabChannel
-  defdelegate flex_form(socket, sender),
-    to: Form
-  defdelegate flex_form_save(socket, sender),
-    to: Form
-  defdelegate flex_form_cancel(socket, sender),
-    to: Form
-  defdelegate flex_form_toggle(socket, sender),
-    to: Form
+  defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
+  defdelegate flex_call(socket, sender), to: FlexTabChannel
+  defdelegate flex_form(socket, sender), to: Form
+  defdelegate flex_form_save(socket, sender), to: Form
+  defdelegate flex_form_cancel(socket, sender), to: Form
+  defdelegate flex_form_toggle(socket, sender), to: Form
 
 end

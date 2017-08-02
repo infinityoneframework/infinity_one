@@ -152,6 +152,7 @@
       $('.input-message').focus()
     },
     push_history: function() {
+      let ucxchat = window.UccChat.ucxchat
       history.pushState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
     },
     replace_history: function() {

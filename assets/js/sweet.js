@@ -1,4 +1,4 @@
-import sweetAlert from "./sweetalert.min"
+// import sweetAlert from "./sweetalert.min"
 
 export function warning(text, confirm_text, confirm_callback) {
   sweetAlert({

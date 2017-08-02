@@ -1,6 +1,6 @@
 import * as cc from "./chat_channel"
 import toastr from 'toastr'
-import sweetAlert from "./sweetalert.min"
+// import sweetAlert from "./sweetalert.min"
 import * as utils from './utils'
 
 // export function init() {

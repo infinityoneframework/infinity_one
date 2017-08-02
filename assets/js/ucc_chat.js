@@ -9,6 +9,11 @@ console.log('ucc_chat.js loading...')
 window.root = global || window
 
 import hljs from "highlight.js"
+// import * as swal from "./sweetalert.min"
+require('sweetalert')
+// window.Promise = require('es6-promise').Promise;
+
+// window.swal = swal
 
 // var socket = new Socket("/socket", {params: {token: window.user_token, tz_offset: new Date().getTimezoneOffset() / -60}})
 
@@ -238,6 +243,6 @@ require('./chan_room')
 require('./messages')
 
 import * as cc from "./chat_channel"
-import * as sweet from "./sweetalert.min"
+// import * as sweet from "./sweetalert.min"
 import * as device from './device_manager'
 // import Typing from "./typing"

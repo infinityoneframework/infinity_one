@@ -4,4 +4,4 @@
 - else
   %i(class="#{get_room_icon(@chatd)} status-offline")
 %span.room-title= @chatd.active_room[:display_name]
-%span.room-topic= markdown @chatd.channel.topic
+%span.room-topic(rebel-click="topic_click")= markdown @chatd.channel.topic

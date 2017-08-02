@@ -11,19 +11,46 @@ defmodule UccChat.Web.RoomChannel do
     "user:action",
     "room:state_change",
     "room:update:list",
-    "room:delete"
+    "room:delete",
+    "update:topic",
+    "update:description",
+    "update:settings:name",
+    "update:messages_header",
+    "update:name:change"
   ]
 
-  alias UccChat.{Subscription, Channel, Message}
-  alias UccChat.{Web.UserSocket}
+  alias UccChat.{
+    Subscription, Channel, Message, Web.UserSocket, ChatDat, Web.MasterView,
+  }
   alias UccChat.ServiceHelpers, as: Helpers
   alias UcxUcc.Permissions
   alias UcxUcc.Web.Endpoint
+
+  import Rebel.Core, warn: false
+  import Rebel.Query, warn: false
 
   require UccChat.ChatConstants, as: CC
 
   ############
   # API
+
+  def broadcast_room_field(room, field, value) do
+    Endpoint.broadcast! CC.chan_room <> room, "update:#{field}", %{field: value}
+  end
+
+  def broadcast_name_change(room, new_room, user_id, channel_id) do
+    Endpoint.broadcast! CC.chan_room <> room, "update:name:change",
+      %{new_room: new_room, user_id: user_id, channel_id: channel_id}
+  end
+
+  def broadcast_room_settings_field(room, field, value) do
+    Endpoint.broadcast! CC.chan_room <> room, "update:settings:#{field}", %{field: value}
+  end
+
+  def broadcast_messages_header(room, user_id, channel_id) do
+    Endpoint.broadcast! CC.chan_room <> room, "update:messages_header",
+      %{user_id: user_id, channel_id: channel_id}
+  end
 
   def user_join(nil), do: Logger.warn "join for nil username"
   def user_join(username, room) do
@@ -72,6 +99,49 @@ defmodule UccChat.Web.RoomChannel do
 
   ##########
   # Outgoing message handlers
+
+  def handle_out(ev = "update:messages_header", payload, socket) do
+    update_messages_header(socket, get_chatd(payload))
+  end
+
+  def handle_out(ev = "update:name:change", payload, socket) do
+    chatd = get_chatd(payload)
+    ar = chatd.active_room
+
+    socket
+    |> update_messages_header(chatd)
+    |> Client.replace_history(ar.name, ar.display_name)
+
+    {:noreply, socket}
+  end
+
+  defp get_chatd(%{user_id: user_id, channel_id: channel_id}) do
+    subscription = Subscription.get channel_id, user_id,
+      preload: [:user, :channel]
+    ChatDat.new subscription.user, subscription.channel
+  end
+
+  def handle_out(ev = "update:topic", %{field: field} = payload, socket) do
+    debug ev, payload
+    socket
+    |> update!(:text, set: field, on: "header.fixed-title .room-topic")
+    |> update!(:text, set: field, on: ~s(.current-setting[data-edit="topic"]))
+    {:noreply, socket}
+  end
+
+  def handle_out(ev = "update:description", %{field: field} = payload, socket) do
+    debug ev, payload
+    update!(socket, :text, set: field,
+      on: ~s(.current-setting[data-edit="description"]))
+    {:noreply, socket}
+  end
+
+  def handle_out(ev = "update:settings:name", %{field: field} = payload, socket) do
+    debug ev, payload
+    socket
+    |> update!(:text, set: field, on: ~s(.current-setting[data-edit="name"]))
+    {:noreply, socket}
+  end
 
   def handle_out(ev = "room:state_change", msg, %{assigns: assigns} = socket) do
     debug ev, msg, "assigns: #{inspect assigns}"
@@ -183,4 +253,11 @@ defmodule UccChat.Web.RoomChannel do
   end
 
   defp authorized?(_socket, _pattern, _params, _ucxchat, _), do: true
+
+  defp update_messages_header(socket, %ChatDat{} = chatd) do
+    html = Phoenix.View.render_to_string MasterView, "messages_header.html",
+    on = "header.fixed-title h2"
+    update! socket, :html, set: html, on: on
+  end
+
 end

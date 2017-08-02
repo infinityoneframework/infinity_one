@@ -28,6 +28,7 @@ exports.config = {
         "css/app.css": [
           /^(css)/,
           "node_modules/highlight.js/styles/default.css",
+          "node_modules/sweetalert/dist/sweetalert.css"
           // "node_modules/emojionearea/dist/emojionearea.min.css",
 
         ],
@@ -94,11 +95,13 @@ exports.config = {
     // whitelist: ["highlight.js"],
     styles: {
       // toastr: ["toastr.css"],
-      "highlight.js": ['styles/default.css']
+      "highlight.js": ['styles/default.css'],
+      sweetalert: ['dist/sweetalert.css']
       // emojionearea: ['dist/emojionearea.min.css']
       // emojipicker: ['dist/emojipicker.css']
     },
     globals: {
+      sweetAlert: 'sweetalert',
       // $: 'jquery',
       // JQuery: 'jquery',
       _: 'underscore'

@@ -11,8 +11,10 @@ defmodule UccChat.Subscription do
     @repo.one @schema.get_by_room room, user_id
   end
 
-  def get(channel_id, user_id) do
-    from c in @schema, where: c.channel_id == ^channel_id and c.user_id == ^user_id
+  def get(channel_id, user_id, opts \\ []) do
+    preload = opts[:preload] || []
+    from c in @schema, where: c.channel_id == ^channel_id and c.user_id == ^user_id,
+      preload: ^preload
   end
 
   def get_by_channel_id_and_not_user_id(channel_id, user_id) do

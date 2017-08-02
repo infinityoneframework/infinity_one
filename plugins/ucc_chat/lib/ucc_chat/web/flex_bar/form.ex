@@ -3,7 +3,7 @@ defmodule UccChat.Web.FlexBar.Form do
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
-  import UccChat.Web.UiChannel.Js
+  import UccChat.Web.RebelChannel.Client
   import UcxUcc.Web.Gettext
 
   alias UccChat.Web.FlexBar.Helpers

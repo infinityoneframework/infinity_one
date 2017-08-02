@@ -29,5 +29,5 @@ require('./typing')
 // require('./favico')
 // require('./emoji')
 // require('./ucc_webrtc')
-window.sweetAlert = require("./sweetalert.min").sweetAlert
+// window.sweetAlert = require("./sweetalert.min").sweetAlert
 window.moment = require('moment');
