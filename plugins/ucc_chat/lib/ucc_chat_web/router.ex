@@ -28,6 +28,18 @@ defmodule UccChatWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/", UcxUccWeb  do
+    pipe_through :browser
+    coherence_routes()
+  end
+
+  scope "/", UcxUccWeb  do
+    pipe_through :protected
+
+    get "/logout", Coherence.SessionController, :delete
+    coherence_routes :protected
+  end
+
   scope "/", UccChatWeb do
     pipe_through :avatar
     get "/avatar/:username", AvatarController, :show

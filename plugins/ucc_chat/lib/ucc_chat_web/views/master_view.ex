@@ -4,7 +4,8 @@ defmodule UccChatWeb.MasterView do
   alias UccChat.Schema.Channel, as: ChannelSchema
   # alias UccChatWeb.MessageView
   # alias UccUiFlexTabWeb.TabBarView
-  alias UccChatWeb.SharedView
+  alias UccChatWeb.{SharedView, MessageView}
+  alias UccUiFlexTabWeb.TabBarView
 
   require IEx
 

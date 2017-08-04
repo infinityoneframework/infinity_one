@@ -73,12 +73,15 @@ defmodule UccChatWeb.ChannelController do
   end
 
   def show(conn, %{"name" => name}) do
+    # require IEx
     case Channel.get_by(name: name) do
       nil ->
+        # IEx.pry
         conn
         |> put_flash(:error, "#{name} is an invalid channel name!")
         |> redirect(to: "/")
       channel ->
+        # IEx.pry
         if channel.type in [0,1] do
           show(conn, channel)
         else

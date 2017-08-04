@@ -43,7 +43,7 @@ defmodule UccChatWeb do
   def view do
     quote do
       Code.ensure_compiled(UccChatWeb.Router)
-      use Phoenix.View, root: "plugins/ucc_chat/lib/ucc_chat/web/templates",
+      use Phoenix.View, root: "plugins/ucc_chat/lib/ucc_chat_web/templates",
                         namespace: UccChatWeb
 
       # Import convenience functions from controllers

@@ -70,24 +70,6 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  # def topic_click(socket, sender) do
-  #   case SweetAlert.swal socket, "warning", "My Title", "are you sure?",
-  #     showCancelButton: true, closeOnConfirm: false, closeOnCancel: false,
-  #     confirm_function: true do
-
-  #     {:ok, %{"result" => "confirmed"}} ->
-  #       Logger.warn "sweet confirmed!"
-  #       SweetAlert.swal socket, "success", "Confirmed!", "Your action was confirmed"
-  #       Logger.warn "sweet notice complete!"
-  #     {:ok, %{"result" => "canceled"}} ->
-  #       Logger.warn "sweet canceled!"
-  #       SweetAlert.swal socket, "error", "Canceled!", "Your action was canceled"
-  #       Logger.warn "sweet notice complete!"
-  #   end
-  #   # Logger.warn "res: #{inspect res}"
-  #   socket
-  # end
-
   def join_room(user_id, room) do
     # Logger.debug ("...join_room user_id: #{inspect user_id}")
     Endpoint.broadcast!(CC.chan_user() <> "#{user_id}", "room:join",

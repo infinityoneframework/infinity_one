@@ -27,7 +27,7 @@ defmodule UccUiFlexTabWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "plugins/ucc_ui_flex_tab/lib/ucc_ui_flex_tab/web/templates",
+      use Phoenix.View, root: "plugins/ucc_ui_flex_tab/lib/ucc_ui_flex_tab_web/templates",
                         namespace: UccUiFlexTabWeb
 
       # Import convenience functions from controllers

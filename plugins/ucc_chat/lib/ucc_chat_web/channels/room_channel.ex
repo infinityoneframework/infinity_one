@@ -33,8 +33,15 @@ defmodule UccChatWeb.RoomChannel do
 
   require UccChat.ChatConstants, as: CC
 
+  onconnect :on_connect
+
   ############
   # API
+
+  def on_connect(socket) do
+    Logger.warn "on_connect"
+    socket
+  end
 
   def broadcast_room_field(room, field, value) do
     Endpoint.broadcast! CC.chan_room <> room, "update:#{field}", %{field: value}

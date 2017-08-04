@@ -151,6 +151,10 @@ defmodule UccChatWeb.SharedView do
     Subscription.subscribed?(channel_id, user_id)
   end
 
+  def avatar_url(username) do
+    UccChat.AvatarService.avatar_url username
+  end
+
   defmacro gt(text, opts \\ []) do
     quote do
       gettext(unquote(text), unquote(opts))

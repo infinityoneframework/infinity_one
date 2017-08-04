@@ -53,9 +53,10 @@ config :coherence,
   require_current_password: false,
   messages_backend: UcxUccWeb.Coherence.Messages,
   logged_out_url: "/",
+  layout: {UcxUccWeb.Coherence.LayoutView, "app.html"},
   email_from_name: {:system, "COH_NAME"},
   email_from_email: {:system, "COH_EMAIL"},
-  opts: [:invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
+  opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
   # opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
 
 config :coherence, UcxUccWeb.Coherence.Mailer,

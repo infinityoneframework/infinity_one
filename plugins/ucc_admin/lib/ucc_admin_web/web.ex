@@ -29,7 +29,7 @@ defmodule UccAdminWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "plugins/ucc_admin/lib/ucc_admin/web/templates",
+      use Phoenix.View, root: "plugins/ucc_admin/lib/ucc_admin_web/templates",
                         namespace: UccAdminWeb
 
       # Use all HTML functionality (forms, tags, etc)

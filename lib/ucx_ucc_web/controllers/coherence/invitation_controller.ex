@@ -10,17 +10,19 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   * create_user - create a new user database record
   * resend - resend an invitation token email
   """
-  use UcxUccWeb.Coherence, :controller
+  use CoherenceWeb, :controller
+  use Timex
 
   import Ecto.Changeset
 
-  alias Coherence.{Config, Invitation}
+  alias Coherence.{Config, Messages}
+  alias UcxUcc.Coherence.Schemas
 
   require Logger
 
   plug Coherence.ValidateOption, :invitable
   plug :scrub_params, "user" when action in [:create_user]
-  plug :layout_view, view: Coherence.InvitationView
+  plug :layout_view, view: Coherence.InvitationView, caller: __MODULE__
 
   @type schema :: Ecto.Schema.t
   @type conn :: Plug.Conn.t
@@ -31,7 +33,7 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   """
   @spec new(conn, params) :: conn
   def new(conn, _params) do
-    changeset = Invitation.changeset(%Invitation{})
+    changeset = Schemas.change_invitation()
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -43,39 +45,39 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   """
   @spec create(conn, params) :: conn
   def create(conn, %{"invitation" =>  invitation_params} = params) do
-    repo = Config.repo
-    user_schema = Config.user_schema
     email = invitation_params["email"]
-    cs = Invitation.changeset(%Invitation{}, invitation_params)
-    case repo.one from u in user_schema, where: u.email == ^email do
+    changeset = Schemas.change_invitation invitation_params
+    # case repo.one from u in user_schema, where: u.email == ^email do
+    case Schemas.get_user_by_email email do
       nil ->
         token = random_string 48
         url = router_helpers().invitation_url(conn, :edit, token)
-        cs = put_change(cs, :token, token)
-        do_insert(conn, cs, url, params, email)
+        changeset = put_change(changeset, :token, token)
+        do_insert(conn, changeset, url, params, email)
       _ ->
-        cs = cs
-        |> add_error(:email, dgettext("coherence", "User already has an account!"))
-        |> struct(action: true)
-        conn
-        |> render("new.html", changeset: cs)
+        changeset =
+          changeset
+          |> add_error(:email, Messages.backend().user_already_has_an_account())
+          |> struct(action: true)
+        render(conn, "new.html", changeset: changeset)
     end
   end
 
-  defp do_insert(conn, cs, url, params, email) do
-    repo = Config.repo()
-    case repo.insert cs do
+  defp do_insert(conn, changeset, url, params, email) do
+    case Schemas.create changeset do
       {:ok, invitation} ->
         send_user_email :invitation, invitation, url
         conn
-        |> put_flash(:info, dgettext("coherence", "Invitation sent."))
+        |> put_flash(:info, Messages.backend().invitation_sent())
         |> redirect_to(:invitation_create, params)
       {:error, changeset} ->
         {conn, changeset} =
-          case repo.one from i in Invitation, where: i.email == ^email do
+          case Schemas.get_by_invitation email: email do
             nil -> {conn, changeset}
             invitation ->
-              {assign(conn, :invitation, invitation), add_error(changeset, :email, dgettext("coherence", "Invitation already sent."))}
+              {assign(conn, :invitation, invitation),
+                add_error(changeset, :email,
+                  Messages.backend().invitation_already_sent())}
           end
         render(conn, "new.html", changeset: changeset)
     end
@@ -90,31 +92,17 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   @spec edit(conn, params) :: conn
   def edit(conn, params) do
     token = params["id"]
-    Invitation
-    |> where([u], u.token == ^token)
-    |> Config.repo.one
-    |> case do
+    case Schemas.get_by_invitation token: token do
       nil ->
         conn
-        |> put_flash(:error, dgettext("coherence", "Invalid invitation token."))
+        |> put_flash(:error, Messages.backend().invalid_invitation_token())
         |> redirect(to: logged_out_url(conn))
       invite ->
         user_schema = Config.user_schema
-        name = String.trim(invite.name)
-        {name, username} =
-          if String.contains? name, " " do
-            username = String.split(name, " ", trim: true) |> Enum.join(".") |> String.downcase
-            {name, username}
-          else
-            username = name
-            name = name |> String.split(".") |> Enum.map(&String.capitalize/1) |> Enum.join(" ")
-            {name, username}
-          end
-
-        cs = Helpers.changeset(:invitation, user_schema, user_schema.__struct__,
-          %{email: invite.email, username: username, name: name})
+        changeset = Controller.changeset(:invitation, user_schema, user_schema.__struct__,
+          %{email: invite.email, name: invite.name})
         conn
-        |> render(:edit, changeset: cs, token: invite.token)
+        |> render(:edit, changeset: changeset, token: invite.token)
     end
   end
 
@@ -126,21 +114,19 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   @spec create_user(conn, params) :: conn
   def create_user(conn, params) do
     token = params["token"]
-    repo = Config.repo
     user_schema = Config.user_schema
-    Invitation
-    |> where([u], u.token == ^token)
-    |> repo.one
-    |> case do
+    case Schemas.get_by_invitation token: token do
       nil ->
         conn
-        |> put_flash(:error, dgettext("coherence", "Invalid Invitation. Please contact the site administrator."))
+        |> put_flash(:error, Messages.backend().invalid_invitation())
         |> redirect(to: logged_out_url(conn))
       invite ->
-        changeset = Helpers.changeset(:invitation, user_schema, user_schema.__struct__, params["user"])
-        case repo.insert changeset do
+        :invitation
+        |> Controller.changeset(user_schema, user_schema.__struct__, params["user"])
+        |> Schemas.create
+        |> case do
           {:ok, user} ->
-            repo.delete invite
+            Schemas.delete invite
             conn
             |> send_confirmation(user, user_schema)
             |> redirect(to: logged_out_url(conn))
@@ -157,16 +143,15 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   """
   @spec resend(conn, params) :: conn
   def resend(conn, %{"id" => id} = params) do
-    conn = case Config.repo.get(Invitation, id) do
-      nil ->
-        conn
-        |> put_flash(:error, dgettext("coherence", "Can't find that token"))
-      invitation ->
-        send_user_email :invitation, invitation,
-          router_helpers().invitation_url(conn, :edit, invitation.token)
-        put_flash conn, :info, dgettext("coherence", "Invitation sent.")
-    end
+    conn =
+      case Schemas.get_invitation id do
+        nil ->
+          put_flash(conn, :error, Messages.backend().cant_find_that_token())
+        invitation ->
+          send_user_email :invitation, invitation,
+            router_helpers().invitation_url(conn, :edit, invitation.token)
+          put_flash conn, :info, Messages.backend().invitation_sent()
+      end
     redirect_to(conn, :invitation_resend, params)
   end
-
 end

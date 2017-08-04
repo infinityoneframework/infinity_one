@@ -3,7 +3,7 @@ defmodule UcxUccWeb.Coherence do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/ucx_ucc_web/templates/coherence"
+      use Phoenix.View, root: "lib/ucx_ucc_web/templates"
       # Import convenience functions from controllers
 
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
@@ -13,14 +13,14 @@ defmodule UcxUccWeb.Coherence do
 
       import UcxUccWeb.Router.Helpers
       import UcxUccWeb.ErrorHelpers
-      use UcxUccWeb.Gettext
+      import UcxUccWeb.Gettext
       import UcxUccWeb.Coherence.ViewHelpers
     end
   end
 
   def controller do
     quote do
-      use Phoenix.Controller, except: [layout_view: 2] #, namespace: BlogPhx.Web
+      use Phoenix.Controller, except: [layout_view: 2]
       use Coherence.Config
       use Timex
 
@@ -28,11 +28,11 @@ defmodule UcxUccWeb.Coherence do
       import Ecto.Query
       import Plug.Conn
       import UcxUccWeb.Router.Helpers
-      use UcxUccWeb.Gettext
-      import Coherence.ControllerHelpers
+      import UcxUccWeb.Gettext
+      import Coherence.Controller
 
       alias Coherence.Config
-      alias Coherence.ControllerHelpers, as: Helpers
+      alias Coherence.Controller
 
       require Redirects
     end

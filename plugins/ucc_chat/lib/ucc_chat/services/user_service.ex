@@ -1,8 +1,9 @@
 defmodule UccChat.UserService do
   use UccChat.Shared, :service
   # alias UccChat.ServiceHelpers, as: Helpers
-  alias UccChat.{Subscription, Channel}
+  alias UccChat.{Subscription, Channel, ChannelMonitor}
   alias UcxUcc.Accounts.Account
+  alias UcxUcc.Coherence.Schemas
   alias Ecto.Multi
 
   require Logger
@@ -12,16 +13,11 @@ defmodule UccChat.UserService do
   end
 
   def online_users_count do
-    Coherence.CredentialStore.Agent
-    |> Agent.get(&(&1))
-    |> Map.keys
-    |> length
+    length ChannelMonitor.get_users
   end
 
   def get_online_users do
-    Coherence.CredentialStore.Agent
-    |> Agent.get(&(&1))
-    |> Map.values
+    Enum.map ChannelMonitor.get_users, &Schemas.get_user/1
   end
 
   def get_all_users do

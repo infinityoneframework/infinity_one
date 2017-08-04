@@ -17,6 +17,15 @@ defmodule UccChat.ChannelMonitor do
     GenServer.start_link(__MODULE__, [], name: name)
   end
 
+  def get_users(server_name \\ :chan_system) do
+    server_name
+    |> status
+    |> Map.get(:channels)
+    |> Map.values
+    |> Enum.map(& elem(&1, 2) |> hd)
+    |> Enum.uniq
+  end
+
   def init(_) do
     Process.flag(:trap_exit, true)
     {:ok, %{channels: %{}}}

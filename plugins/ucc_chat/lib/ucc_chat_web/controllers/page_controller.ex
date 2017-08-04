@@ -3,7 +3,7 @@ defmodule UccChatWeb.PageController do
 
   import Ecto.Query
 
-  alias Coherence.ControllerHelpers, as: Helpers
+  alias Coherence.Controller
   alias UcxUcc.Repo
   alias UcxUcc.Agents.User
   # alias UccChat.Schema.Channel, as: ChannelSchema
@@ -29,8 +29,8 @@ defmodule UccChatWeb.PageController do
       |> Repo.one!
 
     conn
-    |> Helpers.logout_user()
-    |> Helpers.login_user(new_user)
+    |> Controller.logout_user()
+    |> Controller.login_user(new_user)
     |> redirect(to: "/")
   end
 end

@@ -1,9 +1,9 @@
 defmodule UccChat.InvitationService do
   use UccChat.Shared, :service
-  alias Coherence.Invitation
+  alias UcxUcc.Coherence.Invitation
   alias UcxUcc.Accounts.User
   import Ecto.Changeset
-  import Coherence.ControllerHelpers
+  import Coherence.Controller
 
   def create_and_send(email, name \\ nil) do
     name = if name, do: name, else: String.split(email, "@") |> hd
