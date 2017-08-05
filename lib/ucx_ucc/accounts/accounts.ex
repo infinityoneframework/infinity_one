@@ -41,6 +41,25 @@ defmodule UcxUcc.Accounts do
 
   def get_user(id), do: Repo.get(User, id)
 
+  def get_by_user(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(User, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.one
+  end
+
+  def list_by_user(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(User, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.all
+  end
 
   def username_by_user_id(id) do
     case get_user id do
