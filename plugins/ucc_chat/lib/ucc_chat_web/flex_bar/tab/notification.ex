@@ -14,7 +14,7 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
       "icon-bell-alt",
       View,
       "notifications.html",
-      40)
+      50)
   end
 
   def args(socket, user_id, channel_id, _, params) do

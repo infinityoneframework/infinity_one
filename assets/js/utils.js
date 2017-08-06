@@ -76,7 +76,7 @@
     },
     loadmore_with_animation: function() {
       let d = document.createElement('li')
-      return $(d).addClass('load-more').html(loading_animation())
+      return $(d).addClass('load-more').html(this.loading_animation())
     },
     loadmore: function() {
       return `<li class="load-more"></li>`

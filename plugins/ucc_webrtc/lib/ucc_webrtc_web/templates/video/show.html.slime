@@ -23,7 +23,7 @@ elixir:
   end
 = if @webrtc.video_available do
   = if @webrtc.video_active do
-    .webrtc-video(class='#{cls}')
+    .webrtc-video.animated(class='#{cls}' style="z-index: 15;")
       .main-video.background-transparent-darker
         - class = if @webrtc.main_video_url == @webrtc.self_video_url, do: " video-flip", else: ""
         / video(src="#{@webrtc.main_video_url}" autoplay muted="true" class="webrtc-video-element#{class}")
@@ -52,7 +52,7 @@ elixir:
             .background-transparent-darker=  username_by_user_id item.id
       .buttons-group
         = if @webrtc.video_active do
-          button.button.stop-call(rebel-click="video_stop")
+          button.button.stop-call(rebel-click="flex_call" data-fun="video_stop" data-id="webrtc-members-list")
             i.icon-stop
             = ~g"Stop"
           = if @webrtc.audio_enabled do

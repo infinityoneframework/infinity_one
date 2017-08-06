@@ -802,48 +802,7 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
-  def start_video_call(socket, sender) do
-    current_user_id = socket.assigns.user_id
-    user_id = sender["dataset"]["id"]
-    username = socket.assigns.username
-    other_user = Accounts.get_user user_id
-    Logger.warn "start video curr_id: #{current_user_id}, user_id: #{user_id}"
-    payload =  %{from: current_user_id, username: username}
-
-    UcxUccWeb.Endpoint.broadcast "user:" <> user_id, "webrtc:incoming_video_call",
-      payload
-
-    video = %{
-      self: socket.assigns.username,
-      id: 1,
-      audio_and_video_enabled: true,
-      video_available: true,
-      video_active: true,
-      video_enabled: true,
-      audio_enabled: true,
-      main_video_url: "none",
-      self_video_url: "other",
-      main_video_username: username,
-      other_video_username: other_user.username,
-      remote_video_items: [],
-      screen_share_available: false,
-      screen_share_enabled: false,
-      overlay_enabled: false,
-      overlay: false
-    }
-    html = Phoenix.View.render_to_string UccWebrtcWeb.VideoView, "show.html", webrtc: video
-    socket
-    |> update(:html, set: html, on: ".flex-tab .content")
-    # |> exec_js("window.WebRTC.start(); window.WebRTC.call('#{user_id}');")
-    # |> case do
-    #   {:ok, socket} ->
-    #     socket
-    #   {:error, error} ->
-    #     Logger.error "had a problem starting WebRTC error: #{inspect error}"
-    #     socket
-    # end
-  end
-
+  # TOOD: this needs to be moved like the video stuff
   def start_audio_call(socket, sender) do
     current_user_id = socket.assigns.user_id
     user_id = sender["dataset"]["id"]
@@ -968,6 +927,7 @@ defmodule UccChatWeb.UserChannel do
 
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
   defdelegate flex_call(socket, sender), to: FlexTabChannel
+  defdelegate flex_close(socket, sender), to: FlexTabChannel
   defdelegate flex_form(socket, sender), to: Form
   defdelegate flex_form_save(socket, sender), to: Form
   defdelegate flex_form_cancel(socket, sender), to: Form

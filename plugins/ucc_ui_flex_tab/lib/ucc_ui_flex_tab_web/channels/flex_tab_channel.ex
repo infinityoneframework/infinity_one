@@ -81,6 +81,10 @@ defmodule UccUiFlexTab.FlexTabChannel do
     end)
   end
 
+  def flex_close(socket, sender) do
+    execute socket, :click, on: ".tab-button.active"
+  end
+
   defp get_channel_id(socket) do
     exec_js!(socket, "ucxchat.channel_id")
   end

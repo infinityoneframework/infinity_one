@@ -1,6 +1,7 @@
 - settings = @notification.settings
 - import UccChat.NotificationSetting, only: [options: 1, options_select: 1, option_text: 2]
 .content.notifications
+  = render "flex_close_button.html"
   .list-view.push-notifications
     .title
       h2= ~g"Notifications"

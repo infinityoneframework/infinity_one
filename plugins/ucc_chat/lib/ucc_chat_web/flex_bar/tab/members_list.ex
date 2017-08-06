@@ -6,6 +6,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   alias UccChat.Accounts
   alias TabBar.Ftab
   alias TabBar.Tab
+  alias UccWebrtWeb.FlexBar.Tab.MembersList, as: WebrtcMembersList
 
   require Logger
 
@@ -56,21 +57,34 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     ], socket}
   end
 
+  # this is needed since we are overriding below
   def open(socket, user_id, channel_id, tab, nil) do
     super(socket, user_id, channel_id, tab, nil)
   end
 
-  def open(socket, user_id, channel_id, tab, args) do
-    Logger.warn "args: #{inspect args}"
+  # TODO: Figure out how to have this detect this.
+  def open(socket, current_user_id, channel_id, tab, %{"view" => "video"} = args) do
+    WebrtcMembersList.open(socket, current_user_id, channel_id, tab, args)
+  end
+
+  def open(socket, user_id, channel_id, tab, %{"view" => "user"} = args) do
     username = args["username"]
 
     {args, socket} = user_args(socket, user_id, channel_id, username)
 
-    html = Phoenix.View.render_to_string View, "user_card.html", args
+    html =
+      View
+      |> Phoenix.View.render_to_string("user_card.html", args)
+      |> String.replace(~s('), ~s(\\'))
+      |> String.replace("\n", " ")
+
+    selector = ".flex-tab-container .user-view"
 
     socket
     |> super(user_id, channel_id, tab, nil)
-    |> update(:html, set: html, on: "#flex-user-card-details")
+    |> exec_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
+
+    socket
   end
 
   def flex_show_all(socket, sender) do
@@ -116,15 +130,18 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
     tab = TabBar.get_button "members-list"
 
-    Ftab.open user_id, channel_id, "members-list", %{"username" => username},
-      fn :open, {_, args} ->
+    Ftab.open user_id, channel_id, "members-list", %{"username" => username,
+      "view" => "user"}, fn :open, {_, args} ->
         apply tab.module, :open, [socket, user_id, channel_id, tab, args]
       end
   end
 
-  def view_all(socket, _sender) do
+  def view_all(%{assigns: assigns} = socket, _sender) do
+    TabBar.close_view assigns.user_id, assigns.channel_id, "members-list"
+
     update(socket, :class, toggle: "animated-hidden",
       on: ".flex-tab-container .user-view")
   end
+
 end
 

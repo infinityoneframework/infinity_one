@@ -94,6 +94,7 @@ defmodule UcxUcc.TabBar.Ftab do
   def open(user_id, channel_id, name, view, callback \\ nil) do
     warn channel_id
     TabBar.open_ftab user_id, channel_id, name, view
+    view = TabBar.get_view user_id, channel_id, name
     if callback, do: callback.(:open, {name, view})
   end
 
@@ -166,7 +167,17 @@ defmodule UcxUcc.TabBar.Ftab do
       {name, args} ->
         open user_id, channel_id, name, args, callback
       nil ->
-        callback.(:ok, nil)
+        if callback, do: callback.(:ok, nil)
+    end
+  end
+
+  def close_view(user_id, channel_id, name, callback \\ nil) do
+    warn channel_id
+    case TabBar.get_view user_id, channel_id, name do
+      nil ->
+        if callback, do: callback.({:ok, nil})
+      view ->
+        if callback, do: callback.({:open, {name, nil}})
     end
   end
 

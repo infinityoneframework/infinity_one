@@ -13,7 +13,7 @@ defmodule UcxUcc.TabBar.Tab do
     order:     integer
   }
 
-  defstruct [:module, :groups, :id, :title, :icon, :view, :template, :order]
+  defstruct [:module, :groups, :id, :title, :icon, :view, :template, :order, :display]
 
   def new(module, groups, id, title, icon, view, template, order) do
     %__MODULE__{
@@ -24,7 +24,16 @@ defmodule UcxUcc.TabBar.Tab do
       icon:      icon,
       view:      view,
       template:  template,
-      order:     order
+      order:     order,
+      display:   true
+    }
+  end
+
+  def new(module, id) do
+    %__MODULE__{
+      module: module,
+      id: id,
+      display: false
     }
   end
 end

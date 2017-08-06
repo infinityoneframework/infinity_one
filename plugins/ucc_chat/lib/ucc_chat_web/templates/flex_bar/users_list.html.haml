@@ -1,4 +1,5 @@
 .content
+  = render "flex_close_button.html"
   .list-view.animated
     .title
       %h2 Members List
@@ -14,4 +15,4 @@
     %ul.list.clearfix.lines
       - for user <- @users do
         = render "users_list_item.html", user: user, channel_id: @channel_id
-  .content#flex-user-card-details
+  .user-view.animated.animated-hidden

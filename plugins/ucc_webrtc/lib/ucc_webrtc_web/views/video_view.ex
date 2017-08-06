@@ -1,7 +1,7 @@
 defmodule UccWebrtcWeb.VideoView do
   use UccWebrtcWeb, :view
   alias UcxUcc.Coherence.Schemas
-  alias UccChat.Attachment
+  # alias UccChat.Attachment
 
   def username_by_user_id(id) do
     Schemas.get_user(id) |> Map.get(:username)

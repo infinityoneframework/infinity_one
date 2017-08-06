@@ -455,6 +455,7 @@ class RoomManager {
     if (debug) { console.log('open_room', this) }
     cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
       .receive("ok", resp => {
+        console.log('open_room ok', resp)
         if (resp.redirect) {
           console.log('location')
           window.location = resp.redirect
@@ -463,6 +464,11 @@ class RoomManager {
           this.bind_history_manager_scroll_event()
         }
         if (callback) { callback() }
+        if (debug) { console.log('open_room after callback', this) }
+        this.ucc_chat.utils.remove_page_loading()
+      })
+      .receive("error", resp => {
+        console.log('open_room error', resp)
         this.ucc_chat.utils.remove_page_loading()
       })
   }

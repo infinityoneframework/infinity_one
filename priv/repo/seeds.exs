@@ -101,7 +101,7 @@ create_user = fn name, email, password, admin ->
     |> User.changeset(params)
     |> Repo.insert!
 
-  Coherence.ControllerHelpers.confirm! user
+  Coherence.Controller.confirm! user
 
   role_id = case admin do
     true -> roles["admin"]

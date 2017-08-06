@@ -1,4 +1,5 @@
 .content
+  = render "flex_close_button.html"
   .list-view.mentioned-messages-list
     .title
       h2 Mentions

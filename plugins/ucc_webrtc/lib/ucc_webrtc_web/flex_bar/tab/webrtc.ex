@@ -18,7 +18,11 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
       "icon-mic",
       UccWebrtcWeb.FlexBarView,
       "device.html",
-      90)
+      95)
+
+    TabBar.add_button Tab.new(
+      UccWebrtWeb.FlexBar.Tab.MembersList,
+      "webrtc-members-list")
   end
 
   @spec args(socket, id, id, any, args) :: {List.t, socket}

@@ -81,6 +81,7 @@ defmodule UcxUcc.TabBar do
     @name
     |> :ets.match({{:button, :"_"}, :"$2"})
     |> List.flatten
+    |> Enum.filter(& &1.display)
     |> Enum.sort(& &1.order < &2.order)
   end
 
@@ -166,6 +167,7 @@ defmodule UcxUcc.TabBar do
   """
   def close_view(user_id, channel_id, name) do
     :ets.delete @name, {:ftab_view, {user_id, channel_id, name}}
+    insert {:ftab, {user_id, channel_id}}, {name, nil}
   end
 
   @doc """
@@ -203,6 +205,15 @@ defmodule UcxUcc.TabBar do
   end
 
   @doc """
+  Get all views
+
+  ## Examples
+  """
+  def get_views() do
+    :ets.match(@name, {{:ftab_view, :"$1"}, :"$2"})
+  end
+
+  @doc """
   Get all tabs for a given user.
 
   ## Examples
@@ -216,6 +227,15 @@ defmodule UcxUcc.TabBar do
   def get_ftabs(user_id) do
     @name
     |> :ets.match({{:ftab, {user_id, :"_"}}, :"$2"})
+    |> List.flatten
+  end
+
+  @doc """
+  Get all views for a given user
+  """
+  def get_views(user_id) do
+    @name
+    |> :ets.match({{:ftab_view, {user_id, :"_", :"$1"}}, :"$2"})
     |> List.flatten
   end
 

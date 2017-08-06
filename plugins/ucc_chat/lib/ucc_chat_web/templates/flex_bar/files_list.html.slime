@@ -1,4 +1,5 @@
 .content
+  = render "flex_close_button.html"
   .list-view.uploaded-files-list
     .title
       h2= ~g(Files List)

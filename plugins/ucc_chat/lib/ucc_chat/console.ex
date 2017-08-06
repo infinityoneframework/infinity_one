@@ -9,6 +9,8 @@ defmodule UccChat.Console do
   alias UccChat.{Subscription}
   alias UcxUcc.Repo
   alias UcxUcc.UccPubSub
+  alias UcxUcc.Accounts
+  alias Accounts.User
 
   @doc """
   Clear all last_read subscription fields
@@ -42,5 +44,13 @@ defmodule UccChat.Console do
   end
   def pubsub(:values) do
     pubsub(:subs) |> Map.values
+  end
+
+  @doc """
+  Get a user by username
+  """
+  @spec get_by_username(username :: String.t) :: User.t
+  def get_by_username(username) do
+    Accounts.get_by_user username: username
   end
 end

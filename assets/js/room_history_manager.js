@@ -104,7 +104,7 @@ class RoomHistoryManager {
 
     this.is_loading = true
 
-    this.ucc_chat.utils.page_loading()
+    this.utils.page_loading()
     this.startGetMoreAnimation()
 
     cc.get('/messages', {timestamp: $('li.message').first().attr('data-timestamp')})
@@ -138,7 +138,7 @@ class RoomHistoryManager {
     let html = $(container).html()
     let ts = $('.messages-box li[data-timestamp]').last().data('timestamp')
     let last_id = $('.messages-box li[data-timestamp]').last().attr('id')
-    this.ucc_chat.utils.page_loading()
+    this.utils.page_loading()
     this.startGetMoreNextAnimation()
     this.is_loading = true
 
@@ -153,7 +153,7 @@ class RoomHistoryManager {
         $('.load-more-next').remove()
         if (resp.has_more_next) {
           this.setHasMoreNext = true
-          $('.messages-box .wrapper ul').append(utils.loadmore())
+          $('.messages-box .wrapper ul').append(this.utils.loadmore())
         } else {
           this.setHasMoreNext = false
         }
@@ -195,13 +195,13 @@ class RoomHistoryManager {
     if (resp.value == "") {
       let elem = $(container)
       // console.log('set_scroll_top 1 value', resp, elem, elem.parent().scrollTop())
-      this.ucc_chat.utils.scroll_bottom()
+      this.utils.scroll_bottom()
     } else {
       console.log('set_scroll_top 2 value', resp)
       if (code == "ok") {
         this.scroll_to_message(resp.value)
       } else {
-        this.ucc_chat.utils.scroll_bottom()
+        this.utils.scroll_bottom()
       }
     }
   }

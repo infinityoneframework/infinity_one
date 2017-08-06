@@ -3,6 +3,7 @@
 - output_devices = Map.get @devices, :output, []
 - video_devices = Map.get @devices, :video, []
 .content
+  = UccChatWeb.FlexBarView.render "flex_close_button.html"
   .list-view.devices
     .title
       h2= ~g"Device Settings"
