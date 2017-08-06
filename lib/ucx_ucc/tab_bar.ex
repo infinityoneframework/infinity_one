@@ -92,8 +92,17 @@ defmodule UcxUcc.TabBar do
       iex> UcxUcc.TabBar.open_ftab 1, 2, "test", nil
       true
   """
+  def open_ftab(user_id, channel_id, name, nil) do
+    if view = get_view user_id, channel_id, name do
+      insert {:ftab, {user_id, channel_id}}, {name, view}
+    else
+      insert {:ftab, {user_id, channel_id}}, {name, nil}
+    end
+  end
+
   def open_ftab(user_id, channel_id, name, view) do
     insert {:ftab, {user_id, channel_id}}, {name, view}
+    open_view user_id, channel_id, name, view
   end
 
   @doc """
@@ -114,6 +123,49 @@ defmodule UcxUcc.TabBar do
       [{_, data}] -> data
       _ -> nil
     end
+  end
+
+  @doc """
+  Get the open view from the ftab store.
+
+  ## Examples
+
+      iex> UcxUcc.TabBar.insert {:ftab_view, {1, 2, "test"}}, %{one: 1}
+      iex> UcxUcc.TabBar.get_view 1, 2, "test"
+      %{one: 1}
+  """
+  def get_view(user_id, channel_id, name) do
+    case lookup {:ftab_view, {user_id, channel_id, name}} do
+      [{_, data}] -> data
+      _ -> nil
+    end
+  end
+
+  @doc """
+  Inserts a ftab view into the store.
+
+  ## Examples
+
+      iex> UcxUcc.TabBar.open_view 1, 2, "other", %{two: 2}
+      iex> UcxUcc.TabBar.get_view 1, 2, "other"
+      %{two: 2}
+  """
+  def open_view(user_id, channel_id, name, view) do
+    insert {:ftab_view, {user_id, channel_id, name}}, view
+  end
+
+  @doc """
+  Removes a ftab view from the store.
+
+  ## Examples
+
+      iex> UcxUcc.TabBar.open_view 1, 2, "other", %{two: 2}
+      iex> UcxUcc.TabBar.close_view 1, 2, "other"
+      iex> UcxUcc.TabBar.get_view 1, 2, "other"
+      nil
+  """
+  def close_view(user_id, channel_id, name) do
+    :ets.delete @name, {:ftab_view, {user_id, channel_id, name}}
   end
 
   @doc """
