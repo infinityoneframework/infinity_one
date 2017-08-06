@@ -244,5 +244,5 @@ require('./messages')
 
 import * as cc from "./chat_channel"
 // import * as sweet from "./sweetalert.min"
-import * as device from './device_manager'
+// import * as device from './device_manager'
 // import Typing from "./typing"

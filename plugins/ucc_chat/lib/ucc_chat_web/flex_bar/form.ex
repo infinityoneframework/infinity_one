@@ -89,6 +89,35 @@ defmodule UccChatWeb.FlexBar.Form do
     |> stop_loading_animation()
   end
 
+  def flex_form_select_change(socket, sender) do
+    trace "flex_form_toggle", sender
+
+    tab = TabBar.get_button(sender["form"]["id"])
+    field = form_field sender["name"]
+    value = sender["value"]
+
+    {_assigns, _resource_key, resource} = get_assigns_and_resource(socket)
+
+    tab.module
+    |> apply(:flex_form_select_change, [socket, sender, resource, field, value])
+    |> case do
+      {:ok, socket} ->
+        socket
+        |> Helpers.toastr(:success, gettext("Successfully updated %{model}",
+          model: field))
+        |> notify_update_success(tab, sender, %{resource: resource,
+          field: field, value: value})
+      {:error, _changeset, socket} ->
+        Helpers.toastr(socket, :error, gettext("Error updating %{model}",
+          model: field))
+    end
+  end
+
+  defp form_field(name) do
+    [_, field] = Regex.run ~r/.*\[(.+)\]/, name
+    field
+  end
+
   defp get_assigns_and_resource(socket) do
     assigns = Rebel.get_assigns socket
     resource_key = assigns[:resource_key]

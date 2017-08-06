@@ -8,6 +8,11 @@ use Mix.Config
 # with brunch.io to recompile .js and .css sources.
 config :ucx_ucc, UcxUccWeb.Endpoint,
   http: [port: 4017],
+  https: [port: 4317,
+    otp_app: :ucx_ucc,
+    keyfile: "priv/key.pem",
+    certfile: "priv/cert.pem"
+  ],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

@@ -2,22 +2,24 @@
 // Copyright @E-MetroTel 2015
 //
 (function() {
-  function trace(text) {
-    if (text[text.length - 1] === '\n') {
-      text = text.substring(0, text.length - 1);
-    }
-    if (window.performance) {
-      var now = (window.performance.now() / 1000).toFixed(3);
-      console.log(now + ': ' + text);
-    } else {
-      console.log(text);
-    }
-  }
 
-  UccChat.on_connect(function(ucc_chat, socket) {
-    console.log('device_manager on_connect');
-    DeviceManager.init();
-  });
+  const mscs = {debug: true}
+  const transducer_handset = 0
+  const transducer_headset = 1
+  const transducer_handsfree = 2
+  const transducer_all_pairs = 0x3f
+
+  let current_device = ""
+  let installed_devices = []
+
+  let transducer_tx = 0;
+  let transducer_rx = 0;
+
+  let vol_chg = 1
+  var active_audio_ctrl
+  var webrtc = null
+
+  function get_installed_devices() { return installed_devices }
 
   let DeviceManager = {
     debug: true,
@@ -26,17 +28,19 @@
       handsfree_output_id: "",
       headset_input_id: "",
       headset_output_id: "",
-      video_input_id: "",
       current_device: ""
     },
-    installed_devices: {},
-    init: function() {
-      if (this.debug) console.log('device_manager init')
-      this.enumerateDevices();
-    },
+    active_audio_ctrl: $('#audio-alerting')[0],
     set_webrtc: function(web_rtc) {
       this.webrtc = web_rtc
     },
+    update_transducer: function() {
+      let tx = transducer_tx
+      let rx = transducer_rx
+      if (tx) this.connect_transducer_tx(tx.stream_id, tx.pair_id, tx.apb)
+      if (rx) this.connect_transducer_rx(rx.stream_id, rx.pair_id, rx.apb)
+    },
+
     get_device: function(dev) {
       return this.devices[dev]
     },
@@ -45,7 +49,6 @@
     },
     set_devices: function(devs) {
       if (this.debug) console.log("set_devices", devs)
-      var installed_devices = this.installed_devices;
 
       set_devices_id(devs, installed_devices, "handsfree_input_id", "default")
       set_devices_id(devs, installed_devices, "handsfree_output_id", "default")
@@ -65,32 +68,27 @@
       return status;
     },
     enumerateDevices: function() {
-      if (DeviceManager.debug) console.log('device manager enumerateDevices')
-      navigator.mediaDevices.enumerateDevices()
-      .then(DeviceManager.saveDevices)
-      .catch(DeviceManager.errorCallback)
+      // navigator.mediaDevices.enumerateDevices()
+      // .then(DeviceManager.saveDevices)
+      // .catch(DeviceManager.errorCallback)
     },
     saveDevices: function(deviceInfos) {
-      if (DeviceManager.debug) console.log('saveDevices deviceInfos', deviceInfos)
-      DeviceManager.installed_devices = {}
+      if (DeviceManager.debug) console.log('deviceInfos', deviceInfos)
+      DeviceManager.installed_devices = []
       let devices = []
       for (var i = 0; i !== deviceInfos.length; ++i) {
         let device = deviceInfos[i]
-        if (device.kind === 'audioinput' || device.kind === "audiooutput" || device.kind === "videoinput") {
-          DeviceManager.installed_devices[device.deviceId] = device
-          devices.push({kind: device.kind, label: device.label, id: device.deviceId})
+        if (device.kind === 'audioinput' || device.kind === "audiooutput") {
+          DeviceManager.Manager.installed_devices[device.deviceId] = device
+          DeviceManager.devices.push({kind: device.kind, label: device.label, id: device.deviceId})
         } else {
           console.log('---------- other device', device)
         }
       }
       UccChat.installed_devices = devices
       if (DeviceManager.debug) console.log('installed_devices', devices)
-
-      setTimeout(() => {
-        var event = new Event('device_manager_init');
-        document.dispatchEvent(event);
-      }, 100);
     },
+
     load_devices: function() {
       if (DeviceManager.debug) console.log("load_devices()")
       navigator.mediaDevices.enumerateDevices()
@@ -101,8 +99,84 @@
     get_current_device: function() {
       return this.devices.current_device;
     },
+
+    connect_transducer: function(msg) {
+      // TODO: this needs to be moved
+      var audio_ctrl = $('#audio')
+      DeviceManager.set_active_apb(msg.apb_number)
+      if (msg.tx_enable)
+        DeviceManager.connect_transducer_tx(msg.key, msg.pair_id, msg.apb_number)
+      if (msg.rx_enable)
+        DeviceManager.connect_transducer_rx(msg.key, msg.pair_id, msg.apb_number)
+      DeviceManger.handle_call_on_hold(msg, audio_ctrl)
+    },
+
+    alerting_tone_configuration: function(msg) {
+      switch(msg.transducer_routing) {
+        case transducer_headset:
+        case transducer_handset:
+          // alerting.set_headset_output()
+          DeviceManager.setSinkId($('#audio-alerting'), DeviceManager.devices.headset_output_id)
+          break;
+        case transducer_handsfree:
+          DeviceManager.setSinkId($('#audio-alerting'), DeviceManager.devices.handsfree_output_id)
+          break;
+        case transducer_all_pairs:
+          break;
+        default:
+          console.error('Invalid alerting_tone_configuration transducer_routing', msg)
+          break;
+      }
+    },
+    transducer_tone_volume: function(msg) {
+      switch(msg.key) {
+        case "alerting":
+        case "special":
+          DeviceManager.set_tone_volume(msg.tone_level, msg.key);
+          break;
+        default:
+          console.error('Unknown transducer tone', msg.key)
+          break;
+      }
+    },
+    set_tone_volume: function(level, key) {
+      var tone_volume = 0;
+      switch(key) {
+        case "alerting":
+          tone_volume = alerting.get_vol_step_factor();
+          break;
+        case "special":
+          tone_volume = sptone.get_vol_step_factor();
+          break;
+        case "paging":
+          tone_volume = paging.get_vol_step_factor();
+          break;
+        default:
+          console.error('Unknown transducer tone', key)
+          break;
+      }
+      if (level > 8) level = 8
+      if (level < 1) level = 1
+      let new_volume = tone_volume;
+      if (level > 0)
+        new_volume = level * tone_volume;
+      if (DeviceManager.debug)
+        console.log('set_tone_volume', key, level, new_volume)
+      DeviceManager.active_audio_ctrl.volume = new_volume
+    },
+
+    get_audio_ctrl_volume: function() {
+      return DeviceManager.active_audio_ctrl.volume;
+    },
+    play: function(audio_control, tone_file) {
+      if (DeviceManager.debug)
+        console.log("Media player playing tone:", tone_file)
+      DeviceManager.audio_control.attr('src', tone_file)
+      if (DeviceManager.debug)
+        console.log("Media player playing tone with audio control:", audio_control)
+      audio_control[0].play()
+    },
     setSinkId: function(audio_control, sinkId) {
-      if (DeviceManager.debug) console.log("setSinkId", audio_control, sinkId)
       let element = audio_control[0]
       if (sinkId) {
         if (typeof element.sinkId != 'undefined') {
@@ -127,12 +201,32 @@
       }
     },
     stop: function(audio_control) {
-      if (DeviceManager.debug) console.log("device manager stop")
       audio_control[0].pause()
       audio_control.attr('src','')
     },
+    volume_up: function(active_audio_ctrl) {
+    },
+    volume_down: function(active_audio_ctrl) {
+    },
+    get_rx_volume_parms: function(msg) {
+    },
+    set_volume_level: function(active_audio_ctrl, apb, level) {
+    },
+    set_mute_state: function(msg) {
+      switch (msg.key) {
+        case 0:
+          if(msg.mute) {
+            DeviceManager.webrtc.stop_transducer(DeviceManager.transducer_tx.pair_id)
+          }
+          else {
+            DeviceManager.webrtc.set_transducer(DeviceManager.transducer_tx.pair_id)
+          }
+          break;
+        default:
+          console.error("Unsupported stream_id:", msg.key)
+      }
+    },
     gotDevices: function(deviceInfos) {
-      if (DeviceManager.debug) console.log("gotDevices", deviceInfos)
     },
     errorCallback: function(error) {
       console.error('Device Manager Error: ', error)
@@ -200,5 +294,4 @@
       }
     }
   }
-  window.DeviceManager = DeviceManager;
 })();

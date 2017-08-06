@@ -16,7 +16,8 @@ defmodule UccChatWeb.RoomChannel do
     "update:description",
     "update:settings:name",
     "update:messages_header",
-    "update:name:change"
+    "update:name:change",
+    "js:execjs"
   ]
 
   alias UccChat.{
@@ -108,6 +109,18 @@ defmodule UccChatWeb.RoomChannel do
 
   ##########
   # Outgoing message handlers
+
+  def handle_out("js:execjs" = ev, payload, socket) do
+    trace ev, payload
+    case exec_js socket, payload[:js] do
+      {:ok, result} ->
+        send payload[:sender], {:response, result}
+      {:error, error} ->
+        send payload[:sender], {:error, error}
+    end
+    {:noreply, socket}
+  end
+
 
   def handle_out("update:messages_header", payload, socket) do
     update_messages_header(socket, get_chatd(payload))

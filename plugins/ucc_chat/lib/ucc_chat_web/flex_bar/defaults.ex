@@ -12,5 +12,7 @@ defmodule UccChatWeb.FlexBar.Defaults do
       |> apply(:add_buttons, [])
     end)
 
+    UccWebrtcWeb.FlexBar.Tab.Webrtc.add_buttons
+
   end
 end

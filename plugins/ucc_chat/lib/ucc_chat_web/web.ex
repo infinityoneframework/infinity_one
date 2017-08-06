@@ -77,6 +77,7 @@ defmodule UccChatWeb do
       use Phoenix.Channel
       # import UccChatWeb.Gettext
       use UcxUccWeb.Gettext
+      import UcxUccWeb.Channel
     end
   end
 

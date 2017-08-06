@@ -3,7 +3,7 @@ console.log('room_manager.js loading')
 import * as socket from './socket'
 import * as cc from "./chat_channel"
 // import sweetAlert from "./sweetalert.min"
-import * as device from './device_manager'
+// import * as device from './device_manager'
 // import toastr from 'toastr'
 
 const debug = true;

@@ -5,6 +5,10 @@ UccChat.on_connect(function(ucc_chat, socket) {
   let chan = window.Rebel.channels.user.channel
   ucc_chat.userchan = chan
 
+  document.addEventListener('device_manager_init', (e) => {
+    chan.push('webrtc:device_manager_init', {})
+  });
+
   chan.on('room:update:name', resp => {
     if (debug) { console.log('room:update', resp) }
     $('li.link-room-' + resp.old_name)

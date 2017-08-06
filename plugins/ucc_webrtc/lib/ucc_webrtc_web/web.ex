@@ -27,7 +27,7 @@ defmodule UccWebrtcWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/ucc_webrtc/web/templates",
+      use Phoenix.View, root: "plugins/ucc_webrtc/lib/ucc_webrtc_web/templates",
                         namespace: UccWebrtcWeb
 
       # Import convenience functions from controllers

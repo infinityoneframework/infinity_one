@@ -76,4 +76,13 @@ defmodule UccChatWeb.RebelChannel.Client do
         raise "replace_history error: #{inspect error}"
     end
   end
+
+  def toastr!(socket, which, message) do
+    toastr socket, which, message
+    socket
+  end
+
+  def toastr(socket, which, message) do
+    exec_js socket, ~s{window.toastr.#{which}("#{message}");}
+  end
 end

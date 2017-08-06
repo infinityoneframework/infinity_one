@@ -250,3 +250,23 @@ section.flex-tab-container {
     }
   }
 }
+.list-view.devices {
+  form {
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      margin-top: 10px;
+    }
+    fieldset {
+      padding: 0 10px 10px 10px;
+      border: 1px solid #e6e6e6;
+      margin-bottom: 15px;
+      legend {
+        font-weight: bold;
+        // margin-left: 5px;
+        // margin-right: 5px;
+      }
+    }
+  }
+}

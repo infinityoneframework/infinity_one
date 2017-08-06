@@ -12,6 +12,10 @@ defmodule UccChatWeb.UserChannel do
     "user:state",
     "direct:new",
     "get:subscribed",
+    "js:execjs",
+    "webrtc:incoming_video_call",
+    "webrtc:confirmed_video_call",
+    "webrtc:declined_video_call",
   ]
 
   import Rebel.Core, warn: false
@@ -21,7 +25,8 @@ defmodule UccChatWeb.UserChannel do
 
   alias Phoenix.Socket.Broadcast
   alias UcxUcc.Repo
-  alias UcxUcc.Accounts.{Account, User}
+  alias UcxUcc.Accounts
+  alias Accounts.{Account, User}
   alias UccAdmin.AdminService
   alias UcxUccWeb.Endpoint
   alias UccChat.ServiceHelpers, as: Helpers
@@ -36,6 +41,8 @@ defmodule UccChatWeb.UserChannel do
   alias UccChatWeb.{RoomChannel, AccountView, UserSocket, MasterView}
   alias Rebel.SweetAlert
 
+  alias UccWebrtcWeb.WebrtcChannel
+
   require UccChat.ChatConstants, as: CC
 
   onconnect :on_connect
@@ -43,7 +50,8 @@ defmodule UccChatWeb.UserChannel do
 
   def on_connect(socket) do
     exec_js socket, "window.UccChat.run()"
-    socket
+
+    WebrtcChannel.on_connect(socket)
   end
 
   def page_loaded(socket) do
@@ -52,20 +60,23 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def topic_click(socket, _sender) do
-    SweetAlert.swal_modal socket, "My Title", "are you sure?", "warning",
-      [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
-      confirm: fn result ->
-        Logger.warn "sweet confirmed! #{inspect result}"
-        SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
-          timer: 2000, showConfirmButton: false
-        Logger.warn "sweet notice complete!"
-      end,
-      cancel: fn result ->
-        Logger.warn "sweet canceled! result: #{inspect result}"
-        SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
-          timer: 2000, showConfirmButton: false
-        Logger.warn "sweet notice complete!"
-      end
+    Logger.warn "topic_click socket: #{inspect socket}"
+    send socket.assigns.self, :do_topic_click
+    # do_topic_click socket
+    # SweetAlert.swal_modal socket, "My Title", "are you sure?", "warning",
+    #   [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
+    #   confirm: fn result ->
+    #     Logger.warn "sweet confirmed! #{inspect result}"
+    #     SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
+    #       timer: 2000, showConfirmButton: false
+    #     Logger.warn "sweet notice complete!"
+    #   end,
+    #   cancel: fn result ->
+    #     Logger.warn "sweet canceled! result: #{inspect result}"
+    #     SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
+    #       timer: 2000, showConfirmButton: false
+    #     Logger.warn "sweet notice complete!"
+    #   end
     # Logger.warn "res: #{inspect res}"
     socket
   end
@@ -107,6 +118,73 @@ defmodule UccChatWeb.UserChannel do
 
   ###############
   # Outgoing Incoming Messages
+    #   if data.media?.video
+    #     icon = 'videocam'
+    #     title = "Direct video call from #{fromUsername}"
+    #   else
+    #     icon = 'phone'
+    #     title = "Direct audio call from #{fromUsername}"
+    # else
+    #   if data.media?.video
+    #     icon = 'videocam'
+    #     title = "Group video call from #{subscription.name}"
+    #   else
+    #     icon = 'phone'
+    #     title = "Group audio call from #{subscription.name}"
+
+    # swal
+    #   title: "<i class='icon-#{icon} alert-icon success-color'></i>#{title}"
+    #   text: "Do you want to accept?"
+    #   html: true
+    #   showCancelButton: true
+    #   confirmButtonText: "Yes"
+    #   cancelButtonText: "No"
+  def handle_out("webrtc:" <> event, payload, socket) do
+    apply WebrtcChannel, String.to_atom(event), [payload, socket]
+  end
+
+  # def handle_out("webrtc:incoming_video_call" = ev, payload, socket) do
+  #   trace ev, payload
+  #   trace ev, socket.assigns
+  #   title = "Direct video call from #{payload[:username]}"
+  #   icon = "videocam"
+  #   SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
+  #     [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
+  #     confirm: fn result ->
+  #       Logger.warn "sweet confirmed! #{inspect result}"
+  #       UcxUcc.Endpoint.broadcast "user:" <>  payload[:user_id], "webrtc:confirmed_video_call",
+  #         %{user_id: socket.assigns.user_id}
+  #     end,
+  #     cancel: fn result ->
+  #       UcxUcc.Endpoint.broadcast "user:" <>  payload[:user_id], "webrtc:declined_video_call",
+  #         %{user_id: socket.assigns.user_id}
+  #       Logger.warn "sweet canceled! result: #{inspect result}"
+  #     end
+
+  #   {:noreply, socket}
+  # end
+
+  # def handle_out(ev = "webrtc:confirmed_video_call", payload, socket) do
+  #   trace ev, payload
+
+  #   {:noreply, socket}
+  # end
+
+  # def handle_out(ev = "webrtc:declined_video_call", payload, socket) do
+  #   trace ev, payload
+  #   {:noreply, socket}
+  # end
+
+  def handle_out("js:execjs" = ev, payload, socket) do
+    trace ev, payload
+    case exec_js socket, payload[:js] do
+      {:ok, result} ->
+        send payload[:sender], {:response, result}
+      {:error, error} ->
+        send payload[:sender], {:error, error}
+    end
+    {:noreply, socket}
+  end
 
   def handle_out("get:subscribed" = ev, msg, socket) do
     trace ev, msg
@@ -394,6 +472,15 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
+  def handle_in("webrtc:device_manager_init", payload, socket) do
+    WebrtcChannel.device_manager_init(socket, payload)
+  end
+
+  def handle_in(ev = "webrtc:incoming_video_call", payload, socket) do
+    trace ev, payload
+    {:noreply, socket}
+  end
+
   # default unknown handler
   def handle_in(event, params, socket) do
     Logger.warn "UserChannel.handle_in unknown event: #{inspect event}, " <>
@@ -401,8 +488,55 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+
+  defp do_topic_click(socket) do
+    SweetAlert.swal_modal socket, "My Title", "are you sure?", nil,
+      [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
+      confirm: fn result ->
+        Logger.warn "sweet confirmed! #{inspect result}"
+        SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
+          timer: 2000, showConfirmButton: false
+        Logger.warn "sweet notice complete!"
+      end,
+      cancel: fn result ->
+        Logger.warn "sweet canceled! result: #{inspect result}"
+        SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
+          timer: 2000, showConfirmButton: false
+        Logger.warn "sweet notice complete!"
+      end
+  end
   ###############
   # Info messages
+
+  def handle_info(:do_topic_click, socket) do
+    do_topic_click(socket)
+    noreply socket
+  end
+  def handle_info({"webrtc:incoming_video_call" = ev, payload}, socket) do
+    trace ev, payload
+    trace ev, socket.assigns
+    title = "Direct video call from #{payload[:username]}"
+    icon = "videocam"
+    # SweetAlert.swal_modal socket, "<i class='icon-#{icon} alert-icon success-color'></i>#{title}", "Do you want to accept?", "warning",
+    # SweetAlert.swal_modal socket, title, "Do you want to accept?", "warning",
+    SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
+      [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
+      confirm: fn result ->
+        Logger.warn "sweet confirmed! #{inspect result}"
+
+        # SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
+        #   timer: 2000, showConfirmButton: false
+      end,
+      cancel: fn result ->
+        Logger.warn "sweet canceled! result: #{inspect result}"
+        # SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
+        #   timer: 2000, showConfirmButton: false
+        Logger.warn "sweet notice complete!"
+      end
+
+    {:noreply, socket}
+  end
+
 
   def handle_info({:after_join, params}, socket) do
     trace "after_join", socket.assigns, inspect(params)
@@ -422,6 +556,7 @@ defmodule UccChatWeb.UserChannel do
       |> assign(:subscribed, socket.assigns[:subscribed] || [])
       |> assign(:user_state, "active")
       |> assign(:room, channel.name)
+      |> assign(:self, self())
 
     socket =
       Repo.all(from s in SubscriptionSchema, where: s.user_id == ^user_id,
@@ -437,8 +572,9 @@ defmodule UccChatWeb.UserChannel do
       :delete_subscription
     subscribe_callback "user:" <> user_id, "room:update",
       :room_update
-
-
+    subscribe_callback "user:" <> user_id, "webrtc:offer", :webrtc_offer
+    subscribe_callback "user:" <> user_id, "webrtc:answer", :webrtc_answer
+    subscribe_callback "user:" <> user_id, "webrtc:leave", :webrtc_leave
     {:noreply, socket}
   end
 
@@ -669,8 +805,43 @@ defmodule UccChatWeb.UserChannel do
   def start_video_call(socket, sender) do
     current_user_id = socket.assigns.user_id
     user_id = sender["dataset"]["id"]
+    username = socket.assigns.username
+    other_user = Accounts.get_user user_id
     Logger.warn "start video curr_id: #{current_user_id}, user_id: #{user_id}"
+    payload =  %{from: current_user_id, username: username}
+
+    UcxUccWeb.Endpoint.broadcast "user:" <> user_id, "webrtc:incoming_video_call",
+      payload
+
+    video = %{
+      self: socket.assigns.username,
+      id: 1,
+      audio_and_video_enabled: true,
+      video_available: true,
+      video_active: true,
+      video_enabled: true,
+      audio_enabled: true,
+      main_video_url: "none",
+      self_video_url: "other",
+      main_video_username: username,
+      other_video_username: other_user.username,
+      remote_video_items: [],
+      screen_share_available: false,
+      screen_share_enabled: false,
+      overlay_enabled: false,
+      overlay: false
+    }
+    html = Phoenix.View.render_to_string UccWebrtcWeb.VideoView, "show.html", webrtc: video
     socket
+    |> update(:html, set: html, on: ".flex-tab .content")
+    # |> exec_js("window.WebRTC.start(); window.WebRTC.call('#{user_id}');")
+    # |> case do
+    #   {:ok, socket} ->
+    #     socket
+    #   {:error, error} ->
+    #     Logger.error "had a problem starting WebRTC error: #{inspect error}"
+    #     socket
+    # end
   end
 
   def start_audio_call(socket, sender) do
@@ -754,9 +925,25 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  defp broadcast_rooms_list(socket, user_id, channel_id) do
+  def webrtc_offer(event, payload, socket) do
+    trace event, payload, inspect(socket.assigns)
+    IO.inspect Map.get(payload, :name), label: "keys"
     socket
   end
+
+  def webrtc_answer(event, payload, socket) do
+    trace event, payload, inspect(socket.assigns)
+    socket
+  end
+
+  def webrtc_leave(event, payload, socket) do
+    trace event, payload, inspect(socket.assigns)
+    socket
+  end
+
+  # defp broadcast_rooms_list(socket, user_id, channel_id) do
+  #   socket
+  # end
 
   defp update_message_box(socket, user_id, channel_id) do
     update socket, :html,
@@ -773,11 +960,18 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  def video_stop(socket, sender) do
+    trace "video_stop", sender
+    exec_js(socket, "window.WebRTC.hangup")
+    execute(socket, :click, on: ".tab-button.active")
+  end
+
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
   defdelegate flex_call(socket, sender), to: FlexTabChannel
   defdelegate flex_form(socket, sender), to: Form
   defdelegate flex_form_save(socket, sender), to: Form
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
+  defdelegate flex_form_select_change(socket, sender), to: Form
 
 end
