@@ -1,5 +1,5 @@
-defmodule UcxUccWeb.Router do
-  use UcxUccWeb, :router
+defmodule WebrtcClientWeb.Router do
+  use WebrtcClientWeb, :router
   use Coherence.Router
 
   pipeline :browser do
@@ -24,34 +24,30 @@ defmodule UcxUccWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", UcxUccWeb  do
+  scope "/", WebrtcClient  do
     pipe_through :browser
     coherence_routes()
   end
 
-  scope "/", UcxUccWeb  do
+  scope "/", WebrtcClient  do
     pipe_through :protected
-
-    get "/logout", Coherence.SessionController, :delete
     coherence_routes :protected
   end
 
+  scope "/", WebrtcClientWeb do
+    pipe_through :browser # Use the default browser stack
 
-  scope "/", UccChatWeb do
-    pipe_through :protected # Use the default browser stack
-
-    get "/", HomeController, :index
-    get "/phone", MasterController, :phone
+    # get "/", PageController, :index
   end
 
-  # forward "/admin", UccAdminWeb.Router
-  # TODO: get unbrella working for this
-  forward "/client", WebrtcClientWeb.Router
-  forward "/", UccChatWeb.Router
+  scope "/", WebrtcClientWeb do
+    pipe_through :protected # Use the default browser stack
 
-  # use Unbrella.Plugin.Router
+    get "/", ClientController, :index
+  end
+
   # Other scopes may use custom stacks.
-  # scope "/api", UcxUccWeb do
+  # scope "/api", WebrtcClientWeb do
   #   pipe_through :api
   # end
 end

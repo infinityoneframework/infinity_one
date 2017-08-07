@@ -1,0 +1,36 @@
+.tooltip
+  .content
+  .tooltip-arrow
+
+#user-card-popover
+#ucx-chat.menu-nav
+  .connection-status.status-online
+    = # connection status
+  .main-content.content-background-color(style="transform: translateX(0px);")
+    = #{{#if modal}}main-modal{{/if}}">
+    =# render "room.html", chatd: @chatd, conn: @conn
+    .room-container
+      .dropzone
+        .main-content-flex
+          section
+            header.fixed-title.content-background-color.border-component-color
+              = UccChatWeb.MasterView.render "burger.html"
+              h2
+                =# render "messages_header.html", chatd: @chatd
+                | Welcome to Phone
+            .messages-box.phone-box
+              .wrapper.phone(style="margin: 10px")
+
+
+
+
+
+  div.main-content-cache.hidden
+  =# render UccChatWeb.SideNavView, "show.html", conn: @conn, chatd: @chatd
+.sweet-container
+  =# render "sweet.html"
+
+javascript:
+  $(document).ready(function() {
+    UccChat.utils.remove_page_loading()
+  })
