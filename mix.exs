@@ -55,6 +55,7 @@ defmodule UcxUcc.Mixfile do
   defp deps do
     [
       {:phoenix, "~> 1.3", override: true},
+      {:ecto, "~> 2.1.6", override: true},
       # {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
@@ -77,6 +78,7 @@ defmodule UcxUcc.Mixfile do
       {:calliope, "== 0.4.1", override: true},
       {:hackney, "~> 1.9", override: true},
       {:httpoison, "~> 0.13", override: true},
+      {:poison, "3.1.0", override: true},
       # TODO: move this to the chat package
       {:hedwig, "~> 1.0"},
       {:hedwig_simple_responders, "~> 0.1.2"},
@@ -93,6 +95,15 @@ defmodule UcxUcc.Mixfile do
       {:rebel, path: "../rebel"},
       # {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
+      {:exactor, "~> 2.2", override: true},
+      {:sqlite_ecto2, "~> 2.0"},
+      {:gen_fsm, git: "git@bitbucket.org:emetrotel/gen_fsm.git"},
+      {:ex_data, git: "git@bitbucket.org:emetrotel/ex_data.git"},
+      {:rudp, git: "git@bitbucket.org:emetrotel/rudp.git"},
+      {:ucx_license_manager,
+        git: "git@bitbucket.org:emetrotel/ucx_license_manager.git", env: Mix.env},
+      {:ucx_alarm_manager,
+        git: "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", env: Mix.env}
     ]
   end
 
