@@ -23,7 +23,7 @@ require('./ucc_chat')
 require('./typing')
 require('./device_manager')
 require('./ucc_webrtc')
-require('./mscs')
+// require('./mscs')
 // import main from "./main"
 // import flex_bar from "./flex_bar"
 // import utils from './utils'
