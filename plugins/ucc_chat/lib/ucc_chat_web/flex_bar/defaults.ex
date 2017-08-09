@@ -13,6 +13,7 @@ defmodule UccChatWeb.FlexBar.Defaults do
     end)
 
     UccWebrtcWeb.FlexBar.Tab.Webrtc.add_buttons
+    MscsWeb.FlexBar.Tab.Mscs.add_buttons
 
   end
 end

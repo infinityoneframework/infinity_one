@@ -13,6 +13,7 @@ $phone-container-width: #{$main-phone-width}px;
 $phone-container-height: #{(4 * $buttn-size) + ($buttn-gutter * 3)}px;
 $key-strip-width: #{$buttn-size + $buttn-gutter}px;
 $dialpad-width: #{(3 * $buttn-size) + (2 * $buttn-gutter)}px;
+$dialpad-height: #{(4 * $buttn-size) + (3 * $buttn-gutter)}px;
 
 $double-wide-width: #{2 * $buttn-size + $buttn-gutter}px;
 $softkey-width: #{(($main-phone-width - (3 * $buttn-gutter)) / 4) }px;
@@ -208,7 +209,6 @@ html, body {
             justify-content: flex-end;
           }
         } // .key-strip
-
         .keys-pad {
           display: flex;
           flex-flow: row wrap;
@@ -291,6 +291,44 @@ html, body {
     }
   }
 
+  // flip effect for dial-pad
+  section.keys-pad-container {
+    width: $dialpad-width;
+    height: $dialpad-height;
+    position: relative;
+    perspective: 1000px;
 
+    #keys-pad {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: 0.6s;
+
+      .keys-pad {
+        margin: 0;
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .front, .back {
+         backface-visibility: hidden;
+
+         position: absolute;
+         top: 0;
+         left: 0;
+      }
+      .front {
+        z-index: 2;
+        transform: rotateY( 0deg );
+      }
+      .back {
+        transform: rotateY( 180deg );
+      }
+      &.flipped {
+        transform: rotateY( 180deg );
+      }
+    }
+  } // section.keys-pad-container
 }
 

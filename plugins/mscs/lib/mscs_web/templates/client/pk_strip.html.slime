@@ -1,6 +1,6 @@
 .pk-strip
   = for {num, icon, label} <- get_strips(1) do
     .pk(class="#{icon}")
-      .buttn(data-id="#{num}" rebel-click="pk_click")
+      .buttn(data-id="#{num}" rebel-click="click_program_key")
         /span.icon= Phoenix.HTML.raw(icon)
         .label= Phoenix.HTML.raw(label)

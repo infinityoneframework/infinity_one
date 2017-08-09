@@ -4,7 +4,7 @@
       .vol-up(rebel-click="click_volume_up") &nbsp;
       .vol-down(rebel-click="click_volume_down") &nbsp;
   .keys.image.shift
-    .buttn#shift-key
+    .buttn#shift-key(rebel-click="click_shift")
       .label Shift
   .keys.image.disabled
     .buttn

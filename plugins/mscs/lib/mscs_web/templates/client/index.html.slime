@@ -1,4 +1,4 @@
-.mscs-container(rebel-channel="mscs")
+.mscs-container(rebel-channel="client")
   .mscs
     .phone-container
       .header
@@ -21,8 +21,10 @@
         = render "softkeys.html"
       .keys-container
         = render "left_strip.html"
-        = render "dial_pad.html"
-        = render "aux_pad.html"
+        section.keys-pad-container
+          #keys-pad
+            = render "dial_pad.html"
+            = render "aux_pad.html"
         = render "right_strip.html"
       .footer
         .blank-line &nbsp;

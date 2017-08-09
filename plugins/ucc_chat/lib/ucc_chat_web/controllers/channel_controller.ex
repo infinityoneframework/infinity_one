@@ -4,6 +4,7 @@ defmodule UccChatWeb.ChannelController do
     # UccChatWeb.UiChannel,
     UccChatWeb.UserChannel,
     UccChatWeb.RoomChannel,
+    MscsWeb.ClientChannel
   ]
 
   import Ecto.Query
