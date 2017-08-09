@@ -1,0 +1,14 @@
+.key-strip.left
+  .keys.image.volume
+    .buttn
+      .vol-up(rebel-click="click_volume_up") &nbsp;
+      .vol-down(rebel-click="click_volume_down") &nbsp;
+  .keys.image.shift
+    .buttn#shift-key
+      .label Shift
+  .keys.image.disabled
+    .buttn
+      .label &nbsp;
+  .keys.image.mute
+    .buttn(rebel-click="click_mute")
+      .label &nbsp;

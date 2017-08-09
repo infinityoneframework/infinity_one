@@ -1,0 +1,178 @@
+$yellow: #f4f461;
+
+$primary-font-color: white;
+$secondary-font-color: $yellow;
+
+$primary-background-color: #999;
+$secondary-background-color: #656565;
+$tertiary-background-color: #767676;
+
+$main-background: black;
+$display-background: $tertiary-background-color;
+$keys-primary-background: $primary-background-color;
+$keys-primary-font-color: $primary-font-color;
+$keys-secondary-font-color: $secondary-font-color;
+
+$softkeys-font-color: $secondary-font-color;
+$alpha-font-color: $secondary-font-color;
+
+$pk-strip-background-color: $tertiary-background-color;
+
+$release-key-background: #ff7f00;
+$handsfree-key-background: #b8cd00;
+$headset-key-background: #94d3eb;
+
+$display-container-font-color: white;
+$date-time-font-color: $secondary-font-color;
+
+$small-font-size: 12px;
+
+$keys-box-shadow: inset 4px 4px 12px -4px rgba(0,0,0,.75);
+
+.mscs-container {
+/*  #main {
+    border: 1px solid #555;
+    font: 14px Arial;
+    background-color: $main-background;
+  }
+
+  #main .main-container {
+    color: $main-background;
+  }
+*/
+  .keys {
+    background-color: $keys-primary-background;
+    box-shadow: $keys-box-shadow;
+    &:hover {
+      opacity: 0.90;
+      box-shadow: inset 4px 4px 18px -4px rgba(0,0,0,.55);
+    }
+    &:active {
+      opacity: 0.80;
+      box-shadow: inset 4px 4px 18px -4px rgba(0,0,0,.35);
+    }
+    &.disabled {
+      &:hover {
+        opacity: 1.0;
+        box-shadow: $keys-box-shadow;
+      }
+      &:active {
+        opacity: 1.0;
+        box-shadow: $keys-box-shadow;
+      }
+
+    }
+    .buttn {
+      .numero {
+        font-size: 32px;
+        color: $keys-primary-font-color;
+        font-weight: 300;
+      }
+
+      .alpha {
+        font-size: 12px;
+        color: $alpha-font-color;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+    }
+    &.softkeys {
+      color: $softkeys-font-color;
+      background: $secondary-background-color;
+      .buttn {
+        .label {
+          font-size: 12px;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+  .keys-container {
+    .release  {
+      background-color: $release-key-background !important;
+    }
+    .handsfree {
+      background-color: $handsfree-key-background !important;
+    }
+
+    .headset {
+      background-color: $headset-key-background !important;
+    }
+
+    .key-strip {
+      .keys {
+        background-color: $secondary-background-color;
+        .buttn {
+          .label {
+            font-size: $small-font-size;
+            text-transform: uppercase;
+            color: $secondary-font-color;
+          }
+        }
+      }
+    }
+    .aux-pad {
+
+      .cursor-keys-container {
+        &:hover {
+          opacity: 1.0;
+          box-shadow: $keys-box-shadow;
+        }
+        .cursor-arrows {
+          background-repeat:no-repeat !important;
+          background-position: 50% 50%;
+          &:hover {
+            opacity: 0.4;
+          }
+          &:active {
+            opacity: 0.2;
+          }
+        }
+      }
+      .keys .buttn .label {
+        color: $primary-font-color;
+        font-size: 11px;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .display-container {
+    color: $display-container-font-color;
+    font-size: $small-font-size;
+    font-weight: 300;
+    background: $display-background;
+
+    .dt {
+      color: $date-time-font-color;
+    }
+  }
+  .pk-strips-container {
+    .pk-strip {
+      background: $pk-strip-background-color;
+      .pk {
+        background-color: #c1c1c1;
+        border-radius: 5px;
+        box-shadow: 2px 3px 10px -4px rgba(0, 0, 0, 0.85);
+        &:hover {
+          box-shadow: inset 2px 3px 4px -4px rgba(0, 0, 0, 0.65);
+          background-color: #b5b5b5;
+        }
+        &:active {
+          box-shadow: inset 2px 3px 10px -4px rgba(0, 0, 0, 0.95);
+          background-color: #b0b0b0;
+        }
+
+        .buttn {
+          /*background: #c1c1c1;*/
+          /*box-shadow: inset 2px 2px 8px -4px rgba(0,0,0,.45);*/
+          .label {
+            color: #444;
+            font-size: 12px;
+            font-weight: 550;
+          }
+        }
+      }
+    }
+  }
+}

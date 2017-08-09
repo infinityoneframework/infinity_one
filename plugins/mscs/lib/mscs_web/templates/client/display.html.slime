@@ -1,0 +1,14 @@
+.row
+  .icon-field &nbsp;
+  .context E-MetroTel
+  .dt.date Aug 7
+  .dt.time 2h24
+.row
+  .icon-field &nbsp;
+  .display-line 10 new messages
+.row
+  .icon-field &nbsp;
+  .display-line Release 5.0
+.row
+  .icon-field &nbsp;
+  .display-line IP: 24.53.243.123

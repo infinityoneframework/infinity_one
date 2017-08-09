@@ -1,0 +1,12 @@
+.keys.softkeys
+  .buttn(data-id="0" rebel-click="soft_click")
+    .label DND
+.keys.softkeys
+  .buttn(data-id="1" rebel-click="soft_click")
+    .label Redial
+.keys.softkeys
+  .buttn(data-id="2" rebel-click="soft_click")
+    .label Forward
+.keys.softkeys
+  .buttn(data-id="3" rebel-1lick="soft_click")
+    .label Unreg.

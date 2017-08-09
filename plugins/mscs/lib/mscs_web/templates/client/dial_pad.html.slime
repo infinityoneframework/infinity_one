@@ -1,0 +1,7 @@
+#dial-pad.keys-pad.dial-pad
+  = for {numero, id, alpha} <- get_dialpad_keys() do
+    .keys.digit
+      .buttn(data-id="#{id}" rebel-click="dp_click")
+        .numero= numero
+        .alpha= alpha
+
