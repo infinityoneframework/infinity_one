@@ -4,6 +4,7 @@
 /deps
 /*.ez
 start
+/plugins/mscs
 
 # Generated on crash by the VM
 erl_crash.dump
