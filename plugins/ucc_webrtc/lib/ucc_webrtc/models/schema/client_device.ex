@@ -28,6 +28,7 @@ defmodule UccWebrtc.Schema.ClientDevice do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @fields)
-    |> validate_required(:user_id)
+    |> validate_required([:user_id, :ip_addr])
+    |> unique_constraint(:user_id, name: :client_devices_index)
   end
 end

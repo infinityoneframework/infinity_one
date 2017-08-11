@@ -10,14 +10,32 @@
 
   .key-strip {
     .keys {
+      .label.lamp {
+        width: 6px;
+        height: 31px;
+        margin-top: 20px !important;
+        margin-left: 8px;
+        background-repeat: no-repeat !important;
+        &.dark-lamp {
+          background-image: url('../images/mscs/lamb-black-inactive.jpg');
+        }
+        &.light-lamp {
+          background-image: url('../images/mscs/lamb-light-inactive.jpg');
+        }
+        &.on {
+          background-image: url('../images/mscs/lamb-active.jpg');
+        }
+      }
       background-repeat: no-repeat !important;
       &.image.release  {
         background-image: url('../images/mscs/goodbye-ico4.png');
       }
       &.image.handsfree {
+        background-position: 60% 50% !important;
         background-image: url('../images/mscs/vol-loudspeaker-ico.png');
       }
       &.image.headset {
+        background-position: 60% 50% !important;
         background-image: url('../images/mscs/headset2-ico.png');
       }
       &.image.hold {
@@ -32,6 +50,7 @@
       &.image.mute {
         background-image: url('../images/mscs/vol-mute-ico.png');
       }
+
       &.image.volume {
         .vol-up {
           padding: 0;
@@ -115,6 +134,20 @@
 
     &.phone-i-idle {
       background-image: url('../images/mscs/prgm-phone-i-idle-gray.png');
+    }
+    &.feature-active {
+      background-image: url('../images/mscs/prgm-feature-active-gray.png');
+    }
+    &.phone-i-active {
+      background-image: url('../images/mscs/prgm-phone-i-active-gray.png');
+    }
+    &.phone-i-hold {
+      background-image: url('../images/mscs/prgm-phone-i-hold-gray.png');
+      background-size: 30px;
+    }
+    &.phone-i-ring {
+      background-image: url('../images/mscs/prgm-phone-i-ring-flash.png');
+      background-size: 30px;
     }
   }
 }

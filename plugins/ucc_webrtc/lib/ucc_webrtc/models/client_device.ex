@@ -23,4 +23,34 @@ defmodule UccWebrtc.ClientDevice do
     %{input: [], output: [], video: []}
   end
 
+  # def get_devices(user_id, ip_addr) do
+  #   mac
+  #   |> String.to_integer(16)
+  #   |> get_devices(ip_addr)
+  # end
+
+  def get_devices(user_id, ip_addr) do
+    case list_by(user_id: user_id, ip_addr: ip_addr) do
+      [] ->
+        create!(%{user_id: user_id, ip_addr: ip_addr})
+      device ->
+        device
+    end
+  end
+
+  # def get_devices_changeset(mac, ip_addr) when is_binary(mac) do
+  #   mac
+  #   |> String.to_integer(16)
+  #   |> get_devices_changeset(ip_addr)
+  # end
+
+  def get_devices_changeset(user_id, ip_addr) do
+    case get_devices(user_id, ip_addr) do
+      nil ->
+        create!(%{user_id: user_id, ip_addr: ip_addr})
+      device ->
+        device
+    end
+    |> change
+  end
 end

@@ -16,5 +16,6 @@ defmodule UccWebrtc.Repo.Migrations.CreateClientDevices do
     end
 
     create index(:client_devices, [:user_id])
+    create unique_index(:client_devices, [:ip_addr, :user_id], name: :client_devices_index)
   end
 end

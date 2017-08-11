@@ -142,6 +142,10 @@ $keys-box-shadow: inset 4px 4px 12px -4px rgba(0,0,0,.75);
     font-size: $small-font-size;
     font-weight: 300;
     background: $display-background;
+    .text-highlight {
+      color: $display-background;
+      background: $display-container-font-color;
+    }
 
     .dt {
       color: $date-time-font-color;

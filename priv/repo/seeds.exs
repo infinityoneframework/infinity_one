@@ -3,6 +3,7 @@ alias UcxUcc.{Accounts, Permissions}
 alias Accounts.{User, Role, UserRole, Account}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
+alias Mscs.Client
 
 Message.delete_all
 Subscription.delete_all
@@ -72,6 +73,7 @@ default_permissions = [
     %{name: "preview-c-room",                roles: ["admin", "user"] }
   ]
 
+IO.puts "Creating Roles"
 roles =
   [admin: :global, moderator: :rooms, owner: :rooms, user: :global, bot: :global, guest: :global]
   |> Enum.map(fn {role, scope} ->
@@ -114,6 +116,7 @@ create_user = fn name, email, password, admin ->
   user
 end
 
+IO.puts "Creating Permissions"
 # build the permissions
 roles_list = roles
 default_permissions
@@ -125,6 +128,7 @@ default_permissions
   end)
 end)
 
+IO.puts "Creating First Users"
 # build the users
 u0 = create_user.("Bot", "bot@example.com", "test", :bot)
 u1 = create_user.("Admin", "admin@spallen.com", "test", true)
@@ -133,6 +137,7 @@ u3 = create_user.("Merilee Lackey", "merilee.lackey@spallen.com", "test", false)
 
 # TODO: The following should be moved to the UccChat seeds.exs file
 
+IO.puts "Creating Second Users"
 users =
   [
     "Jamie Pallen", "Jason Pallen", "Simon", "Eric", "Lina", "Denine", "Vince", "Richard", "Sharron",
@@ -143,6 +148,8 @@ users =
     create_user.(name, "#{lname}@example.com", "test", false)
   end)
 
+IO.puts "Creating Channels"
+
 ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id})
 ch2 = ChannelService.insert_channel!(%{name: "support", user_id: u2.id})
 
@@ -151,6 +158,8 @@ channels =
   |> Enum.map(fn name ->
     ChannelService.insert_channel!(%{name: name, user_id: u1.id})
   end)
+
+IO.puts "Creating Subscriptions"
 
 [ch1, ch2] ++ Enum.take(channels, 3)
 |> Enum.each(fn ch ->
@@ -164,6 +173,8 @@ users
   Subscription.create!(%{channel_id: ch1.id, user_id: c.id})
 end)
 
+IO.puts "Creating more Channels"
+
 chan_parts = ~w(biz sales tech foo home work product pbx phone iphone galaxy android slim user small big sand storm snow rain tv shows earth hail)
 for i <- 1..50 do
   name = Enum.random(chan_parts) <> to_string(i) <> Enum.random(chan_parts)
@@ -172,6 +183,8 @@ for i <- 1..50 do
 end
 
 add_messages = true
+
+IO.puts "Creating Messages"
 
 if add_messages do
   messages = [
@@ -223,6 +236,8 @@ if add_messages do
     {Enum.random(users), Enum.random(channels)},
   ]
 
+  IO.puts "Creating More Subscriptions"
+
   new_channel_users
   |> Enum.each(fn {c, ch} ->
     Subscription.create!(%{channel_id: ch.id, user_id: c.id})
@@ -234,4 +249,17 @@ if add_messages do
   end
 end
 
+IO.puts "Creating Settings"
+
 UccSettings.init_all()
+
+start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
+
+IO.puts "Setting mac addresses"
+
+Client.list
+|> Enum.with_index
+|> Enum.each(fn {user, inx} ->
+  Client.update(user, %{mac: start_mac + inx})
+end)
+

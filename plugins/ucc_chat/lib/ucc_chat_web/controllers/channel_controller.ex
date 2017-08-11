@@ -18,6 +18,11 @@ defmodule UccChatWeb.ChannelController do
   alias UccChat.Schema.Direct, as: DirectSchema
 
   plug :put_user_id_session
+  plug :put_user_peer
+
+  def put_user_peer(conn, _) do
+    put_session conn, :user_peer, conn.peer
+  end
 
   def put_user_id_session(conn, _) do
     current_user = Coherence.current_user conn

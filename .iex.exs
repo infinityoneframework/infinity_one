@@ -4,3 +4,4 @@ alias Accounts.{User, Role, UserRole}
 alias UccChat.{Message, Config, Settings, Subscription, Channel}
 import UccChat.Console
 import UccConsole
+import MscsConsole
