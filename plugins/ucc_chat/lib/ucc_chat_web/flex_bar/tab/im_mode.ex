@@ -10,7 +10,8 @@ defmodule UccChatWeb.FlexBar.Tab.ImMode do
       ~w[channel group direct],
       "im-mode",
       ~g"IM Mode",
-      "icon-chat",
+      "icon-menu",
+      # "icon-chat",
       View,
       "",
       1)

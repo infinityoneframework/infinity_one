@@ -3292,7 +3292,14 @@ body:not(.is-cordova) {
 
   .flex-tab-bar {
     min-width: 40px;
+    max-width: 40px;
     z-index: 1;
+
+    .tab-separator {
+      margin: 3px 0;
+      height: 0px;
+      border-bottom: 1px solid #ccc;
+    }
 
     .tab-button {
       position: relative;

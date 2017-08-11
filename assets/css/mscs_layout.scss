@@ -2,7 +2,7 @@ $phone-header-height: 30px;
 $phone-footer-height: 30px;
 
 $buttn-size: 70;
-$buttn-gutter: 3;
+$buttn-gutter: 4;
 $main-phone-width: ((5 * $buttn-size) + ($buttn-gutter * 4));
 
 $buttn-width: #{$buttn-size}px;
@@ -18,11 +18,11 @@ $dialpad-height: #{(4 * $buttn-size) + (3 * $buttn-gutter)}px;
 $double-wide-width: #{2 * $buttn-size + $buttn-gutter}px;
 $softkey-width: #{(($main-phone-width - (3 * $buttn-gutter)) / 4) }px;
 $softkey-height: #{($buttn-size / 2)}px;
-$softkey-padding-top: #{($buttn-size / 4 - 6)}px;
+$softkey-padding-top: #{($buttn-size / 4 - 9)}px;
 
-html, body {
-  background: black;
-}
+// html, body {
+//   background: black;
+// }
 .mscs-container {
   margin-left: 20px;
   margin-top: 20px;
@@ -50,7 +50,6 @@ html, body {
         border-radius: 7px;
       }
       .header {
-        color: white;
         height: $phone-header-height;
         display: flex;
         flex-flow: row nowrap;
@@ -63,6 +62,7 @@ html, body {
           flex: 0 1 auto;
           font-size: 12px;
           margin-left: 5px;
+          padding-bottom: 4px;
         }
         .call-progress {
           flex: auto;
@@ -92,7 +92,7 @@ html, body {
                 }
               }
               &.fk-msg-waiting {
-                margin-right: 10px;
+                // margin-right: 10px;
                 margin-left: 2px;
               }
               &.power-btn {
@@ -169,7 +169,7 @@ html, body {
             width: $buttn-height;
             text-align: center;
             .numero {
-              padding: 10px 0 5px 0;
+              padding: 10px 0 0 0;
               width: 70px;
               text-align: center;
               flex: 1;
@@ -275,11 +275,14 @@ html, body {
 
           .buttn {
             border-radius: 5px;
-            width: 85px !important;
+            padding-top: 2px; padding-bottom: 2px;
+            width: 95px !important;
             .label {
               flex: 4;
               text-align: right;
               padding: 6.5px;
+              font-size: 14px;
+              font-weight: 400;
             }
           }
         }

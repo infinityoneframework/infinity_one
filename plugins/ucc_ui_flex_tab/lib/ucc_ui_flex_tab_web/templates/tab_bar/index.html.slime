@@ -1,11 +1,13 @@
-.flex-tab-container#flex-tabs.border-component-color
-  section.flex-tab.content-background-color
-  .flex-tab-bar.content-background-color(role="toolbar")
-    .tab-button.hidden(title="Visitor Info")
-      button(aria-label="Visitor Info")
-        i.icon-info-circled
-    = for tab <- buttons() do
-      = if visible? tab, "channel" do
+section.flex-tab.content-background-color
+.flex-tab-bar.content-background-color(role="toolbar")
+  .tab-button.hidden(title="Visitor Info")
+    button(aria-label="Visitor Info")
+      i.icon-info-circled
+  = for tab <- buttons() do
+    = if visible? tab, @groups do
+      = if tab.type == :separator do
+        div.tab-separator &nbsp;
+      - else
         div(class="tab-button" title="#{tab.title}" data-id="#{tab.id}" rebel-click="flex_tab_click")
           button(aria-label="#{tab.title}")
             i(class="#{tab.icon}")

@@ -13,11 +13,12 @@ defmodule UcxUcc.TabBar.Tab do
     order:     integer
   }
 
-  defstruct [:module, :groups, :id, :title, :icon, :view, :template, :order, :display]
+  defstruct [:module, :type, :groups, :id, :title, :icon, :view, :template, :order, :display]
 
   def new(module, groups, id, title, icon, view, template, order) do
     %__MODULE__{
       module:    module,
+      type:      :button,
       groups:    groups,
       id:        id,
       title:     title,
@@ -32,8 +33,20 @@ defmodule UcxUcc.TabBar.Tab do
   def new(module, id) do
     %__MODULE__{
       module: module,
+      type: :hidden,
       id: id,
       display: false
     }
   end
+
+  def separator(id, groups, order) do
+    %__MODULE__{
+      id: id,
+      type: :separator,
+      groups: groups,
+      order: order,
+      display: true
+    }
+  end
+
 end

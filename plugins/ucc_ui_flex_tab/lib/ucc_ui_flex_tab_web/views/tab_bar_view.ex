@@ -17,7 +17,13 @@ defmodule UccUiFlexTabWeb.TabBarView do
       iex> UccUiFlexTabWeb.TabBarView.visible? tab, :three
       false
   """
-  @spec visible?(UcxUcc.TabBar.Tab.t, atom) :: boolean
+  # @spec visible?(UcxUcc.TabBar.Tab.t, atom | list) :: boolean
+  def visible?(tab, groups) when is_list(groups) do
+    Enum.reduce groups, false, fn group, acc ->
+      acc || visible?(tab, group)
+    end
+  end
+
   def visible?(tab, group) do
     group in Map.get(tab, :groups, [])
   end
