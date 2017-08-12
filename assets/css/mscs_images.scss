@@ -1,4 +1,16 @@
 .mscs-container {
+  .display-container {
+    .icon-field {
+      background-repeat:no-repeat !important;
+      background-position: 0% 50%;
+      &.email-flicker {
+        background-image: url('../images/mscs/email-flicker.gif');
+      }
+      &.email-flash {
+        background-image: url('../images/mscs/email-flash.gif');
+      }
+    }
+  }
   .keys {
     background-repeat: no-repeat !important;
     background-position: 50% 50% !important;

@@ -20,12 +20,19 @@ $softkey-width: #{(($main-phone-width - (3 * $buttn-gutter)) / 4) }px;
 $softkey-height: #{($buttn-size / 2)}px;
 $softkey-padding-top: #{($buttn-size / 4 - 9)}px;
 
+$pk-button-width: 95;
+$pk-strip-margin-left: 5;
+$pk-strip-padding-x: 5;
+
+$container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left + 2 * $pk-strip-padding-x;
 // html, body {
 //   background: black;
 // }
 .mscs-container {
-  margin-left: 20px;
+  margin-right: auto;
+  margin-left: auto;
   margin-top: 20px;
+  width: #{$container-width}px;
 
   .buttn {
     // border: none;
@@ -240,7 +247,6 @@ $softkey-padding-top: #{($buttn-size / 4 - 9)}px;
       }
 
       .footer {
-        color: white;
         height: $phone-footer-height;
         font-size: 10px;
         text-align: center;
@@ -266,17 +272,16 @@ $softkey-padding-top: #{($buttn-size / 4 - 9)}px;
         align-items: stretch;
 
         margin: 0;
-        margin-left: 5px;
-        padding: 8px 5px;
+        margin-left: #{$pk-strip-margin-left}px;
+        padding: 8px #{$pk-strip-padding-x}px;
         border-radius: 7px;
-
         .pk {
           flex: 1 0 100%;
 
           .buttn {
             border-radius: 5px;
             padding-top: 2px; padding-bottom: 2px;
-            width: 95px !important;
+            width: #{$pk-button-width}px !important;
             .label {
               flex: 4;
               text-align: right;

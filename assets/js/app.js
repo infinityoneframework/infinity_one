@@ -24,6 +24,7 @@ require('./typing')
 require('./device_manager')
 require('./ucc_webrtc')
 require('./chan_mscs')
+require('./mscs')
 // require('./mscs')
 // import main from "./main"
 // import flex_bar from "./flex_bar"

@@ -60,6 +60,12 @@
       }
 
     }
+    .buttn[data-id="star"] {
+      .numero {
+        font-size: 48px;
+        padding-top: 5px;
+      }
+    }
     .buttn {
       .numero {
         font-size: 32px;
@@ -221,6 +227,11 @@
   font-size: 1em;
   line-height: 1.3;
 
+  header,
+  .footer {
+    color: $primary-font-color;
+  }
+
   .keys {
     background-color: $keys-primary-background;
     box-shadow: $keys-box-shadow;
@@ -274,6 +285,12 @@
         box-shadow: $keys-box-shadow;
       }
 
+    }
+    .buttn[data-id="star"] {
+      .numero {
+        font-size: 48px;
+        padding-top: 5px;
+      }
     }
     .buttn {
       .numero {

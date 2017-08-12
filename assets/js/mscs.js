@@ -1,4 +1,6 @@
 (function() {
+  console.log('loading mscs')
+  window.Mscs = {}
   // function isVisible(elem) {
   //   var style = window.getComputedStyle(elem);
   //   return (style.display !== 'none');
@@ -27,3 +29,5 @@
   // window.onload = on_load;
   // window.isVisible = isVisible
 })();
+require('./mscs_watchdog')
+require('./mscs_date_time')
