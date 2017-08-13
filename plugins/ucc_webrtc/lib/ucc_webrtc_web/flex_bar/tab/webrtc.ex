@@ -50,7 +50,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
 
   defp get_client_devices(socket) do
     socket
-    |> exec_js("window.UccChat.installed_devices")
+    |> exec_js("window.UcxUcc.installed_devices")
     # |> IO.inspect(label: "installed_devices")
     |> case do
       {:ok, devices} -> devices

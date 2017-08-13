@@ -21,7 +21,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   ]
 
   def device_manager_init(socket, _payload) do
-    case exec_js(socket, "window.DeviceManager.installed_devices") do
+    case exec_js(socket, "window.UcxUcc.DeviceManager.installed_devices") do
       {:ok, installed_devices} ->
          ClientDevice.get_by(user_id: socket.assigns.user_id)
          |> set_client_devices(installed_devices, socket)
@@ -45,7 +45,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
           end)
           |> Enum.join(", ")
 
-        exec_js socket, "window.UccChat.devices = {" <> str <> "}"
+        exec_js socket, "window.UcxUcc.devices = {" <> str <> "}"
         socket
     end
   end
@@ -219,7 +219,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       end)
       |> Enum.join(", ")
 
-    exec_js socket, "window.DeviceManager.devices = {" <> str <> "}"
+    exec_js socket, "window.UcxUcc.DeviceManager.devices = {" <> str <> "}"
     socket
   end
 

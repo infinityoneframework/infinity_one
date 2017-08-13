@@ -14,11 +14,6 @@
     }
   }
 
-  UccChat.on_connect(function(ucc_chat, socket) {
-    console.log('device_manager on_connect');
-    DeviceManager.init();
-  });
-
   let DeviceManager = {
     debug: true,
     devices: {
@@ -83,7 +78,7 @@
           console.log('---------- other device', device)
         }
       }
-      UccChat.installed_devices = devices
+      UcxUcc.installed_devices = devices
       if (DeviceManager.debug) console.log('installed_devices', devices)
 
       setTimeout(() => {
@@ -200,5 +195,11 @@
       }
     }
   }
-  window.DeviceManager = DeviceManager;
+
+  UccChat.on_connect(function(ucc_chat, socket) {
+    console.log('device_manager on_connect');
+    window.UcxUcc.DeviceManager = DeviceManager;
+    window.UcxUcc.DeviceManager.init();
+  });
+
 })();

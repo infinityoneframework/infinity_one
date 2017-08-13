@@ -19,12 +19,15 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
+window.UcxUcc = {}
+
 require('./ucc_chat')
 require('./typing')
 require('./device_manager')
 require('./ucc_webrtc')
 require('./chan_mscs')
 require('./mscs')
+require('./tone_generator')
 // require('./mscs')
 // import main from "./main"
 // import flex_bar from "./flex_bar"
