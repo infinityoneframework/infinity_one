@@ -193,8 +193,11 @@
           audio_ctrl[0].pause()
         }
       }
+    },
+    get_audio_ctrl_volume: function() {
+      return 0.7;
     }
-  }
+  };
 
   UccChat.on_connect(function(ucc_chat, socket) {
     console.log('device_manager on_connect');

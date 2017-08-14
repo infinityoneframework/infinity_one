@@ -3,11 +3,13 @@ alias UcxUcc.{Accounts, Permissions}
 alias Accounts.{User, Role, UserRole, Account}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
-alias Mscs.Client
+alias Mscs.{Client, Apb}
 
 Message.delete_all
 Subscription.delete_all
 Channel.delete_all
+Apb.delete_all
+
 
 Repo.delete_all PermissionRole
 Repo.delete_all UserRole
@@ -260,6 +262,7 @@ IO.puts "Setting mac addresses"
 Client.list
 |> Enum.with_index
 |> Enum.each(fn {user, inx} ->
-  Client.update(user, %{mac: start_mac + inx})
+  mac = start_mac + inx + 1
+  Client.update(user, %{mac: mac})
 end)
 

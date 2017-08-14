@@ -31,3 +31,4 @@
 })();
 require('./mscs_watchdog')
 require('./mscs_date_time')
+require('./mscs_alerting')
