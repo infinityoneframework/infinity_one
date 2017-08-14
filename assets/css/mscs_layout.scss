@@ -95,7 +95,7 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
                 flex: 0 1 20px;
                 img { height: 13px }
                 &.off {
-                  opacity: 0.5;
+                  opacity: 0.2;
                 }
               }
               &.fk-msg-waiting {

@@ -69,7 +69,7 @@
     },
     set_mwi: function(state) {
       this.mwi.state = state
-      mwi_led_update(this, state)
+      mwi_led_update(state)
     },
     startAlerting: function(msg) {
       console.log('startAlerting', this)
@@ -106,7 +106,7 @@
   }
 
   Tone.prototype.setupCadences = function(msg) {
-    console.log('setupCadences context', this.context)
+    console.log('setupCadences context', this.context, msg)
     if (this.context.status != 1) {
       let cadenceSelect = cadenceList[msg.cadence_select];
       let alertingTone = this;
@@ -174,13 +174,16 @@
   }
 
   Tone.prototype.change_gain = function(value, dir) {
-        this.set_gain(value, dir);
+    console.log('change_gain', value, dir);
+    this.set_gain(value, dir);
   }
 
   Tone.prototype.set_frequencies = function(index, freqs) {
+    console.log('set_frequencies', index, freqs);
     this.freqs[index] = freqs
   }
   Tone.prototype.set_warble = function(index, t_on, t_off, t_delay, on_gain, off_gain) {
+    console.log('set_warble', index)
     this.warble[index] = {}
     this.warble[index].t_on = t_on
     this.warble[index].t_off = t_off
@@ -219,45 +222,47 @@
   }
 
   Tone.prototype.setup = function() {
+    console.log('setup')
 
-      for (var i = 0; i < this.freqs.length; i++) {
-        this.oscs[i] = [];
-        for (var j = 0; j < this.freqs[i].length; j++) {
-          this.oscs[i][j] = context.createOscillator();
-          this.oscs[i][j].frequency.value = this.freqs[i][j];
-        }
-        this.gainNode[i] = this.context.createGain();
-        this.gainNode[i].gain.value = 0.15;
+    for (var i = 0; i < this.freqs.length; i++) {
+      this.oscs[i] = [];
+      for (var j = 0; j < this.freqs[i].length; j++) {
+        this.oscs[i][j] = context.createOscillator();
+        this.oscs[i][j].frequency.value = this.freqs[i][j];
       }
-      this.vGainNode = this.context.createGain();
-      this.volume = UcxUcc.DeviceManager.get_audio_ctrl_volume();
+      this.gainNode[i] = this.context.createGain();
+      this.gainNode[i].gain.value = 0.15;
+    }
+    this.vGainNode = this.context.createGain();
+    this.volume = UcxUcc.DeviceManager.get_audio_ctrl_volume();
 
-      if (typeof this.volume === "undefined")
-        this.volume = 0.7;
+    if (typeof this.volume === "undefined")
+      this.volume = 0.7;
 
-      this.vGainNode.gain.value = 0;
+    this.vGainNode.gain.value = 0;
 
-      this.filter = this.context.createBiquadFilter();
-      this.filter.type = "peaking";
-      this.filter.Q.value = 100;
-      this.filter.gain.value = 6;
-      this.filter.frequency.value = 3500;
+    this.filter = this.context.createBiquadFilter();
+    this.filter.type = "peaking";
+    this.filter.Q.value = 100;
+    this.filter.gain.value = 6;
+    this.filter.frequency.value = 3500;
 
-      for (var i = 0; i < this.freqs.length; i++) {
-        for (var j = 0; j < this.freqs[i].length; j++) {
-          this.oscs[i][j].connect(this.gainNode[i]);
-        }
-        this.gainNode[i].connect(this.vGainNode);
+    for (var i = 0; i < this.freqs.length; i++) {
+      for (var j = 0; j < this.freqs[i].length; j++) {
+        this.oscs[i][j].connect(this.gainNode[i]);
       }
-      this.vGainNode.connect(this.filter);
+      this.gainNode[i].connect(this.vGainNode);
+    }
+    this.vGainNode.connect(this.filter);
 
-      if (this.default_destination)
-        this.filter.connect(this.context.destination);
-      else
-        this.filter.connect(this.destination);
+    if (this.default_destination)
+      this.filter.connect(this.context.destination);
+    else
+      this.filter.connect(this.destination);
   }
 
   Tone.prototype.start = function() {
+    console.log('start')
     this.setup();
     for (var i = 0; i < this.freqs.length; i++) {
       for (var j = 0; j < this.freqs[i].length; j++) {
@@ -267,6 +272,7 @@
   }
 
   Tone.prototype.stop = function() {
+    console.log('stop')
     for (var i = 0; i < this.freqs.length; i++) {
       for (var j = 0; j < this.freqs[i].length; j++) {
         this.oscs[i][j].stop(0);
@@ -276,6 +282,7 @@
   }
 
   Tone.prototype.createRingerLFO = function(index) {
+    console.log('createRingerLFO', index)
     let channels = 1;
     let sampleRate = this.context.sampleRate;
 
@@ -334,6 +341,7 @@
   }
 
   Tone.prototype.startRinging = function(attenuated) {
+    console.log('startRinging', attenuated);
     if (typeof this.volume == 'undefined') {
       console.error('undefined volume', this)
       this.volume = 0.7
@@ -351,7 +359,7 @@
         this.ringerLFOSource[i].start(0);
       }
       this.status = 1;
-      alert_mwi_on()
+      alert_mwi_on(this.alerting)
     }
     if (attenuated)
     {
@@ -371,76 +379,86 @@
   }
 
   Tone.prototype.stopRinging = function() {
+    console.log('stopRinging');
     this.stop();
     for (var i = 0; i < this.freqs.length; i++) {
       this.ringerLFOSource[i].stop(0);
     }
-    // alert_mwi_off(this.alerting)
+    alert_mwi_off(this.alerting)
   }
 
   function setup_mwi(alerting) {
-    console.log('setup_mwi alerting', alerting)
-    // alerting.mwi.cad_on = alerting.alertingTone.cadence[0] * 1000
-    // alerting.mwi.cad_off = alerting.alertingTone.cadence[1] * 1000
-    // alerting.mwi.t_on = alerting.alertingTone.warble[0].t_on * 1000
-    // alerting.mwi.t_off = alerting.alertingTone.warble[0].t_on * 1000
-    // alerting.mwi.loop = alerting.alertingTone.loop
+    console.log('setup_mwi alertingTone', alerting.alertingTone)
+    alerting.mwi.cad_on = alerting.alertingTone.cadence[0] * 1000
+    alerting.mwi.cad_off = alerting.alertingTone.cadence[1] * 1000
+    if (alerting.alertingTone.warble[0]) {
+      alerting.mwi.t_on = alerting.alertingTone.warble[0].t_on * 1000
+      alerting.mwi.t_off = alerting.alertingTone.warble[0].t_on * 1000
+    }
+    alerting.mwi.loop = alerting.alertingTone.loop
   }
 
   function alert_mwi_on(alerting) {
-    // mwi_cad_start(alerting)
+    console.log('alert_mwi_on', alerting);
+    mwi_cad_start(alerting)
   }
 
   function alert_mwi_off(alerting) {
-    // clearTimeout(alerting.mwi.warble_timer)
-    // clearTimeout(alerting.mwi.cad_timer)
-    // mwi_led_update(alerting.mwi.state)
+    console.log('alert_mwi_off');
+    clearTimeout(alerting.mwi.warble_timer)
+    clearTimeout(alerting.mwi.cad_timer)
+    mwi_led_update(alerting.mwi.state)
   }
 
   function mwi_cad_start(alerting) {
-    // alerting.mwi.cad_timer = setTimeout(function() {
-    //   mwi_cad_stop(alerting)
-    // }, alerting.mwi.cad_on)
-    // mwi_warble_on(alerting)
+    console.log('alert_mwi_start', alerting);
+    alerting.mwi.cad_timer = setTimeout(() => {
+      mwi_cad_stop(alerting)
+    }, alerting.mwi.cad_on)
+    mwi_warble_on(alerting)
   }
   function mwi_cad_stop(alerting) {
-    // clearTimeout(alerting.mwi.warble_timer)
-    // mwi_led_update(alerting.mwi.state)
-    // if (alerting.mwi.loop) {
-    //   alerting.mwi.cad_timer = setTimeout(function() {
-    //     mwi_cad_start(alerting)
-    //   }, alerting.mwi.cad_off)
-    // }
+    console.log('alert_mwi_stop', alerting);
+    clearTimeout(alerting.mwi.warble_timer)
+    mwi_led_update(alerting.mwi.state)
+    if (alerting.mwi.loop) {
+      alerting.mwi.cad_timer = setTimeout(() => {
+        mwi_cad_start(alerting)
+      }, alerting.mwi.cad_off)
+    }
   }
   function mwi_warble_on(alerting) {
-    // mwi_led_update("on")
-    // mwi.warble_timer = setTimeout(function() {
-    //   mwi_warble_off(alerting)
-    // }, alerting.mwi.t_on)
+    let t_on = alerting.mwi.t_on;
+    console.log('mwi_warble_on', t_on, alerting);
+
+    mwi_led_update("on")
+    alerting.mwi.warble_timer = setTimeout(() => {
+      mwi_warble_off(alerting)
+    }, alerting.mwi.t_on)
   }
   function mwi_warble_off(alerting) {
-    // mwi_led_update("off")
-    // alerting.mwi.warble_timer = setTimeout(function() {
-    //   mwi_warble_on(alerting)
-    // }, alerting.mwi.t_off)
+    console.log('mwi_warble_off', alerting);
+    mwi_led_update("off")
+    alerting.mwi.warble_timer = setTimeout(() => {
+      mwi_warble_on(alerting)
+    }, alerting.mwi.t_off)
   }
 
-  function mwi_led_update(alerting, state) {
-    let key = $("#fk-msg_waiting")
+  function mwi_led_update(state) {
+    console.log('mwi_led_update', state)
+    let key = $(".fk-msg_waiting")
     switch(state) {
       case "on":
         key.removeClass("off")
-        key.removeClass("process-red-mwi-flash")
-        key.addClass("process-red")
+        key.addClass("on")
         break;
       case "off":
+        key.removeClass("on")
         key.addClass("off")
-        key.removeClass("process-red-mwi-flash")
-        key.addClass("process-red")
         break;
       case "flash":
-        key.removeClass("off")
-        key.removeClass("process-red")
+        key.removeClass("on")
+        key.addClass("on")
         key.addClass("process-red-mwi-flash")
         break;
       default:
