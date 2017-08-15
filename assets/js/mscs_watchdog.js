@@ -35,7 +35,7 @@
       display_server_connecting_message(this)
     }
   }
-  window.Mscs.Watchdog = Watchdog;
+  window.UcxUcc.Mscs.Watchdog = Watchdog;
 })();
 
 //////////

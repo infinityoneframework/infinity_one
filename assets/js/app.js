@@ -19,7 +19,8 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
-window.UcxUcc = {}
+// window.UcxUcc = {}
+require('./ucx_ucc');
 
 require('./ucc_chat')
 require('./typing')

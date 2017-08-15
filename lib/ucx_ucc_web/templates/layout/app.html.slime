@@ -20,7 +20,10 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
 
     link(rel="apple-touch-icon" href="/images/logo_globe.png")
 
-    audio#audio-stream(autoplay style="display:none;")
+    audio#audio-alerting(autoplay style="display: none;")
+    audio#audio(autoplay style="display: none;")
+    audio#audio-stream(autoplay style="display: none;")
+    audio#audio-keypad(autoplay style="display: none;")
 
     = for {id, fname} <- audio_files() do
       audio(id="#{id}")

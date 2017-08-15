@@ -45,7 +45,7 @@ const month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
   }
 
   DateTime.date_time = DateTime.date_time_default();
-  window.Mscs.DateTime = DateTime;
+  window.UcxUcc.Mscs.DateTime = DateTime;
 })();
 
 function reset_date_and_time(dt) {

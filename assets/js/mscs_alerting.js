@@ -466,6 +466,6 @@
     }
   }
 
-  window.Mscs.Tone = Tone;
-  window.Mscs.Alerting = Alerting;
+  window.UcxUcc.Mscs.Tone = Tone;
+  window.UcxUcc.Mscs.Alerting = Alerting;
 })();

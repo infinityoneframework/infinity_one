@@ -14,6 +14,11 @@
     }
   }
 
+  const transducer_handset = 0;
+  const transducer_headset = 1;
+  const transducer_handsfree = 2;
+  const transducer_all_pairs = 0x3f;
+
   let DeviceManager = {
     debug: true,
     devices: {
@@ -24,6 +29,8 @@
       video_input_id: "",
       current_device: ""
     },
+    transducer_tx: 0,
+    transducer_rx: 0,
     installed_devices: {},
     init: function() {
       if (this.debug) console.log('device_manager init')
@@ -33,9 +40,11 @@
       this.webrtc = web_rtc
     },
     get_device: function(dev) {
+      if (this.debug) console.log("get_device", dev)
       return this.devices[dev]
     },
     get_devices: function() {
+      if (this.debug) console.log("get_devices")
       return { devices: this.devices, current_device: this.devices.current_device }
     },
     set_devices: function(devs) {
@@ -48,6 +57,7 @@
       set_devices_id(devs, installed_devices, "headset_output_id", "")
     },
     set_devices_id: function(devs, installed, type, the_default) {
+      if (this.debug) console.log("det_devices_id", devs, installed, type, the_default)
       if (installed[devs[type]])
         this.devices[type] = devs[type]
       else
@@ -57,6 +67,7 @@
       var status = false;
       if(this.devices.headset_input_id && this.devices.headset_output_id)
         status = true;
+      if (this.debug) console.log("has_headset_device", status)
       return status;
     },
     enumerateDevices: function() {
@@ -94,6 +105,7 @@
     },
 
     get_current_device: function() {
+      if (this.debug) console.log("get_current_device")
       return this.devices.current_device;
     },
     setSinkId: function(audio_control, sinkId) {
@@ -132,9 +144,29 @@
     errorCallback: function(error) {
       console.error('Device Manager Error: ', error)
     },
+    update_transducer: function() {
+      let tx = this.transducer_tx
+      let rx = this.transducer_rx
+      if (tx) this.connect_transducer_tx(tx.stream_id, tx.pair_id, tx.apb)
+      if (rx) this.connect_transducer_rx(rx.stream_id, rx.pair_id, rx.apb)
+    },
+    connect_transducer: function(msg) {
+      if (this.debug) console.log("connect_transducer", msg)
+
+      var audio_ctrl = $('#audio');
+
+      this.set_active_abp(msg.apb_number);
+      if (msg.tx_enable) {
+        this.connect_transducer_tx(msg.key, msg.pair_id, msg.apb_number)
+      }
+      if (msg.rx_enable) {
+        this.connect_transducer_rx(msg.key, msg.pair_id, msg.apb_number)
+      }
+      this.handle_call_on_hold(msg, audio_ctrl)
+    },
     connect_transducer_tx: function(stream_id, pair_id, apb) {
       if (stream_id == 0) {
-        let transducer_tx = {stream_id: stream_id, pair_id: pair_id, apb: apb}
+        this.transducer_tx = {stream_id: stream_id, pair_id: pair_id, apb: apb}
         switch(pair_id) {
           case transducer_headset:
             if (DeviceManager.devices.headset_output_id) {
@@ -159,11 +191,10 @@
       } else {
         console.warn("connect_transducer tx - unknown stream ID", stream_id)
       }
-      DeviceManager.transducer_tx = transducer_tx;
     },
     connect_transducer_rx: function(stream_id, pair_id, apb) {
       if (stream_id == 0) {
-        let transducer_rx = {stream_id: stream_id, pair_id: pair_id, apb: apb}
+        this.transducer_rx = {stream_id: stream_id, pair_id: pair_id, apb: apb}
         switch(pair_id) {
           case transducer_headset:
             DeviceManager.current_device = DeviceManager.devices.headset_input_id
@@ -182,7 +213,6 @@
       } else {
         console.warn("connect_transducer rx - unknown stream ID", stream_id)
       }
-      DeviceManager.transducer_rx = transducer_rx;
     },
     handle_call_on_hold: function(msg, audio_ctrl) {
       if (audio_ctrl.attr('src')) {
@@ -195,8 +225,36 @@
       }
     },
     get_audio_ctrl_volume: function() {
+      if (this.debug) console.log("get_audio_ctrl_volume")
       return 0.7;
-    }
+    },
+    get_active_apb: function() {
+      if (this.debug) console.log("get_active_apb")
+      return this.apb_active;
+    },
+    set_active_abp: function(apb) {
+      if (this.debug) console.log("set_active_apb", apb)
+      this.apb_active = apb;
+    },
+    get_apb_parms: function() {
+      if (this.debug) console.log("get_apb_parms")
+      var apb = this.get_active_apb();
+      return {apb: apb, current_vol: this.apb_volume[apb]};
+    },
+    set_mute_state: function(msg) {
+      if (this.debug) console.log("set_mute_state", msg)
+      switch(msg.key) {
+        case 0:
+          if (msg.mute) {
+            this.webrtc.stop_transducer(this.transducer_tx.pair_id);
+          } else {
+            this.webrtc.set_transducer(this.transducer_tx.pair_id);
+          }
+          break;
+        default:
+          console.log('Unsupported stream_id:', msg.key);
+      }
+    },
   };
 
   UccChat.on_connect(function(ucc_chat, socket) {

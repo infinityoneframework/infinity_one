@@ -25,12 +25,32 @@
       onLeave: [],
       onHangup: [],
     },
+    callType: 'video',
     localVideo: null,
     remoteVideo: null,
+    // localAudio: undefined,
+    remoteAudio: undefined,
+    constraints: function() {
+      var devicemanager = UcxUcc.DeviceManager
+      if (this.callType == 'mscs' || this.callType == 'audio') {
+        return {
+          audio: {deviceid: {exact: devicemanager.get_device("handsfree_input_id")}}
+        }
+      } else {
+        return {
+          video: {deviceid: {exact: devicemanager.get_device("video_input_id")}},
+          audio: {deviceid: {exact: devicemanager.get_device("handsfree_input_id")}}
+        }
+      }
+    },
     setVideoElements: function() {
       WebRTC.localVideo =
         $(`.webrtc-video .video-item[data-username="${WebRTC.localUsername}"] video`)[0];
       WebRTC.remoteVideo = $('.webrtc-video .main-video video')[0];
+    },
+    setAudioElements: function() {
+      WebRTC.remoteAudio = $('#audio-stream')[0]
+      // WebRTC.remoteAudio = UcxUcc.DeviceManager.get_device('handsfree_output_id')
     },
     init: function(socket, localName, localUsername) {
       console.log('init', localName, localUsername)
@@ -49,7 +69,13 @@
     },
     start: function() {
       console.log('start')
+      this.callType = 'video';
       WebRTC.setVideoElements();
+      WebRTC.startConnection();
+    },
+    start_mscs: function() {
+      this.callType = 'mscs';
+      WebRTC.setAudioElements();
       WebRTC.startConnection();
     },
     call: function(remoteName) {
@@ -64,6 +90,19 @@
           WebRTC.startPeerConnection(remoteName);
         }
       }, 1000)
+    },
+    audio_call: function(remoteName) {
+      trace('Starting call')
+      setTimeout(() => {
+        WebRTC.remoteName = remoteName
+        var callbacks = WebRTC.callbacks.onCall;
+        for (var i = 0; i < callbacks.length; ++i) {
+          callbacks[i]();
+        }
+        if (remoteName.length > 0) {
+          WebRTC.startPeerConnection(remoteName);
+        }
+      }, 1)
     },
     hangup: function() {
       trace('Ending call')
@@ -111,7 +150,7 @@
       WebRTC.chan.push("webrtc:user-" + WebRTC.localName, message)
     },
     onOffer: function(offer, name) {
-      console.log('onOffer')
+      console.log('onOffer', offer)
       WebRTC.connectedUser = name;
       WebRTC.yourConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
@@ -126,7 +165,7 @@
           answer: answer
         });
       }, function(error) {
-        send({
+        WebRTC.send({
           type: "error",
           message: "onOffer error: " + error
         });
@@ -147,15 +186,21 @@
     },
     onLeave: function() {
       console.log('onLeave')
-      var callbacks = WebRTC.callbacks.onLeave;
-      for (var i = 0; i < callbacks.length; ++i) {
-        callbacks[i]();
+      if (WebRTC.yourConnection) {
+        var callbacks = WebRTC.callbacks.onLeave;
+        for (var i = 0; i < callbacks.length; ++i) {
+          callbacks[i]();
+        }
+        if (WebRTC.callType == 'video') {
+          WebRTC.connectedUser = null;
+          WebRTC.remoteVideo.src = null;
+        } else {
+          WebRTC.remoteAudio = null;
+        }
+        WebRTC.yourConnection.onicecandate = null;
+        WebRTC.yourConnection.onaddstream = null;
+        WebRTC.setupPeerConnection(WebRTC.stream)
       }
-      WebRTC.connectedUser = null;
-      WebRTC.remoteVideo.src = null;
-      WebRTC.yourConnection.onicecandate = null;
-      WebRTC.yourConnection.onaddstream = null;
-      WebRTC.setupPeerConnection(WebRTC.stream)
     },
     hasUserMedia: function() {
       navigator.getUserMedia = navigator.getUserMedia ||
@@ -174,11 +219,11 @@
       console.log('startConnection', UcxUcc)
       if (WebRTC.hasUserMedia()) {
         trace('hasUserMedia')
-        var constraints = {
-          video: {deviceId: {exact: UcxUcc.DeviceManager.get_device("video_input_id")}},
-          audio: {deviceId: {exact: UcxUcc.DeviceManager.get_device("handsfree_input_id")}}
-        }
-        navigator.getUserMedia(constraints, function(myStream) {
+        // var constraints = {
+        //   video: {deviceid: {exact: ucxucc.devicemanager.get_device("video_input_id")}},
+        //   audio: {deviceid: {exact: ucxucc.devicemanager.get_device("handsfree_input_id")}}
+        // }
+        navigator.getUserMedia(WebRTC.constraints(), function(myStream) {
           trace('getUserMedia callback')
           WebRTC.stream = myStream;
 
@@ -222,24 +267,37 @@
 
       // Setup stream listening
       WebRTC.yourConnection.addStream(stream);
-      WebRTC.localVideo.srcObject = stream;
+      if (WebRTC.callType == 'video') {
+        WebRTC.localVideo.srcObject = stream;
 
-      WebRTC.yourConnection.onaddstream = function (e) {
-        WebRTC.remoteVideo.srcObject = e.stream;
-      };
+        WebRTC.yourConnection.onaddstream = function (e) {
+          WebRTC.remoteVideo.srcObject = e.stream;
+        };
+      } else {
+        WebRTC.yourConnection.onaddstream = function (e) {
+          WebRTC.remoteAudio.srcObject = e.stream;
+        };
+      }
 
       // Setup ice handling
       WebRTC.yourConnection.onicecandidate = function (event) {
-        if (event.candidate) {
+        var candidate = event.candidate;
+
+        if (candidate) {
+          if (WebRTC.callType == 'mscs') {
+            if (candidate.candidate.search(/ udp /i) == -1) {
+              return;
+            }
+          }
+
           WebRTC.send({
             name: name,
             type: "candidate",
-            candidate: event.candidate
+            candidate: candidate
           });
         }
       };
     },
-
     startPeerConnection: function(user) {
       trace('startPeerConnection')
       WebRTC.connectedUser = user;
