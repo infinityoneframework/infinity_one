@@ -7,8 +7,12 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   alias UccChatWeb.RebelChannel.Client
   alias UcxUccWeb.Endpoint
   alias Rebel.SweetAlert
+  alias UccWebrtWeb.FlexBar.Tab.MembersList
+  alias UccWebrtcWeb.VideoView
+  alias UcxUcc.Accounts
 
   import Rebel.Core
+  import Rebel.Query
 
   require Logger
 
@@ -20,11 +24,18 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     :video_input_id
   ]
 
+  intercept [
+    "webrtc:leave"
+  ]
+
   def device_manager_init(socket, _payload) do
     case exec_js(socket, "window.UcxUcc.DeviceManager.installed_devices") do
       {:ok, installed_devices} ->
-         ClientDevice.get_by(user_id: socket.assigns.user_id)
-         |> set_client_devices(installed_devices, socket)
+        socket =
+          ClientDevice.get_by(user_id: socket.assigns.user_id)
+          |> set_client_devices(installed_devices, socket)
+        # exec_js(socket, "window.WebRTC.start();")
+        socket
       {:error, error} ->
         Client.toastr!(socket, :error, "Problem getting installed devices: #{inspect error}")
         socket
@@ -55,11 +66,22 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       if socket.assigns[:state] do
         {:error, %{reason: "internal error"}}
       else
+        # Process.send_after self(), :after_join, 1000
         {:ok, assign(socket, :state, %{})}
       end
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+
+  def handle_out("webrtc:leave" = ev, payload, socket) do
+    trace ev, payload
+    trace ev, socket.assigns
+    push socket, ev, payload
+    unless payload[:dest] do
+      do_broadcast socket, socket.assigns.state["otherName"], "leave", %{dest: true}
+    end
+    {:noreply, socket}
   end
 
   ##########
@@ -164,6 +186,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
       confirm: fn result ->
         Logger.warn "sweet confirmed! #{inspect result}"
+        open_my_video_tab(socket, payload)
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:confirmed_video_call",
           %{user_id: socket.assigns.user_id}
       end,
@@ -176,19 +199,65 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     {:noreply, socket}
   end
 
-  def confirmed_video_call(payload, socket) do
-    trace "confirmed_video_call", payload
+  # def handle_info(:after_join, socket) do
+  #   trace "after_join", socket.assigns
+  #   #exec_js socket, "window.WebRTC.start();"
+  #   {:noreply, socket}
+  # end
 
+  def open_my_video_tab(socket, payload) do
+    trace "payload", payload
+    trace "assigns", socket.assigns
+
+    socket
+    |> MembersList.open_destination_video(socket.assigns.user_id, payload[:from])
+    |> open_remote_video_item(payload[:from])
+  end
+
+  def confirmed_video_call(payload, socket) do
+    trace "confirmed_video_call payload", payload
+    trace "confirmed_video_call assign", socket.assigns
+    exec_js socket, "window.WebRTC.call('#{payload.user_id}');"
+    open_remote_video_item socket, payload.user_id
     {:noreply, socket}
+  end
+
+  defp open_remote_video_item(socket, user_id) do
+    trace "open_remote_video_item", %{user_id: user_id}
+    user = Accounts.get_user user_id
+
+    html = Phoenix.View.render_to_string VideoView, "remote_video_item.html",
+      item: %{connected: true, username: user.username}
+
+    socket
+    |> insert(html, append: ".videos")
+
+    spawn fn ->
+      Process.sleep 3000
+      js = ~s{$('.videos .video-item[data-username="#{user.username}"] video')[0].srcObject = window.WebRTC.remoteVideo.srcObject}
+      exec_js socket, js
+    end
+    socket
   end
 
   def declined_video_call(payload, socket) do
-    trace "declined_video_call", payload
+    trace "declined_video_call payload", payload
+    trace "declined_video_call assigns", socket.assigns
 
     {:noreply, socket}
   end
 
+  def webrtc_answer(event, payload, socket) do
+    Logger.warn "..."
+    trace event, payload, inspect(socket.assigns)
+    socket
+  end
 
+  def webrtc_leave(event, payload, socket) do
+    Logger.warn "..."
+    trace event, payload, inspect(socket.assigns)
+    socket
+  end
 
   # defp ucc_broadcast(%{assigns: assigns} = socket, topic) do
   #   UccPubSub.broadcast "user:" <> assigns.user_id, topic, %{}

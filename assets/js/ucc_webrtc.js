@@ -33,19 +33,22 @@
       WebRTC.remoteVideo = $('.webrtc-video .main-video video')[0];
     },
     init: function(socket, localName, localUsername) {
+      console.log('init', localName, localUsername)
       this.socket = socket;
-      this.localName = localName;
       this.localName = localName;
       this.localUsername = localUsername;
       this.create_channel();
     },
     setRemoteName: function(name) {
+      console.log('setRemoteName')
       this.remoteName = name;
     },
     setLocalName: function(name) {
+      console.log('setLocalName')
       this.localName = name;
     },
     start: function() {
+      console.log('start')
       WebRTC.setVideoElements();
       WebRTC.startConnection();
     },
@@ -72,6 +75,7 @@
       WebRTC.onLeave();
     },
     create_channel: function() {
+      console.log('create_channel')
       var chan = this.socket.channel("webrtc:user-" + this.localName, {});
       WebRTC.chan = chan;
 
@@ -107,6 +111,7 @@
       WebRTC.chan.push("webrtc:user-" + WebRTC.localName, message)
     },
     onOffer: function(offer, name) {
+      console.log('onOffer')
       WebRTC.connectedUser = name;
       WebRTC.yourConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
@@ -129,6 +134,7 @@
       });
     },
     onAnswer: function(answer) {
+      console.log('onAnswer')
       var callbacks = WebRTC.callbacks.onAnswer;
       for (var i = 0; i < callbacks.length; ++i) {
         callbacks[i](answer);
@@ -136,9 +142,11 @@
       WebRTC.yourConnection.setRemoteDescription(new RTCSessionDescription(answer));
     },
     onCandidate: function(candidate) {
+      console.log('onCandidate')
       WebRTC.yourConnection.addIceCandidate(new RTCIceCandidate(candidate));
     },
     onLeave: function() {
+      console.log('onLeave')
       var callbacks = WebRTC.callbacks.onLeave;
       for (var i = 0; i < callbacks.length; ++i) {
         callbacks[i]();
@@ -163,11 +171,12 @@
     },
     startConnection: function() {
       trace('startConnection')
+      console.log('startConnection', UcxUcc)
       if (WebRTC.hasUserMedia()) {
         trace('hasUserMedia')
         var constraints = {
-          video: {deviceId: {exact: DeviceManager.get_device("video_input_id")}},
-          audio: {deviceId: {exact: DeviceManager.get_device("handsfree_input_id")}}
+          video: {deviceId: {exact: UcxUcc.DeviceManager.get_device("video_input_id")}},
+          audio: {deviceId: {exact: UcxUcc.DeviceManager.get_device("handsfree_input_id")}}
         }
         navigator.getUserMedia(constraints, function(myStream) {
           trace('getUserMedia callback')

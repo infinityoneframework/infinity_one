@@ -1,0 +1,5 @@
+- class = if @item.connected, do: "", else: " state-overlay background-transparent-darker-before"
+/.video-item.background-transparent-darker(class="#{class}" data-state-text="#{@item.state_text}" data-username="#{@item.username}")
+.video-item.background-transparent-darker(class="#{class}" data-username="#{@item.username}")
+  video.webrtc-video-element(autoplay)
+  .background-transparent-darker= @item.username

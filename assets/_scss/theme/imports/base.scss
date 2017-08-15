@@ -3681,7 +3681,7 @@ body:not(.is-cordova) {
 $user-image-square: 20px;
 
 .user-image {
-  margin: 4px;
+  margin: 4px !important;
   height: $user-image-square;
   width: $user-image-square;
   cursor: pointer;

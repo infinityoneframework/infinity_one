@@ -7,8 +7,6 @@ defmodule UccWebrtcWeb.VideoView do
     Schemas.get_user(id) |> Map.get(:username)
   end
 
-
-
   # import UcxUcc.Accounts, only: [username_by_user_id: 1]
 
 end

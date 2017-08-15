@@ -573,8 +573,8 @@ defmodule UccChatWeb.UserChannel do
     subscribe_callback "user:" <> user_id, "room:update",
       :room_update
     subscribe_callback "user:" <> user_id, "webrtc:offer", :webrtc_offer
-    subscribe_callback "user:" <> user_id, "webrtc:answer", :webrtc_answer
-    subscribe_callback "user:" <> user_id, "webrtc:leave", :webrtc_leave
+    subscribe_callback "user:" <> user_id, "webrtc:answer", {WebrtcChannel, :webrtc_answer}
+    subscribe_callback "user:" <> user_id, "webrtc:leave", {WebrtcChannel, :webrtc_leave}
     {:noreply, socket}
   end
 
@@ -887,16 +887,6 @@ defmodule UccChatWeb.UserChannel do
   def webrtc_offer(event, payload, socket) do
     trace event, payload, inspect(socket.assigns)
     IO.inspect Map.get(payload, :name), label: "keys"
-    socket
-  end
-
-  def webrtc_answer(event, payload, socket) do
-    trace event, payload, inspect(socket.assigns)
-    socket
-  end
-
-  def webrtc_leave(event, payload, socket) do
-    trace event, payload, inspect(socket.assigns)
     socket
   end
 

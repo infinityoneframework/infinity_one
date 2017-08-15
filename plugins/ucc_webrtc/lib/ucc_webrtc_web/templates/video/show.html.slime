@@ -27,14 +27,14 @@ elixir:
       .main-video.background-transparent-darker
         - class = if @webrtc.main_video_url == @webrtc.self_video_url, do: " video-flip", else: ""
         / video(src="#{@webrtc.main_video_url}" autoplay muted="true" class="webrtc-video-element#{class}")
-        video(autoplay muted="true" class="webrtc-video-element#{class}")
+        video(autoplay muted="true" class="video1 webrtc-video-element#{class}")
         .background-transparent-darker= @webrtc.other_video_username
       .videos
         = if @webrtc.self_video_url do
           .video-item.background-transparent-darker(data-username="#{@webrtc.self}")
             - class = if @webrtc.screen_share_enabled, do: "", else: " video-flip"
             / video(src="#{@webrtc.self_video_url}" autoplay muted="true" class="webrtc-video-element#{class}")
-            video(autoplay muted="true" class="webrtc-video-element#{class}")
+            video(autoplay muted="true" class="video2 webrtc-video-element#{class}")
             = unless @webrtc.audio_and_video_enabled do
               .video-muted-overlay.background-transparent-darker
                 = unless @webrtc.audio_enabled do
@@ -44,12 +44,6 @@ elixir:
                   button
                     i.icon-eye-off
             .background-transparent-darker= ~g(you)
-        = for item <- @webrtc.remote_video_items do
-          - class = if item.connected, do: "", else: " state-overlay background-transparent-darker-before"
-          .video-item.background-transparent-darker(class="#{class}" data-state-text="#{item.state_text}" data-username="#{item.id}")
-            / video.webrtc-video-element(src="#{item.url}" autoplay)
-            video.webrtc-video-element(autoplay)
-            .background-transparent-darker=  username_by_user_id item.id
       .buttons-group
         = if @webrtc.video_active do
           button.button.stop-call(rebel-click="flex_call" data-fun="video_stop" data-id="webrtc-members-list")
