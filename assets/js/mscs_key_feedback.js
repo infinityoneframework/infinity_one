@@ -107,6 +107,10 @@
     return [tone_dtmf1[indexes[0]], tone_dtmf2[indexes[1]]];
   };
 
+  Feedback.prototype.set_volume = function(volume) {
+    document.getElementById(audio_device).volume = volume;
+  };
+
   window.UcxUcc.Mscs.Feedback = {
     create: function() {
       window.UcxUcc.Mscs.feedback = new Feedback();

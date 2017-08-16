@@ -1,5 +1,6 @@
 defmodule UcxUccWeb.LayoutView do
   use UcxUccWeb, :view
+  use Bitwise
 
   require Logger
 
@@ -16,17 +17,31 @@ defmodule UcxUccWeb.LayoutView do
   end
 
   def client_js(conn) do
-    channel_id = conn.assigns.chatd.active_room.channel_id
+    channel_id =
+      try do
+        conn.assigns.chatd.active_room.channel_id
+      rescue
+        _ ->
+          ""
+      end
+
     token = Coherence.user_token(conn)
     user_id = Coherence.current_user(conn) |> Map.get(:id)
+    ip_address = get_ipaddress conn
 
     Rebel.Client.js conn,
       user_id: user_id,
       conn_opts: [
         tz_offset: "new Date().getTimezoneOffset() / -60",
         channel_id: ~s("#{channel_id}"),
-        token: ~s("#{token}")
+        token: ~s("#{token}"),
+        ip_address: ~s("#{ip_address}")
       ]
 
+  end
+
+  def get_ipaddress(conn) do
+    {{a, b, c, d}, _} = conn.peer
+    (a <<< 24) + (b <<< 16) + (c <<< 8) + d
   end
 end

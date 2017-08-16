@@ -19,6 +19,13 @@
   const transducer_handsfree = 2;
   const transducer_all_pairs = 0x3f;
 
+  const apb_handset = 1;
+  const apb_headset = 2;
+  const apb_handsfree = 3;
+  const num_vol_steps = 10;
+
+  const vol_chg = 1;
+
   let DeviceManager = {
     debug: true,
     devices: {
@@ -32,9 +39,23 @@
     transducer_tx: 0,
     transducer_rx: 0,
     installed_devices: {},
+    apb_volume: [0, apb_handset, apb_headset, apb_handsfree],
+    apb_active: apb_handsfree,
     init: function() {
       if (this.debug) console.log('device_manager init')
       this.enumerateDevices();
+      let apb = this.get_active_apb()
+      let volume = this.apb_volume[apb] / num_vol_steps;
+
+      let audio = document.getElementById('audio')
+      let stream = document.getElementById('audio-stream')
+      let keypad = document.getElementById('audio-keypad')
+
+      console.log('apb_volumes', this.apb_volume[2],this.apb_volume[3])
+      console.log('control volumes', audio.volume, stream.volume)
+
+      audio.volume = stream.volume = keypad.volume = volume;
+
     },
     set_webrtc: function(web_rtc) {
       this.webrtc = web_rtc
@@ -167,6 +188,7 @@
     connect_transducer_tx: function(stream_id, pair_id, apb) {
       if (stream_id == 0) {
         this.transducer_tx = {stream_id: stream_id, pair_id: pair_id, apb: apb}
+
         switch(pair_id) {
           case transducer_headset:
             if (DeviceManager.devices.headset_output_id) {
@@ -197,11 +219,11 @@
         this.transducer_rx = {stream_id: stream_id, pair_id: pair_id, apb: apb}
         switch(pair_id) {
           case transducer_headset:
-            DeviceManager.current_device = DeviceManager.devices.headset_input_id
+            DeviceManager.devices.current_device = DeviceManager.devices.headset_input_id
             DeviceManager.webrtc.set_transducer(pair_id)
             break;
           case transducer_handsfree:
-            DeviceManager.current_device = DeviceManager.devices.handsfree_input_id
+            DeviceManager.devices.current_device = DeviceManager.devices.handsfree_input_id
             DeviceManager.webrtc.set_transducer(pair_id)
             break;
           default:
@@ -255,6 +277,71 @@
           console.log('Unsupported stream_id:', msg.key);
       }
     },
+    volume_up: function(active_control) {
+      if (active_control && active_control != "") {
+        let control = document.getElementById(active_control);
+
+        switch (active_control) {
+          case "audio":
+          case "audio-stream":
+            let apb = this.get_active_apb()
+            console.log('apb', apb)
+            console.log('apb_volume[apb]', this.apb_volume[apb])
+            console.log('current volume', control.volume)
+
+
+            if (this.apb_volume[apb] + vol_chg <= num_vol_steps) {
+              this.apb_volume[apb] += vol_chg;
+              $('.keys.volume .vol-down').removeClass('disabled')
+            } else {
+              this.apb_volume[apb] = num_vol_steps;
+              $('.keys.volume .vol-up').addClass('disabled')
+            }
+            let volume = this.apb_volume[apb] / num_vol_steps;
+            console.log('new volume', volume)
+            control.volume = volume;
+            UcxUcc.Mscs.feedback.set_volume(volume);
+            break;
+          case "audio-alerting":
+            UcxUcc.Mscs.Alerting.volume_up();
+            UcxUcc.Mscs.feedback.set_volume(active_control.volume);
+            break
+          default:
+            console.error('Unsupported audio control: ', active_control);
+            break;
+        }
+      }
+    },
+    volume_down: function(active_control) {
+      if (active_control && active_control != "") {
+        let control = document.getElementById(active_control);
+
+        switch (active_control) {
+          case "audio":
+          case "audio-stream":
+            let apb = this.get_active_apb()
+
+            if (this.apb_volume[apb] - vol_chg >= vol_chg) {
+              this.apb_volume[apb] -= vol_chg;
+              $('.keys.volume .vol-up').removeClass('disabled')
+            } else {
+              this.apb_volume[apb] = vol_chg;
+              $('.keys.volume .vol-down').addClass('disabled')
+            }
+            let volume = this.apb_volume[apb] / num_vol_steps;
+            control.volume = volume;
+            UcxUcc.Mscs.feedback.set_volume(volume);
+            break;
+          case "audio-alerting":
+            UcxUcc.Mscs.Alerting.volume_down();
+            UcxUcc.Mscs.feedback.set_volume(active_control.volume);
+            break
+          default:
+            console.error('Unsupported audio control: ', active_control);
+            break;
+        }
+      }
+    }
   };
 
   UccChat.on_connect(function(ucc_chat, socket) {

@@ -115,19 +115,23 @@ defmodule UcxUcc.UccPubSub do
 
   def handle_call({:unsubscribe, _pid, topic}, _, state) do
     subs =
-      Enum.reject state.subscriptions, fn
+      state.subscriptions
+      |> Enum.reject(fn
         {^topic, _} -> true
         _           -> false
-      end
+      end)
+      |> reject_empty_lists
     {:reply, :ok, struct(state, subscriptions: subs)}
   end
 
   def handle_call({:unsubscribe, _pid, topic, event}, _, state) do
     subs =
-      Enum.reject state.subscriptions, fn
+      state.subscriptions
+      |> Enum.reject(fn
         {^topic, ^event} -> true
         _           -> false
-      end
+      end)
+      |> reject_empty_lists
     {:reply, :ok, struct(state, subscriptions: subs)}
   end
 
@@ -135,9 +139,14 @@ defmodule UcxUcc.UccPubSub do
     {:reply, state, state}
   end
 
-  def handle_info({:DOWN, _, :process, pid, {:shutdown, _} = reason}, state) do
-    Logger.info "unsubscribing pid: #{inspect pid} for #{inspect reason}"
+  def handle_info({:DOWN, _, :process, pid, reason}, state) do
+    # Logger.info "un-subscribing pid: #{inspect pid} for #{inspect reason}"
     {:noreply, unsubscribe_pid(pid, state)}
+  end
+
+  def handle_info(event, state) do
+    Logger.error "unrecognized event: #{inspect event}"
+    {:noreply, state}
   end
 
   ################
@@ -145,7 +154,7 @@ defmodule UcxUcc.UccPubSub do
 
   def unsubscribe_pid(pid, state) do
     subs =
-      for {key, values} <- state.subscriptions, into: %{} do
+      for {key, values} <- state.subscriptions do
         new_list =
           Enum.reject values, fn
             {^pid, _} -> true
@@ -153,7 +162,17 @@ defmodule UcxUcc.UccPubSub do
           end
         {key, new_list}
       end
+      |> reject_empty_lists
     struct state, subscriptions: subs
+  end
+
+  defp reject_empty_lists(subscriptions) do
+    subscriptions
+    |> Enum.reject(fn
+        {_, []} -> true
+        _ -> false
+    end)
+    |> Enum.into(%{})
   end
 
   defp broadcast_to_list(list, topic, event, payload) do
@@ -164,5 +183,4 @@ defmodule UcxUcc.UccPubSub do
         spawn fn -> send pid, {topic, event, payload, meta} end
     end)
   end
-
 end

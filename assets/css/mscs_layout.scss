@@ -1,5 +1,5 @@
 $phone-header-height: 30px;
-$phone-footer-height: 30px;
+$phone-footer-height: 20px;
 
 $buttn-size: 70;
 $buttn-gutter: 4;
@@ -29,6 +29,7 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
 //   background: black;
 // }
 .mscs-container {
+
   margin-right: auto;
   margin-left: auto;
   margin-top: 20px;
@@ -44,8 +45,9 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
 
   .mscs {
     display: inline-flex;
-    flex-flow: row nowrap;
-    width: $phone-container-width;
+    flex-flow: row wrap;
+    // width: $phone-container-width;
+    width: #{$container-width}px;
     // padding: 30px;
 
     .phone-container {
@@ -208,7 +210,13 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
                 flex-direction: column;
                 flex-wrap: wrap;
 
-                .vol-up, .vol-down { flex: 1; }
+                .vol-up, .vol-down {
+                  flex: 1;
+                  &.disabled {
+                    opacity: 0.3;
+                    cursor: default;
+                  }
+                }
               }
             }
           }
@@ -246,23 +254,24 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
         } // .keys-pad
       }
 
-      .footer {
-        height: $phone-footer-height;
-        font-size: 10px;
-        text-align: center;
-        .blank-line {
-          font-size: 4px;
-        }
-      }
     } // .phone-container
+    .footer {
+      flex: 1;
+      height: $phone-footer-height;
+      font-size: 10px;
+      text-align: center;
+      .blank-line {
+        font-size: 4px;
+      }
+    }
 
     .pk-strips-container {
-      flex: auto;
+      flex: 0;
 
       display: flex;
       flex-flow: row nowrap;
       margin-top: $phone-header-height;
-      margin-bottom: $phone-footer-height;
+      // margin-bottom: $phone-footer-height;
 
       .pk-strip {
         flex: 1;
@@ -338,5 +347,35 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
       }
     }
   } // section.keys-pad-container
+  &.pk-bottom {
+    $pk-button-width-sm: 85;
+
+    width: #{$main-phone-width}px;
+    .mscs {
+      flex-flow: column nowrap;
+    }
+    .pk-strips-container {
+      // flex: auto;
+      margin: 0;
+      margin-top: 5px;
+      width-min: #{$main-phone-width}px;
+      width-max: #{$main-phone-width}px;
+
+      .pk-strip {
+        margin-left: 0px !important;
+        margin: 0;
+
+        padding: 8px #{$pk-strip-padding-x}px;
+        .pk {
+          flex: 1 0 22% !important;
+          margin-right: 4px;
+
+          .buttn {
+            width: #{$pk-button-width-sm}px !important;
+          }
+        }
+      }
+    }
+  }
 }
 

@@ -276,11 +276,12 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   end
 
   defp set_client_devices(nil, installed_devices, socket) do
-    case ClientDevice.create %{user_id: socket.assigns.user_id} do
+    case ClientDevice.create %{user_id: socket.assigns.user_id, ip_addr: socket.assigns.ip_address} do
       {:ok, client_device} ->
         client_device
-      {:error, error} ->
-        Client.toastr(socket, :error, "Problem creating ClientDevice: #{inspect error}")
+      {:error, changeset} ->
+        errors = UcxUccWeb.Utils.format_errors changeset
+        Client.toastr(socket, :error, "Problem creating ClientDevice: #{errors}")
         nil
     end
     |> set_client_devices(installed_devices, socket)

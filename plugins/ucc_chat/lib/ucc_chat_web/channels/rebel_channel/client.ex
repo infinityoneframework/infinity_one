@@ -83,6 +83,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def toastr(socket, which, message) do
-    exec_js socket, ~s{window.toastr.#{which}("#{message}");}
+    message = Poison.encode! message
+    exec_js socket, ~s{window.toastr.#{which}(#{message});}
   end
 end

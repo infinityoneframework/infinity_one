@@ -65,6 +65,7 @@ defmodule UccChatWeb.FlexBar.Helpers do
   end
 
   def toastr(socket, action, message) when action in ~w(success warning error)a do
+    message = Poison.encode message
     exec_js socket, "window.toastr.#{action}('#{message}')"
     socket
   end

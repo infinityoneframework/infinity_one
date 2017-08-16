@@ -16,7 +16,9 @@
     initStart: function() {
       var ctrl = this.control //
       this.destination = this.audioContext.createMediaStreamDestination();
-      ctrl.srcObject = this.destination.stream
+      if (ctrl) {
+        ctrl.srcObject = this.destination.stream
+      }
     },
     // Set the frequency of the oscillator and start it running.
     startTone: function(toneId, frequency) {
