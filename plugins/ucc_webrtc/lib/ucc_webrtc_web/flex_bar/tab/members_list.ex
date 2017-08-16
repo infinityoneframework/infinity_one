@@ -1,4 +1,4 @@
-defmodule UccWebrtWeb.FlexBar.Tab.MembersList do
+defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   use UccLogger
 
   import Rebel.{Core, Query}
@@ -6,7 +6,7 @@ defmodule UccWebrtWeb.FlexBar.Tab.MembersList do
   alias UcxUcc.Accounts
   alias UccWebrtcWeb.VideoView
   alias UccChatWeb.FlexBar.Tab.MembersList, as: ChatMembersList
-  alias UccWebrtWeb.FlexBar.Tab.MembersList
+  alias UccWebrtcWeb.FlexBar.Tab.MembersList
   alias UcxUcc.TabBar
   alias UcxUcc.TabBar.Ftab
 

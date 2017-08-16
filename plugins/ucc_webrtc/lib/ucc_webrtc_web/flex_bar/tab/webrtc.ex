@@ -2,10 +2,9 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
   use UccChatWeb.FlexBar.Helpers
   alias UcxUcc.UccPubSub
 
-  alias UcxUcc.TabBar.Tab
-  # alias UccWebrtcWeb.FlexBarView, as: View
+  alias UcxUcc.{TabBar.Tab, Repo}
+  alias UccWebrtcWeb.{FlexBar.Tab.MembersList, FlexBarView}
   alias UccWebrtc.ClientDevice
-  alias UcxUcc.Repo
 
   require Logger
 
@@ -17,12 +16,12 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
       "device-settings",
       ~g"Device Settings",
       "icon-mic",
-      UccWebrtcWeb.FlexBarView,
+      FlexBarView,
       "device.html",
       95)
 
     TabBar.add_button Tab.new(
-      UccWebrtWeb.FlexBar.Tab.MembersList,
+      MembersList,
       "webrtc-members-list")
   end
 
