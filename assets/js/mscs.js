@@ -2,6 +2,7 @@ require('./mscs_webrtc');
 require('./mscs_watchdog');
 require('./mscs_date_time');
 require('./mscs_alerting');
+require('./mscs_key_feedback');
 
 (function() {
   console.log('loading mscs')
