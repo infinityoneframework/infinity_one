@@ -66,6 +66,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       if socket.assigns[:state] do
         {:error, %{reason: "internal error"}}
       else
+        :erlang.process_flag(:trap_exit, true)
         # Process.send_after self(), :after_join, 1000
         {:ok, assign(socket, :state, %{})}
       end
@@ -82,6 +83,11 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       do_broadcast socket, socket.assigns.state["otherName"], "leave", %{dest: true}
     end
     {:noreply, socket}
+  end
+
+  def terminate(_reason, socket) do
+    # UccPubSub.unsubscribe "user:" <> socket.assigns.user_id
+    :ok
   end
 
   ##########

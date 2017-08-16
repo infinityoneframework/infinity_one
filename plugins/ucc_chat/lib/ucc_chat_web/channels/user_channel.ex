@@ -539,6 +539,7 @@ defmodule UccChatWeb.UserChannel do
 
 
   def handle_info({:after_join, params}, socket) do
+    :erlang.process_flag(:trap_exit, true)
     trace "after_join", socket.assigns, inspect(params)
     user_id = socket.assigns.user_id
     channel = Channel.get params["channel_id"]
@@ -723,6 +724,14 @@ defmodule UccChatWeb.UserChannel do
 
   handle_callback("user:" <>  _user_id)
 
+  def handle_info(_payload, socket) do
+    {:noreply, socket}
+  end
+
+  def terminate(reason, socket) do
+    UccPubSub.unsubscribe "user:" <> socket.assigns[:user_id]
+    :ok
+  end
   ###############
   # Helpers
 

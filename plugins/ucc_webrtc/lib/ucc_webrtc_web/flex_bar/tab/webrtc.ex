@@ -1,5 +1,6 @@
 defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
   use UccChatWeb.FlexBar.Helpers
+  alias UcxUcc.UccPubSub
 
   alias UcxUcc.TabBar.Tab
   # alias UccWebrtcWeb.FlexBarView, as: View
@@ -83,8 +84,11 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
     |> ClientDevice.change(%{field => sender["value"], "user_id" => user_id})
     |> Repo.insert_or_update
     |> case do
-      {:ok, _}            -> {:ok, socket}
-      {:error, changeset} -> {:error, changeset, socket}
+      {:ok, device} ->
+        UccPubSub.broadcast "user:" <> user_id, "device:change", %{device: device}
+        {:ok, socket}
+      {:error, changeset} ->
+        {:error, changeset, socket}
     end
   end
 end

@@ -201,6 +201,9 @@
   $keys-primary-background: $primary-background-color;
   $keys-primary-font-color: $primary-font-color;
   $keys-secondary-font-color: $secondary-font-color;
+  $keys-secondary-background: $secondary-background-color;
+  $auxpad-keys-font-color: white;
+
   $dialpad-keys-background-color: gray;
 
   $softkeys-font-color: $secondary-font-color;
@@ -284,7 +287,6 @@
         opacity: 1.0;
         box-shadow: $keys-box-shadow;
       }
-
     }
     .buttn[data-id="star"] {
       .numero {
@@ -298,7 +300,6 @@
         color: $numero-font-color;
         font-weight: 300;
       }
-
       .alpha {
         font-size: 12px;
         color: $alpha-font-color;
@@ -364,8 +365,11 @@
           }
         }
       }
+      .keys {
+        background-color: $keys-secondary-background;
+      }
       .keys .buttn .label {
-        color: $primary-font-color;
+        color: $auxpad-keys-font-color;
         font-size: 11px;
         text-transform: uppercase;
       }

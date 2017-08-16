@@ -51,10 +51,10 @@
       if (this.debug) console.log("set_devices", devs)
       var installed_devices = this.installed_devices;
 
-      set_devices_id(devs, installed_devices, "handsfree_input_id", "default")
-      set_devices_id(devs, installed_devices, "handsfree_output_id", "default")
-      set_devices_id(devs, installed_devices, "headset_input_id", "")
-      set_devices_id(devs, installed_devices, "headset_output_id", "")
+      this.set_devices_id(devs, installed_devices, "handsfree_input_id", "default")
+      this.set_devices_id(devs, installed_devices, "handsfree_output_id", "default")
+      this.set_devices_id(devs, installed_devices, "headset_input_id", "")
+      this.set_devices_id(devs, installed_devices, "headset_output_id", "")
     },
     set_devices_id: function(devs, installed, type, the_default) {
       if (this.debug) console.log("det_devices_id", devs, installed, type, the_default)
