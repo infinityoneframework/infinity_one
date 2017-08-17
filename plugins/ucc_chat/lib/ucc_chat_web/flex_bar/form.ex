@@ -7,9 +7,9 @@ defmodule UccChatWeb.FlexBar.Form do
   import UcxUccWeb.Gettext
 
   alias UccChatWeb.FlexBar.Helpers
-  alias UcxUcc.TabBar
+  alias UcxUcc.{TabBar, Repo}
   alias UccChat.ServiceHelpers
-  alias UcxUcc.Repo
+
 
   def flex_form(socket, %{"form" => %{"id" => tab_name}, "dataset" =>
     %{"edit" => control}} = sender) do
@@ -45,12 +45,12 @@ defmodule UccChatWeb.FlexBar.Form do
         socket
         |> Phoenix.Socket.assign(resource_key, resource)
         |> flex_form_cancel(sender)
-        |> Helpers.toastr(:success, "#{resource_key} updated successfully")
+        |> toastr!(:success, "#{resource_key} updated successfully")
         |> notify_update_success(tab, sender,
           %{resource: resource, resource_params: resource_params})
       {:error, changeset} ->
         trace "error", changeset
-        Helpers.toastr(socket, :error, "Problem updating #{resource_key}")
+        toastr!(socket, :error, "Problem updating #{resource_key}")
     end
   end
 
@@ -79,11 +79,11 @@ defmodule UccChatWeb.FlexBar.Form do
     case apply tab.module, :flex_form_toggle, [socket, sender, resource, id, val] do
       {:ok, socket} ->
         socket
-        |> Helpers.toastr(:success, gettext("Successfully updated %{model}",
+        |> toastr!(:success, gettext("Successfully updated %{model}",
           model: sender["form"]["id"]))
         |> notify_update_success(tab, sender, %{resource: resource, toggle: id, value: val})
       {:error, _changeset, socket} ->
-        Helpers.toastr(socket, :error, gettext("Error updating %{model}",
+        toastr!(socket, :error, gettext("Error updating %{model}",
           model: sender["form"]["id"]))
     end
     |> stop_loading_animation()
@@ -103,12 +103,12 @@ defmodule UccChatWeb.FlexBar.Form do
     |> case do
       {:ok, socket} ->
         socket
-        |> Helpers.toastr(:success, gettext("Successfully updated %{model}",
+        |> toastr!(:success, gettext("Successfully updated %{model}",
           model: field))
         |> notify_update_success(tab, sender, %{resource: resource,
           field: field, value: value})
       {:error, _changeset, socket} ->
-        Helpers.toastr(socket, :error, gettext("Error updating %{model}",
+        toastr!(socket, :error, gettext("Error updating %{model}",
           model: field))
     end
   end

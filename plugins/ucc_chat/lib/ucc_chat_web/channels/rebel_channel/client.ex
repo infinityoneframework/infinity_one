@@ -78,8 +78,13 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def toastr!(socket, which, message) do
-    toastr socket, which, message
-    socket
+    case toastr socket, which, message do
+      {:ok, _} ->
+        socket
+      {:error, error} ->
+        Logger.error "toastr failed with error: #{inspect error}"
+        socket
+    end
   end
 
   def toastr(socket, which, message) do

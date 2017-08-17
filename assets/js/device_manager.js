@@ -36,6 +36,7 @@
       video_input_id: "",
       current_device: ""
     },
+    active_audio_ctrl: undefined,
     transducer_tx: 0,
     transducer_rx: 0,
     installed_devices: {},
@@ -340,6 +341,58 @@
             console.error('Unsupported audio control: ', active_control);
             break;
         }
+      }
+    },
+    set_volume_level: function(active_audio_control, abp, level) {
+      if (active_audio_control == "audio-stream" || active_audio_control == "audio") {
+        if (apb == apb_headset || apb == apb_handsfree) {
+          let control = document.getElementById(active_audio_control);
+          this.apb_volume[apb] = level
+          control.volume = level / num_vol_steps;
+        }
+      }
+    },
+    set_tone_volume: function(level, key) {
+      this.active_audio_ctrl = document.getElementById('audio-alerting');
+      var tone_volume = 0;
+
+      switch(key) {
+        case "alerting":
+          tone_volume = UcxUcc.Mscs.Alerting.get_vol_step_factor();
+          break;
+        case "special":
+          tone_volume = UcxUcc.Mscs.SpecialTone.get_vol_step_factor();
+          break;
+        case "paging":
+          tone_volume = UcxUcc.Mscs.Paging.get_vol_step_factor();
+          break;
+        default:
+          console.error("Unknown transducer tone", key);
+          break;
+      }
+      if (level > 8) level = 8;
+      if (level < 1) level = 1;
+
+      let new_volume = tone_volume;
+
+      if (level > 0) {
+        new_volume = level * tone_volume;
+      }
+
+      if (this.debug)
+        console.log('set_tone_volume', key, level, new_volume)
+
+      this.active_audio_ctrl.volume = new_volume;
+    },
+    transducer_tone_volume: function(msg) {
+      switch (msg.key) {
+        case "alerting":
+        case "special":
+          this.set_tone_volume(msg.tone_level, msg.key);
+          break;
+        default:
+          console.error('Unknown transducer tone', msg.key)
+          break;
       }
     }
   };

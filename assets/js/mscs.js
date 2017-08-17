@@ -3,6 +3,7 @@ require('./mscs_watchdog');
 require('./mscs_date_time');
 require('./mscs_alerting');
 require('./mscs_key_feedback');
+require('./mscs_paging');
 
 (function() {
   console.log('loading mscs')
