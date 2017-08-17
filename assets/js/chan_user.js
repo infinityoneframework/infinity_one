@@ -4,6 +4,8 @@ UccChat.on_connect(function(ucc_chat, socket) {
   let ucxchat = ucc_chat.ucxchat
   let chan = window.Rebel.channels.user.channel
   ucc_chat.userchan = chan
+  console.log('ucxchat', ucxchat)
+  console.log('ucc_chat', ucc_chat)
 
   document.addEventListener('device_manager_init', (e) => {
     chan.push('webrtc:device_manager_init', {})
@@ -46,16 +48,16 @@ UccChat.on_connect(function(ucc_chat, socket) {
     toastr.error(resp.message)
   })
   chan.on("room:mention", resp => {
-    ucx_chat.roomManager.room_mention(resp)
+    ucc_chat.roomManager.room_mention(resp)
   })
   chan.on("notification:new", resp => {
-    ucx_chat.roomManager.notification(resp)
+    ucc_chat.roomManager.notification(resp)
   })
   chan.on('message:preview', msg => {
-    ucx_chat.message_preview(msg)
+    ucc_chat.message_preview(msg)
   })
   chan.on('update:alerts', msg => {
-    ucx_chat.roomManager.update_burger_alert()
+    ucc_chat.roomManager.update_burger_alert()
   })
 
   console.log('finished starting user channel')

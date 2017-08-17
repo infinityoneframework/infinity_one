@@ -12,6 +12,8 @@ function start_room_channel(ucc_chat, socket) {
 
   if (debug) { console.log('start socket', ucxchat) }
 
+  UccChat.utils.push_history();
+
   chan.on("user:entered", msg => {
   })
 
@@ -71,25 +73,35 @@ function start_room_channel(ucc_chat, socket) {
 
   ucc_chat.roomchan = chan;
 
+  console.log('....going to clear')
   ucc_chat.roomManager.clear_unread()
+  console.log('....going to new_room')
   ucc_chat.roomManager.new_room()
+  console.log('....going to scroll_new_window')
   ucc_chat.roomHistoryManager.scroll_new_window()
 
+  console.log('....going to run')
   ucc_chat.main.run(ucc_chat)
+  console.log('....going to update_mentions')
   ucc_chat.roomManager.updateMentionsMarksOfRoom()
 
   if (window.Rebel) {
     window.Rebel.set_event_handlers('#flex-tabs')
   }
 
+  console.log('....going to close')
   ucc_chat.navMenu.close()
+  console.log('....done')
 
 }
 
 UccChat.on_connect(function(ucc_chat, socket) {
+  // console.warn('running room channel on_connect');
   start_room_channel(ucc_chat, socket)
 
   $('body').on('restart-socket', () => {
+    // console.warn('received restart-socket event', UccChat)
+    Rebel.run_channel("room", Rebel.get_rebel_session_token('room'), UccChat.ucxchat.room)
     start_room_channel(ucc_chat, socket)
   })
 })

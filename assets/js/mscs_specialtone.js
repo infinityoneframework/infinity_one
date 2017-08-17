@@ -11,9 +11,9 @@
 
   var SpecialTone = {
     specialTone: undefined,
-    context: new UcxUcc.AudioContext(),
     setup: function() {
       this.destination = this.context.createMediaStreamDestination();
+      this.context = UcxUcc.Mdse.Paging.context;
     },
     get_vol_step_factor: function() {
       return(this.specialTone.vol_step_factor());

@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannelController do
   require Logger
 
   def show(%{assigns: assigns} = socket, params) do
-    # Logger.warn "room channel_controller params: #{inspect params}, socket.assigns: #{inspect socket.assigns}"
+    Logger.warn "room channel_controller params: #{inspect params}, socket.assigns: #{inspect socket.assigns}"
     reply =
       if assigns.room == "lobby" do
         %{redirect: ChannelService.room_redirect(params["room_id"], params["display_name"])}

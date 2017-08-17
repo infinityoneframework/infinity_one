@@ -1,4 +1,4 @@
-// import Favico from "./favico"
+import Favico from "./favico"
 console.log('room_manager.js loading')
 import * as socket from './socket'
 import * as cc from "./chat_channel"
@@ -34,10 +34,12 @@ class RoomManager {
     }
 
     // this.favico = new require("./favico").Favico({
-    //   position : 'up',
-    //   animation : 'pop'
-    //   // animation : 'popFade'
-    // })
+    this.favico = Favico({
+      position : 'up',
+      animation : 'pop'
+      // animation : 'popFade'
+    })
+
     this.title = document.title.replace(/\(.*?\)/, '')
     this.set_badges()
     $('textarea.input-message').autogrow({
@@ -453,6 +455,7 @@ class RoomManager {
 
   open_room(room, display_name, callback) {
     if (debug) { console.log('open_room', this) }
+    console.log('open_room room', room, 'old_room', ucxchat.room)
     cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
       .receive("ok", resp => {
         console.log('open_room ok', resp)

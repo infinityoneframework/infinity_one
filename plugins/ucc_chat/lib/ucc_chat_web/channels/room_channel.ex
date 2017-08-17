@@ -96,6 +96,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_info({:after_join, room, msg}, socket) do
     # room = String.split(room, "/") |> List.last
+    :erlang.process_flag(:trap_exit, true)
     trace room, msg
     channel = Channel.get_by!(name: room)
     broadcast! socket, "user:entered", %{user: msg["user"],
@@ -104,6 +105,10 @@ defmodule UccChatWeb.RoomChannel do
     # UserSocket.push_message_box socket, socket.assigns.user_id, channel.id
     # ChannelService.clear_unread(channel.id, socket.assigns.user_id)
     # socket = Phoenix.Socket.assign(socket, :user_id, msg["user_id"])
+    {:noreply, socket}
+  end
+
+  def handle_info(_event, socket) do
     {:noreply, socket}
   end
 
@@ -190,6 +195,11 @@ defmodule UccChatWeb.RoomChannel do
 
     # push socket, event, msg
     {:noreply, socket}
+  end
+
+  def terminate(reason, socket) do
+    Logger.error "terminate reason: #{inspect reason}"
+    :ok
   end
 
   ##########
