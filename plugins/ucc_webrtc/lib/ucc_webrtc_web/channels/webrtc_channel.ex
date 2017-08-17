@@ -7,7 +7,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   alias UccChatWeb.RebelChannel.Client
   alias UcxUccWeb.Endpoint
   alias Rebel.SweetAlert
-  alias UccWebrtWeb.FlexBar.Tab.MembersList
+  alias UccWebrtcWeb.FlexBar.Tab.MembersList
   alias UccWebrtcWeb.VideoView
   alias UcxUcc.Accounts
 
