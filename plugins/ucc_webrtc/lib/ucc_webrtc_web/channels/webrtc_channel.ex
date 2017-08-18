@@ -85,7 +85,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     {:noreply, socket}
   end
 
-  def terminate(_reason, socket) do
+  def terminate(_reason, _socket) do
     # UccPubSub.unsubscribe "user:" <> socket.assigns.user_id
     :ok
   end
@@ -96,6 +96,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   def handle_in(ev = "webrtc:user-" <> nm, %{"type" => "offer", "name" => name,
       "offer" => offer} = msg, socket) do
     trace ev, msg
+    _ = ev
+    _ = msg
     Logger.debug "Sending offer to #{name}"
     String.split(offer["sdp"], "\r\n")
     |> Enum.each(&(Logger.debug &1))
@@ -114,6 +116,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   def handle_in(ev = "webrtc:user-" <> _nm, %{"type" => "answer", "name" => name,
       "answer" => answer} = msg, socket) do
     trace ev, msg
+    _ = ev
+    _ = msg
     Logger.debug "Sending answer to #{name}"
     # Logger.debug "answer #{name} #{inspect answer}"
     String.split(answer["sdp"], "\r\n")
@@ -134,6 +138,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   def handle_in(ev = "webrtc:user-" <> _nm, %{"type" => "leave", "name" => name} =
       msg, socket) do
     trace ev, msg
+    _ = ev
+    _ = msg
     Logger.debug "Disconnecting from  #{name}"
     case socket.assigns[:state] do
       nil -> socket
@@ -149,6 +155,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   def handle_in(ev = "webrtc:user-" <> _nm, %{"type" => "candidate",
       "name" => name, "candidate" => candidate} = msg, socket) do
     trace ev, msg
+    _ = ev
+    _ = msg
     Logger.debug "Sending candidate to #{name}: #{inspect candidate}"
     socket =
       socket
@@ -159,6 +167,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
 
   def handle_in(ev = "webrtc:user-" <> nm, msg, socket) do
     trace ev, msg
+    _ = ev
+    _ = msg
     type = msg["type"]
     Logger.debug "name: #{nm}, unknown type: #{type}, msg: #{inspect msg}"
     socket = do_broadcast socket, nm, "error", %{type: "error", message: "Unrecognized command: " <> type}
@@ -247,6 +257,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   end
 
   def declined_video_call(payload, socket) do
+    _ = payload
     trace "declined_video_call payload", payload
     trace "declined_video_call assigns", socket.assigns
 
@@ -254,13 +265,16 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   end
 
   def webrtc_answer(event, payload, socket) do
-    Logger.warn "..."
+    _ = event
+    _ = payload
     trace event, payload, inspect(socket.assigns)
+
     socket
   end
 
   def webrtc_leave(event, payload, socket) do
-    Logger.warn "..."
+    _ = event
+    _ = payload
     trace event, payload, inspect(socket.assigns)
     socket
   end

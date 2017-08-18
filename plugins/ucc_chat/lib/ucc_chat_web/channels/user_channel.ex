@@ -177,6 +177,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_out("js:execjs" = ev, payload, socket) do
     trace ev, payload
+    _ = ev
+    _ = payload
     case exec_js socket, payload[:js] do
       {:ok, result} ->
         send payload[:sender], {:response, result}
@@ -188,6 +190,9 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_out("get:subscribed" = ev, msg, socket) do
     trace ev, msg
+    _ = ev
+    _ = msg
+
     Kernel.send msg.pid, {:subscribed, socket.assigns[:subscribed]}
     {:noreply, socket}
   end
@@ -205,6 +210,8 @@ defmodule UccChatWeb.UserChannel do
   def handle_out("room:leave" = ev, msg, socket) do
     %{room: room} = msg
     trace ev, msg, "assigns: #{inspect socket.assigns}"
+    _ = ev
+    _ = msg
     # UserSocket.push_message_box(socket, socket.assigns.channel_id, socket.assigns.user_id)
     socket.endpoint.unsubscribe(CC.chan_room <> room)
     update_rooms_list(socket)
@@ -254,6 +261,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in(ev = "reaction:" <> action, params, socket) do
     trace ev, params
+    _ = ev
+    _ = params
     case UccChat.ReactionService.select(action, params, socket) do
       nil -> {:noreply, socket}
       res -> {:reply, res, socket}
@@ -266,12 +275,16 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("subscribe" = ev, params, socket) do
     trace ev, params, "assigns: #{inspect socket.assigns}"
+    _ = ev
+    _ = params
     {:noreply, socket}
   end
 
   def handle_in("side_nav:open" = ev, %{"page" => "account"} = params,
     socket) do
     trace ev, params
+    _ = ev
+    _ = params
 
     user = Helpers.get_user!(socket)
     account_cs = Account.changeset(user.account, %{})
@@ -285,6 +298,8 @@ defmodule UccChatWeb.UserChannel do
   end
   def handle_in("side_nav:open" = ev, %{"page" => "admin"} = params, socket) do
     trace ev, params
+    _ = ev
+    _ = params
 
     user = Helpers.get_user!(socket)
 
@@ -298,6 +313,8 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def handle_in("side_nav:more_channels" = ev, params, socket) do
+    _ = ev
+    _ = params
     trace ev, params
 
     html = SideNavService.render_more_channels(socket.assigns.user_id)
@@ -306,6 +323,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("side_nav:more_users" = ev, params, socket) do
     trace ev, params
+    _ = ev
+    _ = params
 
     html = SideNavService.render_more_users(socket.assigns.user_id)
     {:reply, {:ok, %{html: html}}, socket}
@@ -313,12 +332,16 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("side_nav:close" = ev, params, socket) do
     trace ev, params
+    _ = ev
+    _ = params
 
     {:noreply, socket}
   end
 
   def handle_in("account:preferences:save" = ev, params, socket) do
     trace ev, params, "assigns: #{inspect socket.assigns}"
+    _ = ev
+    _ = params
     params =
       params
       |> Helpers.normalize_form_params
@@ -340,6 +363,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("account:profile:save" = ev, params, socket) do
     trace ev, params, "assigns: #{inspect socket.assigns}"
+    _ = ev
+    _ = params
     params =
       params
       |> Helpers.normalize_form_params
@@ -364,6 +389,9 @@ defmodule UccChatWeb.UserChannel do
     when link in @links do
 
     trace ev, params
+    _ = ev
+    _ = params
+
     user = Helpers.get_user(socket.assigns.user_id)
     user_cs = User.changeset(user, %{})
     account_cs = Account.changeset(user.account, %{})
@@ -376,6 +404,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in(ev = "mode:set:" <> mode, params, socket) do
     trace ev, params
+    _ = ev
+    _ = params
     mode = if mode == "im", do: true, else: false
     user = Helpers.get_user!(socket)
 
@@ -397,6 +427,8 @@ defmodule UccChatWeb.UserChannel do
   @links ~w(info general chat_general message permissions layout users rooms file_upload)
   def handle_in(ev = "admin_link:click:" <> link, params, socket) when link in @links do
     trace ev, params
+    _ = ev
+    _ = params
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
@@ -406,6 +438,8 @@ defmodule UccChatWeb.UserChannel do
   def handle_in(ev = "admin_link:click:webrtc" , params, socket) do
     link = "webrtc"
     trace ev, params
+    _ = ev
+    _ = params
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content",
@@ -415,6 +449,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in(ev = "admin:" <> link, params, socket) do
     trace ev, params
+    _ = ev
     AdminService.handle_in(link, params, socket)
   end
 
@@ -425,7 +460,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in(ev = "update:currentMessage", params, socket) do
     trace ev, params
-
+    _ = ev
     value = params["value"] || "0"
     assigns = socket.assigns
     last_read = SubscriptionService.get(assigns.channel_id, assigns.user_id,
@@ -444,6 +479,7 @@ defmodule UccChatWeb.UserChannel do
   def handle_in(ev = "get:currentMessage", params,
     %{assigns: assigns} = socket) do
     trace ev, params
+    _ = ev
     channel = Channel.get_by name: params["room"]
     if channel do
       res =
@@ -459,6 +495,7 @@ defmodule UccChatWeb.UserChannel do
   end
   def handle_in(ev = "last_read", params, %{assigns: assigns} = socket) do
     trace ev, params
+    _ = ev
     SubscriptionService.update assigns, %{last_read: params["last_read"]}
     {:noreply, socket}
   end
@@ -478,6 +515,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in(ev = "webrtc:incoming_video_call", payload, socket) do
     trace ev, payload
+    _ = ev
+    _ = payload
     {:noreply, socket}
   end
 
@@ -515,6 +554,7 @@ defmodule UccChatWeb.UserChannel do
   def handle_info({"webrtc:incoming_video_call" = ev, payload}, socket) do
     trace ev, payload
     trace ev, socket.assigns
+    _ = ev
     title = "Direct video call from #{payload[:username]}"
     icon = "videocam"
     # SweetAlert.swal_modal socket, "<i class='icon-#{icon} alert-icon success-color'></i>#{title}", "Do you want to accept?", "warning",
@@ -599,11 +639,14 @@ defmodule UccChatWeb.UserChannel do
   end
   def handle_info(%Broadcast{topic: _, event: "room:update:list" = event,
     payload: payload}, socket) do
+    _ = event
+    _ = payload
     trace event, payload
     {:noreply, update_rooms_list(socket)}
   end
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
+    _ = event
     trace event, ""  #socket.assigns
     assigns = socket.assigns
 
@@ -631,6 +674,8 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: _, event: "user:action" = event,
     payload: %{action: "unhide"} = payload}, %{assigns: assigns} = socket) do
+    _ = assigns
+    _ = event
     trace event, payload, "assigns: #{inspect assigns}"
 
     UserSocket.push_rooms_list_update(socket, payload.channel_id,
@@ -641,6 +686,8 @@ defmodule UccChatWeb.UserChannel do
   def handle_info(%Broadcast{topic: _, event: "user:entered" = event,
     payload: %{user: user} = payload},
     %{assigns: %{user: user} = assigns} = socket) do
+
+    _ = event
 
     trace event, payload, "assigns: #{inspect assigns}"
     # old_channel_id = assigns[:channel_id]
@@ -655,6 +702,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: _, event: "room:delete" = event,
     payload: payload}, socket) do
+    _ = event
     trace event, payload
     room = payload.room
     if Enum.any?(socket.assigns[:subscribed], &(&1 == room)) do
@@ -667,6 +715,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def handle_info({:update_mention, payload, user_id} = ev, socket) do
+    _ = ev
     trace "upate_mention", ev
     if UserService.open_channel_count(socket.assigns.user_id) > 1 do
       opens = UserService.open_channels(socket.assigns.user_id)
@@ -728,7 +777,7 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     UccPubSub.unsubscribe "user:" <> socket.assigns[:user_id]
     :ok
   end
@@ -895,6 +944,7 @@ defmodule UccChatWeb.UserChannel do
 
   def webrtc_offer(event, payload, socket) do
     trace event, payload, inspect(socket.assigns)
+    _ = event
     IO.inspect Map.get(payload, :name), label: "keys"
     socket
   end
@@ -919,6 +969,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def video_stop(socket, sender) do
+    _ = sender
     trace "video_stop", sender
     exec_js(socket, "window.WebRTC.hangup")
     execute(socket, :click, on: ".tab-button.active")

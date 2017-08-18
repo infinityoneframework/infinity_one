@@ -116,6 +116,7 @@ defmodule UccChatWeb.RoomChannel do
   # Outgoing message handlers
 
   def handle_out("js:execjs" = ev, payload, socket) do
+    _ = ev
     trace ev, payload
     case exec_js socket, payload[:js] do
       {:ok, result} ->
@@ -197,7 +198,7 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, socket) do
+  def terminate(reason, _socket) do
     Logger.error "terminate reason: #{inspect reason}"
     :ok
   end
@@ -209,6 +210,7 @@ defmodule UccChatWeb.RoomChannel do
     socket) do
     # debug pattern, msg
     trace pattern, msg
+    _ = msg
     user = Helpers.get_user! socket.assigns.user_id
     if authorized? socket, String.split(pattern, "/"), params, ucxchat, user do
       UccChatWeb.ChannelRouter.route(socket, pattern, params, ucxchat)

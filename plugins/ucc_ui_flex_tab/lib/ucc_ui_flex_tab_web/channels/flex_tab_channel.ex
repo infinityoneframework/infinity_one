@@ -67,6 +67,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
   @spec room_join(String.t, Map.t, socket) :: socket
   def room_join(event, payload, socket) do
     trace event, payload
+    _ = event
     user_id = socket.assigns.user_id
     channel_id = payload[:channel_id]
     socket = Phoenix.Socket.assign(socket, :channel_id, channel_id)
@@ -81,7 +82,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
     end)
   end
 
-  def flex_close(socket, sender) do
+  def flex_close(socket, _sender) do
     execute socket, :click, on: ".tab-button.active"
   end
 

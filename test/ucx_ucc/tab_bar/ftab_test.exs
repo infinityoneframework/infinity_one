@@ -3,7 +3,7 @@ defmodule UcxUcc.TabBar.FtabTest do
   doctest UcxUcc.TabBar.Ftab
 
   alias UcxUcc.TabBar
-  alias TabBar.Ftab
+  # alias TabBar.Ftab
 
   setup do
     TabBar.delete_all

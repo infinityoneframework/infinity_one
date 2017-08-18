@@ -121,7 +121,7 @@ defmodule UccChat.PresenceAgent do
   ##############
   # casts
 
-  def handle_cast(:clear, data) do
+  def handle_cast(:clear, _data) do
     noreply initial_state()
   end
 

@@ -139,7 +139,7 @@ defmodule UcxUcc.UccPubSub do
     {:reply, state, state}
   end
 
-  def handle_info({:DOWN, _, :process, pid, reason}, state) do
+  def handle_info({:DOWN, _, :process, pid, _reason}, state) do
     # Logger.info "un-subscribing pid: #{inspect pid} for #{inspect reason}"
     {:noreply, unsubscribe_pid(pid, state)}
   end

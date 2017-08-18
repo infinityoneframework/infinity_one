@@ -23,6 +23,7 @@ defmodule UccChatWeb.FlexBar.Form do
 
   def flex_form(socket, sender) do
     trace "flex_form sender", sender
+    _ = sender
     socket
   end
 
@@ -49,6 +50,7 @@ defmodule UccChatWeb.FlexBar.Form do
         |> notify_update_success(tab, sender,
           %{resource: resource, resource_params: resource_params})
       {:error, changeset} ->
+        _ = changeset
         trace "error", changeset
         toastr!(socket, :error, "Problem updating #{resource_key}")
     end
@@ -56,6 +58,7 @@ defmodule UccChatWeb.FlexBar.Form do
 
   def flex_form_cancel(socket, %{"form" => %{"id" => tab_name}} = sender) do
     trace "flex_form_cancel", sender
+    _ = sender
     tab = TabBar.get_button(tab_name)
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket
@@ -64,6 +67,7 @@ defmodule UccChatWeb.FlexBar.Form do
 
   def flex_form_toggle(socket, sender) do
     trace "flex_form_toggle", sender
+    _ = sender
 
     id = "#" <> sender["dataset"]["id"]
 

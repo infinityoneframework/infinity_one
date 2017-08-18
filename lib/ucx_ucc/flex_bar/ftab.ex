@@ -3,7 +3,6 @@ defmodule UcxUcc.TabBar.Ftab do
   alias UcxUcc.TabBar
 
   require Logger
-  import Logger
 
   @type id :: String.t
 
@@ -176,7 +175,7 @@ defmodule UcxUcc.TabBar.Ftab do
     case TabBar.get_view user_id, channel_id, name do
       nil ->
         if callback, do: callback.({:ok, nil})
-      view ->
+      _view ->
         if callback, do: callback.({:open, {name, nil}})
     end
   end

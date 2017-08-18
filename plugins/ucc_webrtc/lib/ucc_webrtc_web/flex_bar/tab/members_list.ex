@@ -13,12 +13,12 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   require UccChat.ChatConstants, as: CC
   require Logger
 
-  def video_args(socket, current_user_id, channel_id, user_id) do
+  def video_args(socket, current_user_id, _channel_id, user_id) do
     username = socket.assigns.username
     other_user = Accounts.get_user user_id
     Logger.warn "video args curr_id: #{current_user_id}, user_id: #{user_id}"
-    remote_item = %{connected: false, state_text: "state", id: other_user.id,
-      username: other_user.username}
+    # remote_item = %{connected: false, state_text: "state", id: other_user.id,
+    #   username: other_user.username}
 
     {[webrtc: %{self: username,
       id: 1,
@@ -78,7 +78,6 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
 
   def flex_video_open(socket, sender) do
     Logger.warn "flex_video_open, assigns: #{inspect socket.assigns}"
-    current_user_id = socket.assigns[:user_id]
     channel_id = Rebel.get_assigns(socket, :channel_id)
     user_id = sender["dataset"]["user_id"]
 

@@ -43,6 +43,8 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
 
   def notify_update_success(socket, tab, sender, %{toggle: _} = opts) do
     trace "notify_update_success toggle", {tab, sender}
+    _ = tab
+    _ = sender
 
     params = %{channel_id: opts.resource.id, field: socket.assigns.toggle_field}
     broadcast socket, "room:update", params
