@@ -23,6 +23,11 @@ defmodule UcxUcc.Accounts do
     Repo.all(User)
   end
 
+  def list_users([preload: preload]) do
+    Repo.all from u in User, preload: ^preload
+  end
+
+
   @doc """
   Gets a single user.
 
