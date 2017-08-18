@@ -73,16 +73,16 @@ defmodule UcxUcc.TabBar do
 
   ## Examples
 
-      iex> UcxUcc.TabBar.add_button %{id: "one", name: "B1"}
+      iex> UcxUcc.TabBar.add_button %{id: "one", name: "B1", display: true}
       iex> UcxUcc.TabBar.get_buttons
-      [%{id: "one", name: "B1"}]
+      [%{id: "one", name: "B1", display: true}]
   """
   def get_buttons() do
     @name
     |> :ets.match({{:button, :"_"}, :"$2"})
     |> List.flatten
-    |> Enum.filter(& &1.display)
-    |> Enum.sort(& &1.order < &2.order)
+    |> Enum.filter(& &1[:display])
+    |> Enum.sort(& &1[:order] < &2[:order])
   end
 
   @doc """
@@ -281,12 +281,12 @@ defmodule UcxUcc.TabBar do
       iex> UcxUcc.TabBar.open_ftab 1, 2, "test", nil
       iex> UcxUcc.TabBar.open_ftab 1, 3, "other", %{one: 1}
       iex> UcxUcc.TabBar.open_ftab 2, 3, "other", %{one: 2}
-      iex> UcxUcc.TabBar.add_button %{id: "one", name: "B1"}
+      iex> UcxUcc.TabBar.add_button %{id: "one", name: "B1", display: true}
       iex> UcxUcc.TabBar.delete_ftabs
       iex> UcxUcc.TabBar.get_ftabs
       []
       iex> UcxUcc.TabBar.get_buttons
-      [%{id: "one", name: "B1"}]
+      [%{id: "one", name: "B1", display: true}]
   """
   def delete_ftabs do
     :ets.match_delete(@name, {{:ftab, :"_"}, :"_"})
