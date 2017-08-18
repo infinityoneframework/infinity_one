@@ -59,7 +59,8 @@ defmodule UccChatWeb.ChannelController do
     user =
       conn
       |> Coherence.current_user
-      |> Repo.preload([:account])
+      |> Repo.preload([:account, :extension])
+      # TODO: find generic way to only load extension if plugin available
 
     UccChat.PresenceAgent.load user.id
 

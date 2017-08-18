@@ -4,12 +4,13 @@ alias Accounts.{User, Role, UserRole, Account}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
 alias Mscs.{Client, Apb}
+alias UcxPresence.Extension
 
+Extension.delete_all
 Message.delete_all
 Subscription.delete_all
 Channel.delete_all
 Apb.delete_all
-
 
 Repo.delete_all PermissionRole
 Repo.delete_all UserRole
@@ -266,3 +267,18 @@ Client.list
   Client.update(user, %{mac: mac})
 end)
 
+IO.puts "Setting extensions"
+
+add_extension = fn {extension, user} ->
+  Extension.create(%{user_id: user.id, extension: "#{extension}"})
+end
+
+# [
+#   2000: u2, 2001: u3, 2002: Enum.at(users, 0),
+#   2002: Enum.at(users, 1), 2003: Enum.at(users, 2),
+#   2004: Enum.at(users, 3)
+# ]
+
+2000..2009
+|> Enum.zip([u2, u3] ++ users)
+|> Enum.each(& add_extension.(&1))

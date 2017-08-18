@@ -1523,6 +1523,10 @@ label.required::after {
       .archived {
         font-style: italic;
       }
+
+      span.name {
+        padding-left: 3px;
+      }
     }
 
     .opt {

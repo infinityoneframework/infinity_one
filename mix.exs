@@ -97,13 +97,19 @@ defmodule UcxUcc.Mixfile do
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
-      {:gen_fsm, git: "git@bitbucket.org:emetrotel/gen_fsm.git"},
+      # {:gen_fsm, git: "git@bitbucket.org:emetrotel/gen_fsm.git"},
       {:ex_data, git: "git@bitbucket.org:emetrotel/ex_data.git"},
       {:rudp, git: "git@bitbucket.org:emetrotel/rudp.git"},
       {:ucx_license_manager,
         git: "git@bitbucket.org:emetrotel/ucx_license_manager.git", env: Mix.env},
       {:ucx_alarm_manager,
-        git: "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", env: Mix.env}
+        git: "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", env: Mix.env},
+
+      # ucx_presence
+      # {:speak_ex, github: "smpallen99/speak_ex"},
+      # {:ex_ami, "~> 0.0"}
+      {:ex_ami, path: "../ex_ami"}
+
     ]
   end
 

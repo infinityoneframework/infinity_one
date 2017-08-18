@@ -10,6 +10,7 @@ defmodule UccChat.PresenceAgent do
   state overrides are handled her.
 
   """
+  use GenServer
   import Ecto.Query
 
   alias UcxUcc.{Repo}
@@ -21,32 +22,8 @@ defmodule UccChat.PresenceAgent do
   # @audit_secs 120
 
   def start_link do
-    # spawn fn ->
-    #   :timer.sleep(2000)
-    #   @name.startup()
-    # end
-    Agent.start_link(fn -> %{} end, name: @name)
-  end
-
-  @doc """
-  Read the data base and record with users have an overridden presence status.
-  """
-  def startup do
-    # query =
-    #   from u in User,
-    #     join: c in User, on: c.id == u.user_id,
-    #     select: {u.id, c.chat_status}
-
-    # users =
-    #   query
-    #   |> Repo.all
-    #   |> Enum.map(fn
-    #     {id, nil} = default -> {to_string(id), nil}
-    #     {id, status} -> {to_string(id), {:override, status}}
-    #   end)
-    #   |> Enum.into(%{})
-
-    # Agent.update(@name, fn _ -> users end)
+    GenServer.start_link __MODULE__, [], name: @name
+    # Agent.start_link(fn -> %{} end, name: @name)
   end
 
   @doc """
@@ -60,20 +37,7 @@ defmodule UccChat.PresenceAgent do
   an override. Otherwise, sets the status to "online"
   """
   def load(user_id) when is_binary(user_id) do
-    query =
-      from u in User,
-        where: u.id == ^user_id,
-        select: u.chat_status
-
-    status =
-      query
-      |> Repo.one
-      |> case do
-        nil    -> "online"
-        status -> {:override, status}
-      end
-
-    Agent.update(@name, &Map.put(&1, to_string(user_id), status))
+    GenServer.cast @name, {:load, user_id}
   end
 
   @doc """
@@ -83,31 +47,21 @@ defmodule UccChat.PresenceAgent do
   #   user_id |> to_string |> unload
   # end
   def unload(user) do
-    Agent.update(@name, &Map.delete(&1, user))
+    GenServer.cast @name, {:unload, user}
   end
 
   # def update_presence(user_id, status) when is_integer(user_id),
   #   do: user_id |> to_string |> update_presence(status)
 
   def update_presence(user, status) do
-    Agent.update @name, fn state ->
-      update_in state, [user], fn
-        {:override, _} = override -> override   # don't change the override
-        _ -> status                            # new status
-      end
-    end
+    GenServer.cast @name, {:update_presence, user, status}
   end
 
   # def get_and_update_presence(user_id, status) when is_integer(user_id),
   #   do: user_id |> to_string |> get_and_update_presence(status)
 
   def get_and_update_presence(user, status) do
-    Agent.get_and_update @name, fn state ->
-      get_and_update_in state, [user], fn
-        {:override, val} = override -> {val, override}   # don't change the override
-        _ -> {status, status}                            # new status
-      end
-    end
+    GenServer.call @name, {:get_and_update_presence, user, status}
   end
   # Agent.get_and_update name, &(get_and_update_in(&1, ["18"], fn state -> {"busy", "busy"} end))
 
@@ -127,43 +81,141 @@ defmodule UccChat.PresenceAgent do
   end
 
   def put(user_id, user, "online") do
-    set_chat_status(user_id, nil)
-    Agent.update(@name, &Map.put(&1, user, "online"))
+    GenServer.cast @name, {:put, user_id, user, "online"}
   end
+
   def put(user_id, user, "invisible") do
     put(user_id, user, "offline")
   end
+
   def put(user_id, user, status) do
-    set_chat_status(user_id, status)
-    Agent.update(@name, &Map.put(&1, user, {:override, status}))
+    GenServer.cast @name, {:put, user_id, user, status}
   end
 
   # def get(user_id) when is_integer(user_id),
   #   do: user_id |> to_string |> get
 
   def get(user) do
-    case Agent.get @name, &Map.get(&1, user) do
-      {:override, status} -> status
-      nil -> "offline"
-      status -> status
-    end
+    GenServer.call @name, {:get, user}
   end
 
   # def active?(user_id) when is_integer(user_id),
   #   do: user_id |> to_string |> active?
 
   def active?(user) do
-    not is_nil(Agent.get(@name, &Map.get(&1, user)))
-    # @name |> Agent.get(&Map.get(&1, user)) |> is_nil |> not
+    GenServer.call @name, {:active?, user}
   end
 
   def all do
-    Agent.get @name, &(&1)
+    GenServer.call @name, :all
   end
 
   def clear do
-    Agent.update @name, fn _ -> %{} end
+    GenServer.cast @name, :clear
   end
+
+  def init(_) do
+    {:ok, %{}}
+  end
+
+  ##############
+  # casts
+
+  def handle_cast(:clear, data) do
+    noreply initial_state()
+  end
+
+  def handle_cast({:put, user_id, user, "online"}, data) do
+    set_chat_status(user_id, nil)
+    data
+    |> Map.put(user, "online")
+    |> noreply
+  end
+
+  def handle_cast({:put, user_id, user, status}, data) do
+    set_chat_status(user_id, status)
+    data
+    |> Map.put(user, {:override, status})
+    |> noreply
+  end
+
+  def handle_cast({:update_presence, user, status}, data) do
+    update_in data, [user], fn
+      {:override, _} = override -> override   # don't change the override
+      _ -> status                            # new status
+    end
+    |> noreply
+  end
+
+  def handle_cast({:unload, user}, data) do
+    data
+    |> Map.delete(user)
+    |> noreply
+  end
+
+  def handle_cast({:load, user_id}, data) do
+
+    query =
+      from u in User,
+        where: u.id == ^user_id,
+        select: u.chat_status
+
+    status =
+      query
+      |> Repo.one
+      |> case do
+        nil    -> "online"
+        status -> {:override, status}
+      end
+
+    data
+    |> Map.put(to_string(user_id), status)
+    |> noreply
+  end
+
+  ##############
+  # calls
+
+  def handle_call(:all, _, data) do
+    reply data, data
+  end
+
+  def handle_call({:active?, user}, _, data) do
+    reply data, not is_nil(Map.get(data, user))
+  end
+
+  def handle_call({:get, user}, _, data) do
+    reply =
+      case Map.get(data, user) do
+        {:override, status} -> status
+        nil -> "offline"
+        status -> status
+      end
+
+    reply data, reply
+  end
+
+  def handle_call({:get_and_update_presence, user, status}, _, data) do
+    {reply, data} =
+      get_and_update_in data, [user], fn
+        {:override, val} = override -> {val, override}   # don't change the override
+        _ -> {status, status}                            # new status
+      end
+    reply data, reply
+  end
+
+  ##############
+  # infos
+
+  def handle_info(_, data) do
+    noreply data
+  end
+
+
+  ##################
+  # Private
+
+  def initial_state, do: %{}
 
   defp user(user_id) do
     Repo.one!(from u in User, where: u.id == ^user_id)
@@ -175,5 +227,8 @@ defmodule UccChat.PresenceAgent do
     |> User.changeset(%{chat_status: status})
     |> Repo.update
   end
+
+  defp noreply(data), do: {:noreply, data}
+  defp reply(data, reply), do: {:reply, reply, data}
 
 end
