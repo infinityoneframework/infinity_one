@@ -81,8 +81,8 @@ defmodule UcxUcc.TabBar do
     @name
     |> :ets.match({{:button, :"_"}, :"$2"})
     |> List.flatten
-    |> Enum.filter(& &1[:display])
-    |> Enum.sort(& &1[:order] < &2[:order])
+    |> Enum.filter(& &1.display)
+    |> Enum.sort(& &1.order < &2.order)
   end
 
   @doc """

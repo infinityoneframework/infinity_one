@@ -14,8 +14,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
     certfile: "priv/cert.pem"
   ],
   debug_errors: true,
-  # code_reloader: true,
-  code_reloader: false,
+  code_reloader: true,
+  # code_reloader: false,
   check_origin: false,
   watchers: [node: ["node_modules/.bin/brunch", "watch", "--stdin",
                     cd: Path.expand("../assets", __DIR__)]]
