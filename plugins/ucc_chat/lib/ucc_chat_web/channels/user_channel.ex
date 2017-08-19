@@ -616,6 +616,7 @@ defmodule UccChatWeb.UserChannel do
     subscribe_callback "user:" <> user_id, "webrtc:offer", :webrtc_offer
     subscribe_callback "user:" <> user_id, "webrtc:answer", {WebrtcChannel, :webrtc_answer}
     subscribe_callback "user:" <> user_id, "webrtc:leave", {WebrtcChannel, :webrtc_leave}
+    subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     {:noreply, socket}
   end
 
@@ -773,7 +774,14 @@ defmodule UccChatWeb.UserChannel do
 
   handle_callback("user:" <>  _user_id)
 
-  def handle_info(_payload, socket) do
+  def handle_info({"phone:presence", "presence:change", meta, {mod, fun}} = payload, socket) do
+    Logger.error "payload: #{inspect payload}"
+    apply(mod, fun, ["presence:change", meta, socket])
+    {:noreply, socket}
+  end
+
+  def handle_info(payload, socket) do
+    Logger.error "default handle info payload: #{inspect payload}"
     {:noreply, socket}
   end
 
@@ -973,6 +981,17 @@ defmodule UccChatWeb.UserChannel do
     trace "video_stop", sender
     exec_js(socket, "window.WebRTC.hangup")
     execute(socket, :click, on: ".tab-button.active")
+  end
+
+  def phone_presence_change(event, %{state: :active, username: username} = _payload, socket) do
+    Logger.error "state change :active, assigns: " <> inspect(socket.assigns)
+     exec_js socket, ~s/$('[data-phone-status="#{username}"]').removeClass('phone-idle').addClass('phone-busy')/
+     socket
+  end
+  def phone_presence_change(event, %{state: :idle, username: username} = _payload, socket) do
+    Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
+     exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
+     socket
   end
 
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel

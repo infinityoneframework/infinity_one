@@ -311,7 +311,8 @@ defmodule UccChat.ChannelService do
     chan = cc.channel
     open = chan.id == channel_id
     type = get_chan_type(cc.type, chan.type)
-    {display_name, user_status} = get_channel_display_name(type, chan, id)
+    {display_name, user_status, phone_status} =
+      get_channel_display_name(type, chan, id)
     unread = if cc.unread == 0, do: false, else: cc.unread
     cc = unhide_current_channel(cc, channel_id)
 
@@ -331,7 +332,8 @@ defmodule UccChat.ChannelService do
       type: type,
       display_name: display_name,
       active: chan.active,
-      last_read: cc.last_read
+      last_read: cc.last_read,
+      phone_status: phone_status
     }
   end
 
@@ -394,15 +396,22 @@ defmodule UccChat.ChannelService do
       %{} = direct ->
         username = Map.get(direct, :users)
         user = Repo.one! User.user_from_username(username)
-        {username, UccChat.PresenceAgent.get(user.id)}
+        {username, UccChat.PresenceAgent.get(user.id), get_phone_status(user)}
       _ ->
-        {name, "offline"}
+        {name, "offline", nil}
     end
   end
   def get_channel_display_name(_, %ChannelSchema{name: name}, _) do
-    {name, "offline"}
+    {name, "offline", nil}
   end
 
+  defp get_phone_status(user) do
+    if function_exported?(UcxPresence, :status, 1) do
+      UcxPresence.status user
+    else
+      nil
+    end
+  end
 
   def favorite_room?(%{} = chatd, channel_id) do
     with room_types <- chatd.rooms,

@@ -1,16 +1,20 @@
 .phone-idle {
-  color: #4dff4d;
-  rotate: 135deg;
+  color: #4dff4d !important;
+  transform: rotate(135deg);
 }
 .phone-busy {
-  color: #bc2031;
-  rotate: 0deg;
+  color: #bc2031 !important;
+  transform: rotate(0deg);
 }
 .phone-offline {
-  color: gray;
-  rotate: 135deg;
+  color: gray !important;
+  transform: rotate(135deg);
 }
 .phone-away {
-  color: #fcb316;
-  rotate: 135deg;
+  color: #fcb316 !important;
+  transform: rotate(135deg);
+}
+
+.side-nav li i.icon-phone {
+  margin-left: 3px;
 }

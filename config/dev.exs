@@ -44,8 +44,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
       ~r{lib/ucx_ucc/web/templates/.*(eex|haml|slim|slime)$},
-      # ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
-      # ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml|slim|slime)$},
+      ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
+      ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml|slim|slime)$},
     ]
   ]
 

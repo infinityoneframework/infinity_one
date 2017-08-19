@@ -178,8 +178,10 @@ defmodule UcxUcc.UccPubSub do
   defp broadcast_to_list(list, topic, event, payload) do
     Enum.each(list, fn
       {pid, nil} ->
+        Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload}}"
         spawn fn -> send pid, {topic, event, payload} end
       {pid, meta} ->
+        Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload, meta}}"
         spawn fn -> send pid, {topic, event, payload, meta} end
     end)
   end
