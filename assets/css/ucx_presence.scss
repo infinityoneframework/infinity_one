@@ -1,20 +1,49 @@
 .phone-idle {
   color: #4dff4d !important;
-  transform: rotate(135deg);
+  &:before {
+    transform: rotate(135deg);
+  }
 }
 .phone-busy {
   color: #bc2031 !important;
-  transform: rotate(0deg);
+  &:before {
+    transform: rotate(0deg);
+  }
 }
 .phone-offline {
   color: gray !important;
-  transform: rotate(135deg);
+  &:before {
+    transform: rotate(135deg);
+  }
 }
 .phone-away {
   color: #fcb316 !important;
-  transform: rotate(135deg);
+  &:before {
+    transform: rotate(135deg);
+  }
 }
 
-.side-nav li i.icon-phone {
-  margin-left: 3px;
+// .side-nav li.room-link {
+.side-nav li {
+  i {
+    &.icon-phone,
+    &.phone-none {
+      margin-right: 2px;
+    }
+  }
+}
+section.flex-tab {
+  li.user-card-room {
+    display: flex;
+    flex-flow: row nowrap;
+
+    .phone-status {
+      margin-right: 1px;
+      width: 15px;
+    }
+    button {
+      margin-left: 13px;
+      margin-top: -8.5px;
+    }
+  }
 }

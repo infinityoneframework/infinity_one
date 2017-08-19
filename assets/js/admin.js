@@ -51,7 +51,7 @@ class Admin {
         let value = $(this).is(':checked')
 
         if (!value) { value = "false" }
-        userchan.push('admin:permissions:change:' + name, {value: value})
+        UccChat.userchan.push('admin:permissions:change:' + name, {value: value})
         .receive("ok", resp => {
           // stop_loading_animation()
           toastr.success('Room ' + name + ' updated successfully.')
@@ -79,7 +79,7 @@ class Admin {
       .on('click', '.admin-settings button.save', function(e) {
         console.log('saving form....', $('form').data('id'))
         e.preventDefault()
-        userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
+        UccChat.userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
           .receive("ok", resp => {
             if (resp.success) {
               admin.disable_save_button()
@@ -121,7 +121,7 @@ class Admin {
         }
       })
       .on('click', 'section.admin form.user button.save', e => {
-        userchan.push('admin:save:user', $('form.user').serializeArray())
+        UccChat.userchan.push('admin:save:user', $('form.user').serializeArray())
           .receive("ok", resp => {
             if (resp.success) {
               toastr.success(resp.success)
@@ -146,7 +146,7 @@ class Admin {
   }
 
   close_edit_form(name) {
-    userchan.push('admin:flex:user-info', {name: name})
+    UccChat.userchan.push('admin:flex:user-info', {name: name})
       .receive("ok", resp => {
         $('section.flex-tab').html(resp.html).parent().addClass('opened')
         flex.set_tab_buttons_inactive()
@@ -167,7 +167,7 @@ class Admin {
     }
   }
   userchan_push(action, params) {
-    userchan.push('admin:channel-settings:' + action, params)
+    UccChat.userchan.push('admin:channel-settings:' + action, params)
       .receive("ok", resp => {
         if (resp.html) {
           $('.content.channel-settings').replaceWith(resp.html)

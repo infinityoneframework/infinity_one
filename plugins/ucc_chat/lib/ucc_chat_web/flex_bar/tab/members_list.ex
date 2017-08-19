@@ -7,6 +7,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   alias TabBar.Ftab
   alias TabBar.Tab
   alias UccWebrtcWeb.FlexBar.Tab.MembersList, as: WebrtcMembersList
+  alias UcxUcc.Repo
 
   require Logger
 
@@ -25,6 +26,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   def args(socket, user_id, channel_id, _, opts) do
     current_user = Helpers.get_user!(user_id)
     channel = Channel.get!(channel_id, preload: [users: :roles])
+    phone_status? = UccChat.phone_status?
 
     {user, user_mode} =
       case opts["username"] do
@@ -34,7 +36,10 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
           {Helpers.get_user_by_name(username, preload: [:roles]), true}
       end
 
-    users = Accounts.get_all_channel_online_users(channel)
+    users =
+      channel
+      |> Accounts.get_all_channel_online_users
+      |> load_extensions_and_status(phone_status?)
 
     total_count = channel.users |> length
 
@@ -47,10 +52,22 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
      channel_id: channel_id, current_user: current_user], socket}
   end
 
+  defp load_extensions_and_status(users, true) do
+    users
+    |> Repo.preload([:extension])
+    |> Enum.map(&UcxPresence.set_status/1)
+  end
+
+  defp load_extensions_and_status(users, _) do
+    users
+  end
+
   def user_args(socket, user_id, channel_id, username) do
     channel = Channel.get!(channel_id, preload: [users: :roles])
+    # preload = if UccChat.phone_status?, do: [:roles, :extension], else: [:roles]
+    preload = Helpers.user_preload [:roles]
     {[
-      user: Helpers.get_user_by_name(username, preload: [:roles]),
+      user: Helpers.get_user_by_name(username, preload: preload),
       user_info: user_info(channel, user_mode: true, view_mode: true),
       channel_id: channel_id,
       current_user: Helpers.get_user!(user_id)
@@ -89,10 +106,12 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
   def flex_show_all(socket, sender) do
     channel_id = exec_js!(socket, "ucxchat.channel_id")
+
     users =
       channel_id
       |> Channel.get!(preload: [:users])
       |> Accounts.get_channel_offline_users
+      |> load_extensions_and_status(UccChat.phone_status?)
 
     html =
       for user <- users do

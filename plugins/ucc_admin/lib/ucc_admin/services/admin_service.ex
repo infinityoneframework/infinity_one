@@ -398,7 +398,15 @@ defmodule UccAdmin.AdminService do
     [user: user, changeset: cs]
   end
   def get_args("users", user) do
-    users = Repo.all(from u in User, order_by: [asc: u.username])
+    phone_status? = UccChat.phone_status?
+    preload = if phone_status?, do: [:extension], else: []
+    user = Repo.preload user, preload
+
+    users =
+      (from u in User, order_by: [asc: u.username], preload: ^preload)
+      |> Repo.all
+      |> set_phone_status(phone_status?)
+
     [user: user, users: users]
   end
   def get_args("rooms", user) do
@@ -478,5 +486,13 @@ defmodule UccAdmin.AdminService do
   defp get_pending_invitations do
     Coherence.Invitation
     |> Repo.all
+  end
+
+  defp set_phone_status(users, true) do
+    Enum.map users, &UcxPresence.set_status/1
+  end
+
+  defp set_phone_status(users, _) do
+    users
   end
 end

@@ -21,7 +21,7 @@ defmodule UccChat.ServiceHelpers do
     get_user!(assigns[:user_id], opts)
   end
   def get_user!(id, opts) do
-    preload = opts[:preload] || @default_user_preload
+    preload = user_preload(opts[:preload] || @default_user_preload)
     Repo.one!(from u in User, where: u.id == ^id, preload: ^preload)
   end
 
@@ -38,7 +38,14 @@ defmodule UccChat.ServiceHelpers do
   def get_user_by_name(username, opts \\ [])
   def get_user_by_name(nil, _), do: nil
   def get_user_by_name(username, opts) do
-    preload = if opts[:preload] == false, do: [], else: @default_user_preload
+    preload =
+      if opts[:preload] == false do
+        []
+      else
+        @default_user_preload
+      end
+      |> user_preload
+
     User
     |> where([c], c.username == ^username)
     |> preload(^preload)
@@ -56,6 +63,14 @@ defmodule UccChat.ServiceHelpers do
       _ -> 0
     end
     query |> offset(^offset) |> limit(^page_size)
+  end
+
+  def user_preload(preload) do
+    if UccChat.phone_status? do
+      [:extension | preload]
+    else
+      preload
+    end
   end
 
   @dt_re ~r/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d+)/

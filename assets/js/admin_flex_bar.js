@@ -22,7 +22,7 @@ class AdminFlexBar {
     let name = elem.data('name')
     console.log('clicked link-row', type, name, this.current)
 
-    userchan.push('admin:flex:' + type, {name: name})
+    UccChat.userchan.push('admin:flex:' + type, {name: name})
       .receive("ok", resp => {
         $('section.flex-tab').html(resp.html).parent().addClass('opened')
         flex.set_tab_buttons_inactive()
@@ -45,7 +45,7 @@ class AdminFlexBar {
     } else if (title == 'Invite Users') {
       if ($('.invite-users').closest('.flex-tab-container.opened').length == 0) {
         flex.toggle_tab_container()
-        userchan.push('admin:flex:Invite Users')
+        UccChat.userchan.push('admin:flex:Invite Users')
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             $('section.flex-tab').html(resp.html).parent().addClass('opened')
@@ -73,7 +73,7 @@ class AdminFlexBar {
     // console.log('nav_button', action, username)
     switch(action) {
       case 'edit-user':
-        userchan.push('admin:flex:action:' + action, {username: username})
+        UccChat.userchan.push('admin:flex:action:' + action, {username: username})
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             $('section.flex-tab').html(resp.html).parent().addClass('opened')
@@ -89,7 +89,7 @@ class AdminFlexBar {
       case 'remove-admin':
       case 'deactivate':
       case 'activate':
-        userchan.push('admin:flex:action:' + action, {username: username})
+        UccChat.userchan.push('admin:flex:action:' + action, {username: username})
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             if (resp.success) { toastr.success(resp.success) }
@@ -106,7 +106,7 @@ class AdminFlexBar {
           gettext.deleting_user_delete_messages,
           gettext.yes_delete_it,
           function() {
-            userchan.push('admin:flex:action:' + action, {username: username})
+            UccChat.userchan.push('admin:flex:action:' + action, {username: username})
               .receive("ok", resp => {
                 // if (resp.success) { toastr.success(resp.success) }
                 sweet.warning_confirmation(gettext.deleted, gettext.the_user_has_been_deleted, 2000)
@@ -143,7 +143,7 @@ class AdminFlexBar {
       .on('click', '.invite-users nav button.send', function(e) {
         let email = $('#inviteEmails')
         let emails = email.val().replace('\n', ' ')
-        userchan.push('admin:flex:send-invitation-email', {emails: emails})
+        UccChat.userchan.push('admin:flex:send-invitation-email', {emails: emails})
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             $('section.flex-tab').html(resp.html).parent().addClass('opened')
@@ -164,7 +164,7 @@ class AdminFlexBar {
       .on('click', '.invite-users .outstanding button.resend', function(e) {
         let email = $(e.currentTarget).data('email')
         let id = $(e.currentTarget).data('id')
-        userchan.push('invitation:resend', {email: email, id: id})
+        UccChat.userchan.push('invitation:resend', {email: email, id: id})
           .receive("ok", resp => {
             if (resp.success) { toastr.success(resp.success) }
             $(`button[data-email="${email}"]`).next().append('<i class="icon-verified"></i>')
