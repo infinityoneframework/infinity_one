@@ -24,5 +24,5 @@ $(document).ready(() => {
 
 export function select(emoji, message_id) {
   chat_emoji.update_recent(emoji)
-  userchan.push('reaction:select', {reaction: emoji, message_id: message_id})
+  UccChat.userchan.push('reaction:select', {reaction: emoji, message_id: message_id})
 }

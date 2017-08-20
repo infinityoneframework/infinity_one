@@ -21,7 +21,7 @@ class ChatEmoji {
   }
   update_recent(emoji) {
     $('.input-message').focus()
-    userchan.push('emoji:recent', {recent: emoji})
+    UccChat.userchan.push('emoji:recent', {recent: emoji})
       .receive("ok", resp => {
         if (resp.html) {
           $('.emojis ul.recent').html(resp.html)
@@ -62,7 +62,7 @@ class ChatEmoji {
       $('.emoji-list').removeClass('visible')
       $(`.emoji-list.${name}`).addClass('visible')
       $('.emoji-filter input.search').val('')
-      userchan.push('emoji:filter-item', {name: name})
+      UccChat.userchan.push('emoji:filter-item', {name: name})
       return false
     })
     .on('click', '.emojis li', e => {
@@ -84,7 +84,7 @@ class ChatEmoji {
     .on('click', 'a.tone', e => {
       e.preventDefault()
       let tone = $(e.currentTarget).data('tone')
-      userchan.push("emoji:tone_list", {tone: tone})
+      UccChat.userchan.push("emoji:tone_list", {tone: tone})
         .receive("ok", resp => {
           let obj = resp.tone_list
           Object.keys(obj).forEach((key, index) => {
@@ -109,7 +109,7 @@ class ChatEmoji {
     .on('keyup', '.emoji-filter input.search', e => {
       let text = $('.emoji-filter input.search').val()
       let category = $('.filter-item.active').data('name')
-      userchan.push('emoji:search', {pattern: text, category: category})
+      UccChat.userchan.push('emoji:search', {pattern: text, category: category})
         .receive("ok", resp => {
           if (resp.html) {
             $('.emojis ul.' + category).html(resp.html)

@@ -15,7 +15,7 @@ class NotificationsForm {
       })
       .on('click', '.notifications i[data-play]', e => {
         console.log('play...')
-        userchan.push('notifications_form:play')
+        UccChat.userchan.push('notifications_form:play')
           .receive("ok", resp => {
             if (resp.sound) {
               desktop_notifier.notify_audio(resp.sound)
@@ -36,7 +36,7 @@ class NotificationsForm {
       })
   }
   push_userchan(action, params = {}) {
-    userchan.push('notifications_form:' + action, params)
+    UccChat.userchan.push('notifications_form:' + action, params)
       .receive("ok", resp => {
         if (resp.html) {
           $('.content.notifications').replaceWith(resp.html)
