@@ -39,7 +39,7 @@
             %i(class="icon-at status-#{user.status}" data-status-name="#{user.username}")
             - if @phone_status do
               - if Map.get(user, :extension) do
-                %i(class="icon-phone phone-#{user.extension.status}" data-phone-status="#{user.username}")
+                %i(class="phone-status" data-status="#{user.extension.status}" data-phone-status="#{user.username}")
               - else
                 %i(class="phone-none")
             = user.username

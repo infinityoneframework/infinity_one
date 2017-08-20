@@ -2,7 +2,7 @@
 - if get_room_icon(@chatd) == "icon-at" do
   %i(class="#{get_room_icon(@chatd)} status-#{get_room_status(@chatd)}" data-status-name="#{@chatd.active_room[:display_name]}")
   - if UccChat.phone_status? do
-    %i(class="icon-phone phone-#{@chatd.active_room[:phone_status]}" data-phone-status="#{@chatd.active_room[:display_name]}")
+    %i(class="phone-status" data-status="#{@chatd.active_room[:phone_status]}" data-phone-status="#{@chatd.active_room[:display_name]}")
 - else
   %i(class="#{get_room_icon(@chatd)} status-offline")
 %span.room-title= @chatd.active_room[:display_name]

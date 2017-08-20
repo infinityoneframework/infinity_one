@@ -11,18 +11,32 @@
           = if Application.get_env :ucx_chat, :debug do
             span.debug-info= "(#{id})"
   nav.options.primary-background-color.animated-hidden
-    .wrapper
-      button.status.online(data-status="online")
-        span Online
-      button.status.away(data-status="away")
-        span Away
-      button.status.busy(data-status="busy")
-        span Busy
-      button.status.offline(data-status="offline")
-        span Offline
+    .wrapper(rebel-channel="user")
+      button.status.online(data-status="online" rebel-click="click_status")
+        span= ~g(Online)
+      button.status.away(data-status="away" rebel-click="click_status")
+        span= ~g(Away)
+      button.status.busy(data-status="busy" rebel-click="click_status")
+        span= ~g(Busy)
+      button.status.offline(data-status="offline" rebel-click="click_status")
+        span= ~g(Offline)
+      = if UccChat.phone_status? do
+        button.phone-status.idle(data-phone="idle" rebel-click="click_status")
+          i.icon-phone.phone-idle
+          span= ~g(Idle)
+        button.phone-status.away(data-phone="away" rebel-click="click_status")
+          i.icon-phone.phone-away
+          span= ~g(Away)
+        button.phone-status.busy(data-phone="busy" rebel-click="click_status")
+          i.icon-phone.phone-busy
+          span= ~g(Busy)
+        button.phone-status.offline(data-phone="offline" rebel-click="click_status")
+          i.icon-phone.phone-offline
+          span= ~g(Offline)
+
       button#account.account-link
         i.icon-sliders
-        span My Account
+        span= ~g(My Account)
       = for menu <- get_registered_menus(@chatd.user) do
         button.account-box-item
           i(class="#{menu[:icon]}")
@@ -30,7 +44,7 @@
       = if show_admin_option(@chatd.user) do
         button#admin.account-link
           i.icon-wrench
-          span Administration
+          span= ~g(Administration)
       button#logout
         i.icon-logout
-        span Logout
+        span= ~g(Logout)

@@ -26,7 +26,7 @@
         - if @user.extension do
           - user = UcxPresence.set_status(@user)
           %p.secondary-font-color
-            %i.icon-phone(class="phone-#{user.extension.status}" data-phone-status="#{user.username}")
+            %i.phone-status(data-status="#{user.extension.status}" data-phone-status="#{user.username}")
             = user.extension.extension
       - if has_permission?(@current_user, "view-full-other-user-info") do
         %p.secondary-font-color

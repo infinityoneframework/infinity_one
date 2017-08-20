@@ -983,15 +983,48 @@ defmodule UccChatWeb.UserChannel do
     execute(socket, :click, on: ".tab-button.active")
   end
 
-  def phone_presence_change(event, %{state: :active, username: username} = _payload, socket) do
-    Logger.error "state change :active, assigns: " <> inspect(socket.assigns)
-     exec_js socket, ~s/$('[data-phone-status="#{username}"]').removeClass('phone-idle').addClass('phone-busy')/
+  def phone_presence_change(event, %{state: state, username: username} = _payload, socket) do
+    Logger.info "state change #{inspect state}, assigns: " <> inspect(socket.assigns)
+     # exec_js socket, ~s/$('[data-phone-status="#{username}"]').removeClass('phone-idle').addClass('phone-busy')/
+    exec_js socket, set_data_status_js(username, state)
+     #{}~s/$('[data-phone-status="#{username}"]').data('status', '#{state}')/
+    socket
+  end
+
+  defp set_data_status_js(username, state) do
+    """
+    var e = document.querySelectorAll('[data-phone-status="merilee.lackey"]');
+    for(var i = 0; i < e.length; i++) {e[i].dataset.status = '#{state}'}
+    console.log('done...');
+    """
+    |> String.replace("\n", "")
+  end
+  # def phone_presence_change(event, %{state: :idle, username: username} = _payload, socket) do
+  #   Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
+  #   # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
+  #   exec_js socket, ~s/$('[data-phone-status="#{username}"]').data('state', 'idle')
+  #   socket
+  # end
+  # def phone_presence_change(event, %{state: :busy, username: username} = _payload, socket) do
+  #   Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
+  #    # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
+  #    exec_js socket, ~s/$('[data-phone-status="#{username}"]').data('state', 'busy')/
+  #    socket
+  # end
+
+  def phone_presence_change(event, %{state: state, username: username} = _payload, socket) do
+    Logger.info "state #{inspect state}, assigns: " <> inspect(socket.assigns)
+     # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
      socket
   end
-  def phone_presence_change(event, %{state: :idle, username: username} = _payload, socket) do
-    Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
-     exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
-     socket
+
+  def click_status(socket, sender) do
+    Logger.error "Click Status #{inspect sender}"
+    user_id = socket.assigns.user_id
+    status = sender["dataset"]["status"] || ""
+    Logger.error "handle status #{status}"
+    UccPubSub.broadcast "status:" <> socket.assigns.user_id, "set:" <> status, sender["dataset"]
+    socket
   end
 
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel

@@ -5,6 +5,7 @@ defmodule UccChatWeb.SystemChannel do
   alias UcxUccWeb.Presence
   alias UccChatWeb.UserChannel
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UcxUcc.UccPubSub
 
   # import Ecto.Query
 
@@ -48,16 +49,16 @@ defmodule UccChatWeb.SystemChannel do
   ###############
   # handle_in
 
-  def handle_in(ev = "status:set:" <> status, params, socket) do
-    trace ev, params
-    _ = ev
-    _ = params
-    # Logger.warn "status:set socket: #{inspect socket}"
-    UccChat.PresenceAgent.put(socket.assigns.user_id, status)
-    update_status socket, status
-    # Presence.update socket, socket.assigns.user_id, %{status: status}
-    {:noreply, socket}
-  end
+  # def handle_in(ev = "status:set:" <> status, params, socket) do
+  #   trace ev, params
+  #   _ = ev
+  #   _ = params
+  #   # Logger.warn "status:set socket: #{inspect socket}"
+  #   UccChat.PresenceAgent.put(socket.assigns.user_id, status)
+  #   update_status socket, status
+  #   # Presence.update socket, socket.assigns.user_id, %{status: status}
+  #   {:noreply, socket}
+  # end
   def handle_in(ev = "state:blur", params, socket) do
     trace ev, params
     _ = ev
@@ -108,13 +109,23 @@ defmodule UccChatWeb.SystemChannel do
     list = Presence.list(socket)
     # Logger.warn "after join presence list: #{inspect list}"
     push socket, "presence_state", list
-    user = Helpers.get_user!(socket.assigns.user_id)
+    user_id = socket.assigns.user_id
+    user = Helpers.get_user!(user_id)
     {:ok, _} = Presence.track(socket, socket.assigns.user_id, %{
       # online_at: :os.system_time(:milli_seconds),
       status: "online",
       username: user.username
     })
     update_status socket, "online"
+    UccPubSub.subscribe "status:" <> user_id
+    {:noreply, socket}
+  end
+
+  def handle_info({"status:" <> _, "set:" <> status, _payload}, socket) do
+    if status != "" do
+      UccChat.PresenceAgent.put(socket.assigns.user_id, status)
+      update_status socket, status
+    end
     {:noreply, socket}
   end
 

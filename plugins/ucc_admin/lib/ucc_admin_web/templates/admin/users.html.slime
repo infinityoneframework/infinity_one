@@ -46,7 +46,7 @@
                   = if phone_status? do
                     td.border-component-color
                       = if user.extension do
-                        i.icon-phone(class="phone-#{user.extension.status}" data-phone-status="#{user.username}" style="margin-right: 3px;")
+                        i.phone-status(data-status="#{user.extension.status}" data-phone-status="#{user.username}" style="margin-right: 3px;")
                         = user.extension.extension
                       - else
                         i.phone-none(style="margin-right: 3px;")

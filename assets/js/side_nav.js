@@ -142,10 +142,10 @@ class SideNav {
       $('div.flex-nav').removeClass('animated-hidden')
       this.set_nav_top_icon('close')
     })
-    .on('click', 'nav.options button.status', (e) =>  {
-      e.preventDefault()
-      this.systemchan.push('status:set:' + $(e.currentTarget).data('status'), {})
-    })
+    // .on('click', 'nav.options button.status', (e) =>  {
+    //   e.preventDefault()
+    //   this.systemchan.push('status:set:' + $(e.currentTarget).data('status'), {})
+    // })
     .on('click', '.flex-nav header', (e) => {
       e.preventDefault()
       this.userchan.push('side_nav:close', {})

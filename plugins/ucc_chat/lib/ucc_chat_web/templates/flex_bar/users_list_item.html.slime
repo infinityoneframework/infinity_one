@@ -3,9 +3,9 @@
 li.user-image.user-card-room(class="status-#{user.status}" data-status-name="#{user.username}")
   = if UccChat.phone_status? do
     = if user.extension do
-      i.icon-phone.phone-status(class="phone-#{user.extension.status}" data-phone-status="#{user.username}")
+      i.phone-status(data-status="#{user.extension.status}" data-phone-status="#{user.username}")
     - else
-      i.phone-status.phone-none
+      i.phone-none
   button(data-username="#{user.username}" tabindex="0" title="#{user.username}" data-fun="flex_user_open" rebel-click="flex_call" data-id="members-list")
     .avatar
       .avatar-image(style="background-image:url(#{avatar_url(user.username)});")

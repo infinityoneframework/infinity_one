@@ -71,6 +71,10 @@ defmodule UcxUcc.UccPubSub do
     GenServer.cast @name, {:broadcast, topic, event, payload}
   end
 
+  def broadcast(topic, event) do
+    broadcast topic, event, nil
+  end
+
   def state do
     GenServer.call @name, :state
   end
@@ -98,12 +102,18 @@ defmodule UcxUcc.UccPubSub do
 
   def handle_cast({:broadcast, topic, event, payload}, state) do
     Logger.warn "broadcast, topic: #{topic}, event: #{event}"
-    state.subscriptions
-    |> Map.get({topic, "*"}, [])
-    |> broadcast_to_list(topic, event, payload)
+    # state.subscriptions
+    # |> Map.get({topic, "*"}, [])
+    # |> broadcast_to_list(topic, event, payload)
+
+    # state.subscriptions
+    # |> Map.get({topic, event}, [])
+    # |> broadcast_to_list(topic, event, payload)
 
     state.subscriptions
-    |> Map.get({topic, event}, [])
+    |> Enum.filter(fn {{t, e}, _} -> String.match?(topic, ~r/^#{t}/) and (e == "*"
+      or String.match?(event, ~r/^#{e}/)) end)
+    |> Enum.map(&elem &1, 1)
     |> broadcast_to_list(topic, event, payload)
 
     {:noreply, state}
@@ -175,14 +185,16 @@ defmodule UcxUcc.UccPubSub do
     |> Enum.into(%{})
   end
 
-  defp broadcast_to_list(list, topic, event, payload) do
-    Enum.each(list, fn
-      {pid, nil} ->
-        Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload}}"
-        spawn fn -> send pid, {topic, event, payload} end
-      {pid, meta} ->
-        Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload, meta}}"
-        spawn fn -> send pid, {topic, event, payload, meta} end
-    end)
+  defp broadcast_to_list(lists, topic, event, payload) do
+    Enum.each lists, fn list ->
+      Enum.each(list, fn
+        {pid, nil} ->
+          Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload}}"
+          spawn fn -> send pid, {topic, event, payload} end
+        {pid, meta} ->
+          Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload, meta}}"
+          spawn fn -> send pid, {topic, event, payload, meta} end
+      end)
+    end
   end
 end
