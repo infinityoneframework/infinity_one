@@ -18,25 +18,12 @@ import "phoenix_html"
 // Local files can be imported directly using relative
 // paths "./socket" or full ones "web/static/js/socket".
 
-// import socket from "./socket"
-// window.UcxUcc = {}
 require('./ucx_ucc');
 
 require('./ucc_chat')
 require('./typing')
 require('./device_manager')
 require('./ucc_webrtc')
-require('./chan_mscs')
-require('./mscs')
+require("mscs")
 require('./tone_generator')
-// require('./mscs')
-// import main from "./main"
-// import flex_bar from "./flex_bar"
-// import utils from './utils'
-// import cc from './chat_channel'
-// require('./notifications_form')
-// require('./favico')
-// require('./emoji')
-// require('./ucc_webrtc')
-// window.sweetAlert = require("./sweetalert.min").sweetAlert
 window.moment = require('moment');
