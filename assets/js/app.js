@@ -19,11 +19,15 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 require('./ucx_ucc');
-
 require('./ucc_chat')
 require('./typing')
 require('./device_manager')
 require('./ucc_webrtc')
-require("mscs")
 require('./tone_generator')
+
+// import configured plugin js
+var plugins = window.ucx_ucc_plugins;
+for(var i = 0; i < plugins.length; ++i) {
+  require(plugins[i]);
+}
 window.moment = require('moment');

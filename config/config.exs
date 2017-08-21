@@ -7,7 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :ucx_ucc,
-  ecto_repos: [UcxUcc.Repo]
+  ecto_repos: [UcxUcc.Repo],
+  js_plugins: ["mscs"]
 
 # Configures the endpoint
 config :ucx_ucc, UcxUccWeb.Endpoint,

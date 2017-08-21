@@ -44,4 +44,12 @@ defmodule UcxUccWeb.LayoutView do
     {{a, b, c, d}, _} = conn.peer
     (a <<< 24) + (b <<< 16) + (c <<< 8) + d
   end
+
+  def get_js_plugins do
+    :ucx_ucc
+    |> Application.get_env(:js_plugins, [])
+    |> inspect
+    |> String.replace(~s("), "'")
+    |> Phoenix.HTML.raw
+  end
 end

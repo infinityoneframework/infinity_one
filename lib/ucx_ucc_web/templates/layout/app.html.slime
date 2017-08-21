@@ -34,7 +34,9 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
     style body { background-color: #04436A; }
 
   javascript:
-    window.UccChat = {}
+    window.UccChat = { }
+    window.ucx_ucc_plugins = #{get_js_plugins()}
+
 
   body.global-font-family.color-primary-font-color
     #initial-page-loading.page-loading
