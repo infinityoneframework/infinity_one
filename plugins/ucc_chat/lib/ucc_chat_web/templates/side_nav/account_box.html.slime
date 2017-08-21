@@ -21,18 +21,18 @@
       button.status.offline(data-status="offline" rebel-click="click_status")
         span= ~g(Offline)
       = if UccChat.phone_status? do
-        button.phone-status.idle(data-phone="idle" rebel-click="click_status")
-          i.icon-phone.phone-idle
-          span= ~g(Idle)
+        button.phone-status.idle(data-phone="online" rebel-click="click_status")
+          i.phone-status(data-status="idle")
+          span= ~g(Online)
         button.phone-status.away(data-phone="away" rebel-click="click_status")
-          i.icon-phone.phone-away
+          i.phone-status(data-status="away")
           span= ~g(Away)
         button.phone-status.busy(data-phone="busy" rebel-click="click_status")
-          i.icon-phone.phone-busy
+          i.phone-status(data-status="busy")
           span= ~g(Busy)
-        button.phone-status.offline(data-phone="offline" rebel-click="click_status")
-          i.icon-phone.phone-offline
-          span= ~g(Offline)
+        button.phone-status.offline(data-phone="invisible" rebel-click="click_status")
+          i.phone-status
+          span= ~g(Invisible)
 
       button#account.account-link
         i.icon-sliders

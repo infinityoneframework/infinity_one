@@ -775,7 +775,7 @@ defmodule UccChatWeb.UserChannel do
   handle_callback("user:" <>  _user_id)
 
   def handle_info({"phone:presence", "presence:change", meta, {mod, fun}} = payload, socket) do
-    Logger.error "payload: #{inspect payload}"
+    Logger.info "payload: #{inspect payload}"
     apply(mod, fun, ["presence:change", meta, socket])
     {:noreply, socket}
   end
@@ -983,22 +983,14 @@ defmodule UccChatWeb.UserChannel do
     execute(socket, :click, on: ".tab-button.active")
   end
 
-  def phone_presence_change(event, %{state: state, username: username} = _payload, socket) do
-    Logger.info "state change #{inspect state}, assigns: " <> inspect(socket.assigns)
+  def phone_presence_change(_event, %{state: state, username: username} = _payload, socket) do
+    Logger.info "state change #{inspect state}" #, assigns: " <> inspect(socket.assigns)
      # exec_js socket, ~s/$('[data-phone-status="#{username}"]').removeClass('phone-idle').addClass('phone-busy')/
     exec_js socket, set_data_status_js(username, state)
      #{}~s/$('[data-phone-status="#{username}"]').data('status', '#{state}')/
     socket
   end
 
-  defp set_data_status_js(username, state) do
-    """
-    var e = document.querySelectorAll('[data-phone-status="merilee.lackey"]');
-    for(var i = 0; i < e.length; i++) {e[i].dataset.status = '#{state}'}
-    console.log('done...');
-    """
-    |> String.replace("\n", "")
-  end
   # def phone_presence_change(event, %{state: :idle, username: username} = _payload, socket) do
   #   Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
   #   # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
@@ -1012,18 +1004,26 @@ defmodule UccChatWeb.UserChannel do
   #    socket
   # end
 
-  def phone_presence_change(event, %{state: state, username: username} = _payload, socket) do
+  def phone_presence_change(_event, %{state: state, username: _username} = _payload, socket) do
     Logger.info "state #{inspect state}, assigns: " <> inspect(socket.assigns)
      # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
      socket
   end
 
+  defp set_data_status_js(username, state) do
+    """
+    var e = document.querySelectorAll('[data-phone-status="merilee.lackey"]');
+    for(var i = 0; i < e.length; i++) {e[i].dataset.status = '#{state}'}
+    console.log('done...');
+    """
+    |> String.replace("\n", "")
+  end
   def click_status(socket, sender) do
     Logger.error "Click Status #{inspect sender}"
     user_id = socket.assigns.user_id
     status = sender["dataset"]["status"] || ""
     Logger.error "handle status #{status}"
-    UccPubSub.broadcast "status:" <> socket.assigns.user_id, "set:" <> status, sender["dataset"]
+    UccPubSub.broadcast "status:" <> user_id, "set:" <> status, sender["dataset"]
     socket
   end
 

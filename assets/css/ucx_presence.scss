@@ -34,17 +34,19 @@ i.phone-status {
 
   &[data-status="idle"] {
     color: #4dff4d !important;
-    // transform: rotate(135deg);
     &:before {
       content: '\e82f';
-      // transform: rotate(135deg);
     }
   }
   &[data-status="in_use"] {
     color: #bc2031 !important;
-    // transform: rotate(0deg);
     &:before {
-      // transform: rotate(0deg);
+      content: '\e82f';
+    }
+  }
+  &[data-status="none"] {
+    color: #aaa !important;
+    &:before {
       content: '\e82f';
     }
   }
@@ -54,12 +56,14 @@ i.phone-status {
       content: '\58';
     }
   }
+  &[data-status="away"] {
+    color: #fcb316 !important;
+    &:before {
+      content: '\e82f';
+    }
+  }
   &[data-status="ringing"] {
     color: #bc2031 !important;
-    // transform: rotate(0deg);
-    // position:fixed;
-    // top:2%;
-    // left:0%;
     -webkit-animation-name: spinnerRotate;
     -webkit-animation-duration: 0.5s;
     -webkit-animation-iteration-count: infinite;
@@ -78,14 +82,6 @@ i.phone-status {
     }
   }
 }
-// .phone-busy {
-// .phone-offline {
-i.phone-away {
-  color: #fcb316 !important;
-  &:before {
-    transform: rotate(135deg);
-  }
-}
 
 // .side-nav li.room-link {
 .side-nav {
@@ -98,6 +94,11 @@ i.phone-away {
     }
   }
   nav.options {
+    i.phone-status {
+      margin-right: 5px;
+      margin-left: 5px;
+      width: 15px;
+    }
     button.status.offline {
       border-bottom: 1px solid #888;
     }

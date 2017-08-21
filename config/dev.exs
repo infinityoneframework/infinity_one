@@ -49,8 +49,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
     ]
   ]
 
-config :ucx_ucc, :ucc_tracer_modules, :all
-config :ucx_ucc, :ucc_tracer_level, :warn
+# config :ucx_ucc, :ucc_tracer_modules, :all
+config :ucx_ucc, :ucc_tracer_level, :info
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console,
