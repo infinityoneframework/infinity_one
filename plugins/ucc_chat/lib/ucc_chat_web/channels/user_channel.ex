@@ -984,7 +984,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def phone_presence_change(_event, %{state: state, username: username} = _payload, socket) do
-    Logger.info "state change #{inspect state}" #, assigns: " <> inspect(socket.assigns)
+    Logger.info "state change #{inspect state}, username: #{username}" #, assigns: " <> inspect(socket.assigns)
      # exec_js socket, ~s/$('[data-phone-status="#{username}"]').removeClass('phone-idle').addClass('phone-busy')/
     exec_js socket, set_data_status_js(username, state)
      #{}~s/$('[data-phone-status="#{username}"]').data('status', '#{state}')/
@@ -1012,7 +1012,7 @@ defmodule UccChatWeb.UserChannel do
 
   defp set_data_status_js(username, state) do
     """
-    var e = document.querySelectorAll('[data-phone-status="merilee.lackey"]');
+    var e = document.querySelectorAll('[data-phone-status="#{username}"]');
     for(var i = 0; i < e.length; i++) {e[i].dataset.status = '#{state}'}
     console.log('done...');
     """
@@ -1024,6 +1024,11 @@ defmodule UccChatWeb.UserChannel do
     status = sender["dataset"]["status"] || ""
     Logger.error "handle status #{status}"
     UccPubSub.broadcast "status:" <> user_id, "set:" <> status, sender["dataset"]
+    socket
+  end
+
+  def phone_call(socket, sender) do
+    Logger.warn "click to call... #{inspect sender}"
     socket
   end
 

@@ -1,6 +1,9 @@
 defmodule UccChatWeb.SharedView do
   use UcxUcc.Utils
   use UcxUccWeb.Gettext
+
+  import Phoenix.HTML.Tag
+
   alias UcxUcc.Permissions
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
@@ -153,6 +156,24 @@ defmodule UccChatWeb.SharedView do
 
   def avatar_url(username) do
     UccChat.AvatarService.avatar_url username
+  end
+
+  def phone_status_icon(user) do
+    with true <- UccChat.phone_status?,
+         true <- !! user.extension do
+      phone_status_icon_tag user.extension.status, user.username
+    else
+      _ -> ""
+    end
+  end
+
+  def phone_status_icon_tag(status, username) do
+    content_tag :i,[
+      class: "phone-status",
+      "data-status": status,
+      "data-phone-status": username,
+      "rebel-click": "phone_call"
+      ], do: ""
   end
 
   defmacro gt(text, opts \\ []) do

@@ -113,6 +113,29 @@ i.phone-status {
       }
     }
   }
+  .account-box.phone-status {
+    .info {
+      i.phone-status {
+        position: absolute;
+        top: 25px;
+        left: 12px;
+        z-index: 200;
+      }
+      .thumb {
+        margin-left: 14px;
+        &:after {
+          left: -30px;
+        }
+      }
+      .data {
+        width: calc(100% - 95px);
+        padding: 0 0 0 6px;
+        h4 {
+          width: 140px;
+        }
+      }
+    }
+  }
 }
 section.flex-tab {
   li.user-card-room {
@@ -129,3 +152,4 @@ section.flex-tab {
     }
   }
 }
+

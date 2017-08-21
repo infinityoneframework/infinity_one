@@ -19,6 +19,7 @@ defmodule UccChat.ChatDat do
     |> new(channel, messages)
   end
   def new(%User{} = user, %ChannelSchema{} = channel, messages) do
+    user = preload_phone_status user
     %{room_types: room_types, rooms: rooms, room_map: room_map,
       active_room: ar} =
         UccChat.ChannelService.get_side_nav(user, channel.id)
@@ -48,6 +49,7 @@ defmodule UccChat.ChatDat do
   end
 
   def new(user) do
+    user = preload_phone_status user
     %{room_types: room_types, rooms: rooms, room_map: room_map,
       active_room: _ar} =
         UccChat.ChannelService.get_side_nav(user, nil)
@@ -64,6 +66,20 @@ defmodule UccChat.ChatDat do
       active_room: 0,
       room_route: "home"
     }
+  end
+
+  defp preload_phone_status(user) do
+    if UccChat.phone_status? do
+      user
+      |> Repo.preload([:extension])
+      |> load_phone_status
+    else
+      user
+    end
+  end
+
+  defp load_phone_status(user) do
+    apply UcxPresence, :set_status, [user]
   end
 
   def get_messages_info(chatd) do

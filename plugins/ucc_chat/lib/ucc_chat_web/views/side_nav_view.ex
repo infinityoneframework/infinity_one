@@ -1,5 +1,6 @@
 defmodule UccChatWeb.SideNavView do
   use UccChatWeb, :view
+
   require Logger
   # import UccChat.AvatarService, only: [avatar_url: 1]
   def chat_room_item_li_class(item) do
@@ -36,5 +37,9 @@ defmodule UccChatWeb.SideNavView do
   end
 
   def username(chatd), do: chatd.user.username
+
+  def account_box_class() do
+    if UccChat.phone_status?, do: "phone-status", else: ""
+  end
 end
 
