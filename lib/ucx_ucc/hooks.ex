@@ -60,4 +60,6 @@ defmodule UcxUcc.Hooks do
   defhook :nav_option_buttons, 1
   defhook :nav_room_item_icons, 2
   defhook :account_box_class, 1
+
+  defhook :add_flex_buttons, 0
 end

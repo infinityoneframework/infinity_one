@@ -1,6 +1,8 @@
 defmodule UccChatWeb.FlexBar.Defaults do
   use UcxUccWeb.Gettext
 
+  alias UcxUcc.Hooks
+
   # alias UcxUcc.TabBar
 
   def add_buttons do
@@ -12,8 +14,7 @@ defmodule UccChatWeb.FlexBar.Defaults do
       |> apply(:add_buttons, [])
     end)
 
-    UccWebrtcWeb.FlexBar.Tab.Webrtc.add_buttons
-    MscsWeb.FlexBar.Tab.Mscs.add_buttons
+    Hooks.add_flex_buttons
 
   end
 end

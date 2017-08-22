@@ -302,11 +302,11 @@
             let volume = this.apb_volume[apb] / num_vol_steps;
             console.log('new volume', volume)
             control.volume = volume;
-            UcxUcc.Mscs.feedback.set_volume(volume);
+            this.feedback.set_volume(volume);
             break;
           case "audio-alerting":
-            UcxUcc.Mscs.Alerting.volume_up();
-            UcxUcc.Mscs.feedback.set_volume(active_control.volume);
+            this.Alerting.volume_up();
+            this.feedback.set_volume(active_control.volume);
             break
           default:
             console.error('Unsupported audio control: ', active_control);
@@ -332,11 +332,11 @@
             }
             let volume = this.apb_volume[apb] / num_vol_steps;
             control.volume = volume;
-            UcxUcc.Mscs.feedback.set_volume(volume);
+            this.feedback.set_volume(volume);
             break;
           case "audio-alerting":
-            UcxUcc.Mscs.Alerting.volume_down();
-            UcxUcc.Mscs.feedback.set_volume(active_control.volume);
+            this.Alerting.volume_down();
+            this.feedback.set_volume(active_control.volume);
             break
           default:
             console.error('Unsupported audio control: ', active_control);
@@ -359,13 +359,13 @@
 
       switch(key) {
         case "alerting":
-          tone_volume = UcxUcc.Mscs.Alerting.get_vol_step_factor();
+          tone_volume = this.Alerting.get_vol_step_factor();
           break;
         case "special":
-          tone_volume = UcxUcc.Mscs.SpecialTone.get_vol_step_factor();
+          tone_volume = this.SpecialTone.get_vol_step_factor();
           break;
         case "paging":
-          tone_volume = UcxUcc.Mscs.Paging.get_vol_step_factor();
+          tone_volume = this.Paging.get_vol_step_factor();
           break;
         default:
           console.error("Unknown transducer tone", key);
@@ -394,6 +394,32 @@
         default:
           console.error('Unknown transducer tone', msg.key)
           break;
+      }
+    },
+    feedback: {
+      set_volume: function(value) {
+        console.log('TBD: implement this', value);
+      }
+    },
+    Alerting: {
+      volume_up: function() {
+        console.log('TBD: implement this');
+      },
+      volume_down: function() {
+        console.log('TBD: implement this');
+      },
+      get_vol_step_factor: function() {
+        return 8;
+      }
+    },
+    SpecialTone: {
+      get_vol_step_factor: function() {
+        return 8;
+      }
+    },
+    Paging: {
+      get_vol_step_factor: function() {
+        return 8;
       }
     }
   };

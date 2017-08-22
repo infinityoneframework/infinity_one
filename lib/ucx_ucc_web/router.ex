@@ -46,10 +46,10 @@ defmodule UcxUccWeb.Router do
 
   # forward "/admin", UccAdminWeb.Router
   # TODO: get unbrella working for this
-  forward "/client", MscsWeb.Router
-  forward "/", UccChatWeb.Router
+  # forward "/client", MscsWeb.Router
+  # forward "/", UccChatWeb.Router
 
-  # use Unbrella.Plugin.Router
+  use Unbrella.Plugin.Router
   # Other scopes may use custom stacks.
   # scope "/api", UcxUccWeb do
   #   pipe_through :api
