@@ -21,7 +21,6 @@ import "phoenix_html"
 require('./ucx_ucc');
 require('./ucc_chat')
 require('./typing')
-require('./device_manager')
 require('./ucc_webrtc')
 require('./tone_generator')
 

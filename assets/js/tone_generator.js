@@ -1,6 +1,6 @@
-
 (function() {
-  console.log('loading tone_generator')
+
+  if (UcxUcc.trace_startup) { console.log('loading tone_generator', UcxUcc); }
 
   var ToneGenerator = {
     debug: true,
@@ -65,6 +65,8 @@
   };
 
   window.UccChat.ToneGenerator = ToneGenerator;
+
+  if (UcxUcc.trace_startup) { console.log('finished loading tone generator'); }
 })();
 
 function createAudioContext()

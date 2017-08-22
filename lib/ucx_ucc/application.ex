@@ -15,7 +15,7 @@ defmodule UcxUcc.Application do
 
     Unbrella.start type, args
 
-    Unbrella.js_plugins()
+    Unbrella.set_js_plugins(:ucx_ucc)
 
     children =
       Unbrella.application_children()

@@ -1,7 +1,8 @@
 //
-// Copyright @E-MetroTel 2015
+// Copyright @E-MetroTel 2015-2017
 //
 (function() {
+  if (UcxUcc.trace_startup) { console.log('loading device_manager'); }
   function trace(text) {
     if (text[text.length - 1] === '\n') {
       text = text.substring(0, text.length - 1);
@@ -209,7 +210,7 @@
             console.error("Invalid tx pair_id", pair_id)
         }
       } else if (stream_id == 255) {
-        if (mscs.debug) console.log("disconnect tx streams")
+        if (UcxUcc.debug) console.log("disconnect tx streams")
         DeviceManager.webrtc.stop_transducer(pair_id)
       } else {
         console.warn("connect_transducer tx - unknown stream ID", stream_id)
@@ -403,4 +404,5 @@
     window.UcxUcc.DeviceManager.init();
   });
 
+  if (UcxUcc.trace_startup) { console.log('complete loading device_manager'); }
 })();

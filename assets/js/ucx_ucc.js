@@ -11,7 +11,8 @@
       window.RTCIceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate || window.mozRTCIceCandidate;
       return !!window.RTCPeerConnection;
     },
-    Mscs: {}
+    Mscs: {},
+    trace_startup: true
   }
 
   window.UcxUcc = UcxUcc;
