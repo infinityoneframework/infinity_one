@@ -15,6 +15,8 @@ defmodule UcxUcc.Application do
 
     Unbrella.start type, args
 
+    Unbrella.js_plugins()
+
     children =
       Unbrella.application_children()
       |> Enum.map(fn {mod, fun, args} ->

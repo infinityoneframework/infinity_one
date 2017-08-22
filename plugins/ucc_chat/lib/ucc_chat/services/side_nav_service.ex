@@ -28,8 +28,7 @@ defmodule UccChat.SideNavService do
 
   def render_more_users(user_id) do
     user = Helpers.get_user! user_id
-    has_extension? = UccChat.phone_status?
-    preload = user_preload(has_extension?)
+    preload = UcxUcc.Hooks.user_preload [:roles]
     users =
       Repo.all(from u in User,
         left_join: d in DirectSchema, on: u.id == d.user_id and
@@ -42,7 +41,7 @@ defmodule UccChat.SideNavService do
         preload: ^preload,
         select: {u, s})
       |> Enum.reject(fn {user, _} -> User.has_role?(user, "bot") || user.active != true end)
-      |> load_phone_status(has_extension?)
+      |> UcxUcc.Hooks.process_user_subscription
       |> Enum.map(fn
         {user, nil} ->
           struct(user, subscription_hidden: nil,
@@ -51,9 +50,9 @@ defmodule UccChat.SideNavService do
           struct(user, subscription_hidden: sub.hidden,
             status: UccChat.PresenceAgent.get(user.id))
       end)
-    bindings = [users: users, current_user: user]
-    bindings = if has_extension?, do: [{:phone_status, true} | bindings],
-      else: bindings
+
+    bindings = UcxUcc.Hooks.render_users_bindings [users: users, current_user: user]
+
     "list_users_flex.html"
     |> UccChatWeb.SideNavView.render(bindings)
     |> Helpers.safe_to_string
@@ -73,8 +72,5 @@ defmodule UccChat.SideNavService do
       end
     end)
   end
-
-  defp user_preload(true), do: [:roles, :extension]
-  defp user_preload(false), do: [:roles]
 
 end

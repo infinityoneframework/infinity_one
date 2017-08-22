@@ -65,7 +65,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   def user_args(socket, user_id, channel_id, username) do
     channel = Channel.get!(channel_id, preload: [users: :roles])
     # preload = if UccChat.phone_status?, do: [:roles, :extension], else: [:roles]
-    preload = Helpers.user_preload [:roles]
+    preload = UcxUcc.Hooks.user_preload [:roles]
     {[
       user: Helpers.get_user_by_name(username, preload: preload),
       user_info: user_info(channel, user_mode: true, view_mode: true),

@@ -9,7 +9,7 @@ defmodule UccAdmin.AdminService do
   alias ChatSettings.{FileUpload, Layout}
   alias ChatSettings.ChatGeneral
   alias UcxUcc.Settings.General
-  alias UcxUcc.Permissions
+  alias UcxUcc.{Permissions, Hooks}
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
   alias UccChat.Schema.Channel, as: ChannelSchema
@@ -399,13 +399,17 @@ defmodule UccAdmin.AdminService do
   end
   def get_args("users", user) do
     phone_status? = UccChat.phone_status?
-    preload = if phone_status?, do: [:extension], else: []
+    # users_preload(preload \\ [])
+    # preload_user(user, preload \\ [])
+    # preload = if phone_status?, do: [:extension], else: []
+    preload = Hooks.user_preload []
     user = Repo.preload user, preload
 
     users =
       (from u in User, order_by: [asc: u.username], preload: ^preload)
       |> Repo.all
-      |> set_phone_status(phone_status?)
+      |> Hooks.all_users_post_filter
+      # |> set_phone_status(phone_status?)
 
     [user: user, users: users]
   end

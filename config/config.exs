@@ -7,8 +7,7 @@ use Mix.Config
 
 # General application configuration
 config :ucx_ucc,
-  ecto_repos: [UcxUcc.Repo],
-  js_plugins: ["mscs"]
+  ecto_repos: [UcxUcc.Repo]
 
 # Configures the endpoint
 config :ucx_ucc, UcxUccWeb.Endpoint,
@@ -66,6 +65,7 @@ config :coherence, UcxUccWeb.Coherence.Mailer,
 # %% End Coherence Configuration %%
 
 import_config("../plugins/*/config/config.exs")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
