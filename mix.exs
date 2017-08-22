@@ -64,10 +64,10 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.13"},
       {:phoenix_haml, "~> 0.2"},
-      # {:unbrella, github: "smpallen99/unbrella"},
-      {:unbrella, path: "../unbrella"},
-      # {:coherence, github: "smpallen99/coherence", branch: "phx-1.3"},
-      {:coherence, path: "../coherence3"},
+      {:unbrella, github: "smpallen99/unbrella"},
+      # {:unbrella, path: "../unbrella"},
+      {:coherence, github: "smpallen99/coherence"},
+      # {:coherence, path: "../coherence3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.7.0"},
       {:auto_linker, "~> 0.1"},
@@ -92,24 +92,11 @@ defmodule UcxUcc.Mixfile do
       {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.8"},
       {:postgrex, ">= 0.0.0", only: :test},
-      {:rebel, path: "../rebel"},
-      # {:rebel, github: "smpallen99/rebel"},
+      # {:rebel, path: "../rebel"},
+      {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
-      # {:gen_fsm, git: "git@bitbucket.org:emetrotel/gen_fsm.git"},
-      {:ex_data, git: "git@bitbucket.org:emetrotel/ex_data.git"},
-      {:rudp, git: "git@bitbucket.org:emetrotel/rudp.git"},
-      {:ucx_license_manager,
-        git: "git@bitbucket.org:emetrotel/ucx_license_manager.git", env: Mix.env},
-      {:ucx_alarm_manager,
-        git: "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", env: Mix.env},
-
-      # ucx_presence
-      # {:speak_ex, github: "smpallen99/speak_ex"},
-      # {:ex_ami, "~> 0.0"}
-      {:ex_ami, path: "../ex_ami"}
-
     ]
   end
 
