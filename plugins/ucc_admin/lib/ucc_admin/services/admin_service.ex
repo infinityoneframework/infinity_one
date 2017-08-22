@@ -398,10 +398,6 @@ defmodule UccAdmin.AdminService do
     [user: user, changeset: cs]
   end
   def get_args("users", user) do
-    phone_status? = UccChat.phone_status?
-    # users_preload(preload \\ [])
-    # preload_user(user, preload \\ [])
-    # preload = if phone_status?, do: [:extension], else: []
     preload = Hooks.user_preload []
     user = Repo.preload user, preload
 
@@ -409,7 +405,6 @@ defmodule UccAdmin.AdminService do
       (from u in User, order_by: [asc: u.username], preload: ^preload)
       |> Repo.all
       |> Hooks.all_users_post_filter
-      # |> set_phone_status(phone_status?)
 
     [user: user, users: users]
   end
@@ -492,11 +487,4 @@ defmodule UccAdmin.AdminService do
     |> Repo.all
   end
 
-  defp set_phone_status(users, true) do
-    Enum.map users, &UcxPresence.set_status/1
-  end
-
-  defp set_phone_status(users, _) do
-    users
-  end
 end

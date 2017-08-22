@@ -7,8 +7,7 @@ defmodule UccChat.ServiceHelpers do
   require UccChatWeb.SharedView
   use UcxUccWeb.Gettext
 
-  alias UcxUcc.Repo
-  alias UcxUcc.Accounts.{User}
+  alias UcxUcc.{Repo, Hooks, Accounts.User}
 
   import Ecto.Query
 
@@ -66,11 +65,7 @@ defmodule UccChat.ServiceHelpers do
   end
 
   def user_preload(preload) do
-    if UccChat.phone_status? do
-      [:extension | preload]
-    else
-      preload
-    end
+    Hooks.user_preload preload
   end
 
   @dt_re ~r/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d+)/

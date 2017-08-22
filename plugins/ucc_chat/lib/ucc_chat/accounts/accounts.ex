@@ -2,7 +2,7 @@ defmodule UccChat.Accounts do
 
   alias UccChat.{PresenceAgent, Channel, Subscription}
   alias UcxUcc.Accounts.Account
-  alias UcxUcc.Repo
+  alias UcxUcc.{Repo, Hooks}
 
   def get_all_channel_online_users(channel) do
     channel
@@ -12,7 +12,9 @@ defmodule UccChat.Accounts do
 
   def get_all_channel_users(channel) do
     Enum.map(channel.users, fn user ->
-      struct(user, status: PresenceAgent.get(user.id))
+      user
+      |> struct(status: PresenceAgent.get(user.id))
+      |> Hooks.preload_user([])
     end)
   end
 

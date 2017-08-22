@@ -22,7 +22,6 @@
           = ~g(SHOWING) <> " "
           b= @users |> length
           = " " <> ~g(RESULTS)
-          - phone_status? = UccChat.phone_status?
         .list
           table.secondary-background-color
             thead
@@ -30,8 +29,7 @@
                 th.content-background-color.border-component-color &nbsp;
                 th.content-background-color.border-component-color(width="34%")= ~g(Name)
                 th.content-background-color.border-component-color(width="33%")= ~g(Username)
-                = if phone_status? do
-                  th.content-background-color.border-component-color(width="33%")= ~g(Extension)
+                = user_details_thead_hook()
                 th.content-background-color.border-component-color(width="33%")= ~g(Email)
             tbody
               = for user <- @users do
@@ -43,13 +41,7 @@
                         .avatar-image(style="background-image:url(#{avatar});")
                   td.border-component-color= user.name
                   td.border-component-color= user.username
-                  = if phone_status? do
-                    td.border-component-color
-                      = if user.extension do
-                        i.phone-status(data-status="#{user.extension.status}" data-phone-status="#{user.username}" style="margin-right: 3px;")
-                        = user.extension.extension
-                      - else
-                        i.phone-none(style="margin-right: 3px;")
+                  = user_details_body_hook user
 
                   td.border-component-color= user.email
           /<%# {{#if hasMore}} %>

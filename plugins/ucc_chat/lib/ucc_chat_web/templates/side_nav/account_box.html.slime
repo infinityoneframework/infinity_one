@@ -1,6 +1,6 @@
 .account-box(class="#{account_box_class()}" aria="Account" role="region")
   div(class="info status-#{@chatd.status} primary-background-color" data-status-name="#{get_user_name @chatd.user}")
-    = phone_status_icon @chatd.user
+    = account_box_header @chatd.user
     = if @chatd.user.username do
       .thumb(data-status="#{@chatd.status}")
         .avatar
@@ -21,19 +21,8 @@
         span= ~g(Busy)
       button.status.offline(data-status="offline" rebel-click="click_status")
         span= ~g(Offline)
-      = if UccChat.phone_status? do
-        button.phone-status.idle(data-phone="online" rebel-click="click_status")
-          i.phone-status(data-status="idle")
-          span= ~g(Online)
-        button.phone-status.away(data-phone="away" rebel-click="click_status")
-          i.phone-status(data-status="away")
-          span= ~g(Away)
-        button.phone-status.busy(data-phone="busy" rebel-click="click_status")
-          i.phone-status(data-status="busy")
-          span= ~g(Busy)
-        button.phone-status.offline(data-phone="invisible" rebel-click="click_status")
-          i.phone-status
-          span= ~g(Invisible)
+
+      = nav_option_buttons()
 
       button#account.account-link
         i.icon-sliders

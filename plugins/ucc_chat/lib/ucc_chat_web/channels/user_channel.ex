@@ -991,25 +991,6 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  # def phone_presence_change(event, %{state: :idle, username: username} = _payload, socket) do
-  #   Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
-  #   # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
-  #   exec_js socket, ~s/$('[data-phone-status="#{username}"]').data('state', 'idle')
-  #   socket
-  # end
-  # def phone_presence_change(event, %{state: :busy, username: username} = _payload, socket) do
-  #   Logger.error "state change :idle, assigns: " <> inspect(socket.assigns)
-  #    # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
-  #    exec_js socket, ~s/$('[data-phone-status="#{username}"]').data('state', 'busy')/
-  #    socket
-  # end
-
-  def phone_presence_change(_event, %{state: state, username: _username} = _payload, socket) do
-    Logger.info "state #{inspect state}, assigns: " <> inspect(socket.assigns)
-     # exec_js socket, ~s/$('[data-phone-status="#{username}"]').addClass('phone-idle').removeClass('phone-busy')/
-     socket
-  end
-
   defp set_data_status_js(username, state) do
     """
     var e = document.querySelectorAll('[data-phone-status="#{username}"]');

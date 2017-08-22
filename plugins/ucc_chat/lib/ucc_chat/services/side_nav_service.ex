@@ -58,19 +58,4 @@ defmodule UccChat.SideNavService do
     |> Helpers.safe_to_string
   end
 
-  defp load_phone_status(users, false) do
-    users
-  end
-
-  defp load_phone_status(users, true) do
-    Enum.map(users, fn {user, other} ->
-      if user.extension do
-        # {struct(user, extension: Map.put(user.extension, :status, status)), other}
-        {UcxPresence.set_status(user), other}
-      else
-        {user, other}
-      end
-    end)
-  end
-
 end

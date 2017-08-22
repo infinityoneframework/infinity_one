@@ -8,6 +8,7 @@ defmodule UccChatWeb.SharedView do
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
   alias UccChat.Subscription
+  alias UcxUcc.Hooks
 
   require Logger
 
@@ -158,22 +159,32 @@ defmodule UccChatWeb.SharedView do
     UccChat.AvatarService.avatar_url username
   end
 
-  def phone_status_icon(user) do
-    with true <- UccChat.phone_status?,
-         true <- !! user.extension do
-      phone_status_icon_tag user.extension.status, user.username
-    else
-      _ -> ""
-    end
+  def user_details_thead_hook do
+    Hooks.user_details_thead_hook []
   end
 
-  def phone_status_icon_tag(status, username) do
-    content_tag :i,[
-      class: "phone-status",
-      "data-status": status,
-      "data-phone-status": username,
-      "rebel-click": "phone_call"
-      ], do: ""
+  def user_details_body_hook(user) do
+    Hooks.user_details_body_hook [], user
+  end
+
+  def user_card_details(user) do
+    Hooks.user_card_details [], user
+  end
+
+  def user_list_item_hook(user) do
+    Hooks.user_list_item_hook [], user
+  end
+
+  def messages_header_icons(chatd) do
+    Hooks.messages_header_icons [], chatd
+  end
+
+  def account_box_header(user) do
+    Hooks.account_box_header [], user
+  end
+
+  def nav_option_buttons do
+    Hooks.nav_option_buttons []
   end
 
   defmacro gt(text, opts \\ []) do
