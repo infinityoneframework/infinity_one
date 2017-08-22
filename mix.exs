@@ -82,7 +82,7 @@ defmodule UcxUcc.Mixfile do
       # TODO: move this to the chat package
       {:hedwig, github: "hedwig-im/hedwig", override: true},
       # {:hedwig, "~> 1.0"},
-      {:hedwig_simple_responders, github: "labzero/hedwig_simple_responders"},
+      {:hedwig_simple_responders, github: "smpallen99/hedwig_simple_responders"},
       # {:hedwig_simple_responders, "~> 0.1.2"},
       {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.5", only: :test},
