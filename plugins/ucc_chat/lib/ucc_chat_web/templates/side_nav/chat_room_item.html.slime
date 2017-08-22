@@ -7,7 +7,7 @@ li(class="room-link #{chat_room_item_li_class(@room)}")
 
     span(class="name #{@room[:archived]}")
       = @room[:display_name]
-    -# if !! @room[:unread] do
+
     span.opt
       i.icon-eye-off.hide-room(title="Hide_room" aria-label="Hide_room")
       = if @room[:can_leave] do

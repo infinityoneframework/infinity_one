@@ -1,11 +1,9 @@
 defmodule UccChatWeb.ChannelController do
   use UccChatWeb, :controller
   use Rebel.Controller, channels: [
-    # UccChatWeb.UiChannel,
     UccChatWeb.UserChannel,
     UccChatWeb.RoomChannel,
-    MscsWeb.ClientChannel
-  ]
+  ] ++ UcxUcc.Hooks.ucc_chat_channel_controller_channels([])
 
   import Ecto.Query
 
@@ -13,7 +11,7 @@ defmodule UccChatWeb.ChannelController do
 
   alias UccChat.{ChatDat}
   alias UccChat.{Message, Channel, ChannelService}
-  alias UcxUcc.Accounts.User
+  alias UcxUcc.{Accounts.User, Hooks}
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChat.Schema.Direct, as: DirectSchema
 
@@ -59,20 +57,17 @@ defmodule UccChatWeb.ChannelController do
     user =
       conn
       |> Coherence.current_user
-      |> Repo.preload([:account, :extension])
-      # TODO: find generic way to only load extension if plugin available
+      |> Hooks.preload_user([:account])
 
     UccChat.PresenceAgent.load user.id
 
     messages = Message.get_room_messages(channel.id, user)
-    # Logger.warn "message count #{length messages}"
 
     chatd =
       user
       |> ChatDat.new(channel, messages)
       |> ChatDat.get_messages_info
 
-    # Logger.warn "controller messages_info: #{inspect chatd.messages_info}"
     conn
     |> put_view(UccChatWeb.MasterView)
     |> put_layout({UcxUccWeb.LayoutView, "app.html"})
@@ -80,15 +75,12 @@ defmodule UccChatWeb.ChannelController do
   end
 
   def show(conn, %{"name" => name}) do
-    # require IEx
     case Channel.get_by(name: name) do
       nil ->
-        # IEx.pry
         conn
         |> put_flash(:error, "#{name} is an invalid channel name!")
         |> redirect(to: "/")
       channel ->
-        # IEx.pry
         if channel.type in [0,1] do
           show(conn, channel)
         else
@@ -116,25 +108,6 @@ defmodule UccChatWeb.ChannelController do
       _ -> redirect conn, to: "/"
     end
   end
-  # def direct(conn, %{"name" => name}) do
-  #   case UccChat.ServiceHelpers.get_by User, :username, name do
-  #     nil ->
-  #       redirect conn, to: "/"
-  #     user ->
-  #       user_id = Coherence.current_user(conn) |> Map.get(:id)
-  #       user_id
-  #       |> get_direct(name)
-  #       |> case do
-  #         nil ->
-  #           # create the direct and redirect
-  #           ChannelService.add_direct(name, user_id, nil)
-  #           direct = get_direct(user_id, name)
-  #           show(conn, direct.channel)
-  #         direct ->
-  #           show(conn, direct.channel)
-  #       end
-  #   end
-  # end
 
   defp get_direct(user_id, name) do
     (from d in DirectSchema,

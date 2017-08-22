@@ -1,11 +1,12 @@
 defmodule UccChat.Hooks do
+  use Unbrella.Hooks, :add_hooks
+  alias UcxUcc.Repo
 
-  def hooks do
-    [
-      # user_preload: {__MODULE__, :user_preload}
-    ]
+  require Logger
+
+  add_hook :preload_user, [:user, :preload] do
+    Logger.warn "preload_user, preload: #{inspect preload}"
+    Repo.preload user, preload
   end
-
-  # def user_preload(preload), do: preload
 
 end

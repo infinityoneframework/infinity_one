@@ -64,6 +64,8 @@ config :coherence, UcxUccWeb.Coherence.Mailer,
   api_key: {:system, "SENDGRID_API_KEY"}
 # %% End Coherence Configuration %%
 
+config :slime, :keep_lines, true
+
 import_config("../plugins/*/config/config.exs")
 
 # Import environment specific config. This must remain at the bottom

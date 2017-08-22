@@ -1,7 +1,7 @@
 defmodule UcxUcc.TestHelpers do
   alias FakerElixir, as: Faker
   alias UcxUcc.{Repo, Accounts}
-  alias Accounts.{User, Role, UserRole, Account}
+  alias Accounts.{User, Role, UserRole}
   import Ecto.Query
 
   def strip_ts(schema) do

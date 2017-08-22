@@ -20,7 +20,7 @@ defmodule UccChat.ChannelService do
   alias UcxUcc.Permissions
   alias UccChat.ServiceHelpers, as: Helpers
   alias Ecto.Multi
-  alias UcxUcc.UccPubSub
+  alias UcxUcc.{UccPubSub, Hooks, Accounts}
 
   require UccChat.ChatConstants, as: CC
   require Logger
@@ -395,22 +395,14 @@ defmodule UccChat.ChannelService do
     case Direct.get_by channel_id: id, user_id: user_id do
       %{} = direct ->
         username = Map.get(direct, :users)
-        user = Repo.one! User.user_from_username(username)
-        {username, UccChat.PresenceAgent.get(user.id), get_phone_status(user)}
+        user = Accounts.get_by_user username: username, preload: [:account]
+        {username, UccChat.PresenceAgent.get(user.id), Hooks.preload_user(user, [])}
       _ ->
         {name, "offline", nil}
     end
   end
   def get_channel_display_name(_, %ChannelSchema{name: name}, _) do
     {name, "offline", nil}
-  end
-
-  defp get_phone_status(user) do
-    if function_exported?(UcxPresence, :status, 1) do
-      UcxPresence.status user
-    else
-      nil
-    end
   end
 
   def favorite_room?(%{} = chatd, channel_id) do

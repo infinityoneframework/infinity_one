@@ -62,4 +62,5 @@ defmodule UcxUcc.Hooks do
   defhook :account_box_class, 1
 
   defhook :add_flex_buttons, 0
+  defhook :ucc_chat_channel_controller_channels, 1
 end

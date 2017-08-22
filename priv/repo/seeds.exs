@@ -3,7 +3,7 @@ alias UcxUcc.{Accounts, Permissions}
 alias Accounts.{User, Role, UserRole, Account}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
-alias Mscs.{Client, Apb}
+# alias Mscs.{Client, Apb}
 alias UcxPresence.Extension
 
 Extension.delete_all
@@ -256,22 +256,22 @@ IO.puts "Creating Settings"
 
 UccSettings.init_all()
 
-start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
+# start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
 
-IO.puts "Setting mac addresses"
+# IO.puts "Setting mac addresses"
 
-Client.list
-|> Enum.with_index
-|> Enum.each(fn {user, inx} ->
-  mac = start_mac + inx + 1
-  Client.update(user, %{mac: mac})
-end)
+# Client.list
+# |> Enum.with_index
+# |> Enum.each(fn {user, inx} ->
+#   mac = start_mac + inx + 1
+#   Client.update(user, %{mac: mac})
+# end)
 
-IO.puts "Setting extensions"
+# IO.puts "Setting extensions"
 
-add_extension = fn {extension, user} ->
-  Extension.create(%{user_id: user.id, extension: "#{extension}"})
-end
+# add_extension = fn {extension, user} ->
+#   Extension.create(%{user_id: user.id, extension: "#{extension}"})
+# end
 
 # [
 #   2000: u2, 2001: u3, 2002: Enum.at(users, 0),
@@ -279,6 +279,6 @@ end
 #   2004: Enum.at(users, 3)
 # ]
 
-2000..2009
-|> Enum.zip([u2, u3] ++ users)
-|> Enum.each(& add_extension.(&1))
+# 2000..2009
+# |> Enum.zip([u2, u3] ++ users)
+# |> Enum.each(& add_extension.(&1))

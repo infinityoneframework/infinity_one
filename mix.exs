@@ -84,14 +84,13 @@ defmodule UcxUcc.Mixfile do
       # {:hedwig, "~> 1.0"},
       {:hedwig_simple_responders, github: "labzero/hedwig_simple_responders"},
       # {:hedwig_simple_responders, "~> 0.1.2"},
-      {:ucc_shared, path: "plugins/ucc_shared", app: false},
       {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.5", only: :test},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:phoenix_slime, "~> 0.9"},
       # {:slime, "~> 1.0", override: true},
-      # {:slime, github: "slime-lang/slime", override: true},
-      {:slime, "~> 1.0", override: true},
+      {:slime, github: "smpallen99/slime", override: true},
+      # {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.8"},
       {:postgrex, ">= 0.0.0", only: :test},
       # {:rebel, path: "../rebel"},
@@ -99,6 +98,7 @@ defmodule UcxUcc.Mixfile do
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
+      {:floki, "~> 0.0", override: true}
     ]
   end
 
@@ -112,7 +112,7 @@ defmodule UcxUcc.Mixfile do
     ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
-     "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
-     # "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
+     # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
+     "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
   end
 end

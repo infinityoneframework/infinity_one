@@ -2,7 +2,7 @@ defmodule UccChatWeb.SharedView do
   use UcxUcc.Utils
   use UcxUccWeb.Gettext
 
-  import Phoenix.HTML.Tag
+  import Phoenix.HTML.Tag, warn: false
 
   alias UcxUcc.Permissions
   alias UcxUcc.Repo

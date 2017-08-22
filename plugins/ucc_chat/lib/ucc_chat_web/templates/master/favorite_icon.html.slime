@@ -1,5 +1,5 @@
-- class = if @show, do: "", else: "hidden"
-a.toggle-favorite(href="#favorite" class='#{class}')
+- class = if @show, do: "", else: " hidden"
+a(href="#favorite" class='toggle-favorite#{class}')
   = if @favorite do
     i(class="icon-star favorite-room pending-color" aria-label="#{~g(Unfavorite)}")
   - else

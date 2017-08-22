@@ -7,7 +7,6 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   alias TabBar.Ftab
   alias TabBar.Tab
   alias UccWebrtcWeb.FlexBar.Tab.MembersList, as: WebrtcMembersList
-  alias UcxUcc.Repo
 
   require Logger
 

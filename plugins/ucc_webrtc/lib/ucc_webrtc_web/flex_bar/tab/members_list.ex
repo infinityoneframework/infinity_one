@@ -92,6 +92,8 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   def open_destination_video(socket, current_user_id, user_id) do
     trace "", %{current_user_id: current_user_id, user_id: user_id}
     trace "assigns", socket.assigns
+    _ = current_user_id
+
     # channel_id = Rebel.get_assigns(socket, :channel_id)
     channel_id = socket.assigns.channel_id
     trace "channel_id", channel_id
