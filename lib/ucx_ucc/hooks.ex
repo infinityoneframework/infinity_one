@@ -63,4 +63,6 @@ defmodule UcxUcc.Hooks do
 
   defhook :add_flex_buttons, 0
   defhook :ucc_chat_channel_controller_channels, 1
+
+  defhook :register_admin_pages, 1
 end

@@ -26,4 +26,10 @@ defmodule UccChatWeb.RebelChannel.Macros do
     end
   end
 
+  defmacro defdelegateadmin(name) do
+    quote bind_quoted: [name: name] do
+      defdelegate unquote(name)(socket, sender), to: UccAdminWeb.AdminChannel
+    end
+  end
+
 end

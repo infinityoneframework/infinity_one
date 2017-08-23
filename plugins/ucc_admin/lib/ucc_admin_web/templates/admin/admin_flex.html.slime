@@ -4,22 +4,25 @@ header
 .content
   .wrapper
     ul
-      li= link ~g"Info", class: "admin-link", "data-link": "info", to: "#"
-      li= link ~g"Rooms", class: "admin-link", "data-link": "rooms", to: "#"
-      li= link ~g"Users", class: "admin-link", "data-link": "users", to: "#"
+      = for page <- admin_pages() do
+        = render_flex_item page, @user
+      /  li= link page.name, class: "admin-link", "rebel-click": "admin_link", "data-id": page.id, to: "#"
+      / li= link ~g"Info", class: "admin-link", "rebel-click": "click_admin_info", to: "#"
+      /li= link ~g"Rooms", class: "admin-link", "rebel-click": "click_admin_rooms", to: "#"
+      /li= link ~g"Users", class: "admin-link", "rebel-click": "click_admin_users", to: "#"
 
-      = if has_permission? @user, "access-permissions" do
-        li= link ~g"Permissions", class: "admin-link", "data-link": "permissions", to: "#"
+      / = if has_permission? @user, "access-permissions" do
+      /  li= link ~g"Permissions", class: "admin-link", "data-link": "permissions", to: "#"
 
-      h3.add-room= ~g(Settings)
-      li
-        input(type="text" name="settings-search" placeholder="#{~g(Search)}")
+      / h3.add-room= ~g(Settings)
+      /li
+      /  input(type="text" name="settings-search" placeholder="#{~g(Search)}")
 
-      li= link ~g"General", class: "admin-link", "data-link": "general", to: "#"
+      / li= link ~g"General", class: "admin-link", "data-link": "general", to: "#"
 
       = if has_permission? @user, "view-message-administration" do
-        li= link ~g"Chat General", class: "admin-link", "data-link": "chat_general", to: "#"
-        li= link ~g"Message", class: "admin-link", "data-link": "message", to: "#"
-        li= link ~g"Layout", class: "admin-link", "data-link": "layout", to: "#"
-        li= link ~g"File Upload", class: "admin-link", "data-link": "file_upload", to: "#"
-        li= link ~g"WebRTC", class: "admin-link", "data-link": "webrtc", to: "#"
+        /li= link ~g"Chat General", class: "admin-link", "data-link": "chat_general", to: "#"
+        /li= link ~g"Message", class: "admin-link", "data-link": "message", to: "#"
+        /li= link ~g"Layout", class: "admin-link", "data-link": "layout", to: "#"
+        /li= link ~g"File Upload", class: "admin-link", "data-link": "file_upload", to: "#"
+        / li= link ~g"WebRTC", class: "admin-link", "data-link": "webrtc", to: "#"

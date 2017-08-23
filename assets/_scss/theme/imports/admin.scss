@@ -13,6 +13,23 @@
     }
   }
 }
+section.flex-tab-main-content {
+  tr {
+    &.row-link.active {
+      background-color: #a6d256;
+    }
+  }
+
+}
+.flex-nav {
+  .wrapper{
+    li.active {
+      a {
+        color: #333;
+      }
+    }
+  }
+}
 // .main-content section.page-container.admin-settings button:hover {
 //   color: #fff !important;
 // }

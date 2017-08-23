@@ -1,5 +1,6 @@
 defmodule UccChatWeb.FlexBarView do
   use UccChatWeb, :view
+  import UccAdminWeb.View.Utils, warn: false
   # import Phoenix.HTML.Tag, only: [content_tag: 3, content_tag: 2]
   # import UccChat.AvatarService, only: [avatar_url: 1]
   # "Showing: <b>1<b>, Online: 1, Total: 1 users"

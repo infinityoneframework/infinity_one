@@ -17,6 +17,7 @@ defmodule UccChatWeb.UserChannel do
     "webrtc:confirmed_video_call",
     "webrtc:declined_video_call",
   ]
+  use UccChatWeb.RebelChannel.Macros
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
@@ -1034,6 +1035,9 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
-  defdelegate click_admin(socket, sender), to: UccAdminWeb.AdminChannel
+  # defdelegate click_admin(socket, sender), to: UccAdminWeb.AdminChannel
+
+  defdelegateadmin :click_admin
+  defdelegateadmin :admin_link
 
 end

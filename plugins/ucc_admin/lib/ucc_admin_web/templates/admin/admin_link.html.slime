@@ -1,0 +1,1 @@
+li= link @page.name, class: "admin-link", "rebel-click": "admin_link", "data-id": @page.id, to: "#"

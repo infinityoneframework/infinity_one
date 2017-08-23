@@ -147,6 +147,7 @@ class SideNav {
     //   this.systemchan.push('status:set:' + $(e.currentTarget).data('status'), {})
     // })
     .on('click', '.flex-nav header', (e) => {
+      console.log('.flex-nav header click', e)
       e.preventDefault()
       this.userchan.push('side_nav:close', {})
       // console.log('.flex-nav header clicked')
@@ -165,12 +166,12 @@ class SideNav {
       this.userchan.push('account_link:click:' + $(e.currentTarget).data('link'), {})
       this.navMenu.close()
     })
-    .on('click', '.admin-link', e => {
-      console.log('admin link click')
-      e.preventDefault()
-      this.userchan.push('admin_link:click:' + $(e.currentTarget).data('link'), {})
-      navMenu.close()
-    })
+    // .on('click', '.admin-link', e => {
+    //   console.log('admin link click')
+    //   e.preventDefault()
+    //   this.userchan.push('admin_link:click:' + $(e.currentTarget).data('link'), {})
+    //   navMenu.close()
+    // })
     .on('submit', '#account-preferences-form', e => {
       e.preventDefault()
       this.userchan.push('account:preferences:save', $(e.currentTarget).serializeArray())

@@ -49,4 +49,4 @@
                   td.border-component-color= room.messages |> length
                   td.border-component-color= admin_label room.default
             / button.button.secondary.load-more= ~g"Load more"
-  = render "admin_flex_tab_bar.html", mode: "room"
+  /= render "admin_flex_tab_bar.html", mode: "room"

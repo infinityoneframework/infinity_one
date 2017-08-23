@@ -2,8 +2,8 @@ defmodule UccChat.Message do
   use UccModel, schema: UccChat.Schema.Message
   use Timex
 
+  alias UcxUcc.Repo
   alias UccChat.Schema.Channel
-
   alias UccChat.{AppConfig, SubscriptionService,}
   #   TypingAgent, Mention, Subscription,
   #   Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
@@ -28,6 +28,10 @@ defmodule UccChat.Message do
     from m in @schema, select: count(m.id)
   end
 
+  def get_total_count do
+    Repo.one total_count()
+  end
+
   def total_channels(type \\ 0) do
     from m in @schema,
       join: c in Channel, on: m.channel_id == c.id,
@@ -35,12 +39,24 @@ defmodule UccChat.Message do
       select: count(m.id)
   end
 
+  def get_total_channels do
+    Repo.one total_channels()
+  end
+
   def total_private do
     total_channels 1
   end
 
+  def get_total_private do
+    Repo.one total_private()
+  end
+
   def total_direct do
     total_channels 2
+  end
+
+  def get_total_direct do
+    Repo.one total_direct()
   end
 
   def get_surrounding_messages(channel_id, ts, user) when ts in ["", nil] do

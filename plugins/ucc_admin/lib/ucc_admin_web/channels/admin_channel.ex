@@ -11,22 +11,25 @@ defmodule UccAdminWeb.AdminChannel do
   require Logger
 
   def click_admin(socket, sender) do
-    user = get_user! socket
-    Logger.warn "admin: user_id: #{user.id}, #{inspect sender}"
-    main_content = AdminService.render_info(user) |> IO.inspect(label: "html")
-    admin_flex = render_to_string("admin_flex.html", user: user) |> IO.inspect(label: "admin_flex")
-    socket
-    |> SideNav.open
-    |> update(:html, set: main_content, on: ".main-content")
-    |> update(:html, set: admin_flex, on: ".flex-nav section")
-    {:noreply, socket}
+    admin_link "admin_info", socket, sender
+  end
+
+  def admin_link(socket, sender) do
+    admin_link sender["dataset"]["id"], socket, sender
+  end
+
+  def admin_link(id, socket, sender) do
+    page = UccAdmin.get_page id
+    Logger.warn "page: #{inspect page}"
+    Logger.warn "sender: #{inspect sender}"
+    {:noreply, apply(page.module, :open, [socket, sender, page])}
   end
 
   defp get_user!(%{assigns: %{user_id: user_id}}) do
     Accounts.get_user! user_id, preload: [:account, :roles]
   end
 
-  defp render_to_string(templ, bindings \\ []) do
+  def render_to_string(templ, bindings \\ []) do
     Phoenix.View.render_to_string AdminView, templ, bindings
   end
 

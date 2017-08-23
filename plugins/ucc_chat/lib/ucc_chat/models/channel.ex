@@ -3,7 +3,7 @@ defmodule UccChat.Channel do
 
   import Ecto.Changeset
 
-  alias UcxUcc.Accounts.User
+  alias UcxUcc.{Accounts.User,  Repo}
   alias UccChat.Schema.{Subscription}
 
   require Logger
@@ -55,6 +55,10 @@ defmodule UccChat.Channel do
     from c in @schema, select: count(c.id)
   end
 
+  def get_total_rooms do
+    Repo.one total_rooms()
+  end
+
   def total_rooms(type) do
     from c in @schema, where: c.type == ^type, select: count(c.id)
   end
@@ -63,12 +67,24 @@ defmodule UccChat.Channel do
     total_rooms 0
   end
 
+  def get_total_channels do
+    Repo.one total_channels()
+  end
+
   def total_private do
     total_rooms 1
   end
 
+  def get_total_private do
+    Repo.one total_private()
+  end
+
   def total_direct do
     total_rooms 2
+  end
+
+  def get_total_direct do
+    Repo.one total_direct()
   end
 
   def get_all_channels do

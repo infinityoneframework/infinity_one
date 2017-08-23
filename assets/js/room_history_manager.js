@@ -93,7 +93,7 @@ class RoomHistoryManager {
   restore_cached_room() {
     if (ucxchat.channel_id) {
       $(wrapper)[0].scrollTop = this.cached_scrollTop
-      roomManager.bind_history_manager_scroll_event()
+      UccChat.roomManager.bind_history_manager_scroll_event()
     }
   }
 

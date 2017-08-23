@@ -9,4 +9,5 @@ defmodule UccChat.Hooks do
     Repo.preload user, preload
   end
 
+  add_hook :register_admin_pages, UccChatWeb.Admin, :add_pages
 end
