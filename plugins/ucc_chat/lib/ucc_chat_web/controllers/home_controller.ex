@@ -10,6 +10,7 @@ defmodule UccChatWeb.HomeController do
     chatd = ChatDat.new(user)
     conn
     |> put_layout({UcxUccWeb.LayoutView, "app.html"})
+    |> put_view(UccChatWeb.HomeView)
     |> render("index.html", chatd: chatd)
   end
 

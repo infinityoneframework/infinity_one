@@ -43,6 +43,10 @@ defmodule UcxUcc.Accounts do
 
   """
   def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id, opts) do
+    preload = opts[:preload] || []
+    Repo.one! from u in User, where: u.id == ^id, preload: ^preload
+  end
 
   def get_user(id), do: Repo.get(User, id)
 

@@ -296,21 +296,21 @@ defmodule UccChatWeb.UserChannel do
     html = Helpers.render(AccountView, "account_flex.html")
     {:reply, {:ok, %{html: html}}, socket}
   end
-  def handle_in("side_nav:open" = ev, %{"page" => "admin"} = params, socket) do
-    trace ev, params
-    _ = ev
-    _ = params
+  # def handle_in("side_nav:open" = ev, %{"page" => "admin"} = params, socket) do
+  #   trace ev, params
+  #   _ = ev
+  #   _ = params
 
-    user = Helpers.get_user!(socket)
+  #   user = Helpers.get_user!(socket)
 
-    html = AdminService.render_info(user)
-    push socket, "code:update", %{html: html, selector: ".main-content",
-      action: "html"}
+  #   html = AdminService.render_info(user)
+  #   push socket, "code:update", %{html: html, selector: ".main-content",
+  #     action: "html"}
 
-    html = Helpers.render(UccAdminWeb.AdminView, "admin_flex.html",
-      user: user)
-    {:reply, {:ok, %{html: html}}, socket}
-  end
+  #   html = Helpers.render(UccAdminWeb.AdminView, "admin_flex.html",
+  #     user: user)
+  #   {:reply, {:ok, %{html: html}}, socket}
+  # end
 
   def handle_in("side_nav:more_channels" = ev, params, socket) do
     _ = ev
@@ -432,6 +432,7 @@ defmodule UccChatWeb.UserChannel do
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
+    exec_js socket, "Rebel.set_event_handlers('.main-content')"
     {:noreply, socket}
   end
 
@@ -582,7 +583,18 @@ defmodule UccChatWeb.UserChannel do
     :erlang.process_flag(:trap_exit, true)
     trace "after_join", socket.assigns, inspect(params)
     user_id = socket.assigns.user_id
-    channel = Channel.get params["channel_id"]
+    # require IEx
+    # IEx.pry
+
+    channel_name =
+      case params["channel_id"] do
+        id when id in ["", nil] ->
+          "lobby"
+        channel_id ->
+          channel_id
+          |> Channel.get
+          |> Map.get(:name)
+      end
 
     new_assigns =
       params
@@ -596,7 +608,7 @@ defmodule UccChatWeb.UserChannel do
       |> struct(assigns: Map.merge(new_assigns, socket.assigns))
       |> assign(:subscribed, socket.assigns[:subscribed] || [])
       |> assign(:user_state, "active")
-      |> assign(:room, channel.name)
+      |> assign(:room, channel_name)
       |> assign(:self, self())
 
     socket =
@@ -616,7 +628,8 @@ defmodule UccChatWeb.UserChannel do
     subscribe_callback "user:" <> user_id, "webrtc:offer", :webrtc_offer
     subscribe_callback "user:" <> user_id, "webrtc:answer", {WebrtcChannel, :webrtc_answer}
     subscribe_callback "user:" <> user_id, "webrtc:leave", {WebrtcChannel, :webrtc_leave}
-    subscribe_callback "phone:presence", "presence:change", :phone_presence_change
+    # TODO: add Hooks for this
+    # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     {:noreply, socket}
   end
 
@@ -1021,5 +1034,6 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+  defdelegate click_admin(socket, sender), to: UccAdminWeb.AdminChannel
 
 end

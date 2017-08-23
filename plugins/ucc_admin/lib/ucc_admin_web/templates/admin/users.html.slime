@@ -6,7 +6,7 @@
         i
         i
       h2
-        span.room-title= "New " <> ~g"Users"
+        span.room-title= ~g"Users"
     .content
       = if not has_permission? @user, "view-user-administration" do
         p= ~g(You are not authorized to view this page)
@@ -47,7 +47,9 @@
           /<%# {{#if hasMore}} %>
           /  <%# <button class="button secondary load-more {{isLoading}}">{{_ "Load_more"}}</button> %>
           /<%# {{/if}} %>
-  = render "admin_flex_tab_bar.html", mode: "user"
+  =# render "admin_flex_tab_bar.html", mode: "user"
+  .flex-tab-container#flex-tabs.border-component-color(rebel-chan="user")
+    = render UccUiFlexTabWeb.TabBarView, "index.html", groups: ~w(admin_users)
   /<%# {{#with flexData}} %>
   /   <%# {{> flexTabBar}} %>
   / <%# {{/with}} %>

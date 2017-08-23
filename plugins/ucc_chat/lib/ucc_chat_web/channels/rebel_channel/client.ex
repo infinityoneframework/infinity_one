@@ -91,4 +91,14 @@ defmodule UccChatWeb.RebelChannel.Client do
     message = Poison.encode! message
     exec_js socket, ~s{window.toastr.#{which}(#{message});}
   end
+
+  def do_exec_js(socket, js) do
+    case exec_js(socket, js) do
+      {:ok, res} ->
+        res
+      {:error, error} = res ->
+        Logger.error "Problem with exec_js #{js}, error: #{inspect error}"
+        res
+    end
+  end
 end

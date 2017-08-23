@@ -116,4 +116,17 @@ defmodule UccChatWeb.ChannelController do
     |> Repo.one
   end
 
+  def page(conn, params) do
+    Logger.warn "page action"
+    # _page_name = params["page"] || "home"
+
+    # user =
+    #   conn
+    #   |> Coherence.current_user
+    #   |> Hooks.preload_user([:account])
+
+    # UccChat.PresenceAgent.load user.id
+    UccChatWeb.HomeController.index(conn, params)
+  end
+
 end

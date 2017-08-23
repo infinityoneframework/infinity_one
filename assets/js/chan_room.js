@@ -96,7 +96,7 @@ function start_room_channel(ucc_chat, socket) {
 }
 
 UccChat.on_connect(function(ucc_chat, socket) {
-  // console.warn('running room channel on_connect');
+  console.warn('running room channel on_connect');
   start_room_channel(ucc_chat, socket)
 
   $('body').on('restart-socket', () => {

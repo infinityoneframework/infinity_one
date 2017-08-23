@@ -49,7 +49,7 @@ defmodule UccChatWeb.Router do
     pipe_through :protected
 
     get "/", HomeController, :index
-    get "/home", HomeController, :index
+    get "/home", ChannelController, :page
     get "/channels/:name", ChannelController, :show
     get "/direct/:name", ChannelController, :direct
     get "/switch_user/:user", PageController, :switch_user

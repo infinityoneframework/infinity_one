@@ -32,7 +32,7 @@
           i(class="#{menu[:icon]}")
           span= menu[:name]
       = if show_admin_option(@chatd.user) do
-        button#admin.account-link
+        button.admin(rebel-click="click_admin")
           i.icon-wrench
           span= ~g(Administration)
       button#logout

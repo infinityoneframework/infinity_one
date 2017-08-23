@@ -37,11 +37,7 @@
         %li
           %a.direct-link(href="/direct/#{user.username}")
             %i(class="icon-at status-#{user.status}" data-status-name="#{user.username}")
-            - if @phone_status do
-              - if Map.get(user, :extension) do
-                %i(class="phone-status" data-status="#{user.extension.status}" data-phone-status="#{user.username}")
-              - else
-                %i(class="phone-none")
+            = user_list_item_hook user
             = user.username
             %span.opt.fixed
               - unless is_nil user.subscription_hidden do

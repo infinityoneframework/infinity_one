@@ -91,7 +91,12 @@ defmodule UccChatWeb.RoomChannel do
   end
 
   def topic(_broadcasting, _controller, _request_path, conn_assigns) do
-    conn_assigns.chatd.active_room.name
+    # Logger.error "conn_assigns: #{inspect conn_assigns}"
+    if conn_assigns.chatd.active_room == 0 do
+      "lobby"
+    else
+      conn_assigns.chatd.active_room.name
+    end
   end
 
   def handle_info({:after_join, room, msg}, socket) do
