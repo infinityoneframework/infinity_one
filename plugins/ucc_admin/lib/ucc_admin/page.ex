@@ -26,7 +26,6 @@ defmodule UccAdmin.Page do
         html = Phoenix.View.render_to_string page.view, page.template, bindings
         admin_flex = AdminChannel.render_to_string("admin_flex.html", user: user)
         socket
-        |> SideNav.open
         |> update(:html, set: html, on: ".main-content")
         |> update(:html, set: admin_flex, on: ".flex-nav section")
         |> exec_js(active_link_js(page))

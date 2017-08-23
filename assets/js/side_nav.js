@@ -155,7 +155,9 @@ class SideNav {
       // console.log('.flex-nav header clicked')
       $('div.flex-nav').addClass('animated-hidden')
       this.set_nav_top_icon('bottom')
+      console.log('going to restore cache')
       if ($('.main-content-cache').html() != '') {
+        console.log('restoring cache now!')
         $('.main-content').html($('.main-content-cache').html())
         $('.main-content-cache').html('')
         this.roomHistoryManager.restore_cached_room()

@@ -11,6 +11,7 @@ defmodule UccAdminWeb.AdminChannel do
   require Logger
 
   def click_admin(socket, sender) do
+    SideNav.open socket
     admin_link "admin_info", socket, sender
   end
 

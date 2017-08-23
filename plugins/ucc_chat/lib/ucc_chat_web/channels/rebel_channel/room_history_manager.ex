@@ -12,8 +12,7 @@ defmodule UccChatWeb.RebelChannel.RoomHistoryManager do
   defjs :cache_room, do: @cache_room_js
 
   defjs :cache_room_content,
-    do: @cache_room_js <>
-      " $('.main-content-cache').html($('.main-content').html());"
+    do: @cache_room_js <> " $('.main-content-cache').html($('.main-content').html());"
 
   defjs :restore_cached_room_js, do: """
     if (ucxchat.channel_id) {

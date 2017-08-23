@@ -794,6 +794,10 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+  def handle_info({:EXIT, _, :normal}, socket) do
+    {:noreply, socket}
+  end
+
   def handle_info(payload, socket) do
     Logger.error "default handle info payload: #{inspect payload}"
     {:noreply, socket}
@@ -803,6 +807,7 @@ defmodule UccChatWeb.UserChannel do
     UccPubSub.unsubscribe "user:" <> socket.assigns[:user_id]
     :ok
   end
+
   ###############
   # Helpers
 
