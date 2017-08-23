@@ -135,9 +135,11 @@ class SideNav {
       $('.main-content-cache').html($('.main-content').html())
       this.userchan.push('side_nav:open', {page: $(e.currentTarget).attr('id')})
         .receive("ok", resp => {
+          console.log('resp', resp)
           $('.flex-nav section').html(resp.html)
           console.log('resp from side_nav:open')
           this.navMenu.open()
+          $('.flex-nav .wrapper ul li').first().addClass('active');
         })
       $('div.flex-nav').removeClass('animated-hidden')
       this.set_nav_top_icon('close')
@@ -163,6 +165,8 @@ class SideNav {
     .on('click', '.account-link', e => {
       console.log('account link click')
       e.preventDefault()
+      $('.flex-nav .wrapper li').removeClass('active');
+      $(e.currentTarget).parent().addClass('active');
       this.userchan.push('account_link:click:' + $(e.currentTarget).data('link'), {})
       this.navMenu.close()
     })
