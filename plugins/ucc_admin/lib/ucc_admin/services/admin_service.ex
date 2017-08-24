@@ -267,19 +267,19 @@ defmodule UccAdmin.AdminService do
   end
 
 
-  def handle_in(ev = "flex:row-info", params, socket) do
-    debug ev, params
-    {:noreply, socket}
-  end
+  # def handle_in(ev = "flex:row-info", params, socket) do
+  #   debug ev, params
+  #   {:noreply, socket}
+  # end
 
-  defp flex_action("edit-user", user, _username, _params, socket) do
-    current_user = Helpers.get_user socket.assigns.user_id
-    html =
-      "admin_edit_user.html"
-      |> AdminView.render(user: user, current_user: current_user)
-      |> safe_to_string
-    {:ok, %{html: html, title: "Edit User"}}
-  end
+  # defp flex_action("edit-user", user, _username, _params, socket) do
+  #   current_user = Helpers.get_user socket.assigns.user_id
+  #   html =
+  #     "admin_edit_user.html"
+  #     |> AdminView.render(user: user, current_user: current_user)
+  #     |> safe_to_string
+  #   {:ok, %{html: html, title: "Edit User"}}
+  # end
 
   defp flex_action("delete" = ev, user, _username, _params, socket) do
     debug ev, user

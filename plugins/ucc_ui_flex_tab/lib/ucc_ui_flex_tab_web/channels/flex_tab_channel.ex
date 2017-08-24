@@ -42,6 +42,22 @@ defmodule UccUiFlexTab.FlexTabChannel do
      end
   end
 
+  @spec flex_tab_open(socket, sender) :: socket
+  def flex_tab_open(socket, sender) do
+    Logger.warn "sender: #{inspect sender}"
+    channel_id = get_channel_id(socket)
+    user_id = socket.assigns.user_id
+    Rebel.put_assigns socket, :channel_id, channel_id
+    tab_id = sender["dataset"]["id"]
+    tab = TabBar.get_button tab_id
+
+    Ftab.open socket.assigns.user_id, channel_id, sender["dataset"]["id"],
+      nil, fn
+       :open, {_, args} -> apply(tab.module, :open, [socket, {user_id, channel_id, tab, sender}, args])
+       :close, nil -> apply(tab.module, :close, [socket, sender])
+     end
+  end
+
   @doc """
   Redirect rebel calls to the configured module and function.
 

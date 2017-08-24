@@ -33,7 +33,7 @@
                 th.content-background-color.border-component-color(width="33%")= ~g(Email)
             tbody
               = for user <- @users do
-                tr.user-info.row-link(data-name="#{user.username}" data-id="admin_user_info" rebel-click="flex_tab_click")
+                tr.user-info.row-link(data-name="#{user.username}" data-id="admin_user_info" rebel-click="flex_tab_open")
                   td.border-component-color
                     div(class="user-image status-#{get_status(user)}" data-status-name="#{user.username}")
                       .avatar

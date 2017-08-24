@@ -41,7 +41,7 @@
                 th.content-background-color.border-component-color(width="20%")= ~g(Default)
             tbody
               = for room <- @rooms do
-                tr.room-info.row-link(data-name="#{room.name}" data-id="admin_room_info" rebel-click="flex_tab_click")
+                tr.room-info.row-link(data-name="#{room.id}" data-id="admin_room_info" rebel-click="flex_tab_open")
                   td.border-component-color= room.name
                   td.border-component-color= room_type room.type
                   td.border-component-color= admin_state_label room

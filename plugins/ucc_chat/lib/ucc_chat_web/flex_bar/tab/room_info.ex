@@ -19,26 +19,35 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
       10)
   end
 
-  def args(socket, {user_id, channel_id, _, _}, params) do
+  def args(socket, {user_id, channel_id, _, sender}, params) do
     current_user = Helpers.get_user! user_id
-    channel = Channel.get!(channel_id) |> set_private()
-    changeset = Channel.change channel
-    editing = to_existing_atom(params["editing"])
+    dataset = sender["dataset"]
+    channel = if channel_id = dataset["name"], do: Channel.get(channel_id)
+    changeset = Channel.change(channel || %{})
+    # editing = to_existing_atom(params["editing"])
+    editing = false
 
-    assigns =
-      socket
-      |> Rebel.get_assigns()
-      |> Map.put(:channel, channel)
-      |> Map.put(:resource_key, :channel)
+   channel_settings =
+     if channel, do: settings_form_fields(channel, user_id)
+   type = Map.get channel || %{}, :type
+    # require IEx
+    # IEx.pry
 
-    Rebel.put_assigns(socket, assigns)
+    # assigns =
+    #   socket
+    #   |> Rebel.get_assigns()
+    #   |> Map.put(:channel, channel)
+    #   |> Map.put(:resource_key, :channel)
+
+    # Rebel.put_assigns(socket, assigns)
 
     {[
-      channel: settings_form_fields(channel, user_id),
+      channel: channel_settings,
+      # channel: channel,
       current_user: current_user,
       changeset: changeset,
       editing: editing,
-      channel_type: channel.type], socket}
+      channel_type: type], socket}
   end
 
   def notify_update_success(socket, tab, sender, %{toggle: _} = opts) do
