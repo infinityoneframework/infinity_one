@@ -17,6 +17,7 @@ defmodule UccChatWeb.UserChannel do
     "webrtc:confirmed_video_call",
     "webrtc:declined_video_call",
   ]
+
   use UccChatWeb.RebelChannel.Macros
 
   import Rebel.Core, warn: false
@@ -25,8 +26,8 @@ defmodule UccChatWeb.UserChannel do
   import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
-  alias UcxUcc.Repo
-  alias UcxUcc.Accounts
+  alias UcxUcc.{Repo, Accounts}
+  # alias UcxUcc.TabBar.Ftab
   alias Accounts.{Account, User}
   alias UccAdmin.AdminService
   alias UcxUccWeb.Endpoint
@@ -516,9 +517,9 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def handle_in(ev = "webrtc:incoming_video_call", payload, socket) do
+
     trace ev, payload
-    _ = ev
-    _ = payload
+
     {:noreply, socket}
   end
 
@@ -533,11 +534,11 @@ defmodule UccChatWeb.UserChannel do
   defp do_topic_click(socket) do
     SweetAlert.swal_modal socket, "My Title", "are you sure?", nil,
       [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
-      confirm: fn result ->
+      confirm: fn _result ->
         SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
           timer: 2000, showConfirmButton: false
       end,
-      cancel: fn result ->
+      cancel: fn _result ->
         # Logger.warn "sweet canceled! result: #{inspect result}"
         SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
           timer: 2000, showConfirmButton: false
@@ -551,9 +552,10 @@ defmodule UccChatWeb.UserChannel do
     noreply socket
   end
   def handle_info({"webrtc:incoming_video_call" = ev, payload}, socket) do
+
     trace ev, payload
     trace ev, socket.assigns
-    _ = ev
+
     title = "Direct video call from #{payload[:username]}"
     icon = "videocam"
     # SweetAlert.swal_modal socket, "<i class='icon-#{icon} alert-icon success-color'></i>#{title}", "Do you want to accept?", "warning",
@@ -561,16 +563,16 @@ defmodule UccChatWeb.UserChannel do
     SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
       [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
       confirm: fn result ->
-        Logger.warn "sweet confirmed! #{inspect result}"
+        # Logger.warn "sweet confirmed! #{inspect result}"
 
         # SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
         #   timer: 2000, showConfirmButton: false
       end,
       cancel: fn result ->
-        Logger.warn "sweet canceled! result: #{inspect result}"
+        # Logger.warn "sweet canceled! result: #{inspect result}"
         # SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
         #   timer: 2000, showConfirmButton: false
-        Logger.warn "sweet notice complete!"
+        # Logger.warn "sweet notice complete!"
       end
 
     {:noreply, socket}
@@ -579,6 +581,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info({:after_join, params}, socket) do
     :erlang.process_flag(:trap_exit, true)
+
     trace "after_join", socket.assigns, inspect(params)
     user_id = socket.assigns.user_id
     # require IEx
@@ -642,7 +645,9 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: _, event: "room:update:name" = event,
     payload: payload}, socket) do
+
     trace event, payload
+
     push socket, event, payload
     # socket.endpoint.unsubscribe(CC.chan_room <> payload[:old_name])
     {:noreply, assign(socket, :subscribed,
@@ -651,15 +656,16 @@ defmodule UccChatWeb.UserChannel do
   end
   def handle_info(%Broadcast{topic: _, event: "room:update:list" = event,
     payload: payload}, socket) do
-    _ = event
-    _ = payload
+
     trace event, payload
+
     {:noreply, update_rooms_list(socket)}
   end
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
-    _ = event
+
     trace event, ""  #socket.assigns
+
     assigns = socket.assigns
 
     if room in assigns.subscribed do
@@ -684,10 +690,9 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  def handle_info(%Broadcast{topic: _, event: "user:action" = event,
+  def handle_info(%Broadcast{event: "user:action" = event,
     payload: %{action: "unhide"} = payload}, %{assigns: assigns} = socket) do
-    _ = assigns
-    _ = event
+
     trace event, payload, "assigns: #{inspect assigns}"
 
     UserSocket.push_rooms_list_update(socket, payload.channel_id,
@@ -695,14 +700,13 @@ defmodule UccChatWeb.UserChannel do
 
     {:noreply, socket}
   end
-  def handle_info(%Broadcast{topic: _, event: "user:entered" = event,
-    payload: %{user: user} = payload},
-    %{assigns: %{user: user} = assigns} = socket) do
 
-    _ = event
+  def handle_info(%Broadcast{event: "user:entered" = event,
+    payload: %{user_id: user_id} = payload},
+    %{assigns: %{user_id: user_id} = assigns} = socket) do
 
     trace event, payload, "assigns: #{inspect assigns}"
-    # old_channel_id = assigns[:channel_id]
+
     channel_id = payload[:channel_id]
     socket = %{assigns: _assigns} = assign(socket, :channel_id, channel_id)
 
@@ -712,10 +716,15 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  def handle_info(%Broadcast{topic: _, event: "room:delete" = event,
+  def hadnle_info(%Broadcast{event: "user:entered"}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info(%Broadcast{event: "room:delete" = event,
     payload: payload}, socket) do
-    _ = event
+
     trace event, payload
+
     room = payload.room
     if Enum.any?(socket.assigns[:subscribed], &(&1 == room)) do
       update_rooms_list(socket)
@@ -726,8 +735,14 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
+  # Default broadcast case to ignore messages we are not interested in
+  def handle_info(%Broadcast{} = broadcast, socket) do
+    Logger.warn "broadcast: " <> inspect(broadcast)
+    Logger.warn "assigns: " <> inspect(socket.assigns)
+    {:noreply, socket}
+  end
+
   def handle_info({:update_mention, payload, user_id} = ev, socket) do
-    _ = ev
     trace "upate_mention", ev
     if UserService.open_channel_count(socket.assigns.user_id) > 1 do
       opens = UserService.open_channels(socket.assigns.user_id)
@@ -775,11 +790,6 @@ defmodule UccChatWeb.UserChannel do
           update_in(msg, [:body], &Helpers.strip_tags/1)
       end
     end
-    {:noreply, socket}
-  end
-
-  # Default case to ignore messages we are not interested in
-  def handle_info(%Broadcast{}, socket) do
     {:noreply, socket}
   end
 

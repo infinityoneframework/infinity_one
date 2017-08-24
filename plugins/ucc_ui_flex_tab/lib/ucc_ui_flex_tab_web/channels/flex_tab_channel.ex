@@ -44,7 +44,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
   @spec flex_tab_open(socket, sender) :: socket
   def flex_tab_open(socket, sender) do
-    Logger.warn "sender: #{inspect sender}"
+    Logger.debug "sender: #{inspect sender}"
     channel_id = get_channel_id(socket)
     user_id = socket.assigns.user_id
     Rebel.put_assigns socket, :channel_id, channel_id
@@ -83,10 +83,10 @@ defmodule UccUiFlexTab.FlexTabChannel do
   @spec room_join(String.t, Map.t, socket) :: socket
   def room_join(event, payload, socket) do
     trace event, payload
-    _ = event
     user_id = socket.assigns.user_id
     channel_id = payload[:channel_id]
     socket = Phoenix.Socket.assign(socket, :channel_id, channel_id)
+
     Rebel.put_assigns socket, :channel_id, channel_id
 
     Ftab.reload(user_id, channel_id, fn

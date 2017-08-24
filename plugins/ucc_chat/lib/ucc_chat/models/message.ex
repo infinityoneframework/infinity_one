@@ -80,7 +80,7 @@ defmodule UccChat.Message do
       Enum.reverse(@repo.all(before_q)) ++ [message|@repo.all(after_q)]
       |> new_days(tz || 0, [])
     else
-      Logger.warn "did not find a message"
+      Logger.debug "did not find a message"
       get_messages(channel_id, user)
     end
   end

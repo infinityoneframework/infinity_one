@@ -189,10 +189,10 @@ defmodule UcxUcc.UccPubSub do
     Enum.each lists, fn list ->
       Enum.each(list, fn
         {pid, nil} ->
-          Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload}}"
+          # Logger.debug "sending to #{inspect pid}, #{inspect {topic, event, payload}}"
           spawn fn -> send pid, {topic, event, payload} end
         {pid, meta} ->
-          Logger.error "sending to #{inspect pid}, #{inspect {topic, event, payload, meta}}"
+          # Logger.debug "sending to #{inspect pid}, #{inspect {topic, event, payload, meta}}"
           spawn fn -> send pid, {topic, event, payload, meta} end
       end)
     end

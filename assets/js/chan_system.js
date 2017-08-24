@@ -23,7 +23,10 @@ let userList = document.getElementById("UserList")
 
 function update_presence(elem, status) {
   if (typeof elem === "object" &&  elem.length > 0) {
-    elem.attr('class', elem.attr('class').replace(/status-([a-z]+)/, 'status-' + status))
+    for (var i = 0; i < elem.length; i++) {
+      var el = elem[i];
+      el.className = el.className.replace(/status-([a-z]+)/, 'status-' + status);
+    }
   }
 }
 
@@ -35,7 +38,8 @@ let render = (presences) => {
       if (typeof elem === "object" &&  elem.length > 0) {
         elem.children(':first-child').data('status', status)
       }
-      update_presence($(`[data-status-name="${presence.username}"]`), status)
+      update_presence(document.querySelectorAll(`[data-status-name="${presence.username}"]`), status)
+      // update_presence($(`[data-status-name="${presence.username}"]`), status)
     })
 }
 

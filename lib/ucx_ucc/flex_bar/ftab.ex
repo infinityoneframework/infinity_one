@@ -20,7 +20,6 @@ defmodule UcxUcc.TabBar.Ftab do
   """
   @spec open?(id, id) :: boolean
   def open?(user_id, channel_id) do
-    # warn channel_id
     !!get(user_id, channel_id)
   end
 
@@ -39,7 +38,6 @@ defmodule UcxUcc.TabBar.Ftab do
   """
   @spec open?(id, id, String.t) :: boolean
   def open?(user_id, channel_id, name) do
-    # warn channel_id <> " name: " <> inspect(name)
     case get(user_id, channel_id) do
       {^name, _} -> true
       _ -> false
@@ -71,7 +69,6 @@ defmodule UcxUcc.TabBar.Ftab do
   """
   @spec toggle(id, id, String.t, Map.t | nil, function | nil) :: any
   def toggle(user_id, channel_id, name, view, callback \\ nil) do
-    # warn channel_id
     if open? user_id, channel_id, name do
       close user_id, channel_id, callback
     else
@@ -91,7 +88,6 @@ defmodule UcxUcc.TabBar.Ftab do
       true
   """
   def open(user_id, channel_id, name, view, callback \\ nil) do
-    # warn channel_id
     TabBar.open_ftab user_id, channel_id, name, view
     view = TabBar.get_view user_id, channel_id, name
     if callback, do: callback.(:open, {name, view})
@@ -117,7 +113,6 @@ defmodule UcxUcc.TabBar.Ftab do
       true
   """
   def close(user_id, channel_id, callback \\ nil) do
-    # warn channel_id
     TabBar.close_ftab user_id, channel_id
     if callback, do: callback.(:close, nil)
   end
@@ -134,7 +129,6 @@ defmodule UcxUcc.TabBar.Ftab do
       {"test", nil}
   """
   def get(user_id, channel_id) do
-    # warn channel_id
     TabBar.get_ftab(user_id, channel_id)
   end
 
@@ -161,7 +155,6 @@ defmodule UcxUcc.TabBar.Ftab do
       :pass
   """
   def reload(user_id, channel_id, callback \\ nil) do
-    # warn channel_id
     case get user_id, channel_id do
       {name, args} ->
         open user_id, channel_id, name, args, callback
@@ -171,7 +164,6 @@ defmodule UcxUcc.TabBar.Ftab do
   end
 
   def close_view(user_id, channel_id, name, callback \\ nil) do
-    # warn channel_id
     case TabBar.get_view user_id, channel_id, name do
       nil ->
         if callback, do: callback.({:ok, nil})
@@ -179,9 +171,4 @@ defmodule UcxUcc.TabBar.Ftab do
         if callback, do: callback.({:open, {name, nil}})
     end
   end
-
-  # defp warn(message) do
-  #   System.stacktrace |> inspect(pretty: true) |> Logger.warn
-  #   # Logger.warn message
-  # end
 end

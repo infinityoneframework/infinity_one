@@ -99,20 +99,29 @@ defmodule UccChatWeb.RoomChannel do
   end
 
   def handle_info({:after_join, room, msg}, socket) do
-    # room = String.split(room, "/") |> List.last
     :erlang.process_flag(:trap_exit, true)
     trace room, msg
+    # Logger.warn "msg: " <> inspect(msg) <> ", user_id: " <> inspect(socket.assigns[:user_id])
     channel = Channel.get_by!(name: room)
-    broadcast! socket, "user:entered", %{user: msg["user"],
-      channel_id: channel.id}
+    Process.send_after self(), :broadcast_user_join, 20
+
     push socket, "join", %{status: "connected"}
-    # UserSocket.push_message_box socket, socket.assigns.user_id, channel.id
-    # ChannelService.clear_unread(channel.id, socket.assigns.user_id)
-    # socket = Phoenix.Socket.assign(socket, :user_id, msg["user_id"])
+
+    {:noreply, assign(socket, :channel_id, channel.id)}
+  end
+
+  def handle_info(:broadcast_user_join, socket) do
+    broadcast! socket, "user:entered", %{user_id: socket.assigns[:user_id],
+      channel_id: socket.assigns[:channel_id]}
     {:noreply, socket}
   end
 
-  def handle_info(_event, socket) do
+  def handle_info({:EXIT, _, :normal}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info(event, socket) do
+    Logger.warn "unhandled event: #{inspect event}"
     {:noreply, socket}
   end
 

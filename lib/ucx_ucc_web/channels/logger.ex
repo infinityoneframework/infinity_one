@@ -7,10 +7,11 @@ defmodule UccLogger do
       require Logger
       import unquote(__MODULE__)
       if Keyword.get(unquote(opts), :debug, :true) do
-        def debug, do: true
+        def __debug__, do: true
       else
-        def debug, do: false
+        def __debug__, do: false
       end
+      @__level__ Keyword.get(unquote(opts), :level)
     end
   end
 
@@ -21,8 +22,6 @@ defmodule UccLogger do
         other -> other
       end
 
-    level = Application.get_env :ucx_ucc, :ucc_tracer_level, :debug
-
     match =
       Enum.find(modules, fn
         {__MODULE__, _} -> true
@@ -32,13 +31,20 @@ defmodule UccLogger do
       end)
       |> case do
         {_, mod_level} -> mod_level
-        __MODULE__     -> level
-        :all           -> level
+        __MODULE__     -> :check
+        :all           -> :check
         _              -> false
       end
-    if match do
-      quote location: :keep do
-        the_level = unquote(match)
+    quote location: :keep do
+      if unquote(match) do
+        the_level =
+          case unquote(match) do
+            :check ->
+              @__level__ || Application.get_env(:ucx_ucc, :ucc_tracer_level, :debug)
+            false - false
+            other -> other
+          end
+
         msg1 =
           case unquote(msg) do
             "" -> ""
@@ -48,9 +54,7 @@ defmodule UccLogger do
         Logger.log the_level, fn -> "TRACE: #{unquote(event)}: #{msg1}params: " <>
           inspect(unquote(params)) end
       else
-        quote do
-          _ = fn -> {unquote(event), unquote(params), unquote(msg)} end
-        end
+        _ = {unquote(event), unquote(params), unquote(msg)}
       end
     end
   end
@@ -58,12 +62,13 @@ defmodule UccLogger do
   defmacro debug(event, params, msg \\ "") do
     name = __CALLER__.function |> elem(0) |> to_string
     quote location: :keep do
-      msg1 = case unquote(msg) do
-        "" -> ""
-        mg -> mg <> ", "
-      end
+      msg1 =
+        case unquote(msg) do
+          "" -> ""
+          mg -> mg <> ", "
+        end
 
-      if debug() do
+      if __debug__() do
         if UcxUcc.env() == :prod do
           Logger.debug "%% " <> inspect(__MODULE__) <>
             ".#{unquote(name)} #{unquote(event)}: #{msg1}params: " <>
@@ -73,6 +78,8 @@ defmodule UccLogger do
             ".#{unquote(name)} #{unquote(event)}: #{msg1}params: " <>
             "#{inspect unquote(params)}"
         end
+      else
+        _ = {unquote(event), unquote(params), msg1}
       end
     end
   end
@@ -85,12 +92,13 @@ defmodule UccLogger do
         mg -> mg <> ", "
       end
 
-      if debug() do
+      if __debug__() do
         Logger.warn "%% " <> inspect(__MODULE__) <> ".#{unquote(name)} " <>
           "#{unquote(event)}: #{msg1}params: #{inspect unquote(params)}"
       end
     end
   end
+
   def log_inspect(term, level, opts) do
     {label, opts} = Keyword.pop(opts, :label)
     label =
