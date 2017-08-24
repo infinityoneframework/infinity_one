@@ -21,6 +21,8 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   def args(socket, {user_id, _channel_id, other, sender}, params) do
 
+    exec_js socket, set_active_js(sender)
+
     user =
       if name = sender["dataset"]["name"] do
         Accounts.get_by_user username: name, preload: Hooks.user_preload([])
@@ -32,5 +34,10 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
       user: user,
     ], socket}
   end
+
+  defp set_active_js(sender), do: """
+   $('.flex-tab-main-content tr').removeClass('active');
+   $('#{this(sender)}').addClass('active');
+    """ |> String.replace("\n", "")
 
 end

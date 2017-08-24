@@ -1,0 +1,24 @@
+
+$primary-background-color: #a6d256;
+$primary-active-color: #333;
+
+// hope this works
+section.flex-tab-main-content {
+  tr {
+    &.row-link.active {
+      background-color: $primary-background-color;
+    }
+    &:hover {
+      background-color: $primary-background-color;
+    }
+  }
+}
+.flex-nav {
+  .wrapper{
+    li.active {
+      a {
+        color: $primary-active-color;
+      }
+    }
+  }
+}

@@ -6,6 +6,8 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
   alias UcxUcc.TabBar.Tab
   alias UcxUcc.UccPubSub
 
+  import Rebel.{Core, Query, Browser}, warn: false
+
   @spec add_buttons() :: no_return
   def add_buttons do
     TabBar.add_button Tab.new(
@@ -19,7 +21,13 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
       10)
   end
 
+  defp set_active_js(sender), do: """
+   $('.flex-tab-main-content tr').removeClass('active');
+   $('#{this(sender)}').addClass('active');
+    """ |> String.replace("\n", "")
+
   def args(socket, {user_id, channel_id, _, sender}, params) do
+    Logger.error "sender: " <> inspect(sender)
     current_user = Helpers.get_user! user_id
     dataset = sender["dataset"]
     channel = if channel_id = dataset["name"], do: Channel.get(channel_id)
@@ -27,11 +35,12 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
     # editing = to_existing_atom(params["editing"])
     editing = false
 
-   channel_settings =
-     if channel, do: settings_form_fields(channel, user_id)
-   type = Map.get channel || %{}, :type
-    # require IEx
-    # IEx.pry
+    channel_settings = if channel, do: settings_form_fields(channel, user_id)
+
+    type = Map.get channel || %{}, :type
+
+    exec_js socket, set_active_js(sender);
+
 
     # assigns =
     #   socket
@@ -43,7 +52,6 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
 
     {[
       channel: channel_settings,
-      # channel: channel,
       current_user: current_user,
       changeset: changeset,
       editing: editing,

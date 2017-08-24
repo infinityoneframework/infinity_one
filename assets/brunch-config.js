@@ -28,7 +28,8 @@ exports.config = {
         "css/app.css": [
           /^(css)/,
           "node_modules/highlight.js/styles/default.css",
-          "node_modules/sweetalert/dist/sweetalert.css"
+          "node_modules/sweetalert/dist/sweetalert.css",
+          "../plugins/ucc_admin/priv/static/ucc_admin.scss"
           // "node_modules/emojionearea/dist/emojionearea.min.css",
 
         ],
@@ -57,7 +58,7 @@ exports.config = {
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "css", "js", "vendor", "scss"],
+    watched: ["static", "css", "js", "vendor", "scss", "../plugins/ucc_admin/priv/static"],
     // Where to compile files to
     public: "../priv/static"
   },
@@ -92,11 +93,12 @@ exports.config = {
 
   npm: {
     enabled: true,
-    // whitelist: ["highlight.js"],
+    // whitelist: ["ucc_admin"],
     styles: {
       // toastr: ["toastr.css"],
       "highlight.js": ['styles/default.css'],
       sweetalert: ['dist/sweetalert.css']
+      // ucc_admin: ['priv/static/ucc_admin.scss']  // this isn't working
       // emojionearea: ['dist/emojionearea.min.css']
       // emojipicker: ['dist/emojipicker.css']
     },
