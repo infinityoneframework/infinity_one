@@ -17,7 +17,7 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
       50)
   end
 
-  def args(socket, user_id, channel_id, _, params) do
+  def args(socket, {user_id, channel_id, _, _}, params) do
     editing = params["editing"]
     current_user = Helpers.get_user! user_id
     notification =

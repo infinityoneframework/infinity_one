@@ -19,7 +19,7 @@ defmodule UccAdminWeb.FlexBar.Tab.AddUser do
       20)
   end
 
-  def args(socket, user_id, _channel_id, _, _) do
+  def args(socket, {user_id, _channel_id, _, _}, _) do
     user = Helpers.get_user! user_id
     {[
       user: user

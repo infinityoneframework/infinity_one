@@ -34,12 +34,12 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
             super(socket, user_id, channel_id, tab, args)
           end
       """
-      @spec open(socket, id, id, tab, args) :: socket
-      def open(socket, user_id, channel_id, tab, args) do
+      @spec open(socket, {id, id, tab, map}, args) :: socket
+      def open(socket, {user_id, channel_id, tab, sender}, args) do
         case tab.template do
           "" -> socket
           templ ->
-            {args, socket} = args socket, user_id, channel_id, nil, args
+            {args, socket} = args socket, {user_id, channel_id, nil, sender}, args
             # IO.inspect args, label: "... args"
             html = Phoenix.View.render_to_string(tab.view, templ, args)
 
@@ -71,8 +71,8 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
       at the end of your override.
       """
-      @spec close(socket) :: socket
-      def close(socket) do
+      @spec close(socket, map) :: socket
+      def close(socket, _sender) do
         exec_js(socket, """
           $('section.flex-tab').parent().removeClass('opened')
           $('.tab-button.active').removeClass('active')
@@ -85,8 +85,8 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
       Override to implement.
       """
-      @spec args(socket, id, id, any, map | nil) :: {Keyword.t, socket}
-      def args(socket, _, _, _, _), do: {[], socket}
+      @spec args(socket, {id, id, any, map}, map | nil) :: {Keyword.t, socket}
+      def args(socket, {_, _, _, _}, _), do: {[], socket}
 
       @doc """
       Callback when a form has been successfully updated
@@ -96,7 +96,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       @spec notify_update_success(socket, tab, map, map) :: socket
       def notify_update_success(socket, tab, _sender, _opts), do: socket
 
-      defoverridable [open: 5, close: 1, args: 5, notify_update_success: 4]
+      defoverridable [open: 3, close: 2, args: 3, notify_update_success: 4]
     end
   end
 

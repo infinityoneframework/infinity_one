@@ -26,6 +26,11 @@ defmodule UccAdminWeb.AdminChannel do
     {:noreply, apply(page.module, :open, [socket, sender, page])}
   end
 
+  def admin_flex(socket, sender) do
+    Logger.warn "sender: #{inspect sender}"
+    {:noreply, socket}
+  end
+
   defp get_user!(%{assigns: %{user_id: user_id}}) do
     Accounts.get_user! user_id, preload: [:account, :roles]
   end

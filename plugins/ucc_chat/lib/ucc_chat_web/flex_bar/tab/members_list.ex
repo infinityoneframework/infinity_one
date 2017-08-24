@@ -22,7 +22,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       40)
   end
 
-  def args(socket, user_id, channel_id, _, opts) do
+  def args(socket, {user_id, channel_id, _, _}, opts) do
     current_user = Helpers.get_user!(user_id)
     channel = Channel.get!(channel_id, preload: [users: :roles])
 
@@ -61,16 +61,16 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   end
 
   # this is needed since we are overriding below
-  def open(socket, user_id, channel_id, tab, nil) do
-    super(socket, user_id, channel_id, tab, nil)
+  def open(socket, {user_id, channel_id, tab, sender}, nil) do
+    super(socket, {user_id, channel_id, tab, sender}, nil)
   end
 
   # TODO: Figure out how to have this detect this.
-  def open(socket, current_user_id, channel_id, tab, %{"view" => "video"} = args) do
-    WebrtcMembersList.open(socket, current_user_id, channel_id, tab, args)
+  def open(socket, {current_user_id, channel_id, tab, sender}, %{"view" => "video"} = args) do
+    WebrtcMembersList.open(socket, {current_user_id, channel_id, tab, sender}, args)
   end
 
-  def open(socket, user_id, channel_id, tab, %{"view" => "user"} = args) do
+  def open(socket, {user_id, channel_id, tab, sender}, %{"view" => "user"} = args) do
     username = args["username"]
 
     {args, socket} = user_args(socket, user_id, channel_id, username)
@@ -84,7 +84,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     selector = ".flex-tab-container .user-view"
 
     socket
-    |> super(user_id, channel_id, tab, nil)
+    |> super({user_id, channel_id, tab, sender}, nil)
     |> exec_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
 
     socket
@@ -136,7 +136,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
     Ftab.open user_id, channel_id, "members-list", %{"username" => username,
       "view" => "user"}, fn :open, {_, args} ->
-        apply tab.module, :open, [socket, user_id, channel_id, tab, args]
+        apply tab.module, :open, [socket, {user_id, channel_id, tab, sender}, args]
       end
   end
 

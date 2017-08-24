@@ -15,7 +15,7 @@ defmodule UccChatWeb.FlexBar.Tab.Mention do
       70)
   end
 
-  def args(socket, user_id, channel_id, _, _) do
+  def args(socket, {user_id, channel_id, _, _}, _) do
     mentions =
       user_id
       |> Mention.get_by_user_id_and_channel_id(channel_id)

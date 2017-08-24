@@ -25,8 +25,8 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
       "webrtc-members-list")
   end
 
-  @spec args(socket, id, id, any, args) :: {List.t, socket}
-  def args(socket, user_id, _channel_id, _, _) do
+  @spec args(socket, {id, id, any, map}, args) :: {List.t, socket}
+  def args(socket, {user_id, _channel_id, _, _}, _) do
     current_user = Helpers.get_user! user_id
     client_device = ClientDevice.get_by(user_id: current_user.id) ||
       ClientDevice.new()

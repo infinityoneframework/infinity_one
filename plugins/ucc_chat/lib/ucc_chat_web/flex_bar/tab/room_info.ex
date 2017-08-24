@@ -1,4 +1,4 @@
-defmodule UccChatWeb.FlexBar.Tab.Info do
+defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
   use UccChatWeb.FlexBar.Helpers
   use UccLogger
 
@@ -10,16 +10,16 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   def add_buttons do
     TabBar.add_button Tab.new(
       __MODULE__,
-      ~w[channel direct],
-      "info",
-      ~g"Info",
+      ~w[admin_rooms],
+      "admin_room_info",
+      ~g"Room Info",
       "icon-info-circled",
       View,
       "channel_settings.html",
       10)
   end
 
-  def args(socket, {user_id, channel_id, _, _,}, params) do
+  def args(socket, {user_id, channel_id, _, _}, params) do
     current_user = Helpers.get_user! user_id
     channel = Channel.get!(channel_id) |> set_private()
     changeset = Channel.change channel

@@ -1,3 +1,7 @@
 .content
   .user-view
-    = UccChatWeb.FlexBarView.render "user_edit.html", user: @user, current_user: @current_user
+    = if @user do
+      = UccChatWeb.FlexBarView.render "user_edit.html", user: @user, current_user: @current_user
+    - else
+      .about.clearfix
+        p= ~g(Please select a User)

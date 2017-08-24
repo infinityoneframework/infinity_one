@@ -39,7 +39,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
     }], socket}
   end
 
-  def open(socket, current_user_id, channel_id, tab, args) do
+  def open(socket, {current_user_id, channel_id, tab, sender}, args) do
     Logger.warn "open assigns: #{inspect socket.assigns}"
     user_id = args["user_id"]
     Logger.warn "stuff: #{inspect %{current_user_id: current_user_id, user_id: user_id, assigns_user_id: socket.assigns.user_id}}"
@@ -57,7 +57,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
 
     socket =
       socket
-      |> ChatMembersList.open(user_id, channel_id, tab, nil)
+      |> ChatMembersList.open({user_id, channel_id, tab, sender}, nil)
       |> update(:class, toggle: "animated-hidden", on: ".flex-tab-container .user-view")
       |> insert(html, append: ".flex-tab .content")
     exec_js socket, "window.WebRTC.start();"
@@ -85,7 +85,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
 
     Ftab.open user_id, channel_id, "members-list", %{"view" => "video",
       "user_id" => user_id}, fn :open, {_, args} ->
-        apply tab.module, :open, [socket, user_id, channel_id, tab, args]
+        apply tab.module, :open, [socket, {user_id, channel_id, tab, sender}, args]
       end
   end
 
@@ -103,7 +103,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
     Ftab.open user_id, channel_id, "members-list", %{"view" => "video",
       "user_id" => user_id}, fn :open, {_, args} ->
         Logger.error "args: #{inspect args}"
-        apply tab.module, :open, [socket, user_id, channel_id, tab, Map.put(args, :dest, true)]
+        apply tab.module, :open, [socket, {user_id, channel_id, tab, %{}}, Map.put(args, :dest, true)]
       end
   end
 end

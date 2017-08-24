@@ -124,11 +124,11 @@ class AdminFlexBar {
 
   register_event_handers(_this) {
     $('body')
-      .on('click', 'section.page-list .row-link', function(e) {
-        e.preventDefault()
-        _this.click_row_link($(this))
-        return false
-      })
+      // .on('click', 'section.page-list .row-link', function(e) {
+      //   e.preventDefault()
+      //   _this.click_row_link($(this))
+      //   return false
+      // })
       .on('click', '.flex-tab-bar.admin .tab-button', function(e) {
         // console.log('clicked', $(this).attr('title'))
         e.preventDefault()

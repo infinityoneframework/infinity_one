@@ -1044,5 +1044,6 @@ defmodule UccChatWeb.UserChannel do
 
   defdelegateadmin :click_admin
   defdelegateadmin :admin_link
+  defdelegateadmin :admin_flex
 
 end

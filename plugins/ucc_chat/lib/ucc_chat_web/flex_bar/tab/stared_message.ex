@@ -16,7 +16,7 @@ defmodule UccChatWeb.FlexBar.Tab.StaredMessage do
       80)
   end
 
-  def args(socket, user_id, channel_id, _, _) do
+  def args(socket, {user_id, channel_id, _, _}, _) do
     stars =
       channel_id
       |> StaredMessage.get_by_channel_id()
