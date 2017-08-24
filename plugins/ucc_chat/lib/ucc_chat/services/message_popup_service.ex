@@ -92,7 +92,7 @@ defmodule UccChat.MessagePopupService do
 
   def handle_in(ev = "get:emojis", msg) do
     pattern = msg["pattern"] |> to_string
-    Logger.warn "#{ev}, pattern: #{pattern} msg: #{inspect msg}"
+    Logger.debug "#{ev}, pattern: #{pattern} msg: #{inspect msg}"
 
 
     case Emoji.commands(pattern) do

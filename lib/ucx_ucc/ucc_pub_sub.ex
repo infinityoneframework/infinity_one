@@ -101,7 +101,7 @@ defmodule UcxUcc.UccPubSub do
   end
 
   def handle_cast({:broadcast, topic, event, payload}, state) do
-    Logger.warn "broadcast, topic: #{topic}, event: #{event}"
+    Logger.debug "broadcast, topic: #{topic}, event: #{event}"
     # state.subscriptions
     # |> Map.get({topic, "*"}, [])
     # |> broadcast_to_list(topic, event, payload)

@@ -5,7 +5,7 @@ defmodule UccChat.Hooks do
   require Logger
 
   add_hook :preload_user, [:user, :preload] do
-    Logger.warn "preload_user, preload: #{inspect preload}"
+    Logger.debug "preload_user, preload: #{inspect preload}"
     Repo.preload user, preload
   end
 

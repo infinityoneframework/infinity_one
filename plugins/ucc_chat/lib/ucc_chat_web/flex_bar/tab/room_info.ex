@@ -26,7 +26,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
    $('#{this(sender)}').addClass('active');
     """ |> String.replace("\n", "")
 
-  def args(socket, {user_id, channel_id, _, sender}, params) do
+  def args(socket, {user_id, _channel_id, _, sender}, _params) do
     Logger.error "sender: " <> inspect(sender)
     current_user = Helpers.get_user! user_id
     dataset = sender["dataset"]
@@ -105,8 +105,8 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
   defp to_existing_atom(atom) when is_atom(atom), do: atom
   defp to_existing_atom(value), do: String.to_existing_atom(value)
 
-  defp set_private(%{type: 1} = channel), do: struct(channel, private: true)
-  defp set_private(channel), do: struct(channel, private: false)
+  # defp set_private(%{type: 1} = channel), do: struct(channel, private: true)
+  # defp set_private(channel), do: struct(channel, private: false)
 
   defp broadcast(socket, event, payload) do
     UccPubSub.broadcast "user:" <> socket.assigns.user_id, event, payload

@@ -201,7 +201,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
       [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
       confirm: fn result ->
-        Logger.warn "sweet confirmed! #{inspect result}"
+        Logger.debug "sweet confirmed! #{inspect result}"
         open_my_video_tab(socket, payload)
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:confirmed_video_call",
           %{user_id: socket.assigns.user_id}
@@ -209,7 +209,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       cancel: fn result ->
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:declined_video_call",
           %{user_id: socket.assigns.user_id}
-        Logger.warn "sweet canceled! result: #{inspect result}"
+        Logger.debug "sweet canceled! result: #{inspect result}"
       end
 
     {:noreply, socket}

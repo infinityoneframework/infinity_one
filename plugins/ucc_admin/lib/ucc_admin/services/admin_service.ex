@@ -15,6 +15,7 @@ defmodule UccAdmin.AdminService do
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
   alias UccChat.Schema.Channel, as: ChannelSchema
+  alias UccChatWeb.AdminView, as: ChatAdminView
 
   def handle_in("save:general", params, socket) do
     params =
@@ -320,7 +321,7 @@ defmodule UccAdmin.AdminService do
             html =
               user.id
               |> Helpers.get_user
-              |> AdminView.render_user_action_button("admin")
+              |> ChatAdminView.render_user_action_button("admin")
               |> safe_to_string
             {:ok, %{success: success, code_update: %{selector: "button." <> action, action: "replaceWith", html: html}}}
           {:error, _} ->
@@ -347,7 +348,7 @@ defmodule UccAdmin.AdminService do
       {:ok, user} ->
         html =
           user
-          |> AdminView.render_user_action_button("activate")
+          |> ChatAdminView.render_user_action_button("activate")
           |> safe_to_string
         {:ok, %{success: success, code_update: %{selector: "button." <> action, action: "replaceWith", html: html}}}
       {:error, _} ->

@@ -30,7 +30,7 @@ defmodule UccChatWeb.ChannelController do
   def index(conn, _params) do
     user = Coherence.current_user(conn)
     channel = if user.open_id do
-      Logger.warn "index load open id"
+      Logger.debug "index load open id"
       case Channel.get(user.open_id) do
         nil ->
           Channel.list() |> hd
@@ -38,7 +38,7 @@ defmodule UccChatWeb.ChannelController do
           channel
       end
     else
-      Logger.warn "index load no open id"
+      Logger.debug "index load no open id"
       channel =
         ChannelSchema
         |> Ecto.Query.first
@@ -117,7 +117,7 @@ defmodule UccChatWeb.ChannelController do
   end
 
   def page(conn, params) do
-    Logger.warn "page action"
+    Logger.debug "page action"
     # _page_name = params["page"] || "home"
 
     # user =

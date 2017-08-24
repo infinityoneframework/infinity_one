@@ -3,10 +3,8 @@ defmodule UccAdminWeb.AdminChannel do
   import Rebel.Query, warn: false
   import Rebel.Core, warn: false
 
-  alias UcxUcc.Accounts
-  alias UccAdmin.AdminService
   alias UccAdminWeb.AdminView
-  alias UccChatWeb.RebelChannel.{NavMenu, SideNav}
+  alias UccChatWeb.RebelChannel.{SideNav}
 
   require Logger
 
@@ -21,19 +19,19 @@ defmodule UccAdminWeb.AdminChannel do
 
   def admin_link(id, socket, sender) do
     page = UccAdmin.get_page id
-    Logger.warn "page: #{inspect page}"
+    Logger.debug "page: #{inspect page}"
     # Logger.warn "sender: #{inspect sender}"
     {:noreply, apply(page.module, :open, [socket, sender, page])}
   end
 
   def admin_flex(socket, sender) do
-    Logger.warn "sender: #{inspect sender}"
+    Logger.debug "sender: #{inspect sender}"
     {:noreply, socket}
   end
 
-  defp get_user!(%{assigns: %{user_id: user_id}}) do
-    Accounts.get_user! user_id, preload: [:account, :roles]
-  end
+  # defp get_user!(%{assigns: %{user_id: user_id}}) do
+  #   Accounts.get_user! user_id, preload: [:account, :roles]
+  # end
 
   def render_to_string(templ, bindings \\ []) do
     Phoenix.View.render_to_string AdminView, templ, bindings

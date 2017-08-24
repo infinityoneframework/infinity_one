@@ -61,7 +61,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def topic_click(socket, _sender) do
-    Logger.warn "topic_click socket: #{inspect socket}"
+    Logger.debug "topic_click socket: #{inspect socket}"
     send socket.assigns.self, :do_topic_click
     # do_topic_click socket
     # SweetAlert.swal_modal socket, "My Title", "are you sure?", "warning",
@@ -534,16 +534,13 @@ defmodule UccChatWeb.UserChannel do
     SweetAlert.swal_modal socket, "My Title", "are you sure?", nil,
       [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
       confirm: fn result ->
-        Logger.warn "sweet confirmed! #{inspect result}"
         SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
           timer: 2000, showConfirmButton: false
-        Logger.warn "sweet notice complete!"
       end,
       cancel: fn result ->
-        Logger.warn "sweet canceled! result: #{inspect result}"
+        # Logger.warn "sweet canceled! result: #{inspect result}"
         SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
           timer: 2000, showConfirmButton: false
-        Logger.warn "sweet notice complete!"
       end
   end
   ###############
@@ -667,7 +664,7 @@ defmodule UccChatWeb.UserChannel do
 
     if room in assigns.subscribed do
       channel = Channel.get_by(name: room)
-      Logger.warn "in the room ... #{assigns.user_id}, room: #{inspect room}"
+      Logger.debug "in the room ... #{assigns.user_id}, room: #{inspect room}"
       # unless channel.id == assigns.channel_id and assigns.user_state != "idle" do
       if channel.id != assigns.channel_id or assigns.user_state == "idle" do
         if channel.type == 2 do
@@ -858,7 +855,7 @@ defmodule UccChatWeb.UserChannel do
     |> clear_unreads(socket)
   end
   defp clear_unreads(socket) do
-    Logger.warn "clear_unreads/1: default"
+    Logger.debug "clear_unreads/1: default"
     socket
   end
 
@@ -875,7 +872,7 @@ defmodule UccChatWeb.UserChannel do
   defp update_has_unread(%{id: channel_id, name: room},
     %{assigns: assigns} = socket) do
     has_unread = ChannelService.get_has_unread(channel_id, assigns.user_id)
-    Logger.warn "has_unread: #{inspect has_unread}, channel_id: " <>
+    Logger.debug "has_unread: #{inspect has_unread}, channel_id: " <>
       "#{inspect channel_id}, assigns: #{inspect assigns}"
     unless has_unread do
       ChannelService.set_has_unread(channel_id, assigns.user_id, true)
@@ -891,7 +888,7 @@ defmodule UccChatWeb.UserChannel do
   def start_audio_call(socket, sender) do
     current_user_id = socket.assigns.user_id
     user_id = sender["dataset"]["id"]
-    Logger.warn "start audio curr_id: #{current_user_id}, user_id: #{user_id}"
+    Logger.debug "start audio curr_id: #{current_user_id}, user_id: #{user_id}"
     socket
   end
 

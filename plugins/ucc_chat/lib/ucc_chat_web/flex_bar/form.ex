@@ -14,7 +14,7 @@ defmodule UccChatWeb.FlexBar.Form do
   def flex_form(socket, %{"form" => %{"id" => tab_name}, "dataset" =>
     %{"edit" => control}} = sender) do
 
-    Logger.warn "flex_form edit tab_name: #{tab_name}, control: #{control} sender: #{inspect sender}"
+    Logger.debug "flex_form edit tab_name: #{tab_name}, control: #{control} sender: #{inspect sender}"
     tab = TabBar.get_button(tab_name)
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket

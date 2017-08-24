@@ -43,8 +43,9 @@
 
     <%= if @remember do %>
       <div class="input-line">
-        <input type="checkbox"  name="remember" id="remember">
-        <label for="remember">Remember Me?</label>
+        <label for="remember">Remember Me?
+          <input type="checkbox"  name="remember" id="remember">
+        </label>
       </div>
       <br />
     <% end %>

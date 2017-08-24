@@ -63,7 +63,7 @@ defmodule UccChatWeb.UserSocket do
 
   def push_message_box(socket, channel_id, user_id) do
     # if channel_id == assigns.channel_id do
-      Logger.warn "push_message_box #{channel_id}, #{user_id}, " <>
+      Logger.debug "push_message_box #{channel_id}, #{user_id}, " <>
         "socket.assigns: #{inspect socket.assigns}"
 
       Phoenix.Channel.push socket, "code:update", %{

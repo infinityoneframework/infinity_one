@@ -44,7 +44,7 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
 
   @doc false
   def handle_info({:message, text, channel, user}, %{owner: owner} = state) do
-    Logger.warn "message text: #{inspect text}, channel.id: #{inspect channel.id}"
+    Logger.debug "message text: #{inspect text}, channel.id: #{inspect channel.id}"
     spawn fn ->
       :timer.sleep 200
       Kernel.send(owner, {:message, %{"text" => text, "user" => user, "channel" => channel}})

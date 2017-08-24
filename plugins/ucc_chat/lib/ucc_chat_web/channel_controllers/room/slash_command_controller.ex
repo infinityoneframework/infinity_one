@@ -18,7 +18,6 @@ defmodule UccChatWeb.SlashCommandChannelController do
   #   "topic", "mute", "me", "open", "unflip", "shrug", "unmute", "unhide"]
 
   def execute(socket, %{"command" => command, "args" => args}) do
-    Logger.warn "+==+++++++ SlashCommandsService.execute command: #{inspect command}, args: #{inspect args}"
     user_id = socket.assigns[:user_id]
     user = Helpers.get_user user_id
     channel_id = socket.assigns[:channel_id]
@@ -27,13 +26,10 @@ defmodule UccChatWeb.SlashCommandChannelController do
     if authorized? user, command, channel_id do
       case handle_command(socket, command, args, user_id, channel_id) do
         {:reply, {_, _}, _} = res ->
-          Logger.warn "execute 1 res: #{inspect res}"
           res
         {:ok, _} = res ->
-          Logger.warn "execute 2 res: #{inspect res}"
           {:reply, res, socket}
         :noreply ->
-          Logger.warn "execute 3"
           {:noreply, socket}
       end
     else
@@ -151,7 +147,7 @@ defmodule UccChatWeb.SlashCommandChannelController do
   end
 
   def handle_channel_command(socket, command, args, user_id, channel_id) do
-    Logger.warn ".......... #{inspect command}"
+    Logger.debug ".......... #{inspect command}"
     with name <- String.trim(args),
          name <- String.replace(name, ~r/^#/, ""),
          true <- String.match?(name, ~r/[a-z0-9\.\-_]/i) do
@@ -173,11 +169,11 @@ defmodule UccChatWeb.SlashCommandChannelController do
             ", name: #{inspect name}"
           {:reply, {:ok, %{}}, socket}
         {:ok, res} ->
-          Logger.warn "res: #{inspect res}, command: #{inspect command}, " <>
+          Logger.debug "res: #{inspect res}, command: #{inspect command}, " <>
             "name: #{inspect name}"
           resp = notify_room_update(socket, command, target_channel,
             {:ok, Helpers.response_message(channel_id, res)})
-          Logger.error "resp: #{inspect resp}"
+          Logger.debug "resp: #{inspect resp}"
           {:reply, resp, socket}
         {:error, :no_permission}
           {:reply, {:ok, %{}}, socket}
@@ -217,7 +213,7 @@ defmodule UccChatWeb.SlashCommandChannelController do
 
   defp notify_room_update(socket, command, target, response)
     when command in ~w(archive unarchive)a do
-    Logger.warn "command: #{inspect command}, channel_id: " <>
+    Logger.debug "command: #{inspect command}, channel_id: " <>
       "#{inspect target.id}, response: #{inspect response}"
     socket.endpoint.broadcast! CC.chan_room <> target.name, "room:state_change",
       %{change: "#{command}", channel_id: target.id}

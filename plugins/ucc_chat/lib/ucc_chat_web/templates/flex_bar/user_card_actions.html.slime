@@ -1,5 +1,4 @@
-- Logger.warn "template @channel_id: #{inspect @channel_id}, user_id: #{@user.id}, current_user_id: #{@current_user.id}"
-- alias UccAdminWeb.AdminView, as: Admin
+- alias UccChatWeb.AdminView, as: Admin
 = if @user_info[:admin] do
   = Admin.render_user_action_button(@user, "edit")
   = Admin.render_user_action_button(@user, "admin")

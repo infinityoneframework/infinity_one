@@ -1,5 +1,4 @@
 defmodule UccWebrtcWeb.Admin do
-  import UcxUccWeb.Gettext
 
   alias UccWebrtcWeb.Admin.Page.Webrtc
 

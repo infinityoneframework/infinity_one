@@ -40,7 +40,6 @@ defmodule UccChatWeb.RoomChannel do
   # API
 
   def on_connect(socket) do
-    Logger.warn "on_connect"
     socket
   end
 
@@ -70,7 +69,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def user_leave(nil), do: Logger.warn "leave for nil username"
   def user_leave(username, room) do
-    Logger.warn "user_leave username: #{inspect username}, room: #{inspect room}"
+    Logger.debug "user_leave username: #{inspect username}, room: #{inspect room}"
     Endpoint.broadcast CC.chan_room <> room, "user:leave", %{username: username}
   end
 
@@ -203,8 +202,7 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, _socket) do
-    Logger.error "terminate reason: #{inspect reason}"
+  def terminate(_reason, _socket) do
     :ok
   end
 

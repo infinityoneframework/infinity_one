@@ -22,7 +22,6 @@ defmodule UccChatWeb.PageController do
   end
 
   def switch_user(conn, %{"user" => username}) do
-    Logger.warn "conn: #{inspect conn}"
     new_user =
       User
       |> where([u], u.username == ^username)

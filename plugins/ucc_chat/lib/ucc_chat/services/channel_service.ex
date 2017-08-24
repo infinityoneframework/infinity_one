@@ -435,7 +435,7 @@ defmodule UccChat.ChannelService do
   end
 
   def open_room(user_id, room, old_room, display_name) do
-    Logger.warn "open_room room: #{inspect room}, old_room: #{inspect old_room}"
+    Logger.debug "open_room room: #{inspect room}, old_room: #{inspect old_room}"
     # Logger.warn "ChannelService.open_room room: #{inspect room}, display_name: #{inspect display_name}"
     user = Helpers.get_user!(user_id)
 
@@ -472,7 +472,7 @@ defmodule UccChat.ChannelService do
       |> ChatDat.new(channel, messages)
       |> ChatDat.get_messages_info(user)
 
-    Logger.warn "messages_info: #{inspect chatd.messages_info}"
+    Logger.debug "messages_info: #{inspect chatd.messages_info}"
 
     # box_html =
     #   "messages_box.html"
@@ -652,7 +652,7 @@ defmodule UccChat.ChannelService do
   end
 
   def channel_command(socket, :create, name, user_id, channel_id) do
-    Logger.warn "name: #{inspect name}"
+    Logger.debug "name: #{inspect name}"
     if is_map(name) do
       Helpers.response_message(channel_id, ~g"The channel " <> "`##{name}`" <>
         ~g" already exists.")
@@ -670,7 +670,7 @@ defmodule UccChat.ChannelService do
   end
 
   def channel_command(socket, :leave, name, user_id, _) when is_binary(name) do
-    Logger.warn "name: #{inspect name}"
+    Logger.debug "name: #{inspect name}"
     case Channel.get_by(name: name) do
       nil ->
         {:error, ~g"The channels does not exist"}

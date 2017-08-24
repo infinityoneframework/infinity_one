@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannelController do
   require Logger
 
   def show(%{assigns: assigns} = socket, params) do
-    Logger.warn "room channel_controller params: #{inspect params}, socket.assigns: #{inspect socket.assigns}"
+    Logger.debug "room channel_controller params: #{inspect params}, socket.assigns: #{inspect socket.assigns}"
     reply =
       if assigns.room == "lobby" do
         %{redirect: ChannelService.room_redirect(params["room_id"], params["display_name"])}
@@ -90,7 +90,7 @@ defmodule UccChatWeb.RoomChannelController do
 
   def command(socket, %{"command" => command, "username" => username})
     when command in @commands do
-    Logger.warn "RoomChannelController: command: #{command}, username: " <>
+    Logger.debug "RoomChannelController: command: #{command}, username: " <>
       "#{inspect username}, socket: #{inspect socket}"
     user = Helpers.get_user_by_name username
 
@@ -135,7 +135,7 @@ defmodule UccChatWeb.RoomChannelController do
   end
 
   def command(socket, %{"command" => command, "username" => username}) do
-    Logger.warn "RoomChannelController: command: #{inspect command}, " <>
+    Logger.debug "RoomChannelController: command: #{inspect command}, " <>
       "username: #{inspect username}"
     {:reply, {:ok, %{}}, socket}
   end

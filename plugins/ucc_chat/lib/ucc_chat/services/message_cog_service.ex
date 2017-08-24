@@ -23,7 +23,7 @@ defmodule UccChat.MessageCogService do
     star_count = StaredMessage.count(user_id, message_id, channel_id)
     pin_count = PinnedMessage.count(message_id)
     opts = [stared: star_count > 0, pinned: pin_count > 0]
-    Logger.warn "MessageCogService: open, msg: #{inspect msg}, message_id: #{inspect message_id}"
+    Logger.debug "MessageCogService: open, msg: #{inspect msg}, message_id: #{inspect message_id}"
 
     html =
       "message_cog.html"
@@ -37,7 +37,7 @@ defmodule UccChat.MessageCogService do
     id = get_message_id msg["message_id"]
     star = StaredMessage.create!(%{message_id: id, user_id: user_id,
       channel_id: channel_id})
-    Logger.warn "star: #{inspect star}"
+    Logger.debug "star: #{inspect star}"
     {"update:stared", %{}}
   end
   def handle_in("unstar-message", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
@@ -52,7 +52,7 @@ defmodule UccChat.MessageCogService do
     message = Repo.get Message, id
     pin = PinnedMessage.create!(%{message_id: id, user_id: message.user_id,
       channel_id: channel_id})
-    Logger.warn "pin: #{inspect pin}"
+    Logger.debug "pin: #{inspect pin}"
     {"update:pinned", %{}}
   end
 

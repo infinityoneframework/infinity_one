@@ -29,7 +29,7 @@ defmodule UccAdmin.FlexAdminService do
     # end)
 
   def get_render_args("User Info", user_id, _channel_id, _, _)  do
-    Logger.warn "==== User Info render args"
+    Logger.debug "==== User Info render args"
     user = current_user = Helpers.get_user! user_id
     # channel = Helpers.get_channel(channel_id)
     # direct = (from d in Direct,

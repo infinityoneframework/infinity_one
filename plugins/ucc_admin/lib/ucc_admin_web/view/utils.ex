@@ -1,9 +1,6 @@
 defmodule UccAdminWeb.View.Utils do
-
-  import Phoenix.HTML
-  import Phoenix.HTML.Tag
-  import Phoenix.HTML.Form
   import UcxUccWeb.Gettext
+  import Phoenix.HTML.{Tag, Form}, warn: false
 
   def collapsable_section(title, fun) do
     content_tag :div, class: "section section-collapsed" do

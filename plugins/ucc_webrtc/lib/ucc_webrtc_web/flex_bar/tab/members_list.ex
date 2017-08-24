@@ -40,12 +40,12 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   end
 
   def open(socket, {current_user_id, channel_id, tab, sender}, args) do
-    Logger.warn "open assigns: #{inspect socket.assigns}"
+    Logger.debug "open assigns: #{inspect socket.assigns}"
     user_id = args["user_id"]
     Logger.warn "stuff: #{inspect %{current_user_id: current_user_id, user_id: user_id, assigns_user_id: socket.assigns.user_id}}"
     {view_args, socket} = MembersList.video_args(socket,
       current_user_id, channel_id, user_id)
-    Logger.warn "args: #{inspect view_args}"
+    Logger.debug "args: #{inspect view_args}"
 
     unless args[:dest] do
       socket.endpoint.broadcast "user:" <> user_id, "webrtc:incoming_video_call",
@@ -77,7 +77,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   end
 
   def flex_video_open(socket, sender) do
-    Logger.warn "flex_video_open, assigns: #{inspect socket.assigns}"
+    Logger.debug "flex_video_open, assigns: #{inspect socket.assigns}"
     channel_id = Rebel.get_assigns(socket, :channel_id)
     user_id = sender["dataset"]["user_id"]
 
@@ -102,7 +102,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
 
     Ftab.open user_id, channel_id, "members-list", %{"view" => "video",
       "user_id" => user_id}, fn :open, {_, args} ->
-        Logger.error "args: #{inspect args}"
+        Logger.debug "args: #{inspect args}"
         apply tab.module, :open, [socket, {user_id, channel_id, tab, %{}}, Map.put(args, :dest, true)]
       end
   end

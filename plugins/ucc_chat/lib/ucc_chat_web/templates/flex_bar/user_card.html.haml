@@ -1,5 +1,4 @@
 - hidden = hidden_on_nil(@user_info[:user_mode] || @user_info[:admin] || @user_info[:direct], "animated-")
-- Logger.warn "@user_info: #{inspect @user_info}, hidden?: #{inspect hidden}"
 - cls = get_user_card_class @user_info
 %div(class="#{cls} #{hidden}" data-username="#{@user.username}")
   .about.clearfix

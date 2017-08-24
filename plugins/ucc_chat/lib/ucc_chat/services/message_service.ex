@@ -65,7 +65,7 @@ defmodule UccChat.MessageService do
   end
 
   def broadcast_bot_message(%{} = channel, _user_id, body) do
-    Logger.warn "broadcast_bot_message body: #{inspect body}"
+    Logger.debug "broadcast_bot_message body: #{inspect body}"
     bot_id = Helpers.get_bot_id()
     message = create_message(String.replace(body, "\n", "<br>"), bot_id,
       channel.id,
@@ -123,7 +123,7 @@ defmodule UccChat.MessageService do
     subscription = SubscriptionService.get(channel_id, user.id)
     has_more =
       with [first|_] <- messages,
-           _ <- Logger.warn("get_messages_info 2"),
+           _ <- Logger.debug("get_messages_info 2"),
            first_msg when not is_nil(first_msg) <-
             Message.first_message(channel_id) do
         first.id != first_msg.id
