@@ -1044,6 +1044,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_call(socket, sender), to: FlexTabChannel
   defdelegate flex_close(socket, sender), to: FlexTabChannel
   defdelegate flex_form(socket, sender), to: Form
+  defdelegate flex_form_change(socket, sender), to: Form
   defdelegate flex_form_save(socket, sender), to: Form
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form

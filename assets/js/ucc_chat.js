@@ -64,6 +64,7 @@ window.UccChat = {
 
     }, 200)
 
+    $('body').on('submit', 'form', function() { return false; });
 
   },
   chan_user: "user:",
@@ -203,6 +204,7 @@ window.UccChat = {
       //   message_popup.open_users()
       //   return true
       // }
+
       let event = new jQuery.Event('user:input')
       event.keyCode = e.keyCode
       $("body").trigger(event)
@@ -210,6 +212,23 @@ window.UccChat = {
       this.typing.start_typing()
       return true
     })
+    // .on('keypress', 'input', e => {
+    //   console.log('keypress input', e.keyCode);
+    //   // return false;
+    //   // e.preventDefault();
+    //   // if (e.KeyCode == 13) {
+    //   //   UccChat.chan_user.push('')
+    //   // }
+    // })
+    // .on('change', 'form', e => {
+    //   console.log('keypress form',  e.target, e);
+    //   // return false;
+    //   // e.preventDefault();
+    //   // if (e.KeyCode == 13) {
+    //   //   UccChat.chan_user.push('')
+    //   // }
+    // })
+
 
     this.navMenu.setup()
 

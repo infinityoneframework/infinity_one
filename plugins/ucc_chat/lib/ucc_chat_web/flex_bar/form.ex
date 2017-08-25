@@ -18,7 +18,7 @@ defmodule UccChatWeb.FlexBar.Form do
     tab = TabBar.get_button(tab_name)
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket
-    apply tab.module, :open, [socket, user_id, channel_id, tab, %{"editing" => control}]
+    apply tab.module, :open, [socket, {user_id, channel_id, tab, sender}, %{"editing" => control}]
   end
 
   def flex_form(socket, sender) do
@@ -27,6 +27,17 @@ defmodule UccChatWeb.FlexBar.Form do
     socket
   end
 
+  # TODO: this it not implemented and should be removed later if we don't
+  #       need it
+  def flex_form_change(socket, sender) do
+    Logger.warn "sender: " <> inspect(sender)
+    socket
+  end
+
+  def flex_form_save(socket, %{"event" => %{"type" => "click"}} = sender) do
+    # ignore this message since it will be handled by the change event
+    socket
+  end
   def flex_form_save(socket, %{"form" => %{"id" => tab_name} = form} = sender) do
     trace "flex_form_save", sender
 
@@ -38,9 +49,9 @@ defmodule UccChatWeb.FlexBar.Form do
 
     resource.__struct__
     |> apply(:changeset, [resource, resource_params])
-    |> log_inspect(:warn, label: "changeset")
+    |> log_inspect(:debug, label: "changeset")
     |> Repo.update()
-    |> log_inspect(:warn, label: "after update")
+    |> log_inspect(:debug, label: "after update")
     |> case do
       {:ok, resource} ->
         socket
@@ -62,7 +73,7 @@ defmodule UccChatWeb.FlexBar.Form do
     tab = TabBar.get_button(tab_name)
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket
-    apply tab.module, :open, [socket, user_id, channel_id, tab, %{}]
+    apply tab.module, :open, [socket, {user_id, channel_id, tab, sender}, %{}]
   end
 
   def flex_form_toggle(socket, sender) do

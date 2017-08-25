@@ -4,7 +4,8 @@
     = if @channel do
       .title
         h2= ~g"Room Info"
-      = form_for @changeset, "#", fn f ->
+      - rebel_opts = ["rebel-change": "flex_form_save"]
+      = form_for @changeset, "#", rebel_opts, fn f ->
         input(type="hidden" name="id" value="info")
         ul.list.clearfix
           = for field <- @channel do
