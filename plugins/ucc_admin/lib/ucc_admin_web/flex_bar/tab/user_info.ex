@@ -19,13 +19,26 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
       30)
   end
 
-  def args(socket, {user_id, _channel_id, _other, sender}, _params) do
+  def args(socket, {user_id, _channel_id, _other, sender}, params) do
 
     exec_js socket, set_active_js(sender)
 
+    # Logger.error "sender: " <> inspect(sender)
+    form = sender["form"] || %{}
+    # Logger.error "id #{form["id"]}, form: " <> inspect(form)
+
     user =
-      if name = sender["dataset"]["name"] do
-        Accounts.get_by_user username: name, preload: Hooks.user_preload([])
+      if name = sender["dataset"]["name"] || form["id"] do
+        user = Accounts.get_by_user username: name, preload: Hooks.user_preload([])
+
+        assigns =
+          socket
+          |> Rebel.get_assigns()
+          |> Map.put(:user, user)
+          |> Map.put(:resource_key, :user)
+
+        Rebel.put_assigns(socket, assigns)
+        user
       else
         nil
       end

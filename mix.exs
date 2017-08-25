@@ -98,7 +98,7 @@ defmodule UcxUcc.Mixfile do
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
-      {:floki, "~> 0.0", override: true}
+      {:floki, "~> 0.0", override: true},
     ]
   end
 

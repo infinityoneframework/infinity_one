@@ -34,10 +34,10 @@ defmodule UccChatWeb.FlexBar.Form do
     socket
   end
 
-  def flex_form_save(socket, %{"event" => %{"type" => "click"}} = sender) do
-    # ignore this message since it will be handled by the change event
-    socket
-  end
+  # def flex_form_save(socket, %{"event" => %{"type" => "click"}} = sender) do
+  #   # ignore this message since it will be handled by the change event
+  #   socket
+  # end
   def flex_form_save(socket, %{"form" => %{"id" => tab_name} = form} = sender) do
     trace "flex_form_save", sender
 

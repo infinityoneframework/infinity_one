@@ -5,9 +5,10 @@
 - else
   .about.clearfix
     %form.edit-form.user(autocomplete="off" data-username="#{user.username}")
+      %input(type="hidden" name="id" value="admin_user_info")
       - if user do
         %h3= user.name
-        %input(type="hidden" name="id" value="#{user.id}")
+        / %input(type="hidden" name="id" value="#{user.id}")
       - else
         %h3= ~g(Add User)
       .input-line
@@ -50,7 +51,7 @@
             %input#sendWelcomeEmail(type="checkbox" value="1" checked="true")
             = ~g(Send welcome email)
       %nav
-        %button.button.button-block.cancel(type="button")
+        %button.button.button-block.cancel(type="button" rebel-click="flex_form_cancel")
           %span= ~g(Cancel)
-        %button.button.button-block.primary.save
+        %button.button.button-block.primary.save(rebel-click="flex_form_save")
           %span= ~g(Save)
