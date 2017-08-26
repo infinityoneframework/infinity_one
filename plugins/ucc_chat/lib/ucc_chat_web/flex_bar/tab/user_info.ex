@@ -13,7 +13,12 @@ defmodule UccChatWeb.FlexBar.Tab.UserInfo do
       "icon-user",
       View,
       "user_card.html",
-      30)
+      30,
+      [
+        model: UcxUcc.User,
+        prefix: "user"
+      ]
+    )
   end
 
   def args(socket, {user_id, channel_id, _, _}, _) do

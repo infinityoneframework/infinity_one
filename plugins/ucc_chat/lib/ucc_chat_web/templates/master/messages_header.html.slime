@@ -1,0 +1,9 @@
+= render "favorite_icon.html", favorite: favorite_room?(@chatd), show: show_toggle_favorite(@chatd)
+= if get_room_icon(@chatd) == "icon-at" do
+  i(class="#{get_room_icon_class(@chatd)}" data-status-name="#{@chatd.active_room[:display_name]}")
+  = messages_header_icons @chatd
+- else
+  - class = get_room_icon_class @chatd, "offline"
+  i(class="#{class}")
+span.room-title= @chatd.active_room[:display_name]
+span.room-topic(rebel-click="topic_click")= markdown @chatd.channel.topic

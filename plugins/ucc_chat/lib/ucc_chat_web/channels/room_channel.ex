@@ -26,7 +26,7 @@ defmodule UccChatWeb.RoomChannel do
   alias UccChatWeb.RebelChannel.Client
   alias UccChatWeb.{MasterView, UserSocket}
   alias UccChat.ServiceHelpers, as: Helpers
-  alias UcxUcc.Permissions
+  alias UcxUcc.{Permissions, Accounts}, warn: false
   alias UcxUccWeb.Endpoint
 
   import Rebel.Core, warn: false
@@ -143,6 +143,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_out("update:messages_header", payload, socket) do
     update_messages_header(socket, get_chatd(payload))
+    {:noreply, socket}
   end
 
   def handle_out("update:name:change", payload, socket) do
@@ -294,16 +295,16 @@ defmodule UccChatWeb.RoomChannel do
 
   defp authorized?(_socket, _pattern, _params, _ucxchat, _), do: true
 
-  defp update_messages_header(socket, %ChatDat{}) do
-    html = Phoenix.View.render_to_string MasterView, "messages_header.html",
-    on = "header.fixed-title h2"
-    update! socket, :html, set: html, on: on
+  defp update_messages_header(socket, %ChatDat{} = chatd) do
+    html = Phoenix.View.render_to_string MasterView, "messages_header.html", chatd: chatd
+    on = ".messages-container header>h2"
+    update socket, :html, set: html, on: on
   end
 
   defp get_chatd(%{user_id: user_id, channel_id: channel_id}) do
-    subscription = Subscription.get channel_id, user_id,
-      preload: [:user, :channel]
-    ChatDat.new subscription.user, subscription.channel
+    user = Helpers.get_user! user_id
+    channel = Channel.get channel_id
+    ChatDat.new user, channel
   end
 
 

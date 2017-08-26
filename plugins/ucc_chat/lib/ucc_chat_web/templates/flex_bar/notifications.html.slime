@@ -7,7 +7,8 @@
       h2= ~g"Notifications"
     = form_for UccChat.Schema.Notification.changeset(@notification, %{}), "#", fn f ->
       / Pass the id field indicating which tab the form is for
-      input(type="hidden" name="id" value="notifications")
+      input(type="hidden" name="flex-id" value="notifications")
+      = hidden_input f, :id
       = inputs_for f, :settings, fn fp ->
         ul.list.clearfix
           li

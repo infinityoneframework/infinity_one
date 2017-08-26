@@ -36,7 +36,7 @@ config :ucx_ucc, :settings_modules, [
 ]
 
 config :phoenix, :template_engines,
-  haml: PhoenixHaml.Engine,
+  # haml: PhoenixHaml.Engine,
   slim: PhoenixSlime.Engine,
   slime: PhoenixSlime.Engine
 

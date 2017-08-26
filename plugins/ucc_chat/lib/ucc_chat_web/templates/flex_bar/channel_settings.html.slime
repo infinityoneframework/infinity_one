@@ -6,7 +6,8 @@
         h2= ~g"Room Info"
       - rebel_opts = ["rebel-change": "flex_form_save"]
       = form_for @changeset, "#", rebel_opts, fn f ->
-        input(type="hidden" name="id" value="info")
+        input(type="hidden" name="flex-id" value="info")
+        = hidden_input f, :id
         ul.list.clearfix
           = for field <- @channel do
             = flex_form_line(f, field, @editing, @channel_type)

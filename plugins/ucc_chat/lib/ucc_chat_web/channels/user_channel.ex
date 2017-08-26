@@ -562,17 +562,19 @@ defmodule UccChatWeb.UserChannel do
     # SweetAlert.swal_modal socket, title, "Do you want to accept?", "warning",
     SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
       [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
-      confirm: fn result ->
+      confirm: fn _result ->
         # Logger.warn "sweet confirmed! #{inspect result}"
 
         # SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
         #   timer: 2000, showConfirmButton: false
+        true
       end,
-      cancel: fn result ->
+      cancel: fn _result ->
         # Logger.warn "sweet canceled! result: #{inspect result}"
         # SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
         #   timer: 2000, showConfirmButton: false
         # Logger.warn "sweet notice complete!"
+        true
       end
 
     {:noreply, socket}
@@ -716,7 +718,7 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  def hadnle_info(%Broadcast{event: "user:entered"}, socket) do
+  def handle_info(%Broadcast{event: "user:entered"}, socket) do
     {:noreply, socket}
   end
 
@@ -735,6 +737,17 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
+  def handle_info(%Broadcast{topic: "room:" <> room, event: "broadcastjs",
+    payload: %{js: js} = _payload}, socket) do
+
+    Logger.error "js: #{js}"
+    # next, update sidebar if subscribed
+    if room in socket.assigns.subscribed do
+      exec_js socket, js
+    end
+
+    {:noreply, socket}
+  end
   # Default broadcast case to ignore messages we are not interested in
   def handle_info(%Broadcast{} = broadcast, socket) do
     Logger.warn "broadcast: " <> inspect(broadcast)
@@ -949,7 +962,9 @@ defmodule UccChatWeb.UserChannel do
     RoomChannel.broadcast_room_field(socket.assigns.room, "description", data)
     socket
   end
-  defp do_room_update(socket, {:type, _}, _user_id, _channel_id) do
+  defp do_room_update(socket, {:type, _type}, user_id, channel_id) do
+    Logger.error "room: #{socket.assigns.room}"
+    RoomChannel.broadcast_messages_header socket.assigns.room, user_id, channel_id
     # breoadcast message header on room channel
     # broadcast room entry on user channel
     # broadcast message box on room channel
@@ -1046,6 +1061,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form(socket, sender), to: Form
   defdelegate flex_form_change(socket, sender), to: Form
   defdelegate flex_form_save(socket, sender), to: Form
+  defdelegate flex_form_submit(socket, sender), to: Form
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form

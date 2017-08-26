@@ -1,0 +1,105 @@
+- account = @user.account
+- import Phoenix.HTML.Form
+- defer = Application.get_env :ucc_chat, :defer, true
+section.page-container.page-home.page-static
+  header.fixed-title.border-component-color
+    = render UccChatWeb.MasterView, "burger.html"
+    h2
+      span.room-title= ~g"Preferences"
+  .content
+    = form_for @account_changeset, "#", [id: "account-preferences-form"], fn f ->
+      .rocket-form
+        fieldset
+          .section
+            h1= ~g"Localization"
+            .section-content.border-component-color
+              .input-line
+                label(for="language")= ~g"Language"
+                div
+                  = select f, :language, get_languages(), class: "language required"
+          .section
+            h1= ~g"Messages"
+            .section-content.border-component-color
+              = if UccSettings.enable_desktop_notifications() do
+                .input-line.double-col
+                  label= ~g"Enable Desktop Notifications"
+                  div
+                    label
+                      = radio_button f, :enable_desktop_notifications, "1", checked: account.enable_desktop_notifications
+                      = ~g(True)
+                    label
+                      = radio_button f, :enable_desktop_notifications, "0", checked: !account.enable_desktop_notifications
+                      = ~g(False)
+                    = unless account.enable_desktop_notifications do
+                      label
+                        button.button.test-notifications
+                          i.icon-comment-empty.secondary-font-color
+                          span= ~g"Test Desktop Notifications"
+
+                = unless account.enable_desktop_notifications do
+                  .input-line.double-col
+                    label= ~g"Notification Duration"
+                    div
+                      = if account.desktop_notification_duration do
+                        = text_input f, :desktop_notification_duration, type: :number, min: "0"
+                      - else
+                        = text_input f, :desktop_notification_duration, type: :number, min: "0", placeholder: ~g"User Global Settings"
+              = unless defer do
+                = radio_button_line(f, "unreadAlert", ~g"Unread Alert", :unread_alert, account, labels: {~g"On", ~g"Off"})
+                = radio_button_line(f, "", ~g"Use Emojis", :use_emojis, account)
+                = radio_button_line(f, "convertAsciiEmoji", ~g"Convert Ascii Emojis", :convert_ascii_emoji, account)
+                = radio_button_line(f, "autoImageLoad", ~g"Auto Load Images", :auto_image_load, account)
+                = radio_button_line(f, "saveMobileBandwidth", ~g"Save Mobile Bandwidth", :save_mobile_bandwidth, account)
+                = radio_button_line(f, "collapseMediaByDefault", ~g"Collapse Embedded Media By Default", :collapse_media_by_default, account)
+                = radio_button_line(f, "unreadRoomMode", ~g"Unread Rooms Mode", :unread_rooms_mode, account)
+              = radio_button_line(f, "hideUsernames", ~g"Hide usernames", :hide_user_names, account)
+              = unless defer do
+                = radio_button_line(f, "hideFlexTab", ~g"Hide flextab", :hide_flex_tab, account)
+              = radio_button_line(f, "hideAvatars", ~g"Hide Avatars", :hide_avatars, account)
+              = unless defer do
+                .input-line.double-col#mergeChannels
+                  label= ~g"UI Merge Channels Groups"
+                  div
+                    label
+                      = radio_button f, :merge_channels, "1", checked: account.merge_channels == true
+                      = ~g"True"
+                    label
+                      = radio_button f, :merge_channels, "0", checked: account.merge_channels == false
+                      = ~g"False"
+                    label
+                      = radio_button f, :merge_channels, "", checked: account.merge_channels == nil
+                      = ~g"Default"
+              .input-line.double-col#viewMode
+                label= ~g"View mode"
+                div
+                  = select f, :view_mode, [{~g"Normal", 1}, {~g"Cozy", 2}, {~g"Compact", 3}]
+                  .info= ~g"This changes the amount of space messages take up on the screen."
+              .input-line.double-col#emailNotificationMode
+                label= ~g"Email Notification Mode"
+                div
+                  = select f, :email_notification_model, Disabled: "disabled", "Every Mention/DM": "all"
+                  .info= ~g"You need to verify your email address to get notifications"
+          = unless defer do
+            .section
+              h1= ~g"Highlights"
+              .section-content.border-component-color
+                .input-line.double-col
+                  label= ~g"Highlights List"
+                  div
+                    label= ~g"Highlights How To"
+                    = textarea f, :highlights, cols: "30", rows: "10", placeholder: ~g"highlight"
+          .section
+            h1= ~g"Sound"
+            .section-content.border-component-color
+              .input-line.double-col
+                label= ~g"New Room Notification"
+                div
+                  = select f, :new_room_notification, get_room_notification_sounds(), class: "audio"
+              .input-line.double-col
+                label= ~g"New Message Notification"
+                div
+                  = select f, :new_message_notification, get_message_notification_sounds(), class: "audio"
+        .submit
+          button.button.primary.save
+            i.icon-send
+            span= ~g"Save changes"

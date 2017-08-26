@@ -26,14 +26,15 @@ defmodule UccChatWeb.MessageView do
       |> Enum.reduce("message background-transparent-dark-hover", fn fun, acc ->
         acc <> apply(__MODULE__, fun, [msg, user])
       end)
-    attrs = [
-      id: msg.id,
-      class: cls,
-      "data-username": msg.user.username,
-      "data-groupable": msg.is_groupable,
-      "data-date": format_date(msg.updated_at, user),
-      "data-timestamp": msg.timestamp
-    ]
+    attrs =
+      [
+        id: msg.id,
+        class: cls,
+        "data-username": msg.user.username,
+        "data-groupable": msg.is_groupable,
+        "data-date": format_date(msg.updated_at, user),
+        "data-timestamp": msg.timestamp
+      ]
     Phoenix.HTML.Tag.tag(:li, attrs)
   end
   def format_date(%{updated_at: dt}, user) do

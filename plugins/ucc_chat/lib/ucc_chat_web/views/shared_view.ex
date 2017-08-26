@@ -4,11 +4,8 @@ defmodule UccChatWeb.SharedView do
 
   import Phoenix.HTML.Tag, warn: false
 
-  alias UcxUcc.Permissions
-  alias UcxUcc.Repo
-  alias UcxUcc.Accounts.User
-  alias UccChat.Subscription
-  alias UcxUcc.Hooks
+  alias UcxUcc.{Permissions, Repo, Accounts.User, Hooks}
+  alias UccChat.{Subscription, ChatDat}
 
   require Logger
 
@@ -20,6 +17,28 @@ defmodule UccChatWeb.SharedView do
 
   def get_status(user) do
     UccChat.PresenceAgent.get(user.id)
+  end
+
+  def get_room_icon_class(data, status \\ nil)
+
+  def get_room_icon_class(%ChatDat{} = chatd, status) do
+    status = status || get_room_status(chatd)
+    [
+      get_room_icon(chatd),
+      "status-" <> status,
+      "room-" <> chatd.active_room[:name]
+    ]
+    |> Enum.join(" ")
+  end
+
+  def get_room_icon_class(%{} = room, status) do
+    status = status || room[:user_status]
+    [
+      room[:room_icon],
+      "status-" <> status,
+      "room-" <> room[:name]
+    ]
+    |> Enum.join(" ")
   end
 
   def get_room_icon(chatd), do: chatd.room_map[chatd.channel.id][:room_icon]

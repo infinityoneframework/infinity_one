@@ -3,7 +3,7 @@ defmodule UccLogger do
   require Logger
 
   defmacro __using__(opts \\ []) do
-    quote do
+    quote location: :keep do
       require Logger
       import unquote(__MODULE__)
       if Keyword.get(unquote(opts), :debug, :true) do
@@ -23,38 +23,41 @@ defmodule UccLogger do
       end
 
     match =
-      Enum.find(modules, fn
-        {__MODULE__, _} -> true
-        __MODULE__      -> true
-        :all            -> true
-        _               -> false
-      end)
-      |> case do
-        {_, mod_level} -> mod_level
-        __MODULE__     -> :check
-        :all           -> :check
-        _              -> false
+      quote do
+        Enum.find(modules, fn
+          {__MODULE__, _} -> true
+          __MODULE__      -> true
+          :all            -> true
+          _               -> false
+        end)
+        |> case do
+          {_, mod_level} -> mod_level
+          __MODULE__     -> :check
+          :all         -> :check
+          _              -> false
+        end
       end
-    quote location: :keep do
-      if unquote(match) do
+
+    quote bind_quoted: [modules: modules, match: match, msg: msg, event: event, params: params], location: :keep do
+      if match != false do
         the_level =
-          case unquote(match) do
+          case match do
             :check ->
               @__level__ || Application.get_env(:ucx_ucc, :ucc_tracer_level, :debug)
-            false - false
+            false -> false
             other -> other
           end
 
         msg1 =
-          case unquote(msg) do
+          case msg do
             "" -> ""
             mg -> mg <> ", "
           end
 
-        Logger.log the_level, fn -> "TRACE: #{unquote(event)}: #{msg1}params: " <>
-          inspect(unquote(params)) end
+        Logger.log the_level, fn -> "TRACE: #{event}: #{msg1}params: " <>
+          inspect(params) end
       else
-        _ = {unquote(event), unquote(params), unquote(msg)}
+        _ = {event, params, msg}
       end
     end
   end

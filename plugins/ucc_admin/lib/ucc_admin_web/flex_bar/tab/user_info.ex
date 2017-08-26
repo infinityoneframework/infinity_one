@@ -19,7 +19,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
       30)
   end
 
-  def args(socket, {user_id, _channel_id, _other, sender}, params) do
+  def args(socket, {user_id, _channel_id, _other, sender}, _params) do
 
     exec_js socket, set_active_js(sender)
 

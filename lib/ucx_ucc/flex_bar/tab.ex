@@ -10,12 +10,24 @@ defmodule UcxUcc.TabBar.Tab do
     icon:      String.t,
     view:      Module.t,
     template:  String.t,
-    order:     integer
+    order:     integer,
+    opts:      Keyword.t
   }
 
-  defstruct [:module, :type, :groups, :id, :title, :icon, :view, :template, :order, :display]
+  defstruct [
+    :module,
+    :type,
+    :groups,
+    :id,
+    :title,
+    :icon,
+    :view,
+    :template,
+    :order,
+    :display,
+    :opts]
 
-  def new(module, groups, id, title, icon, view, template, order) do
+  def new(module, groups, id, title, icon, view, template, order, opts \\ []) do
     %__MODULE__{
       module:    module,
       type:      :button,
@@ -26,7 +38,8 @@ defmodule UcxUcc.TabBar.Tab do
       view:      view,
       template:  template,
       order:     order,
-      display:   true
+      display:   true,
+      opts:      opts
     }
   end
 
@@ -35,7 +48,8 @@ defmodule UcxUcc.TabBar.Tab do
       module: module,
       type: :hidden,
       id: id,
-      display: false
+      display: false,
+      opts: []
     }
   end
 
@@ -45,8 +59,8 @@ defmodule UcxUcc.TabBar.Tab do
       type: :separator,
       groups: groups,
       order: order,
-      display: true
+      display: true,
+      opts: []
     }
   end
-
 end

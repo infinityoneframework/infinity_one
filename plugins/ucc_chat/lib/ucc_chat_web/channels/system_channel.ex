@@ -25,7 +25,7 @@ defmodule UccChatWeb.SystemChannel do
   def join(ev = CC.chan_system(), params, socket) do
     _ = ev
     _ = params
-    trace(ev, params)
+    # trace(ev, params)
     send(self(), :after_join)
 
     :ok = UccChat.ChannelMonitor.monitor(:chan_system, self(),
@@ -61,16 +61,12 @@ defmodule UccChatWeb.SystemChannel do
   # end
   def handle_in(ev = "state:blur", params, socket) do
     trace ev, params
-    _ = ev
-    _ = params
     # TODO: move this blur timer to a configuration item
     ref = Process.send_after self(), :blur_timeout, @blur_timer
     {:noreply, assign(socket, :blur_ref, ref)}
   end
   def handle_in(ev = "state:focus", params, socket) do
     trace ev, params
-    _ = ev
-    _ = params
     # TODO: move this blur timer to a configuration item
     socket =
       case socket.assigns[:blur_ref] do

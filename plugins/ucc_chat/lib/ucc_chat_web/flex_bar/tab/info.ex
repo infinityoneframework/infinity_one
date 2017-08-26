@@ -16,7 +16,12 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
       "icon-info-circled",
       View,
       "channel_settings.html",
-      10)
+      10,
+      [
+        model: UccChat.Channel,
+        prefix: "channel"
+      ]
+    )
   end
 
   def args(socket, {user_id, channel_id, _, _,}, params) do
@@ -25,13 +30,13 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     changeset = Channel.change channel
     editing = to_existing_atom(params["editing"])
 
-    assigns =
-      socket
-      |> Rebel.get_assigns()
-      |> Map.put(:channel, channel)
-      |> Map.put(:resource_key, :channel)
+    # assigns =
+    #   socket
+    #   |> Rebel.get_assigns()
+    #   |> Map.put(:channel, channel)
+    #   |> Map.put(:resource_key, :channel)
 
-    Rebel.put_assigns(socket, assigns)
+    # Rebel.put_assigns(socket, assigns)
 
     {[
       channel: settings_form_fields(channel, user_id),
@@ -43,10 +48,9 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
 
   def notify_update_success(socket, tab, sender, %{toggle: _} = opts) do
     trace "notify_update_success toggle", {tab, sender}
-    _ = tab
-    _ = sender
 
     params = %{channel_id: opts.resource.id, field: socket.assigns.toggle_field}
+    Logger.warn "params: " <> inspect(params)
     broadcast socket, "room:update", params
   end
 
@@ -55,13 +59,13 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
 
     field =
       opts.resource_params
-      |> Enum.reject(fn {_, v} -> v == "on" end)
+      |> Enum.reject(fn {k, v} -> v == "on" or k == "id" end)
       |> Enum.map(fn {k, v} -> {to_existing_atom(k), v} end)
       |> hd
 
     params = %{channel_id: opts.resource.id, field: field}
-    socket
-    |> broadcast("room:update", params)
+
+    broadcast(socket, "room:update", params)
   end
 
   def flex_form_toggle(socket, _sender, resource, id, val) do

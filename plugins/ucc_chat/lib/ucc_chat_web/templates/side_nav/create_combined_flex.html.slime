@@ -1,0 +1,31 @@
+header.primary-background-color
+  div
+    h4= ~g(Channels)
+.content.primary-background-color
+  .wrapper
+    h4= ~g(Create_new)
+    .input-line.no-icon
+      span= ~g(Name)
+      input.required#channel-name(type="text" dir="auto" placeholder="#{~g(Enter name here)}")
+    .input-line.toggle
+      span= ~g(Private)
+      .input.checkbox.toggle
+        input#channel-type(type="checkbox")
+        label.color-tertiary-font-color(for="channel-type")
+    .input-line.toggle
+      span= ~g(Read only channel)
+      .input.checkbox.toggle
+        input.channel-ro(type="checkbox")
+        label.color-tertiary-font-color(for="channel-ro")
+    .input-line.no-icon
+      label.color-tertiary-font-color(for="channel-members")= ~g(Select users)
+      / -# {{> inputAutocomplete settings=autocompleteSettings id="channel-members" class="search"
+      input.search#channel-members(placeholder="#{~g(Search by username)}" autocomplete="off")
+      ul.selected-users
+        = for user <- get_all_users() do
+          li.background-transparent-darker
+            = user.username
+            i.icon-cancel.remove-room-member
+    .input-submit
+      button.button.primary.save-channel= ~g(Create)
+      button.button.cancel-channel= ~g(Cancel)

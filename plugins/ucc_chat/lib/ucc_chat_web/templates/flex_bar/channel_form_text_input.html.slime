@@ -6,7 +6,7 @@ li(class="#{@field[:ltype] || @field[:type]}")
       .buttons.secondary-background-color
         button.button.cancel(type="button" rebel-click="flex_form_cancel")
           i.icon-cancel
-        button.button.save(type="button" rebel-click="flex_form_save")
+        button.button.save(type="button" rebel-click="flex_form_submit")
           i.icon-ok.success-color
     - else
       span(data-edit="#{@field[:name]}" rebel-click="flex_form")

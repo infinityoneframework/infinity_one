@@ -536,6 +536,15 @@ defmodule UccChat.ChannelService do
    {cc, user}
   end
 
+  def render_messages_header(user_id, channel_id) do
+    channel = Channel.get! channel_id
+
+    user_id
+    |> Helpers.get_user!
+    |> ChatDat.new(channel, [])
+    |> render_messages_header
+  end
+
   def render_messages_header(chatd) do
     "messages_header.html"
     |> UccChatWeb.MasterView.render(chatd: chatd)

@@ -7,7 +7,6 @@
 - else
   = if show_webrtc? @user, @user_info do
     .buttons-group
-      / button.button.start-video-call.primary(rebel-click="start_video_call" aria-label="Start video call" data-id="#{@user.id}")
       button.button.start-video-call.primary(data-fun="flex_video_open" rebel-click="flex_call" aria-label="Start video call" data-id="webrtc-members-list" data-user_id="#{@user.id}")
         i.icon-videocam
       button.button.start-audio-call.secondary(rebel-click="start_audio_call" aria-label="Start audio call" data-id="#{@user.id}")

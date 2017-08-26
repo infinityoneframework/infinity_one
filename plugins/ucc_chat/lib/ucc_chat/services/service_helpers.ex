@@ -13,14 +13,14 @@ defmodule UccChat.ServiceHelpers do
 
   @default_user_preload [:account, :roles]
 
-  def default_user_preloads, do: @default_user_preload
+  def default_user_preloads, do: Hooks.user_preload(@default_user_preload)
 
   def get_user!(user, opts \\ [])
   def get_user!(%Phoenix.Socket{assigns: assigns}, opts) do
     get_user!(assigns[:user_id], opts)
   end
   def get_user!(id, opts) do
-    preload = user_preload(opts[:preload] || @default_user_preload)
+    preload = user_preload(opts[:preload] || default_user_preloads())
     Repo.one!(from u in User, where: u.id == ^id, preload: ^preload)
   end
 
@@ -30,7 +30,7 @@ defmodule UccChat.ServiceHelpers do
   end
 
   def get_user(id, opts) do
-    preload = opts[:preload] || @default_user_preload
+    preload = opts[:preload] || default_user_preloads()
     Repo.one(from u in User, where: u.id == ^id, preload: ^preload)
   end
 
@@ -41,7 +41,7 @@ defmodule UccChat.ServiceHelpers do
       if opts[:preload] == false do
         []
       else
-        @default_user_preload
+        default_user_preloads()
       end
       |> user_preload
 

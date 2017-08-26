@@ -18,7 +18,8 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
       "icon-info-circled",
       View,
       "channel_settings.html",
-      10)
+      10,
+      [model: UccChat.Channel])
   end
 
   defp set_active_js(sender), do: """
@@ -60,8 +61,6 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
 
   def notify_update_success(socket, tab, sender, %{toggle: _} = opts) do
     trace "notify_update_success toggle", {tab, sender}
-    _ = tab
-    _ = sender
 
     params = %{channel_id: opts.resource.id, field: socket.assigns.toggle_field}
     broadcast socket, "room:update", params

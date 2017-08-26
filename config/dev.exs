@@ -43,13 +43,13 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
-      ~r{lib/ucx_ucc/web/templates/.*(eex|haml|slim|slime)$},
+      ~r{lib/ucx_ucc/web/templates/.*(eex|slim|slime)$},
       ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
-      ~r{plugins/.*/lib/.*/web/templates/.*(eex|haml|slim|slime)$},
+      ~r{plugins/.*/lib/.*/web/templates/.*(eex|slim|slime)$},
     ]
   ]
 
-# config :ucx_ucc, :ucc_tracer_modules, :all
+config :ucx_ucc, :ucc_tracer_modules, :all
 config :ucx_ucc, :ucc_tracer_level, :debug
 
 # Do not include metadata nor timestamps in development logs
