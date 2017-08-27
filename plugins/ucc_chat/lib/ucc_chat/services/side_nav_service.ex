@@ -12,18 +12,15 @@ defmodule UccChat.SideNavService do
 
     chatd = ChatDat.new(user, channel)
 
-    "rooms_list.html"
-    |> UccChatWeb.SideNavView.render(chatd: chatd)
-    |> Helpers.safe_to_string
+    render_to_string UccChatWeb.SideNavView, "rooms_list.html", chatd: chatd
   end
 
   def render_more_channels(user_id) do
     user = Helpers.get_user! user_id
     channels = ChannelService.get_side_nav_rooms user
 
-    "list_combined_flex.html"
-    |> UccChatWeb.SideNavView.render(channels: channels, current_user: user)
-    |> Helpers.safe_to_string
+    render_to_string UccChatWeb.SideNavView, "list_combined_flex.html",
+      channels: channels, current_user: user
   end
 
   def render_more_users(user_id) do
@@ -51,11 +48,8 @@ defmodule UccChat.SideNavService do
             status: UccChat.PresenceAgent.get(user.id))
       end)
 
-    bindings = UcxUcc.Hooks.render_users_bindings [users: users, current_user: user]
-
-    "list_users_flex.html"
-    |> UccChatWeb.SideNavView.render(bindings)
-    |> Helpers.safe_to_string
+    render_to_string UccChatWeb.SideNavView, "list_users_flex.html",
+      UcxUcc.Hooks.render_users_bindings([users: users, current_user: user])
   end
 
 end

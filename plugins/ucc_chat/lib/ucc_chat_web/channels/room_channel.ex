@@ -16,7 +16,9 @@ defmodule UccChatWeb.RoomChannel do
     "update:description",
     "update:settings:name",
     "update:messages_header",
+    "update:message_box",
     "update:name:change",
+    "update:room-icon",
     "js:execjs"
   ]
 
@@ -61,6 +63,11 @@ defmodule UccChatWeb.RoomChannel do
       %{user_id: user_id, channel_id: channel_id}
   end
 
+  def broadcast_message_box(room, channel_id, user_id) do
+    Endpoint.broadcast! CC.chan_room <> room, "update:message_box",
+      %{user_id: user_id, channel_id: channel_id, room: room}
+  end
+
   def user_join(nil), do: Logger.warn "join for nil username"
   def user_join(username, room) do
     # Logger.warn "user_join username: #{inspect username}, room: #{inspect room}"
@@ -79,14 +86,12 @@ defmodule UccChatWeb.RoomChannel do
   def join(ev = CC.chan_room <> "lobby", msg, socket) do
     Logger.info "user joined lobby msg: #{inspect msg}, socket: #{inspect socket}"
     super ev, msg, socket
-    # {:ok, socket}
   end
 
   def join(ev = CC.chan_room <> room, msg, socket) do
     trace ev, msg
     send self(), {:after_join, room, msg}
     super ev, msg, socket
-    # {:ok, socket}
   end
 
   def topic(_broadcasting, _controller, _request_path, conn_assigns) do
@@ -129,8 +134,8 @@ defmodule UccChatWeb.RoomChannel do
   # Outgoing message handlers
 
   def handle_out("js:execjs" = ev, payload, socket) do
-    _ = ev
     trace ev, payload
+
     case exec_js socket, payload[:js] do
       {:ok, result} ->
         send payload[:sender], {:response, result}
@@ -140,6 +145,12 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
+
+  def handle_out("update:message_box", _payload, socket) do
+    Client.broadcast_message_box socket, socket.assigns.channel_id,
+      socket.assigns.user_id
+    {:noreply, socket}
+  end
 
   def handle_out("update:messages_header", payload, socket) do
     update_messages_header(socket, get_chatd(payload))
@@ -172,6 +183,13 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_out(ev = "update:room-icon", %{field: icon} = payload, socket) do
+    debug ev, payload
+    icon = String.replace(icon, ~r/^icon-/, "")
+    Client.broadcast_room_icon(socket, socket.assigns.room, icon)
+    {:noreply, socket}
+  end
+
   def handle_out(ev = "update:settings:name", %{field: field} = payload, socket) do
     debug ev, payload
     socket
@@ -193,12 +211,15 @@ defmodule UccChatWeb.RoomChannel do
     debug ev, msg
     {:noreply, socket}
   end
+
   def handle_out("room:update:list", _msg, socket) do
     {:noreply, socket}
   end
+
   def handle_out("room:delete", _msg, socket) do
     {:noreply, socket}
   end
+
   def handle_out(ev = "lobby:" <> event, msg, socket) do
     debug ev, msg
     user_id = socket.assigns[:user_id]
@@ -223,8 +244,9 @@ defmodule UccChatWeb.RoomChannel do
     socket) do
     # debug pattern, msg
     trace pattern, msg
-    _ = msg
+
     user = Helpers.get_user! socket.assigns.user_id
+
     if authorized? socket, String.split(pattern, "/"), params, ucxchat, user do
       UccChatWeb.ChannelRouter.route(socket, pattern, params, ucxchat)
     else
@@ -258,6 +280,7 @@ defmodule UccChatWeb.RoomChannel do
 
     {:reply, resp, socket}
   end
+
   def handle_in(ev = "message:get-body:" <> id, msg, socket) do
     debug ev, msg
 
@@ -282,13 +305,14 @@ defmodule UccChatWeb.RoomChannel do
 
   @room_commands ~w(set-owner set-moderator mute-user remove-user)
 
-  defp authorized?(_socket, ["room_settings" | _], _params, ucxchat,
-    user) do
+  defp authorized?(_socket, ["room_settings" | _], _params, ucxchat, user) do
     Permissions.has_permission? user, "edit-room",
       ucxchat["assigns"]["channel_id"]
   end
+
   defp authorized?(_socket, _pattern = ["room", command, _username], _params,
     ucxchat, user) when command in @room_commands do
+
     Permissions.has_permission? user, command,
       ucxchat["assigns"]["channel_id"]
   end
@@ -296,7 +320,8 @@ defmodule UccChatWeb.RoomChannel do
   defp authorized?(_socket, _pattern, _params, _ucxchat, _), do: true
 
   defp update_messages_header(socket, %ChatDat{} = chatd) do
-    html = Phoenix.View.render_to_string MasterView, "messages_header.html", chatd: chatd
+    html = Phoenix.View.render_to_string MasterView,
+      "messages_header.html", chatd: chatd
     on = ".messages-container header>h2"
     update socket, :html, set: html, on: on
   end
@@ -306,6 +331,4 @@ defmodule UccChatWeb.RoomChannel do
     channel = Channel.get channel_id
     ChatDat.new user, channel
   end
-
-
 end

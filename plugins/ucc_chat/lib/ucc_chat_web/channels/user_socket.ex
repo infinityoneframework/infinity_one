@@ -1,10 +1,13 @@
 defmodule UccChatWeb.UserSocket do
   use Phoenix.Socket
-  alias UccChat.{MessageService, SideNavService}
+
+  import Rebel.Query
+
+  alias UccChat.{MessageService}
   alias UcxUcc.Accounts.User
   alias UcxUcc.Repo
-  require UccChat.ChatConstants, as: CC
 
+  require UccChat.ChatConstants, as: CC
   require Logger
 
   ## Channels
@@ -62,23 +65,25 @@ defmodule UccChatWeb.UserSocket do
   def id(socket), do: "users_socket:#{socket.assigns.user_id}"
 
   def push_message_box(socket, channel_id, user_id) do
-    # if channel_id == assigns.channel_id do
-      Logger.debug "push_message_box #{channel_id}, #{user_id}, " <>
-        "socket.assigns: #{inspect socket.assigns}"
+    Logger.debug "push_message_box #{channel_id}, #{user_id}, " <>
+      "socket.assigns: #{inspect socket.assigns}"
 
-      Phoenix.Channel.push socket, "code:update", %{
-        html: MessageService.render_message_box(channel_id, user_id),
-        selector: ".room-container footer.footer",
-        action: "html"
-      }
-    # end
+    update socket, :html,
+      set: MessageService.render_message_box(channel_id, user_id),
+      on: ".room-container footer.footer"
   end
 
-  def push_rooms_list_update(socket, channel_id, user_id) do
-    Phoenix.Channel.push socket, "code:update", %{
-      html: SideNavService.render_rooms_list(channel_id, user_id),
-      selector: "aside.side-nav .rooms-list",
-      action: "html"
-    }
+  def broadcast_message_box(socket, channel_id, user_id) do
+    update! socket, :html,
+      set: MessageService.render_message_box(channel_id, user_id),
+      on: ".room-container footer.footer"
   end
+
+  # def push_rooms_list_update(socket, channel_id, user_id) do
+  #   Phoenix.Channel.push socket, "code:update", %{
+  #     html: SideNavService.render_rooms_list(channel_id, user_id),
+  #     selector: "aside.side-nav .rooms-list",
+  #     action: "html"
+  #   }
+  # end
 end

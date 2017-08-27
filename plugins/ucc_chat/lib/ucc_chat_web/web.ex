@@ -21,22 +21,27 @@ defmodule UccChatWeb do
     quote do
       Code.ensure_compiled(UccChatWeb.Router)
       use Phoenix.Controller, namespace: UccChatWeb
+      use UcxUccWeb.Gettext
+
       import Plug.Conn
       import UccChatWeb.Router.Helpers
-      use UcxUccWeb.Gettext
-      alias UcxUcc.Repo
       import Ecto.Query
+
+      alias UcxUcc.Repo
       # import UccChatWeb.Gettext
     end
   end
 
   def channel_controller do
     quote do
-      alias UcxUcc.Repo
-      import Ecto
-      import Ecto.Query
       use UcxUcc.Utils
       use UcxUccWeb.Gettext
+
+      import Ecto
+      import Ecto.Query
+      import UcxUccWeb.Utils, warn: false
+
+      alias UcxUcc.Repo
     end
   end
 
@@ -45,21 +50,22 @@ defmodule UccChatWeb do
       Code.ensure_compiled(UccChatWeb.Router)
       use Phoenix.View, root: "plugins/ucc_chat/lib/ucc_chat_web/templates",
                         namespace: UccChatWeb
+      use Phoenix.HTML
+      use UcxUccWeb.Gettext
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
 
       # Use all HTML functionality (forms, tags, etc)
-      use Phoenix.HTML
-
       import UccChatWeb.Router.Helpers
       import UccChatWeb.ErrorHelpers
+      import UccChatWeb.SharedView
+      import UcxUccWeb.Utils, warn: false
       # import UccChatWeb.Gettext
-      use UcxUccWeb.Gettext
       alias UcxUcc.Accounts.User
       alias UcxUcc.Repo
-      import UccChatWeb.SharedView
       alias UcxUcc.Permissions
+
       require Logger
     end
   end
@@ -67,6 +73,7 @@ defmodule UccChatWeb do
   def router do
     quote do
       use Phoenix.Router
+
       import Plug.Conn
       import Phoenix.Controller
     end
@@ -75,9 +82,10 @@ defmodule UccChatWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      # import UccChatWeb.Gettext
       use UcxUccWeb.Gettext
-      import UcxUccWeb.Channel
+
+      import UcxUccWeb.{Channel}, warn: false
+
     end
   end
 

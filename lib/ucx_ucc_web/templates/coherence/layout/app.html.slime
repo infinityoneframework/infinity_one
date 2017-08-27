@@ -1,0 +1,30 @@
+doctype html
+html.js.no-touch.cssanimations.csstransitions.csscalc.scroll(lang="en")
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    meta(name="description" content="")
+    meta(name="author" content="")
+
+    title UccChat
+
+    link(rel="stylesheet" href='#{static_path(@conn, "/fonts/fontello/css/fontello.css")}')
+    link(rel="stylesheet" href='#{static_path(@conn, "/css/app.css")}')
+
+    script(src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous")
+    css:
+      body { background-color: #666 !important; }
+  body.global-font-family.color-primary-font-color
+    section.full-page.color-tertiary-font-color
+      .wrapper
+        header
+          a.logo(href="#")
+            img(src="/images/full_logo.png")
+
+        .container
+          = render @view_module, @view_template, assigns
+
+  = render UccChatWeb.LayoutView, "translations.html"
+
+  script(src='#{static_path(@conn, "/js/app.js")}')

@@ -96,24 +96,46 @@ defmodule UccModel do
         end
       end
 
+      @spec create(Ecto.Changeset.t) :: {:ok, Struct.t} |
+                                        {:error, Ecto.Changeset.t}
+
+      def create(changeset_or_attrs \\ %{})
+
+      def create(%Ecto.Changeset{} = changeset) do
+        @repo.insert changeset
+      end
+
       @spec create(Keyword.t) :: {:ok, Struct.t} |
                                  {:error, Ecto.Changeset.t}
-      def create(attrs \\ %{}) do
+      def create(attrs) do
         @repo.insert change(attrs)
       end
 
+      def create!(changeset_or_attrs \\ %{})
+
+      @spec create!(Ecto.Changeset.t) :: Struct.t | no_return
+      def create!(%Ecto.Changeset{} = changeset) do
+        @repo.insert! changeset
+      end
+
       @spec create!(Keyword.t) :: Struct.t | no_return
-      def create!(attrs \\ %{}) do
+      def create!(attrs) do
         @repo.insert! change(attrs)
       end
 
       @spec update(Struct.t, Keyword.t) :: {:ok, Struct.t} |
                                            {:error, Ecto.Changeset.t}
+      def update(%Ecto.Changeset{} = changeset) do
+        @repo.update changeset
+      end
       def update(%@schema{} = schema, attrs) do
         @repo.update change(schema, attrs)
       end
 
       @spec update!(Struct.t, Keyword.t) :: Struct.t | no_return
+      def update!(%Ecto.Changeset{} = changeset) do
+        @repo.update! changeset
+      end
       def update!(%@schema{} = schema, attrs) do
         @repo.update! change(schema, attrs)
       end

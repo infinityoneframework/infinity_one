@@ -3,8 +3,10 @@ defmodule UccChat.Channel do
 
   import Ecto.Changeset
 
-  alias UcxUcc.{Accounts.User,  Repo}
-  alias UccChat.Schema.{Subscription}
+  alias UcxUcc.{Accounts, Accounts.User,  Repo}
+  alias UccChat.Subscription
+  alias UccChat.Schema.Subscription, as: SubscriptionSchema
+  alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
 
@@ -102,7 +104,7 @@ defmodule UccChat.Channel do
         from c in @schema, where: c.type == 0 or c.type == 1
       User.has_role?(user, "user") ->
         from c in @schema,
-          left_join: s in Subscription, on: s.channel_id == c.id and s.user_id == ^user_id,
+          left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
           where: (c.type == 0 or (c.type == 1 and not is_nil(s.id))) and (not s.hidden or c.user_id == ^user_id)
       true -> from c in @schema, where: false
     end
@@ -118,7 +120,7 @@ defmodule UccChat.Channel do
         from c in @schema, where: c.type == 0 or c.type == 1, preload: [:subscriptions]
       User.has_role?(user, "user") ->
         from c in @schema,
-          left_join: s in Subscription, on: s.channel_id == c.id and s.user_id == ^user_id,
+          left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
           where: c.type == 0 or (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
       true -> from c in @schema, where: false
     end
@@ -157,4 +159,57 @@ defmodule UccChat.Channel do
   def list_by_default(default) do
     @repo.all from c in @schema, where: c.default == ^default
   end
+
+  def archive(%ChannelSchema{archived: true} = channel, user_id) do
+    Logger.error ""
+    changeset =
+      channel
+      |> changeset(get_user!(user_id), %{archived: true})
+      |> add_error(:archived, "already archived")
+    {:error, changeset}
+  end
+
+  def archive(%ChannelSchema{id: id} = channel, user_id) do
+    Logger.error ""
+    channel
+    |> changeset(get_user!(user_id), %{archived: true})
+    |> update
+    |> case do
+      {:ok, _channel} = response ->
+        Subscription.update_all_hidden(id, true)
+        response
+      {:error, changeset} = response ->
+        Logger.warn "error archiving channel #{inspect changeset.errors}"
+        response
+    end
+  end
+
+  def unarchive(%ChannelSchema{archived: false} = channel, user_id) do
+    Logger.error ""
+    changeset =
+      channel
+      |> changeset(get_user!(user_id), %{archived: false})
+      |> add_error(:archived, "not archived")
+    {:error, changeset}
+  end
+
+  def unarchive(%ChannelSchema{id: id} = channel, user_id) do
+    Logger.error ""
+    channel
+    |> changeset(get_user!(user_id), %{archived: false})
+    |> update
+    |> case do
+      {:ok, _channel} = response ->
+        Subscription.update_all_hidden(id, false)
+        response
+      {:error, changeset} = response ->
+        Logger.warn "error unarchiving channel #{inspect changeset.errors}"
+        response
+    end
+  end
+
+  defp get_user!(user_id) do
+    Accounts.get_user! user_id, preload: [:roles]
+  end
+
 end

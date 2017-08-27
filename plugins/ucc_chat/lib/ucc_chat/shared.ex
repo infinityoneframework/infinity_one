@@ -2,14 +2,18 @@ defmodule UccChat.Shared do
 
   def service do
     quote do
+      use UcxUccWeb.Gettext
+
       import Ecto.Query
+      import Phoenix.HTML, only: [safe_to_string: 1]
+      import UcxUccWeb.Utils
+
       alias UcxUcc.Repo
       alias UcxUcc.Accounts.{User, UserRole}
       alias UccChat.{Web.RoomChannel, Web.UserChannel}
       alias UccChat.ServiceHelpers, as: Helpers
+
       require UccChatWeb.SharedView
-      use UcxUccWeb.Gettext
-      import Phoenix.HTML, only: [safe_to_string: 1]
     end
   end
 

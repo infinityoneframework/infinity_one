@@ -14,4 +14,8 @@ defmodule UcxUccWeb.Utils do
     |> Enum.join(join_by)
   end
 
+  def render_to_string(view, template, bindings \\ []) do
+    Phoenix.View.render_to_string view, template, bindings
+  end
+
 end

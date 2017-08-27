@@ -1,10 +1,33 @@
 defmodule UccChatWeb.RebelChannel.Client do
   import Rebel.Query
   import Rebel.Core
+  import UcxUccWeb.Utils
 
   alias UccChatWeb.ClientView
+  alias UccChat.{MessageService, SideNavService}
+  alias UcxUcc.Accounts
 
   require Logger
+
+  def do_exec_js(socket, js) do
+    case exec_js(socket, js) do
+      {:ok, res} ->
+        res
+      {:error, error} = res ->
+        Logger.error "Problem with exec_js #{js}, error: #{inspect error}"
+        res
+    end
+  end
+
+  def do_broadcast_js(socket, js) do
+    case broadcast_js(socket, js) do
+      {:ok, res} ->
+        res
+      {:error, error} = res ->
+        Logger.error "Problem with broadcast_js #{js}, error: #{inspect error}"
+        res
+    end
+  end
 
   def page_loading(socket) do
     insert socket, ClientView.page_loading, prepend: "head"
@@ -92,13 +115,72 @@ defmodule UccChatWeb.RebelChannel.Client do
     exec_js socket, ~s{window.toastr.#{which}(#{message});}
   end
 
-  def do_exec_js(socket, js) do
-    case exec_js(socket, js) do
-      {:ok, res} ->
-        res
-      {:error, error} = res ->
-        Logger.error "Problem with exec_js #{js}, error: #{inspect error}"
-        res
-    end
+  def broadcast_room_icon(socket, room_name, icon_name) do
+    do_broadcast_js socket, update_room_icon_js(room_name, icon_name)
+  end
+
+  def set_room_icon(socket, room_name, icon_name) do
+    do_exec_js socket, update_room_icon_js(room_name, icon_name)
+  end
+
+  def update_room_icon_js(room_name, icon_name) do
+    """
+    var elems = document.querySelectorAll('i.room-#{room_name}');
+    for (var i=0; i < elems.length; i++) {
+      var elem = elems[i];
+      elem.className = elem.className.replace(/icon-([a-zA-Z\-_]+)/, 'icon-#{icon_name}');
+    }
+    """ |> String.replace("\n", "")
+  end
+
+  def broadcast_room_visibility(socket, payload, false) do
+    do_broadcast_js socket, remove_room_from_sidebar(payload.room_name)
+  end
+
+  def broadcast_room_visibility(socket, payload, true) do
+    push_rooms_list_update socket, payload.channel_id, socket.assigns.user_id
+  end
+
+  def remove_room_from_sidebar(room_name) do
+    """
+    var elem = document.querySelector('aside.side-nav [data-name="#{room_name}"]');
+    if (elem) { elem.parentElement.remove(); }
+    """ |> String.replace("\n", "")
+  end
+
+  def push_message_box(socket, channel_id, user_id) do
+    update socket, :html,
+      set: MessageService.render_message_box(channel_id, user_id),
+      on: ".room-container footer.footer"
+  end
+
+  def broadcast_message_box(socket, channel_id, user_id) do
+    html = MessageService.render_message_box(channel_id, user_id)
+    html_str = Poison.encode! html
+    do_exec_js socket, "console.log('user_id', '#{user_id}');"
+    do_exec_js socket, "console.log('html', '#{html_str}');"
+
+    update! socket, :html,
+      set: html,
+      on: ".room-container footer.footer"
+  end
+
+  def push_rooms_list_update(socket, channel_id, user_id) do
+    user = Accounts.get_user user_id
+    html = SideNavService.render_rooms_list(channel_id, user_id)
+    # TODO: for testing purposes
+    Logger.info "username: " <> user.username
+    Logger.info html
+
+    update socket, :html,
+      set: html,
+      # set: SideNavService.render_rooms_list(channel_id, user_id),
+      on: "aside.side-nav .rooms-list"
+  end
+
+  def update_main_content_html(socket, view, template, bindings) do
+    update socket, :html,
+      set: render_to_string(view, template, bindings),
+      on: ".main-content"
   end
 end

@@ -48,6 +48,7 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
 
   def notify_update_success(socket, tab, sender, %{toggle: _} = opts) do
     trace "notify_update_success toggle", {tab, sender}
+    trace "assigns", socket.assigns
 
     params = %{channel_id: opts.resource.id, field: socket.assigns.toggle_field}
     Logger.warn "params: " <> inspect(params)
@@ -68,17 +69,43 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     broadcast(socket, "room:update", params)
   end
 
+  def flex_form_toggle(socket, _sender, resource, "#channel_archived" = id, true = val) do
+    Logger.error "channel_archived true"
+    {_params, socket} = set_toggle_field socket, id, val
+    case Channel.archive resource, socket.assigns.user_id do
+      {:ok, _}            -> {:ok, socket}
+      {:error, changeset} ->
+        Logger.error "changeset: #{inspect changeset.errors}"
+        {:error, changeset, socket}
+    end
+  end
+
+  def flex_form_toggle(socket, _sender, resource, "#channel_archived" = id, false = val) do
+    Logger.error "channel_archived false"
+    {_params, socket} = set_toggle_field socket, id, val
+    case Channel.unarchive resource, socket.assigns.user_id do
+      {:ok, _}            -> {:ok, socket}
+      {:error, changeset} ->
+        Logger.error "changeset: #{inspect changeset.errors}"
+        {:error, changeset, socket}
+    end
+  end
+
   def flex_form_toggle(socket, _sender, resource, id, val) do
     trace "flex_form_toggle", socket.assigns, inspect({id, val, resource})
-    field = translate_field id
-    value = translate_value field, val
-    params = %{field => value}
-    socket = Phoenix.Socket.assign socket, :toggle_field, {field, value}
+    {params, socket} = set_toggle_field socket, id, val
 
     case Channel.update resource, params do
       {:ok, _} -> {:ok, socket}
       {:error, changeset} -> {:error, changeset, socket}
     end
+  end
+
+  defp set_toggle_field(socket, id, val) do
+    field = translate_field id
+    value = translate_value field, val
+    socket = Phoenix.Socket.assign socket, :toggle_field, {field, value}
+    {%{field => value}, socket}
   end
 
   def translate_field("#channel_private"), do: :type

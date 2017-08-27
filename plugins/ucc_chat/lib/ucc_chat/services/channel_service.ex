@@ -314,7 +314,7 @@ defmodule UccChat.ChannelService do
     {display_name, user_status, phone_status} =
       get_channel_display_name(type, chan, id)
     unread = if cc.unread == 0, do: false, else: cc.unread
-    cc = unhide_current_channel(cc, channel_id)
+    # cc = unhide_current_channel(cc, channel_id)
 
     %{
       open: open,
@@ -1235,6 +1235,11 @@ defmodule UccChat.ChannelService do
 
   def user_muted?(user_id, channel_id) do
     !! Mute.get_by(user_id: user_id, channel_id: channel_id)
+  end
+
+  def room_icon(channel_id) do
+    channel = Channel.get channel_id
+    get_icon channel.type
   end
 
   # def get_route(@stared_room, name), do: "/direct/" <> name
