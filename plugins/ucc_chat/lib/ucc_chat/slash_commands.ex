@@ -77,7 +77,9 @@ defmodule UccChat.SlashCommands do
   end
 
   def format_command %{command: command, args: args, description: description}, class \\ "" do
-    content_tag :div, class: "popup-item#{class}", "data-name": command do
+    content_tag :div, class: "popup-item#{class}", "data-name": command,
+      "rebel-click": "click_slash_popup" do
+
       [
         content_tag :strong do
           ["/", command]
@@ -92,5 +94,11 @@ defmodule UccChat.SlashCommands do
       ]
     end
   end
-  def special_text(message), do: @special_text[message]
+
+  def special_text(message) do
+    case @special_text[message] do
+      nil   -> "/" <> message
+      value -> value
+    end
+  end
 end

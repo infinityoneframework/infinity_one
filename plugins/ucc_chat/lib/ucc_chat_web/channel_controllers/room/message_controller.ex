@@ -12,6 +12,7 @@ defmodule UccChatWeb.MessageChannelController do
   # alias UcxUcc.Accounts.User
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.Schema.Message, as: MessageSchema
+  alias UccChatWeb.RebelChannel.Client
 
   require Logger
 
@@ -19,9 +20,15 @@ defmodule UccChatWeb.MessageChannelController do
     # Logger.warn "++++ socket: #{inspect socket}"
     message = params["message"]
     user_id = assigns[:user_id]
-    user = Helpers.get_user user_id
     channel_id = assigns[:channel_id]
 
+    create message, channel_id, user_id, socket
+
+    {:noreply, socket}
+  end
+
+  def create(message, channel_id, user_id, socket) do
+    user = Helpers.get_user user_id
     channel = Channel.get!(channel_id)
     msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
 
@@ -37,13 +44,13 @@ defmodule UccChatWeb.MessageChannelController do
         push_message(socket, msg.id, user_id, html)
 
       channel.read_only and
-        not Permissions.has_permission?(user, "post-readonly",
-        assigns.channel_id) ->
-        push_error socket, ~g(You are not authorized to create a message)
+        not Permissions.has_permission?(user, "post-readonly", channel_id) ->
 
+        Client.toastr socket, :error,
+          ~g(You are not authorized to create a message)
       channel.archived ->
-        push_error socket, ~g(You are not authorized to create a message)
-
+        Client.toastr socket, :error,
+          ~g(You are not authorized to create a message)
       true ->
         {body, mentions} = encode_mentions(message, channel_id)
         UccChat.RobotService.new_message body, channel, user
@@ -56,7 +63,7 @@ defmodule UccChatWeb.MessageChannelController do
           message_html, body: body)
     end
     stop_typing(socket, user_id, channel_id)
-    {:noreply, socket}
+    socket
   end
 
   def index(%{assigns: assigns} = socket, params) do

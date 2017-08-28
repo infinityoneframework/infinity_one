@@ -726,22 +726,22 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
-  def handle_info(%Broadcast{topic: "room:" <> room, event: "broadcastjs",
-    payload: %{js: js} = payload}, socket) do
+  # def handle_info(%Broadcast{topic: "room:" <> room, event: "broadcastjs",
+  #   payload: %{js: js} = payload}, socket) do
 
-    trace "broadcast room:" <> room <> ", event: broadcastjs", payload
-    # next, update sidebar if subscribed
-    if room in socket.assigns.subscribed do
-      exec_js socket, js
-    end
+  #   trace "broadcast room:" <> room <> ", event: broadcastjs", payload
+  #   # next, update sidebar if subscribed
+  #   if room in socket.assigns.subscribed do
+  #     exec_js socket, js
+  #   end
 
-    {:noreply, socket}
-  end
+  #   {:noreply, socket}
+  # end
 
   # Default broadcast case to ignore messages we are not interested in
-  def handle_info(%Broadcast{} = broadcast, socket) do
-    Logger.warn "broadcast: " <> inspect(broadcast)
-    Logger.warn "assigns: " <> inspect(socket.assigns)
+  def handle_info(%Broadcast{}, socket) do
+    # Logger.warn "broadcast: " <> inspect(broadcast)
+    # Logger.warn "assigns: " <> inspect(socket.assigns)
     {:noreply, socket}
   end
 
@@ -1091,6 +1091,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+
   # defdelegate click_admin(socket, sender), to: UccAdminWeb.AdminChannel
 
   defdelegateadmin :click_admin

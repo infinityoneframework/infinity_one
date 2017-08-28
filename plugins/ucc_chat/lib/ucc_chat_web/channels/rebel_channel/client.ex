@@ -2,6 +2,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   import Rebel.Query
   import Rebel.Core
   import UcxUccWeb.Utils
+  import Rebel.{Core, Query}, warn: false
 
   alias UccChatWeb.ClientView
   alias UccChat.{MessageService, SideNavService}
@@ -182,5 +183,17 @@ defmodule UccChatWeb.RebelChannel.Client do
     update socket, :html,
       set: render_to_string(view, template, bindings),
       on: ".main-content"
+  end
+
+  def scroll_bottom(socket, selector) do
+    exec_js socket, scroll_bottom_js(selector)
+    socket
+  end
+
+  def scroll_bottom_js(selector) do
+    """
+    var elem = document.querySelector('#{selector}');
+    elem.scrollTop = elem.scrollHeight - elem.clientHeight;
+    """ |> strip_nl()
   end
 end

@@ -19,6 +19,7 @@ defmodule UccChatWeb.RoomChannel do
     "update:message_box",
     "update:name:change",
     "update:room-icon",
+    "send:message",
     "js:execjs"
   ]
 
@@ -132,6 +133,12 @@ defmodule UccChatWeb.RoomChannel do
 
   ##########
   # Outgoing message handlers
+
+  def handle_out("send:message" = ev, payload, socket) do
+    trace ev, payload
+    broadcast_js socket, payload[:js]
+    {:noreply, socket}
+  end
 
   def handle_out("js:execjs" = ev, payload, socket) do
     trace ev, payload
@@ -299,7 +306,6 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-
   #########
   # Private
 
@@ -331,4 +337,7 @@ defmodule UccChatWeb.RoomChannel do
     channel = Channel.get channel_id
     ChatDat.new user, channel
   end
+
+  defdelegate message_keydown(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
+  defdelegate click_slash_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
 end

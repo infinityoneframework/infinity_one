@@ -2,10 +2,10 @@
   form.message-form.secondary-font-color(method="post" action="/")
     .message-popup-results
     = if @mb[:allowed_to_send?] do
-      .message-input.border-component-color
+      .message-input.border-component-color(rebel-channel="room")
         .input-message-container.content-background-color
           - placeholder = gettext "Message %{sym}", sym: @mb[:symbol]
-          textarea.message-form-text.input-message.autogrow-short(dir="auto" name="msg"  maxlength="#{@mb[:max_message_length]}" placeholder="#{placeholder}")
+          textarea.message-form-text.input-message.autogrow-short(rebel-keydown="message_keydown" dir="auto" name="msg"  maxlength="#{@mb[:max_message_length]}" placeholder="#{placeholder}")
           .inner-left-toolbar
             i.emoji-picker-icon.icon-people
 

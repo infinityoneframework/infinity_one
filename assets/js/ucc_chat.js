@@ -168,50 +168,54 @@ window.UccChat = {
       if (this.debug) { console.log('message-form submit', e) }
     })
     .on('keydown', '.message-form-text', e => {
-      let event = new jQuery.Event('user:input')
-      switch(e.keyCode) {
-        case 38: // up arrow
-        case 40: // down arrow
-        case 9:  // TAB
-          event.keyCode = e.keyCode
-          $("body").trigger(event)
-          return false
-        case 8:  // BS
-          event.keyCode = e.keyCode
-          $("body").trigger(event)
-        default:
-          return true
-      }
+      console.log('keydown', e)
     })
+    //   let event = new jQuery.Event('user:input')
+    //   switch(e.keyCode) {
+    //     case 38: // up arrow
+    //     case 40: // down arrow
+    //     case 9:  // TAB
+    //       event.keyCode = e.keyCode
+    //       $("body").trigger(event)
+    //       return false
+    //     case 8:  // BS
+    //       event.keyCode = e.keyCode
+    //       $("body").trigger(event)
+    //     default:
+    //       return true
+    //   }
+    // })
     .on('keypress', '.message-form-text', e => {
-      if (this.debug) { console.log('message-form-text keypress', e) }
-      if (e.keyCode == 13 && e.shiftKey) {
-        return true
-      }
-      if(e.keyCode == 13) {
-        if (this.messagePopup.handle_enter()) {
-          // console.log('return ', $('.message-form-text').hasClass('editing'))
-          if ($('.message-form-text').hasClass('editing')) {
-            // console.log('editing submit...', $('li.message.editing').attr('id'))
-            this.Messages.send_message({update: $('li.message.editing').attr('id'), value: $('.message-form-text').val()})
-          } else {
-            this.Messages.send_message($('.message-form-text').val())
-          }
-        }
-        this.typing.clear()
-        return false
-      } //else if (e.keyCode == 64) {
-      //   message_popup.open_users()
-      //   return true
-      // }
-
-      let event = new jQuery.Event('user:input')
-      event.keyCode = e.keyCode
-      $("body").trigger(event)
-
-      this.typing.start_typing()
-      return true
+      // if (this.debug) { console.log('message-form-text keypress', e) }
+      console.log('keypress', e)
     })
+    //   if (e.keyCode == 13 && e.shiftKey) {
+    //     return true
+    //   }
+    //   if(e.keyCode == 13) {
+    //     if (this.messagePopup.handle_enter()) {
+    //       // console.log('return ', $('.message-form-text').hasClass('editing'))
+    //       if ($('.message-form-text').hasClass('editing')) {
+    //         // console.log('editing submit...', $('li.message.editing').attr('id'))
+    //         this.Messages.send_message({update: $('li.message.editing').attr('id'), value: $('.message-form-text').val()})
+    //       } else {
+    //         this.Messages.send_message($('.message-form-text').val())
+    //       }
+    //     }
+    //     this.typing.clear()
+    //     return false
+    //   } //else if (e.keyCode == 64) {
+    //   //   message_popup.open_users()
+    //   //   return true
+    //   // }
+
+    //   let event = new jQuery.Event('user:input')
+    //   event.keyCode = e.keyCode
+    //   $("body").trigger(event)
+
+    //   this.typing.start_typing()
+    //   return true
+    // })
     // .on('keypress', 'input', e => {
     //   console.log('keypress input', e.keyCode);
     //   // return false;

@@ -17,6 +17,7 @@ defmodule UccChat.Application do
 
   def start(_type, _args) do
     UccChatWeb.FlexBar.Defaults.add_buttons()
+    UccChatWeb.RoomChannel.KeyStore.initialize()
   end
 
 end

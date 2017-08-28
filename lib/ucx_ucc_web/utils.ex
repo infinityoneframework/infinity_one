@@ -18,4 +18,5 @@ defmodule UcxUccWeb.Utils do
     Phoenix.View.render_to_string view, template, bindings
   end
 
+  def strip_nl(text), do: String.replace(text, "\n", "")
 end

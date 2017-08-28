@@ -15,9 +15,24 @@ const application_matches = {
 }
 const application_command_chars   = {users: "@", slashcommands: "/", channels: "#", emojis: ":"}
 
-window.UccChat.on_load(function(ucc_chat) {
-  ucc_chat.messagePopup = new MessagePopup(ucc_chat)
-})
+// window.UccChat.on_load(function(ucc_chat) {
+//   ucc_chat.messagePopup = new MessagePopup(ucc_chat)
+// })
+
+$(document).ready(function() {
+  var elem = document.querySelector(popup_window);
+  elem.addEventListener('mouseover', function(e) {
+    console.log('mouseover', e.target);
+    console.log('mouseover', e);
+    if (e.target) {
+      var curr = document.querySelector('.popup-item.selected');
+      if (curr) {
+        curr.classList.remove('selected');
+      }
+      e.target.classList.add('selected');
+    }
+  });
+});
 
 class MessagePopup {
 
