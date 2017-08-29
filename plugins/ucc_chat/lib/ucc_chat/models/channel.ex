@@ -132,6 +132,16 @@ defmodule UccChat.Channel do
     |> get_all_channels
   end
 
+  def get_channels_by_pattern(user_id, pattern, count \\ 5) do
+    user_id
+    |> get_authorized_channels
+    |> where([c], like(c.name, ^pattern))
+    |> order_by([c], asc: c.name)
+    |> limit(^count)
+    |> select([c], {c.id, c.name})
+    |> @repo.all
+  end
+
   def room_route(channel) do
     case channel.type do
       ch when ch in [0,1] -> "channels"

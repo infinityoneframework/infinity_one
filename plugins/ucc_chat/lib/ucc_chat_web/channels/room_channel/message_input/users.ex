@@ -27,11 +27,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
   end
 
   def handle_select(mb_data, selected, info) do
-    exec_js info.socket, """
-      var te = document.querySelector('#{Const.message_box}');
-      te.value = '@#{selected}';
-      te.focus();
-      """ |> strip_nl
+    if selected != "" do
+      exec_js info.socket, """
+        var te = document.querySelector('#{Const.message_box}');
+        te.value = '@#{selected}';
+        te.focus();
+        """ |> strip_nl
+    end
     mb_data
   end
 
