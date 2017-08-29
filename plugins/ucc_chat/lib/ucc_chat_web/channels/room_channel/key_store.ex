@@ -21,6 +21,10 @@ defmodule UccChatWeb.RoomChannel.KeyStore do
     end
   end
 
+  def delete(id) do
+    :ets.delete @name, id
+  end
+
   def reset do
     :ets.match_delete @name, :"$1"
   end

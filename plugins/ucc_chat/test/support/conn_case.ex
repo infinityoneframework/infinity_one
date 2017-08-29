@@ -29,10 +29,12 @@ defmodule UccChatWeb.ConnCase do
 
   setup tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(UcxUcc.Repo)
+
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(UcxUcc.Repo, {:shared, self()})
     end
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+
+    :ok
   end
 
 end

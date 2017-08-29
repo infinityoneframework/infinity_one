@@ -2,6 +2,9 @@
   console.log('utils.js loading...')
   const debug = false;
 
+  const item_selector = '.popup-item';
+  const selected_selector = item_selector + '.selected';
+
   var Utils = {
     remove: function(arr, item) {
       if (debug) { console.log('remove', arr, item) }
@@ -157,6 +160,82 @@
     },
     replace_history: function() {
       history.replaceState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
+    },
+    // taken from http://blog.vishalon.net/javascript-getting-and-setting-caret-position-in-textarea
+    getCaretPosition: function(ctrl) {
+      // IE < 9 Support
+      if (document.selection) {
+        ctrl.focus();
+        var range = document.selection.createRange();
+        var rangelen = range.text.length;
+        range.moveStart('character', -ctrl.value.length);
+        var start = range.text.length - rangeLen;
+        return {'start': start, 'end': start + rangeLen};
+      }
+      // IE >= 9 and other browsers
+      else if (ctrl.selectionStart || ctrl.selectionStart == '0') {
+        return {'start': ctrl.selectionStart, 'end': ctrl.selectionEnd};
+      } else {
+        return {'start': 0, 'end': 0}
+      }
+    },
+    // taken from http://blog.vishalon.net/javascript-getting-and-setting-caret-position-in-textarea
+    setCaretPosition: function(ctrl, start, end) {
+      // IE >= 9 and other browsers
+      if (ctrl.setSelectionRange){
+        ctrl.focus();
+        ctrl.setSelectionRange(start, end)
+      }
+      // IE < 9
+      else if (ctrl.createTextRange) {
+        var range = ctrl.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', end);
+        range.moveStart('character', start);
+        range.select();
+      }
+    },
+    downArrow: function() {
+      var curr = document.querySelector(selected_selector);
+      console.log('arrow down', curr);
+      if (!curr) {
+        var list = document.querySelector('.message-popup-items');
+        if (list) {
+          curr = list.firstElementChild;
+        }
+      }
+      if (curr) {
+        var next = curr.nextElementSibling;
+        console.log('next', next);
+        if (next && next.classList) {
+          curr.classList.remove('selected');
+          next.classList.add('selected');
+        }
+      }
+    },
+    upArrow: function() {
+      var curr = document.querySelector(selected_selector);
+      if (!curr) {
+        var list = document.querySelector('.message-popup-items');
+        if (list) {
+          curr = list.lastElementChild;
+        }
+      }
+      if (curr) {
+        var prev = curr.previousElementSibling;
+        console.log('prev', prev);
+        if (prev && prev.classList) {
+          curr.classList.remove('selected');
+          prev.classList.add('selected');
+        }
+      }
+    },
+    mb_before: function(event) {
+      console.log('running mb_before', event)
+      if (event.key == "ArrowUp" || event.key == "ArrowDown") {
+        event.stopPropagation();
+        event.preventDefault();
+      }
     }
   }
 

@@ -13,41 +13,41 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
     # Logger.warn "new mb_data: #{inspect mb_data}"
     "%"
     |> get_channels(info.user_id)
-    |> render_channels(mb_data, info.socket)
+    |> render_channels(mb_data, info.socket, info)
 
     Map.put mb_data, :app, Channels
   end
 
   def handle_in(mb_data, _key, info) do
     # Logger.warn "Slash commands handle_in mb_data: #{inspect mb_data}"
-    "%" <> mb_data.keys <> "%"
+    "%" <> buffer(mb_data) <> "%"
     |> get_channels(info.user_id)
-    |> render_channels(mb_data, info.socket)
+    |> render_channels(mb_data, info.socket, info)
   end
+
+  defp buffer(%{keys: "#" <> keys}), do: keys
 
   def handle_select(mb_data, selected, info) do
     if selected != "" do
-      exec_js info.socket, """
+      info.client.send_js info.socket, """
         var te = document.querySelector('#{Const.message_box}');
-        te.value = '##{selected}';
+        te.value = '##{selected} ';
         te.focus();
-        """ |> strip_nl
+        """
     end
     mb_data
   end
 
-  defp render_channels(nil, mb_data, _socket), do: mb_data
-  defp render_channels(channels, mb_data, socket) do
-    html = render_to_string MessageView,
-      "popup.html",
-      chatd: %{
+  defp render_channels(nil, mb_data, _socket, _info), do: mb_data
+  defp render_channels(channels, mb_data, socket, info) do
+    MessageView
+    |> render_to_string("popup.html", chatd: %{
         open: true,
         data: channels,
         title: ~g"Channels",
         templ: "popup_channel.html"
-      }
-
-    update socket, :html, set: html, on: ".message-popup-results"
+    })
+    |> info.client.render_popup_results(socket)
     mb_data
   end
 

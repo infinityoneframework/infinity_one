@@ -21,7 +21,7 @@ defmodule UccChatWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint UccChatWeb.Endpoint
+      @endpoint UcxUccWeb.Endpoint
     end
   end
 

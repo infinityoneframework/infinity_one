@@ -31,6 +31,7 @@ defmodule UccChatWeb.RoomChannel do
   alias UccChat.ServiceHelpers, as: Helpers
   alias UcxUcc.{Permissions, Accounts}, warn: false
   alias UcxUccWeb.Endpoint
+  alias UccChatWeb.RoomChannel.KeyStore
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
@@ -113,7 +114,12 @@ defmodule UccChatWeb.RoomChannel do
 
     push socket, "join", %{status: "connected"}
 
-    {:noreply, assign(socket, :channel_id, channel.id)}
+    socket =
+      socket
+      |> assign(:self, self())
+      |> assign(:channel_id, channel.id)
+
+    {:noreply, socket}
   end
 
   def handle_info(:broadcast_user_join, socket) do
@@ -239,8 +245,10 @@ defmodule UccChatWeb.RoomChannel do
     # push socket, event, msg
     {:noreply, socket}
   end
-
-  def terminate(_reason, _socket) do
+# [[{{"bc47810a-29a3-4cd5-893b-13a5a2ebdd31", #PID<0.4000.0>}, %{keys: ""}}]]
+  def terminate(_reason, %{assigns: assigns}) do
+    Logger.error "terminate: " <> inspect({assigns[:user_id], assigns[:self]})
+    KeyStore.delete {assigns[:user_id], assigns[:self]}
     :ok
   end
 

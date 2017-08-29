@@ -196,4 +196,40 @@ defmodule UccChatWeb.RebelChannel.Client do
     elem.scrollTop = elem.scrollHeight - elem.clientHeight;
     """ |> strip_nl()
   end
+
+  def get_caret_position(socket, selector) do
+    exec_js socket, get_caret_position_js(selector)
+  end
+
+  def get_caret_position!(socket, selector) do
+    case get_caret_position(socket, selector) do
+      {:ok, result} -> result
+      {:error, _} -> %{}
+    end
+  end
+
+  def get_caret_position_js(selector) do
+    """
+    var elem = document.querySelector('#{selector}');
+    UccChat.utils.getCaretPosition(elem);
+    """ |> strip_nl
+  end
+
+  def set_caret_position(socket, selector, start, finish) do
+    exec_js socket, set_caret_position_js(selector, start, finish)
+  end
+
+  def set_caret_position!(socket, selector, start, finish) do
+    case set_caret_position(socket, selector, start, finish) do
+      {:ok, result} -> result
+      other -> other
+    end
+  end
+
+  def set_caret_position_js(selector, start, finish) do
+    """
+    var elem = document.querySelector('#{selector}');
+    UccChat.utils.setCaretPosition(elem, #{start}, #{finish});
+    """ |> strip_nl
+  end
 end

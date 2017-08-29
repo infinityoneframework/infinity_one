@@ -11,39 +11,51 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
   require Logger
 
   def new(mb_data, _key, info) do
-    # Logger.warn "new mb_data: #{inspect mb_data}"
+    Logger.warn "new mb_data: #{inspect mb_data}"
     "%"
     |> get_users(info.channel_id, info.user_id)
-    |> render_users(mb_data, info.socket)
+    |> render_users(mb_data, info.socket, info)
 
     Map.put mb_data, :app, Users
   end
 
   def handle_in(mb_data, _key, info) do
-    # Logger.warn "Slash commands handle_in mb_data: #{inspect mb_data}"
-    "%" <> mb_data.keys <> "%"
+    Logger.warn "handle_in mb_data: #{inspect mb_data}"
+    "%" <> buffer(mb_data) <> "%"
     |> get_users(info.channel_id, info.user_id)
-    |> render_users(mb_data, info.socket)
+    |> render_users(mb_data, info.socket, info)
+  end
+
+  defp buffer(%{keys: keys}) do
+    case Regex.run ~r/.*@(a-zA-Z_\-]+)$/, keys do
+      [_, keys] -> keys
+      _ -> ""
+    end
   end
 
   def handle_select(mb_data, selected, info) do
     if selected != "" do
-      exec_js info.socket, """
+      info.client.send_js info.socket, """
         var te = document.querySelector('#{Const.message_box}');
-        te.value = '@#{selected}';
+        te.value = '@#{selected} ';
         te.focus();
-        """ |> strip_nl
+        """
     end
     mb_data
   end
 
-  defp render_users(nil, mb_data, _socket), do: mb_data
-  defp render_users(users, mb_data, socket) do
-    html = render_to_string MessageView,
-      "popup.html",
-      chatd: %{open: true, data: users, title: ~g"People", templ: "popup_user.html"}
+  defp render_users(nil, mb_data, _socket, _info), do: mb_data
+  defp render_users(users, mb_data, socket, info) do
+    Logger.warn "users: #{inspect users}"
+    MessageView
+    |> render_to_string("popup.html", chatd: %{
+      open: true,
+      data: users,
+      title: ~g"People",
+      templ: "popup_user.html"
+    })
+    |> info.client.render_popup_results(socket)
 
-    update socket, :html, set: html, on: ".message-popup-results"
     mb_data
   end
 

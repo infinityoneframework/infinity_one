@@ -1,7 +1,7 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.Client do
 
-  # import UcxUccWeb.Utils, only: [strip_nl: 1]
-  import Rebel.{Query, Core}, warn: false
+  import UcxUccWeb.Utils
+  import Rebel.{Query, Core, Element}, warn: false
 
   require UccChatWeb.RoomChannel.Constants, as: Const
 
@@ -27,4 +27,18 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Client do
   def clear_message_box_js,
     do: set_message_box_focus_js() <> ~s(elem.value = "";)
 
+  def render_popup_results(html, socket) do
+    update socket, :html, set: html, on: ".message-popup-results"
+  end
+
+  def send_js(socket, js) do
+    exec_js socket, strip_nl(js)
+  end
+
+  def get_selected_item(socket) do
+    case Element.query_one socket, ".popup-item.selected", :dataset do
+      {:ok, %{"dataset" => %{"name" => name}}} -> name
+      _other -> nil
+    end
+  end
 end
