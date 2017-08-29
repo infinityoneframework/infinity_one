@@ -26,9 +26,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
     |> render_users(mb_data, info.socket, info)
   end
 
-  defp buffer(%{keys: keys}) do
-    case Regex.run ~r/.*@(a-zA-Z_\-]+)$/, keys do
-      [_, keys] -> keys
+  defp buffer(%{buffer: buffer}) do
+    case Regex.run ~r/.*@(a-zA-Z_\-]+)$/, buffer do
+      [_, buffer] -> buffer
       _ -> ""
     end
   end

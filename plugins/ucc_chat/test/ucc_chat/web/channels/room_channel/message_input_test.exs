@@ -65,7 +65,7 @@ defmodule UccChatWeb.RoomChannel.MessageInputTest do
 
     data = MessageInput.handle_keydown(socket, sender, "Enter", Client)
     assert_receive :close_popup
-    assert data[:keys] == ""
+    assert data[:buffer] == ""
 
 
   end

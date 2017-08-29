@@ -70,7 +70,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     |> save_mb_data(ks_key, info)
   end
 
-  defp ensure_mb_data(nil),     do: %{keys: ""}
+  defp ensure_mb_data(nil),     do: %{buffer: ""}
   defp ensure_mb_data(mb_data), do: mb_data
 
   defp app_pattern_match?(key, buffer) when key in @app_keys do
@@ -104,7 +104,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp put_key(mb_data, key) do
-    update_in(mb_data, [:keys], & &1 <> key)
+    update_in(mb_data, [:buffer], & &1 <> key)
   end
 
   defp save_mb_data(mb_data, ks_key, info) do
@@ -117,7 +117,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp handle_in(%{app: app} = mb_data, key, info) do
-    if pattern_mod_match? app, mb_data.keys do
+    if pattern_mod_match? app, mb_data.buffer do
       Logger.info "matched: " <> inspect(mb_data)
       app
       |> app_module
@@ -130,7 +130,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp handle_in(mb_data, key, info) when key in @app_keys do
-    if app_pattern_match? key, mb_data.keys do
+    if app_pattern_match? key, mb_data.buffer do
       Logger.info "matched: " <> inspect(mb_data)
       key
       |> key_to_app_module
@@ -175,7 +175,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   #   mb_data
   # end
 
-  defp handle_special_keys(%{keys: ""} = mb_data, @bs, info) do
+  defp handle_special_keys(%{buffer: ""} = mb_data, @bs, info) do
     mb_data
     |> close_popup(info.socket, info)
     |> clear_mb_data
@@ -183,7 +183,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
 
   defp handle_special_keys(mb_data, @bs = key, info) do
     mb_data
-    |> update_in([:keys], &String.replace(&1, ~r/.$/, ""))
+    |> update_in([:buffer], &String.replace(&1, ~r/.$/, ""))
     |> check_and_call_app_module(key, info, :handle_in)
   end
 
@@ -246,7 +246,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
 
   defp clear_mb_data(mb_data) do
     mb_data
-    |> Map.put(:keys, "")
+    |> Map.put(:buffer, "")
     |> Map.delete(:app)
   end
 

@@ -25,7 +25,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
     |> render_channels(mb_data, info.socket, info)
   end
 
-  defp buffer(%{keys: "#" <> keys}), do: keys
+  defp buffer(%{buffer: "#" <> buffer}), do: buffer
 
   def handle_select(mb_data, selected, info) do
     if selected != "" do
