@@ -757,8 +757,8 @@ defmodule UccChatWeb.UserChannel do
     %{channel_id: channel_id, body: body} = payload
     channel = Channel.get!(channel_id)
 
-    with [sub] <- Repo.all(Subscription.get_by(channel_id: channel_id,
-                    user_id: user_id)),
+    with sub <- Subscription.get_by(channel_id: channel_id,
+                    user_id: user_id),
          open  <- Map.get(sub, :open),
          false <- socket.assigns.user_state == "active" and open,
          count <- ChannelService.get_unread(channel_id, user_id) do

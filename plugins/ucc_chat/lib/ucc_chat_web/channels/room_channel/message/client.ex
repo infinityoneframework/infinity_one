@@ -18,9 +18,9 @@ defmodule UccChatWeb.RoomChannel.Message.Client do
   end
 
   def push_message_js(message) do
-    # message = Poison.encode! message
+    message = Poison.encode! message |> strip_nl()
     """
-    var node = document.createRange().createContextualFragment('#{message}');
+    var node = document.createRange().createContextualFragment(#{message});
     var elem = document.querySelector('#{@wrapper_list}');
     elem.append(node);
     """ |> strip_nl()

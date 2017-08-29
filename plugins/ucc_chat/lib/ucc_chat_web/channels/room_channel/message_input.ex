@@ -45,7 +45,14 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     user_id = socket.assigns[:user_id]
 
     ks_key = {user_id, self}
-    info = %{socket: socket, sender: sender, ks_key: ks_key, key: key}
+    info = %{
+      socket: socket,
+      sender: sender,
+      ks_key: ks_key,
+      key: key,
+      user_id: user_id,
+      channel_id: socket.assigns[:channel_id]
+    }
 
     ks_key
     |> KeyStore.get

@@ -27,6 +27,29 @@ defmodule UcxUcc.Accounts do
     Repo.all from u in User, preload: ^preload
   end
 
+  def list_users_by_pattern(user_ids, pattern, count \\ 5) do
+    User
+    |> where([c], like(c.username, ^pattern) and c.id in ^user_ids)
+    |> join(:left, [c], r in assoc(c, :roles))
+    |> where([c, r], not(r.name == "bot" and r.scope == "global"))
+    |> preload([c, r], [roles: c])
+    |> select([c], c)
+    |> order_by([c], desc: c.inserted_at)
+    |> limit(^count)
+    |> Repo.all
+  end
+
+  def list_all_users_by_pattern(pattern, exclude, count) do
+    User
+    |> where([c], like(c.username, ^pattern) and not c.id in ^exclude)
+    |> join(:left, [c], r in assoc(c, :roles))
+    |> where([c, r], not(r.name == "bot" and r.scope == "global"))
+    |> preload([c, r], [roles: c])
+    |> select([c], c)
+    |> order_by([c], asc: c.username)
+    |> limit(^count)
+    |> Repo.all
+  end
 
   @doc """
   Gets a single user.

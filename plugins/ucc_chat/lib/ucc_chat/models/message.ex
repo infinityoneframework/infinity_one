@@ -159,4 +159,13 @@ defmodule UccChat.Message do
     |> @repo.one
   end
 
+  def get_user_ids(channel_id, user_id) do
+    @schema
+    |> where([m], m.channel_id == ^channel_id and m.user_id != ^user_id)
+    |> group_by([m], m.user_id)
+    |> select([m], m.user_id)
+    |> order_by([m], desc: m.inserted_at)
+    |> @repo.all
+    # |> Enum.reverse
+  end
 end

@@ -1,4 +1,4 @@
-defmodule UccChatWeb.RomoChannel.MessageInput.SlashCommands do
+defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
 
   import UcxUccWeb.Utils
   import Rebel.{Core, Query}, warn: false
