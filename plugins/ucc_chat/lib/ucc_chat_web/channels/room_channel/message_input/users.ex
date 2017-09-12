@@ -1,4 +1,6 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.Users do
+  use UccChatWeb.RoomChannel.Constants
+
   import UcxUccWeb.Utils
   import Rebel.{Core, Query}, warn: false
   import UcxUccWeb.Gettext
@@ -7,59 +9,48 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
   alias UccChatWeb.MessageView
   alias UccChat.{PresenceAgent, Message}
 
-  require UccChatWeb.RoomChannel.Constants, as: Const
+  require UccChatWeb.RoomChannel.MessageInput
   require Logger
 
-  def new(mb_data, _key, info) do
-    Logger.warn "new mb_data: #{inspect mb_data}"
-    "%"
-    |> get_users(info.channel_id, info.user_id)
-    |> render_users(mb_data, info.socket, info)
-
-    Map.put mb_data, :app, Users
+  def handle_in("@" <> pattern, context) do
+    handle_in pattern, context
+  end
+  def handle_in(pattern, context) do
+    Logger.warn "Users handle_in pattern: #{inspect pattern}"
+    "%" <> pattern <> "%"
+    |> get_users(context.channel_id, context.user_id)
+    |> render_users(context)
   end
 
-  def handle_in(mb_data, _key, info) do
-    Logger.warn "handle_in mb_data: #{inspect mb_data}"
-    "%" <> buffer(mb_data) <> "%"
-    |> get_users(info.channel_id, info.user_id)
-    |> render_users(mb_data, info.socket, info)
-  end
-
-  defp buffer(%{buffer: buffer}) do
-    case Regex.run ~r/.*@(a-zA-Z_\-]+)$/, buffer do
-      [_, buffer] -> buffer
-      _ -> ""
-    end
-  end
-
-  def handle_select(mb_data, selected, info) do
+  def handle_select(buffer, selected, context) do
     if selected != "" do
-      info.client.send_js info.socket, """
-        var te = document.querySelector('#{Const.message_box}');
-        te.value = '@#{selected} ';
+      context.client.send_js context.socket, """
+        var te = document.querySelector('#{@message_box}');
+        te.value = '#{buffer} ';
         te.focus();
         """
     end
-    mb_data
   end
 
-  defp render_users(nil, mb_data, _socket, _info), do: mb_data
-  defp render_users(users, mb_data, socket, info) do
+  defp render_users([], context) do
+    context.client.close_popup context.socket
+    :close
+  end
+  defp render_users(users, context) do
     Logger.warn "users: #{inspect users}"
     MessageView
     |> render_to_string("popup.html", chatd: %{
+      app: "Users",
       open: true,
       data: users,
       title: ~g"People",
       templ: "popup_user.html"
     })
-    |> info.client.render_popup_results(socket)
-
-    mb_data
+    |> context.client.render_popup_results(context.socket)
   end
 
   defp get_users(pattern, channel_id, user_id) do
+    IO.inspect pattern, label: "pattern....."
     channel_id
     |> get_users_by_pattern(user_id, pattern)
     |> add_extra_users

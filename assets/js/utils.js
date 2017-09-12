@@ -215,6 +215,7 @@
     },
     upArrow: function() {
       var curr = document.querySelector(selected_selector);
+      console.log('up down', curr);
       if (!curr) {
         var list = document.querySelector('.message-popup-items');
         if (list) {

@@ -1,4 +1,6 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
+  use UccChatWeb.RoomChannel.Constants
+
   import UcxUccWeb.Utils
   import Rebel.{Core, Query}, warn: false
   import UcxUccWeb.Gettext
@@ -6,49 +8,46 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
   alias UccChatWeb.MessageView
   alias UccChat.Channel
 
-  require UccChatWeb.RoomChannel.Constants, as: Const
+  require UccChatWeb.RoomChannel.MessageInput
   require Logger
 
-  def new(mb_data, _key, info) do
-    # Logger.warn "new mb_data: #{inspect mb_data}"
-    "%"
-    |> get_channels(info.user_id)
-    |> render_channels(mb_data, info.socket, info)
-
-    Map.put mb_data, :app, Channels
+  def handle_in("#" <> pattern, context) do
+    handle_in pattern, context
   end
 
-  def handle_in(mb_data, _key, info) do
-    # Logger.warn "Slash commands handle_in mb_data: #{inspect mb_data}"
-    "%" <> buffer(mb_data) <> "%"
-    |> get_channels(info.user_id)
-    |> render_channels(mb_data, info.socket, info)
+  def handle_in(pattern, context) do
+    Logger.warn "Channels handle_in pattern: #{inspect pattern}"
+    "%" <> pattern <> "%"
+    |> get_channels(context.user_id)
+    |> render_channels(context)
   end
 
-  defp buffer(%{buffer: "#" <> buffer}), do: buffer
-
-  def handle_select(mb_data, selected, info) do
+  def handle_select(buffer, selected, context) do
     if selected != "" do
-      info.client.send_js info.socket, """
-        var te = document.querySelector('#{Const.message_box}');
-        te.value = '##{selected} ';
+      context.client.send_js context.socket, """
+        var te = document.querySelector('#{@message_box}');
+        te.value = '#{buffer} ';
         te.focus();
         """
     end
-    mb_data
   end
 
-  defp render_channels(nil, mb_data, _socket, _info), do: mb_data
-  defp render_channels(channels, mb_data, socket, info) do
+  defp render_channels([], context) do
+    context.client.close_popup context.socket
+    :close
+  end
+
+  defp render_channels(channels, context) do
+    Logger.error "channels: #{inspect channels}"
     MessageView
     |> render_to_string("popup.html", chatd: %{
+        app: "Channels",
         open: true,
         data: channels,
         title: ~g"Channels",
         templ: "popup_channel.html"
     })
-    |> info.client.render_popup_results(socket)
-    mb_data
+    |> context.client.render_popup_results(context.socket)
   end
 
   defp get_channels(pattern, user_id) do
@@ -60,5 +59,4 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
     |> Channel.get_channels_by_pattern(pattern, 5)
     |> Enum.map(fn {id, name} -> %{id: id, name: name, username: name} end)
   end
-
 end

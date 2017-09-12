@@ -1,5 +1,5 @@
 = if is_popup_open(@chatd) do
-  .message-popup-position
+  .message-popup-position(data-app="SlashCommands")
     .message-popup.content-background-color(class="#{get_popup_cls(@chatd)}")
       = @chatd[:data]
       = if _loading = get_loading(@chatd) do

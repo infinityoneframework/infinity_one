@@ -21,20 +21,6 @@ UccChat.on_connect(function(ucc_chat, socket) {
   console.log('ucxchat', ucxchat)
   console.log('ucc_chat', ucc_chat)
 
-  Rebel.additional_payloads.push(function(sender, event) {
-    if (sender) {
-      let extra = sender.attributes['rebel-extra'];
-      if (extra) {
-        let key = extra.value;
-        let ret = {};
-        ret[key] = to_map(event[key]);
-        return ret;
-      } else {
-        return {};
-      }
-    }
-  });
-
   document.addEventListener('device_manager_init', (e) => {
     chan.push('webrtc:device_manager_init', {})
   });

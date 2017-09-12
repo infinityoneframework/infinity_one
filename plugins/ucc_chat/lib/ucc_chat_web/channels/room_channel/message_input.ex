@@ -1,41 +1,12 @@
 defmodule UccChatWeb.RoomChannel.MessageInput do
   use UccLogger
 
-  alias UccChatWeb.RoomChannel.KeyStore
-  alias UccChatWeb.RoomChannel.MessageInput.Client
-  alias UccChatWeb.RoomChannel.Message
+  # alias UccChatWeb.RoomChannel.KeyStore
+  alias UccChatWeb.RoomChannel.MessageInput.{Client, SpecialKeys}
+  # alias UccChatWeb.RoomChannel.Message
+  alias UccChatWeb.RoomChannel.MessageInput.Buffer
 
-  require UccChatWeb.RoomChannel.Constants, as: Const
-
-  @app_patterns       [
-                        ~r/^\/([^\s]*)$/,
-                        ~r/(^|\s)@([^\s]*)$/,
-                        ~r/(^|\s)#([^\s]*)$/,
-                        ~r/(^|\s):([^\s]*)$/
-                      ]
-
-  @app_keys            ~w(/ @ # :)
-  @app_mods            [SlashCommands, Users, Channels, Emojis]
-  @app_lookup          Enum.zip(@app_keys, @app_mods) |> Enum.into(%{})
-  @pattern_key_lookup  Enum.zip(@app_keys, @app_patterns) |> Enum.into(%{})
-  @pattern_mod_lookup  Enum.zip(@app_mods, @app_patterns) |> Enum.into(%{})
-
-  @up_arrow            "ArrowUp"
-  @dn_arrow            "ArrowDown"
-  @left_arrow          "ArrowLeft"
-  @right_arrow         "ArrowRight"
-  @bs                  "Backspace"
-  @tab                 "Tab"
-  @cr                  "Enter"
-  @esc                 "Escape"
-
-  @special_keys        [@esc, @up_arrow, @dn_arrow, @left_arrow,
-                        @right_arrow, @bs, @tab, @cr]
-
-  @fn_keys             for n <- 1..15, do: "F#{n}"
-
-  @ignore_keys         @fn_keys ++ ~w(Shift Meta Control Alt
-                         PageDown PageUp Home)
+  use UccChatWeb.RoomChannel.Constants
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]
@@ -47,108 +18,90 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def handle_keydown(socket, sender, key, client \\ Client) do
-    self = socket.assigns[:self]
-    user_id = socket.assigns[:user_id]
+    # self = socket.assigns[:self]
+    # user_id = socket.assigns[:user_id]
 
-    ks_key = {user_id, self}
-    info = %{
+    # ks_key = {user_id, self}
+    socket
+    |> create_context(sender, key, client)
+    |> trace_data
+    |> handle_in(key)
+  end
+
+  def create_context(socket, sender, key, client) do
+    %{
       socket: socket,
       sender: sender,
-      ks_key: ks_key,
       key: key,
-      user_id: user_id,
+      user_id: socket.assigns[:user_id],
       channel_id: socket.assigns[:channel_id],
-      client: client
+      client: client,
     }
-
-    ks_key
-    |> KeyStore.get
-    |> trace_data(info)
-    |> ensure_mb_data
-    |> save_key(key)
-    |> handle_in(key, info)
-    |> save_mb_data(ks_key, info)
+    |> Buffer.add_buffer_state(sender, key)
+    |> set_app(sender)
+    |> logit1
   end
 
-  defp ensure_mb_data(nil),     do: %{buffer: ""}
-  defp ensure_mb_data(mb_data), do: mb_data
-
-  defp app_pattern_match?(key, buffer) when key in @app_keys do
-    Regex.match? @pattern_key_lookup[key], buffer
-  end
-  defp app_pattern_match?(_, _), do: false
-
-  defp pattern_mod_match?(mod, buffer) do
-    Regex.match? @pattern_mod_lookup[mod], buffer
+  def logit1(cx) do
+    Logger.error("app: #{inspect cx[:app]}, key: #{inspect cx.key}")
+    cx
   end
 
-  def save_key(mb_data, key) when key in @special_keys, do: mb_data
 
-  # def save_key(mb_data, key) when key in @app_keys do
-  #   if app_pattern_match? key, mb_data.keys <> key do
-  #     Logger.warn "matched"
-  #     mb_data
-  #   else
-  #     Logger.warn "did not match"
-  #     put_key mb_data, key
-  #   end
-  # end
-
-  def save_key(mb_data, key) do
-    put_key mb_data, key
+  defp set_app(context, sender) do
+    Logger.error "popup app: #{inspect sender}"
+    context
+    |> Map.put(:open?, sender["message_popup"])
+    |> Map.put(:app, Module.concat(sender["popup_app"], nil))
+    # if sender["message_popup"] do
+    #   Map.put context, :app, Module.concat(sender["popup_app"], nil)
+    # else
+    #   context
+    # end
   end
 
-  defp trace_data(data, info) do
-    Logger.warn "message_keydown: ks_key: #{inspect info.ks_key}, data: #{inspect data}"
-    data
+  defp trace_data(context) do
+    Logger.warn "message_keydown: " <> inspect(context)
+    context
   end
 
-  defp put_key(mb_data, key) do
-    update_in(mb_data, [:buffer], & &1 <> key)
+  ########################
+  # handle_in Handlers
+
+  defp handle_in(%{state: :ignore} = context, _key) do
+    context
   end
 
-  defp save_mb_data(mb_data, ks_key, info) do
-    KeyStore.put ks_key, mb_data
-    mb_data
+  defp handle_in(context, key) when key in @special_keys do
+    Logger.info "key: #{inspect key}, state: #{inspect context.state}"
+    SpecialKeys.handle_in context, key
   end
 
-  defp handle_in(mb_data, key, info) when key in @special_keys do
-    handle_special_keys mb_data, key, info
-  end
-
-  defp handle_in(%{app: app} = mb_data, key, info) do
-    if pattern_mod_match? app, mb_data.buffer do
-      Logger.info "matched: " <> inspect(mb_data)
-      app
-      |> app_module
-      |> apply(:handle_in, [mb_data, key, info])
+  defp handle_in(%{state: state} = context, key) when key in @app_keys do
+    Logger.info "state: #{inspect state}"
+    if match = Buffer.match_app_pattern state.head do
+      Logger.info "matched: "
+      dispatch_handle_in(key, match, context)
     else
-      Logger.info "did not match: " <> inspect(mb_data)
-      mb_data
-      |> close_popup(info.socket, info)
+      Logger.info "did not match: "
+      context
     end
   end
 
-  defp handle_in(mb_data, key, info) when key in @app_keys do
-    if app_pattern_match? key, mb_data.buffer do
-      Logger.info "matched: " <> inspect(mb_data)
-      key
-      |> key_to_app_module
-      |> apply(:new, [mb_data, key, info])
+  defp handle_in(%{app: app, state: state} = context, _key) do
+    if match = Buffer.pattern_mod_match? app, state.buffer do
+      # Logger.info "matched: "
+      dispatch_handle_in(app, match, context)
     else
-      Logger.info "did not match: " <> inspect(mb_data)
-      mb_data
+      # Logger.info "did not match: "
+      check_and_close :close, context
     end
   end
-
-
-  # defp handle_in({false, mb_data}, _key, _info),
-  #   do: mb_data
 
   # default key handler
-  defp handle_in(mb_data, key, _info) do
-    trace "default handle_in", {mb_data, key}
-    mb_data
+  defp handle_in(context, key) do
+    trace "default handle_in", {key, context.state}
+    context
   end
 
   def click_slash_popup(socket, sender) do
@@ -164,104 +117,47 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     socket
   end
 
-  ####################
-  # Special key handlers
-
-  # defp handle_special_keys({_, mb_data}, @up_arrow = _key, _info) do
-  #   mb_data
-  # end
-
-  # defp handle_special_keys({_, mb_data}, @dn_arrow = _key, _info) do
-  #   mb_data
-  # end
-
-  defp handle_special_keys(%{buffer: ""} = mb_data, @bs, info) do
-    mb_data
-    |> close_popup(info.socket, info)
-    |> clear_mb_data
-  end
-
-  defp handle_special_keys(mb_data, @bs = key, info) do
-    mb_data
-    |> update_in([:buffer], &String.replace(&1, ~r/.$/, ""))
-    |> check_and_call_app_module(key, info, :handle_in)
-  end
-
-  defp handle_special_keys(%{app: app} = mb_data, key, info) when key in [@tab, @cr] do
-    selected = get_selected_item(info)
-
-    app
-    |> app_module
-    |> apply(:handle_select, [mb_data, selected, info])
-    |> close_popup(info.socket, info)
-    |> clear_mb_data
-  end
-
-  defp handle_special_keys(mb_data, @tab = _key, _info) do
-    mb_data
-  end
-
-  defp handle_special_keys(mb_data, @cr = _key, info) do
-    assigns = info.socket.assigns
-
-    message =
-      info.socket
-      |> info.client.get_message_box_value
-      |> String.trim_trailing
-
-    if message != "" do
-      Message.create(message, assigns.channel_id, assigns.user_id, info.socket)
-    end
-
-    info.client.clear_message_box(info.socket)
-    clear_mb_data mb_data
-  end
-
-  defp handle_special_keys(%{app: _} = mb_data, @esc, info) do
-    info.client.close_popup info.socket
-    Map.delete mb_data, :app
-  end
-
-  defp handle_special_keys(%{app: _} = mb_data, @dn_arrow, info) do
-    info.client.run_js info.socket, "UccChat.utils.downArrow()"
-    mb_data
-  end
-
-  defp handle_special_keys(%{app: _} = mb_data, @up_arrow, info) do
-    info.client.run_js info.socket, "UccChat.utils.upArrow()"
-    mb_data
-  end
-
-  defp handle_special_keys(mb_data, _key, _info), do: mb_data
-
-  defp check_and_call_app_module(%{app: app} = mb_data, key, info, fun) do
-    app
-    |> app_module
-    |> apply(fun, [mb_data, key, info])
-  end
-
-  defp check_and_call_app_module(mb_data, _key, _info, _fun) do
-    mb_data
-  end
-
-  defp clear_mb_data(mb_data) do
-    mb_data
-    |> Map.put(:buffer, "")
-    |> Map.delete(:app)
-  end
-
-  defp get_selected_item(info) do
-    info.client.get_selected_item info.socket
+  def get_selected_item(context) do
+    context.client.get_selected_item context.socket
   end
 
   ###############
   # Helpers
 
-  defp close_popup(mb_data, socket, info) do
-    info.client.close_popup socket
-    mb_data
+  def close_popup(context) do
+    context.client.close_popup context.socket
+    Map.delete context, :app
   end
 
-  defp app_module(app), do: Module.concat(__MODULE__, app)
-  defp key_to_app_module(key), do: @app_lookup[key] |> app_module
+  def check_and_close(:close, context) do
+    context.client.close_popup context.socket
+
+    Map.delete context, :app
+  end
+
+  def check_and_close(_, context) do
+    context
+  end
+
+  def dispatch_handle_in(key, pattern, context) when is_binary(key) do
+    Logger.info "pattern 1 #{inspect pattern}"
+    key
+    |> Buffer.key_to_app
+    |> dispatch_handle_in(pattern, context)
+  end
+
+  def dispatch_handle_in(module, pattern, context) when is_atom(module) do
+    Logger.info "pattern 2 #{inspect pattern}, module: #{inspect module}"
+    __MODULE__
+    |> Module.concat(module)
+    |> IO.inspect(label: "after concat")
+    |> apply(:handle_in, [pattern, context])
+    |> check_and_close(Map.put(context, :app, module))
+  end
+
+  def send_js(context, js) do
+    context.client.send_js context.socket, js
+    context
+  end
+
 end

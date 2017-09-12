@@ -1,16 +1,18 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.Client do
 
   import UcxUccWeb.Utils
-  import Rebel.{Query, Core, Element}, warn: false
+  import Rebel.{Query, Core}, warn: false
 
-  require UccChatWeb.RoomChannel.Constants, as: Const
+  alias Rebel.Element
+
+  use UccChatWeb.RoomChannel.Constants
 
   def close_popup(socket) do
     update socket, :html, set: "", on: ".message-popup-results"
   end
 
   def get_message_box_value(socket) do
-    exec_js! socket, "document.querySelector('#{Const.message_box}').value;"
+    exec_js! socket, "document.querySelector('#{@message_box}').value;"
   end
 
   def set_message_box_focus(socket) do
@@ -18,7 +20,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Client do
   end
 
   def set_message_box_focus_js,
-    do: "var elem = document.querySelector('#{Const.message_box}'); elem.focus();"
+    do: "var elem = document.querySelector('#{@message_box}'); elem.focus();"
 
   def clear_message_box(socket) do
     exec_js socket, clear_message_box_js()

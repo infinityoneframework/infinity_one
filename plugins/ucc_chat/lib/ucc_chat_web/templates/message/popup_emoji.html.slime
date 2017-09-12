@@ -1,5 +1,5 @@
 = if is_popup_open(@chatd) do
-  .message-popup-position
+  .message-popup-position(data-app="Emojis")
     .message-popup.content-background-color(class="#{get_popup_cls(@chatd)}")
       = if title = get_popup_title(@chatd) do
         .message-popup-title.secondary-background-color
@@ -9,9 +9,11 @@
           - [item|tail] = data
           .popup-item.selected(data-name="#{item}")
             = item |> EmojiOne.shortname_to_image |> Phoenix.HTML.raw
+            = item
           = for item <- tail do
             .popup-item(data-name="#{item}")
               = item |> EmojiOne.shortname_to_image |> Phoenix.HTML.raw
+              = item
         - else
           // - # {{#unless isLoading.get}}
           // - #   {{#if emptyTemplate}}

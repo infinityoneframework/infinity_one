@@ -14,6 +14,33 @@ function start_room_channel(ucc_chat, socket) {
 
   UccChat.utils.push_history();
 
+  Rebel.additional_payloads.push(function(sender, event) {
+    console.log('additional_payloads', sender, event)
+    var className  = sender.className;
+    if (className && className.lastIndexOf('input-message') != -1) {
+      var opened = false;
+      var results = document.querySelector('.message-popup-results');
+      var position = document.querySelector(
+        '.message-popup-results .message-popup-position');
+      var app = "";
+      if (position) {
+        app = position.dataset["app"];
+        }
+
+      if (results && results.innerHTML != "") {
+        opened = true;
+      }
+
+      // we have the text area
+      return {
+        text_len: sender.value.length,
+        caret: UccChat.utils.getCaretPosition(sender),
+        message_popup: opened,
+        popup_app: app
+      }
+    }
+  });
+
   chan.on("user:entered", msg => {
   })
 
