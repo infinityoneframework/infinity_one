@@ -11,11 +11,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Emojis do
   require UccChatWeb.RoomChannel.MessageInput
   require Logger
 
-  def handle_in("#" <> pattern, context) do
+  def handle_in(":" <> pattern, context) do
     handle_in pattern, context
   end
 
   def handle_in(pattern, context) do
+    Logger.info "pattern: #{inspect pattern}"
     pattern
     |> get_emojis
     |> render_emojis(context)

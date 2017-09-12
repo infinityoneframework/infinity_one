@@ -69,6 +69,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   # handle_in Handlers
 
   defp handle_in(%{state: :ignore} = context, _key) do
+    Logger.info "handle in"
     context
   end
 
@@ -89,11 +90,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp handle_in(%{app: app, state: state} = context, _key) do
+    Logger.info "handle in"
     if match = Buffer.pattern_mod_match? app, state.buffer do
-      # Logger.info "matched: "
+      Logger.info "matched: "
       dispatch_handle_in(app, match, context)
     else
-      # Logger.info "did not match: "
+      Logger.info "did not match: "
       check_and_close :close, context
     end
   end

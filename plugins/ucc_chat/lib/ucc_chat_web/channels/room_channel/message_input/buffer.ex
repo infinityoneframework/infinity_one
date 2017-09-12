@@ -137,10 +137,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Buffer do
 
   defp run_pattern(nil, _buffer), do: nil
   defp run_pattern(pattern, buffer) do
+    Logger.info "pattern: #{inspect pattern}, buffer: #{inspect buffer}"
     case Regex.run pattern, buffer do
       [_, _, match] -> match
       [_, match] -> match
-      _other -> nil
+      other ->
+        Logger.error "other: #{inspect other}"
+        nil
     end
   end
 

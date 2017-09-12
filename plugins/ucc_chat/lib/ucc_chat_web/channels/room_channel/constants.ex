@@ -7,9 +7,9 @@ defmodule UccChatWeb.RoomChannel.Constants do
 
       @app_pattern_strs   [
                             "^\/([^\s]*)$",
-                            "(^|\s)*@([^\s]*)$",
+                            "(.)*@([^\s]*)$",
                             "(.)*#([^\s]*)$",
-                            "(^|\s)*:([^\s]*)$/"
+                            "(.)*:([^\s]*)$"
                           ]
       @app_patterns       Enum.map(@app_pattern_strs, &Regex.compile!/1)
 
