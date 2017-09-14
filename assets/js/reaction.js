@@ -1,4 +1,6 @@
 require('./chat_tooltip')
+console.log('loading reaction');
+
 $(document).ready(() => {
   $('body').on('click', '.reactions li.selected', e => {
     let emoji = ":" + $(e.currentTarget).data('emoji') + ":"

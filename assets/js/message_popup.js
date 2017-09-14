@@ -15,6 +15,8 @@ const application_matches = {
 }
 const application_command_chars   = {users: "@", slashcommands: "/", channels: "#", emojis: ":"}
 
+console.log('loading message_popup');
+
 // window.UccChat.on_load(function(ucc_chat) {
 //   ucc_chat.messagePopup = new MessagePopup(ucc_chat)
 // })

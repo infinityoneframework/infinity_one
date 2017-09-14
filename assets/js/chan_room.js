@@ -11,8 +11,9 @@ function start_room_channel(ucc_chat, socket) {
   let chan = window.Rebel.channels.room.channel
 
   if (debug) { console.log('start socket', ucxchat) }
+  console.log('...', UccUtils)
 
-  UccChat.utils.push_history();
+  UccUtils.push_history();
 
   Rebel.additional_payloads.push(function(sender, event) {
     console.log('additional_payloads', sender, event)
@@ -34,7 +35,7 @@ function start_room_channel(ucc_chat, socket) {
       // we have the text area
       return {
         text_len: sender.value.length,
-        caret: UccChat.utils.getCaretPosition(sender),
+        caret: UccUtils.getCaretPosition(sender),
         message_popup: opened,
         popup_app: app
       }
@@ -83,10 +84,10 @@ function start_room_channel(ucc_chat, socket) {
   })
   chan.on('code:update', resp => {
     console.log('code:update', resp)
-    ucc_chat.utils.code_update(resp)
+    UccUtils.code_update(resp)
   })
   chan.on('code:update:reaction', resp => {
-    ucc_chat.utils.code_update(resp)
+    UccUtils.code_update(resp)
   })
   chan.on('reload', msg => {
     let loc = msg.location

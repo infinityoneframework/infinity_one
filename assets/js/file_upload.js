@@ -4,6 +4,8 @@ require('./file_upload_restrictions.js')
 
 const debug = true
 
+console.log('loading file_upload');
+
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.fileUpload = new FileUpload(ucc_chat)
 })

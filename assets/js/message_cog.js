@@ -1,6 +1,7 @@
 import * as cc from "./chat_channel"
-import * as utils from "./utils"
 import Messages from "./messages"
+
+console.log('loading message_cog');
 
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.messageCog = new MessageCog(ucc_chat)

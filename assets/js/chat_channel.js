@@ -1,4 +1,6 @@
 
+console.log('loading chat_channel');
+
 export function push(message, args={}) {
   let base = {user_id: ucxchat.user_id, channel_id: ucxchat.channel_id, room: ucxchat.room}
   return window.UccChat.roomchan.push(message, Object.assign(base, args));

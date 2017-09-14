@@ -44,7 +44,7 @@ UccChat.on_connect(function(ucc_chat, socket) {
   })
   chan.on('code:update', resp => {
     console.log('code:update', resp)
-    ucc_chat.utils.code_update(resp)
+    UccUtils.code_update(resp)
   })
   chan.on('window:reload', resp => {
     console.log('location')

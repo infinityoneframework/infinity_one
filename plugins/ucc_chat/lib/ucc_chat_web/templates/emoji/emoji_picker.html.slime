@@ -1,23 +1,23 @@
 - current_tone = "tone-#{@account.emoji_tone}"
 - tone_append = tone_append(@account.emoji_tone)
 - active_category = @account.emoji_category
-.emoji-picker.secondary-background-color
+.emoji-picker.secondary-background-color(rebel-channel="room")
   .emoji-top
     form.emoji-filter.input-line.search.search-form
-      input.search.content-background-color(type="text" autocomplete="off")
+      input.search.content-background-color(type="text" autocomplete="off" rebel-keyup="emoji_search")
       i.icon-search.secondary-font-color
     .change-tone
-      a(href="#change-tone")
+      a(href="#change-tone" rebel-click="emoji_tone_open")
         span(class="current-tone #{current_tone}")
       ul.tone-selector.secondary-background-color
         = for tone <- 0..5 do
           li
-            a.tone(href="#tone" data-tone="#{tone}")
+            a.tone(href="#tone" data-tone="#{tone}" rebel-click="emoji_tone_select")
               span(class="tone-#{tone}")
   .filter
     ul.filter-list
       = for {name, title} <- emoji_categories() do
-        li.filter-item.border-secondary-background-color(data-name="#{name}" class="#{active_filter(to_string(name) == active_category)}" title="#{title}")
+        li.filter-item.border-secondary-background-color(rebel-click="emoji_filter" data-name="#{name}" class="#{active_filter(to_string(name) == active_category)}" title="#{title}")
           a.category-link.color-info-font-color(href="#")
             i.category-icon(class="icon-#{name}")
   .emojis

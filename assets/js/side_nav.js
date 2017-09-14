@@ -1,4 +1,5 @@
 import * as cc from './chat_channel'
+console.log('loading side_nav');
 
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.sideNav = new SideNav(ucc_chat)

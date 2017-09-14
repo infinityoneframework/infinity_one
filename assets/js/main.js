@@ -1,4 +1,6 @@
 (function(){
+  console.log('loading main');
+
   var Main = {
     run: function(ucc_chat) {
       this.update_mentions(ucc_chat)

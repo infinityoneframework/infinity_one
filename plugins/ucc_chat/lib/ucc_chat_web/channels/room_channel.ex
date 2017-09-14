@@ -276,11 +276,11 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_in(ev = "message_popup:" <> cmd, msg, socket) do
-    debug ev, msg
-    resp = UccChat.MessagePopupService.handle_in(cmd, msg)
-    {:reply, resp, socket}
-  end
+  # def handle_in(ev = "message_popup:" <> cmd, msg, socket) do
+  #   debug ev, msg
+  #   resp = UccChat.MessagePopupService.handle_in(cmd, msg)
+  #   {:reply, resp, socket}
+  # end
 
   def handle_in(ev = "message_cog:" <> cmd, msg, socket) do
     debug ev, msg
@@ -348,4 +348,10 @@ defmodule UccChatWeb.RoomChannel do
 
   defdelegate message_keydown(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate click_slash_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
+  defdelegate emoji_show(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate emoji_filter(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate emoji_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate emoji_tone_open(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate emoji_tone_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate emoji_search(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
 end

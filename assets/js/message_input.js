@@ -1,5 +1,7 @@
 import Messages from './messages'
 
+console.log('loading message_input');
+
 const send_button = `
   <div class='message-buttons send-button'>
     <i class='icon-paper-plane' aria-label='send'></i>

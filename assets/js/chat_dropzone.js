@@ -1,3 +1,5 @@
+console.log('loading chat_dropzone');
+
 $(document).ready(() => {
   window.isAdvancedUpload = function() {
     var div = document.createElement('div');

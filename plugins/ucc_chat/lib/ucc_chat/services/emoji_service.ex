@@ -63,20 +63,20 @@ defmodule UccChat.EmojiService do
     {:noreply, socket}
   end
 
-  defp update_emoji_recent(user_id, emoji) do
+  def update_emoji_recent(user_id, emoji) do
     user_id
     |> get_account
     |> AccountService.update_emoji_recent(emoji)
   end
 
-  defp set_emoji_category(user_id, name) do
+  def set_emoji_category(user_id, name) do
     user_id
     |> get_account
     |> Account.changeset(%{emoji_category: name})
     |> Repo.update
   end
 
-  defp set_emoji_tone(user_id, tone) do
+  def set_emoji_tone(user_id, tone) do
     user_id
     |> get_account
     |> Account.changeset(%{emoji_tone: tone})

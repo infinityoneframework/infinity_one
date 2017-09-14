@@ -1,6 +1,8 @@
 import toastr from 'toastr'
 import * as flex from './flex_bar'
 
+console.log('loading admin');
+
 const reset_i = '<i class="icon-ccw secondary-font-color color-error-contrast"></i>'
 
 UccChat.on_load(function(ucc_chat) {

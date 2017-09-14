@@ -19,10 +19,11 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 require('./ucx_ucc');
-require('./ucc_chat')
-require('./typing')
-require('./ucc_webrtc')
-require('./tone_generator')
+require('./utils');
+require('./ucc_chat');
+require('./typing');
+require('./ucc_webrtc');
+require('./tone_generator');
 
 // import configured plugin js
 var plugins = window.ucx_ucc_plugins;

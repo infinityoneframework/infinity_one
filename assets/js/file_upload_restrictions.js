@@ -1,3 +1,5 @@
+console.log('loading file_upload_restrections');
+
 UccChat.fileUploadMediaWhiteList = function() {
   var mediaTypeWhiteList = UccChat.settings.accepted_media_types
 

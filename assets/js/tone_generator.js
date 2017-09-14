@@ -1,4 +1,5 @@
 (function() {
+  console.log('loading tone_generator');
 
   if (UcxUcc.trace_startup) { console.log('loading tone_generator', UcxUcc); }
 

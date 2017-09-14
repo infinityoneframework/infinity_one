@@ -1,4 +1,5 @@
 (function() {
+  console.log('loading ucx_ucc');
   var UcxUcc = {
     AudioContext: window.AudioContext || window.webkitAudioContext || window.mozAudioContext,
     hasUserMedia: function() {

@@ -1,5 +1,6 @@
 (function() {
   console.log('loading webrtc')
+
   function trace(text) {
     if (text[text.length - 1] === '\n') {
       text = text.substring(0, text.length - 1);

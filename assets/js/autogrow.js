@@ -25,6 +25,7 @@
 //         $(textarea).css('height', height);
 //     };
 // })(jQuery);
+console.log('loading autogrow');
 
 (function($) {
     /**

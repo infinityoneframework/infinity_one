@@ -7,7 +7,7 @@
           - placeholder = gettext "Message %{sym}", sym: @mb[:symbol]
           textarea.message-form-text.input-message.autogrow-short(rebel-before="UccChat.utils.mb_before" rebel-keydown="message_keydown" dir="auto" name="msg"  maxlength="#{@mb[:max_message_length]}" placeholder="#{placeholder}")
           .inner-left-toolbar
-            i.emoji-picker-icon.icon-people
+            i.emoji-picker-icon.icon-people(rebel-click="emoji_show")
 
         = unless @mb[:show_send] do
           = if @mb[:show_file_upload?] do

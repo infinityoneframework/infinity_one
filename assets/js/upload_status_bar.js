@@ -1,4 +1,5 @@
 const maxFnameLen = 25
+console.log('loading upload_status_bar');
 
 class UploadStatusBar {
   constructor(fileName, size) {

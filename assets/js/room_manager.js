@@ -80,7 +80,7 @@ class RoomManager {
           lr_elem.nextAll('li.message').each((i, elem) => {
             this.unread_list.push($(elem).attr('id'))
           })
-          this.ucc_chat.utils.scroll_bottom()
+          UccUtils.scroll_bottom()
           next.addClass('first-unread')
         }
       }, 2000)
@@ -95,7 +95,7 @@ class RoomManager {
     }
     $('.room-title').html(ucxchat.display_name)
     $('.link-room-' + ucxchat.room).addClass("active")
-    this.ucc_chat.utils.scroll_bottom()
+    UccUtils.scroll_bottom()
     this.ucc_chat.roomchan.leave()
     this.ucc_chat.restart_socket()
   }
@@ -123,7 +123,7 @@ class RoomManager {
       $('.room-title').html(msg.value)
       ucxchat.room = msg.value
       ucxchat.display_name = msg.value
-      this.ucc_chat.utils.replace_history()
+      UccUtils.replace_history()
     }
     setTimeout(() => {
       $('span.current-setting[data-edit="' + fname + '"]').text(msg.value)
@@ -340,8 +340,8 @@ class RoomManager {
     })
 
     this.ucc_chat.roomchan.on('room:open', resp => {
-      this.ucc_chat.utils.page_loading()
-      $('.main-content').html(this.ucc_chat.utils.loading_animation())
+      UccUtils.page_loading()
+      $('.main-content').html(UccUtils.loading_animation())
       this.open_room(resp.room, resp.room)
       if (resp.state) {
         this.focus = true
@@ -468,11 +468,11 @@ class RoomManager {
         }
         if (callback) { callback() }
         if (debug) { console.log('open_room after callback', this) }
-        this.ucc_chat.utils.remove_page_loading()
+        UccUtils.remove_page_loading()
       })
       .receive("error", resp => {
         console.log('open_room error', resp)
-        this.ucc_chat.utils.remove_page_loading()
+        UccUtils.remove_page_loading()
       })
   }
 
@@ -522,8 +522,8 @@ class RoomManager {
     $('body').on('click', 'a.open-room', e => {
       e.preventDefault();
       if (debug) { console.log('clicked a.open-room', e, $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
-      this.ucc_chat.utils.page_loading()
-      $('.main-content').html(this.ucc_chat.utils.loading_animation())
+      UccUtils.page_loading()
+      $('.main-content').html(UccUtils.loading_animation())
       this.open_room($(e.currentTarget).attr('data-room'), $(e.currentTarget).attr('data-name'))
     })
     .on('click', 'a.toggle-favorite', e => {
@@ -782,11 +782,11 @@ class RoomManager {
       console.log('jump-recent 1')
       // messageCog.close_cog($(e.currentTarget))
       // roomHistoryManager.getRecent()
-      this.ucc_chat.utils.scroll_bottom()
+      UccUtils.scroll_bottom()
       this.message_box_focus()
     })
     .on('click', 'button.new-message', e => {
-      this.ucc_chat.utils.scroll_bottom()
+      UccUtils.scroll_bottom()
       this.message_box_focus()
     })
   }

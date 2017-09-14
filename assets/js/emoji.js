@@ -1,13 +1,14 @@
-import * as utils from './utils'
 import * as reaction from './reaction'
 
 let debug = true
+
+console.log('loading emojis');
 
 class ChatEmoji {
   constructor() {
     this.open = false
     this.cursor_position_plugin()
-    this.register_events()
+    // this.register_events()
     this.init_picker()
     this.reactions = false
   }
@@ -143,6 +144,13 @@ class ChatEmoji {
     this.reactions = false
     $('.emoji-picker').removeClass('show')
   }
+  toggle_picker() {
+    if ($('.emoji-picker').hasClass('show')) {
+      this.close_picker();
+    } else {
+      this.open_picker();
+    }
+  }
   init_picker() {
     // emojione.ascii = true
 
@@ -169,7 +177,18 @@ class ChatEmoji {
 }
 
 $(document).ready(() => {
-  window.chat_emoji = new ChatEmoji()
+  window.chat_emoji = new ChatEmoji();
+  Rebel.additional_payloads.push(function(sender, event) {
+    var textarea = document.querySelector('textarea.input-message');
+    if (textarea && sender && sender.getAttribute('rebel-handler') == 'emoji_select') {
+      return {
+        caret: UccUtils.getCaretPosition(textarea),
+        content: textarea.value
+      }
+    } else {
+      return {};
+    }
+  });
 })
 
 export default ChatEmoji

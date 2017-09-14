@@ -243,5 +243,10 @@
   window.pl = Utils.page_loading
   window.rpl = Utils.remove_page_loading
 
+
   window.UccChat.utils = Utils
+  window.UccUtils = Utils
+
+  console.log('utils', UccChat.utils);
+
  })();

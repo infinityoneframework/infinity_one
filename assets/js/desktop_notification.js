@@ -1,5 +1,7 @@
 const debug = true
 
+console.log('loading desktop_notification');
+
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.desktop_notifier = new DesktopNotification(ucc_chat)
 })

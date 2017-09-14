@@ -1,3 +1,5 @@
+console.log('loading chat_tooltip');
+
 UccChat.tooltip = {
   source: null,
   opened: false,

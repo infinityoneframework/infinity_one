@@ -1,10 +1,11 @@
-import * as utils from './utils'
 import * as flex from './flex_bar'
 import toastr from 'toastr'
 import * as sweet from './sweet'
 
 window.toastr = toastr
 const debug = false;
+
+console.log('loading admin');
 
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.adminFlexBar = new AdminFlexBar(ucc_chat)
@@ -94,7 +95,7 @@ class AdminFlexBar {
             // console.log('flex action resp', resp)
             if (resp.success) { toastr.success(resp.success) }
             if (resp.code_update) {
-              utils.code_update(resp.code_update)
+              UccUtils.code_update(resp.code_update)
             }
           })
           .receive("error", resp => {

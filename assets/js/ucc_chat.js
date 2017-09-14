@@ -9,6 +9,7 @@ console.log('ucc_chat.js loading...')
 window.root = global || window
 
 import hljs from "highlight.js"
+require('./emoji.js')
 // import * as swal from "./sweetalert.min"
 require('sweetalert')
 // window.Promise = require('es6-promise').Promise;
@@ -33,8 +34,8 @@ window.UccChat = {
     this.socket = window.Rebel.socket
 
     setTimeout(() => {
-      $('#initial-page-loading').remove()
-      ucc_chat.utils.remove_page_loading()
+      $('#initial-page-loading').remove();
+      window.UccUtils.remove_page_loading();
     }, 1000)
 
     if (!window.ucxchat) {
@@ -60,7 +61,7 @@ window.UccChat = {
       this.onload()
 
       console.log('going remove_page_loading')
-      this.utils.remove_page_loading()
+      UccUtils.remove_page_loading()
 
     }, 200)
 

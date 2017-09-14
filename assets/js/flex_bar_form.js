@@ -1,7 +1,6 @@
 import * as cc from "./chat_channel"
 import toastr from 'toastr'
 // import sweetAlert from "./sweetalert.min"
-import * as utils from './utils'
 
 // export function init() {
 //   $('body').on('click', '.setting-block span.current-setting[data-edit="false"]', dc => {})
@@ -104,12 +103,12 @@ $(document).ready(function() {
 
 function start_loading_animation(elem) {
   console.log('start_loading_animation', elem)
-  utils.page_loading()
+  UccUtils.page_loading()
   elem.next().after(utils.loading_animation())
 }
 
 function stop_loading_animation(elem) {
   console.log('stop_loading_animation', elem)
-  utils.remove_page_loading()
+  UccUtils.remove_page_loading()
   $('.loading-animation').remove()
 }
