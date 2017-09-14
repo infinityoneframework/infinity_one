@@ -1,5 +1,4 @@
-defmodule UccChatWeb.RoomChannel.EmojiInput.Client do
-
+defmodule UccChatWeb.Client do
   import UcxUccWeb.Utils
   import Rebel.{Query, Core}, warn: false
 
@@ -8,5 +7,5 @@ defmodule UccChatWeb.RoomChannel.EmojiInput.Client do
   def send_js(socket, js) do
     exec_js socket, strip_nl(js)
   end
-end
 
+end

@@ -4,7 +4,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
 
   import UccChatWeb.RebelChannel.Client
 
-  alias UccChatWeb.RoomChannel.EmojiInput.Client
+  alias UccChatWeb.Client
   alias UccChat.{Emoji, EmojiService, AccountService}
   alias UccChatWeb.EmojiView
   alias UcxUcc.Accounts
@@ -105,9 +105,19 @@ IO.inspect category, label: "cat"
     sender["value"]
     |> String.replace(":", "")
     |> IO.inspect(label: "value")
-    |> Emoji.search(category)
+    |> search(category, user.account)
     |> IO.inspect(label: "search")
     |> update_emoji_list(user.account, ".emojis ul." <> category, socket, client)
+  end
+
+  defp search(pattern, "recent", account) do
+    account
+    |> AccountService.emoji_recents
+    |> Enum.filter(&String.starts_with?(&1, pattern))
+  end
+
+  defp search(pattern, category, _account) do
+    Emoji.search(pattern, category)
   end
 
   defp update_emoji_list(emojis, account, selector, socket, client \\ Client) do

@@ -43,4 +43,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Client do
       _other -> nil
     end
   end
+  # defdelegate send_js(socket, js), to: UccChatWeb.Client
+
 end
