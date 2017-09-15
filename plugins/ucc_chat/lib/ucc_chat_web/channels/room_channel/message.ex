@@ -9,19 +9,13 @@ defmodule UccChatWeb.RoomChannel.Message do
   alias UccChat.{Channel, Message}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.MessageService, as: Service
-  alias UccChatWeb.RebelChannel.Client, as: RebelClient
   alias __MODULE__.Client
 
   alias UccChatWeb.MessageView
 
   @preloads [:user, :edited_by, :attachments, :reactions]
 
-  # import Rebel.{Query, Core}, warn: false
-  # import UcxUccWeb.Utils, only: [strip_nl: 1]
-
-  # alias UccChatWeb.RebelChannel.RebelClient
-
-  def create(message, channel_id, user_id, socket) do
+  def create(body, channel_id, user_id, socket, client \\ Client) do
     user = Accounts.get_user user_id
     channel = Channel.get!(channel_id)
     msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
@@ -29,13 +23,13 @@ defmodule UccChatWeb.RoomChannel.Message do
     cond do
       ChannelService.user_muted? user_id, channel_id ->
         push_system_message socket, channel_id,
-          ~g"You have been muted and cannot speak in this room"
+          ~g"You have been muted and cannot speak in this room", client
 
         # sys_msg = create_system_message(channel_id,
         #   ~g"You have been muted and cannot speak in this room")
         # html = render_message(sys_msg)
         # push_message(socket, sys_msg.id, user_id, html)
-        create_and_push_new_message socket, message, channel_id, user_id, %{type: "p"}
+        create_and_push_new_message socket, body, channel_id, user_id, %{type: "p"}, client
 
         # msg = create_message(message, user_id, channel_id, %{ type: "p", })
         # html = render_message(msg)
@@ -44,18 +38,18 @@ defmodule UccChatWeb.RoomChannel.Message do
       channel.read_only and
         not Permissions.has_permission?(user, "post-readonly", channel_id) ->
 
-        RebelClient.toastr socket, :error,
+        client.toastr socket, :error,
           ~g(You are not authorized to create a message)
 
       channel.archived ->
-        RebelClient.toastr socket, :error,
+        client.toastr socket, :error,
           ~g(You are not authorized to create a message)
 
       true ->
-        handle_new_message socket, message,
-          channel: channel,
+        handle_new_message socket, body,
+          [channel: channel,
           user: user,
-          msg_params: msg_params
+          msg_params: msg_params], client
 
         # {body, mentions} = encode_mentions(message, channel_id)
         # UccChat.RobotService.new_message body, channel, user
@@ -71,8 +65,8 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
-  defp handle_new_message(socket, message_body, opts) do
-    Logger.warn "handle_new_message #{inspect message_body}"
+  defp handle_new_message(socket, message_body, opts, client \\ Client) do
+    Logger.debug "handle_new_message #{inspect message_body}"
     user = opts[:user]
     channel = opts[:channel]
     channel_id = channel.id
@@ -89,10 +83,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
     message
     |> render_message
-    |> Client.broadcast_message(socket)
-    # broadcast_message(socket, message.id, message.user.id,
-    #   message_html, body: body)
-
+    |> client.broadcast_message(socket)
   end
 
   def create_system_message(channel_id, body) do
@@ -137,21 +128,21 @@ defmodule UccChatWeb.RoomChannel.Message do
     user_id = message.user_id
     user = Accounts.get_user user_id
 
-    render_to_string MessageView, "message.html", message: message,
-      user: user, previews: []
+    {message, render_to_string(MessageView, "message.html", message: message,
+      user: user, previews: [])}
   end
 
-  def push_system_message(socket, channel_id, body) do
+  def push_system_message(socket, channel_id, body, client \\ Client) do
     channel_id
     |> create_system_message(body)
     |> render_message
-    |> Client.push_message(socket)
+    |> client.push_message(socket)
   end
 
-  def create_and_push_new_message(socket, body, channel_id, user_id, opts) do
+  def create_and_push_new_message(socket, body, channel_id, user_id, opts, client \\ Client) do
     body
     |> create_message(user_id, channel_id, opts)
     |> render_message
-    |> Client.push_message(socket)
+    |> client.push_message(socket)
   end
 end

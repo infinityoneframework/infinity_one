@@ -33,7 +33,8 @@ defmodule UccChatWeb.MessageView do
         "data-username": msg.user.username,
         "data-groupable": msg.is_groupable,
         "data-date": format_date(msg.updated_at, user),
-        "data-timestamp": msg.timestamp
+        "data-timestamp": msg.timestamp,
+        "rebel-channel": "room"
       ]
     Phoenix.HTML.Tag.tag(:li, attrs)
   end
@@ -305,11 +306,19 @@ defmodule UccChatWeb.MessageView do
 
   def message_cog_action_li(name, title, icon, extra \\ "") do
     #{}"reaction-message", "Reactions", "people-plus")
-    opts = [class: "#{name} #{extra} message-action", title: title, "data-id": name]
+    opts = [class: "#{name} #{extra} message-action",
+      title: title, "data-id": name] ++ rebel_event(name)
+
     content_tag :li, opts do
       content_tag :i, class: "icon-#{icon}", "aria-label": title do
         ""
       end
     end
   end
+
+  defp rebel_event("reaction-message"), do: ["rebel-click": "reaction_open"]
+  defp rebel_event(_), do: []
+  defp rebel_event(_), do: []
+  defp rebel_event(_), do: []
+  defp rebel_event(_), do: []
 end

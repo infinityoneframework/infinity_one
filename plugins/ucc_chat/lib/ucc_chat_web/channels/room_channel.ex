@@ -354,4 +354,6 @@ defmodule UccChatWeb.RoomChannel do
   defdelegate emoji_tone_open(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_tone_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_search(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate reaction_open(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
+  defdelegate message_cog_click(socket, sender), to: UccChatWeb.RoomChannel.MessageCog
 end

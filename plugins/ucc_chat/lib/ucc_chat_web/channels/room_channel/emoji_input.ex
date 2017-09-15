@@ -3,11 +3,14 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   use UcxUccWeb.Gettext
 
   import UccChatWeb.RebelChannel.Client
+  import Rebel
+  import Rebel.Core, only: [this: 1]
 
   alias UccChatWeb.Client
   alias UccChat.{Emoji, EmojiService, AccountService}
   alias UccChatWeb.EmojiView
   alias UcxUcc.Accounts
+  alias UccChatWeb.RoomChannel.Reaction
 
   use UccChatWeb.RoomChannel.Constants
 
@@ -33,6 +36,16 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   end
 
   def emoji_select(socket, sender, client \\ Client) do
+    Logger.info "emoji_select sender: #{inspect sender}"
+
+    if Rebel.get_assigns socket, :reaction do
+      Reaction.select(socket, sender, client)
+    else
+      select(socket, sender, client)
+    end
+  end
+
+  def select(socket, sender, client \\ Client) do
     Logger.info "select sender: #{inspect sender}"
     start = sender["caret"]["start"]
     content = sender["content"]
@@ -50,6 +63,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
       te.focus();
       """
     update_recent socket, String.replace(emoji, ":", ""), client
+    put_assigns socket, :reaction, false
   end
 
   def update_recent(socket, emoji, client \\ Client) do
@@ -137,4 +151,15 @@ IO.inspect category, label: "cat"
     socket
   end
 
+  def reaction_open(socket, sender, client \\ Client) do
+    message_id = client.closest socket, this(sender), "li.message", :id
+    Logger.info "reaction_open message_id: #{message_id}, sender: #{inspect sender}"
+
+    put_assigns socket, :reaction, message_id
+    client.send_js socket, """
+      chat_emoji.toggle_picker();
+      Rebel.set_event_handlers('.emoji-picker');
+      """
+    socket
+  end
 end

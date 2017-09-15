@@ -10,7 +10,7 @@ UccChat.on_load(function(ucc_chat) {
 class MessageCog {
   constructor(ucx_chat) {
     this.ucx_chat = ucx_chat
-    this.register_events()
+    // this.register_events()
     this.original_text
   }
 
@@ -81,8 +81,8 @@ class MessageCog {
               this.close_cog($(ct))
             })
         } else if (data_id == "reaction-message") {
-          console.log('clicked reaction-message', $(ct))
-          chat_emoji.open_reactions(ct, message_id)
+          // console.log('clicked reaction-message', $(ct))
+          // chat_emoji.open_reactions(ct, message_id)
 
         } else if (data_id == "delete-message") {
           sweetAlert({

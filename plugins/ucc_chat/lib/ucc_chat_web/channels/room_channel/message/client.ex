@@ -7,28 +7,28 @@ defmodule UccChatWeb.RoomChannel.Message.Client do
 
   alias UccChatWeb.RebelChannel.Client, as: RebelClient
 
-  # require UccChat.ChatConstants, as: CC
-
   @wrapper       ".messages-box .wrapper"
   @wrapper_list  @wrapper <> " > ul"
 
-  def push_message(message, socket) do
-    exec_js message, push_message_js(message)
+  def push_message({message, html}, socket) do
+    exec_js message, push_message_js(html, message)
     RebelClient.scroll_bottom(socket, '#{@wrapper}')
   end
 
-  def push_message_js(message) do
-    message = Poison.encode! message |> strip_nl()
+  def push_message_js(html, message) do
+    encoded = Poison.encode! html |> strip_nl()
     """
-    var node = document.createRange().createContextualFragment(#{message});
+    var node = document.createRange().createContextualFragment(#{encoded});
     var elem = document.querySelector('#{@wrapper_list}');
     elem.append(node);
+    Rebel.set_event_handlers('[id="#{message.id}"]');
     """ |> strip_nl()
   end
 
-  def broadcast_message(message, socket) do
-    js = push_message_js(message) <> RebelClient.scroll_bottom_js('#{@wrapper}')
+  def broadcast_message({message, html}, socket) do
+    js = push_message_js(html, message) <> RebelClient.scroll_bottom_js('#{@wrapper}')
     broadcast_js socket, js
-    # socket.endpoint.broadcast CC.chan_room <> socket.assigns.room, "send:message", %{js: js}
   end
+  defdelegate toastr!(socket, which, message), to: UccChatWeb.RebelChannel.Client
+  defdelegate toastr(socket, which, message), to: UccChatWeb.RebelChannel.Client
 end

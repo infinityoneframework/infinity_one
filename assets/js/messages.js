@@ -43,6 +43,7 @@ class Messages {
       UccUtils.scroll_bottom()
     }
 
+    Rebel.set_event_handlers('[id="' + msg.id + '"]');
     ucc_chat.roomManager.new_message(msg.id, msg.user_id)
   }
   static update_message(msg) {
@@ -54,6 +55,7 @@ class Messages {
     if (ucxchat.user_id == msg.user_id) {
       $('#' + msg.id).addClass("own")
     }
+    Rebel.set_event_handlers('[id="' + msg.id + '"]');
   }
   static scroll_bottom() {
     let mypanel = $('.messages-box .wrapper')
@@ -69,7 +71,10 @@ class Messages {
         .receive("ok", resp => {
           $('.message-form-text').removeClass('editing')
           if (resp.html) {
+            console.log('resp', resp);
+            // Rebel.set_event_handlers('[id="' + msg.id + '"]');
             $('.messages-box .wrapper > ul').append(resp.html)
+            //Rebel.set_event_handlers('[id="' + msg.id + '"]');
             $('.messages-box').children('.wrapper').children('ul').children(':last-child').find('pre').each(function(i, block) {
               hljs.highlightBlock(block)
             })
@@ -105,6 +110,8 @@ class Messages {
         .receive("ok", resp => {
           if (resp.html) {
             $('.messages-box .wrapper > ul').append(resp.html)
+            console.log('resp', resp);
+            // Rebel.set_event_handlers('[id="' + msg.id + '"]');
             $('.messages-box').children('.wrapper').children('ul').children(':last-child').find('pre').each(function(i, block) {
               hljs.highlightBlock(block)
             })

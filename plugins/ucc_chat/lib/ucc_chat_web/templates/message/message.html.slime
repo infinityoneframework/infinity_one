@@ -49,7 +49,7 @@
               .avatar-image(style="background-image:url(#{avatar_url(@message.edited_by.username)});")
     = if is_private(@message) do
       span.private= ~g(Only you can see this message)
-    .message-cog-container(class="#{hide_cog(@message)}")
+    .message-cog-container(class="#{hide_cog(@message)}" rebel-click="message_cog_click")
       i.icon-cog.message-cog(aria-label="Actions")
   - info = get_info_class(@message)
   .body.color-primary-font-color(class="#{info}" dir="auto")
@@ -75,5 +75,5 @@
     = for reaction <- reactions do
       = render "reaction.html", reaction: reaction, user: @user
     li.add-reaction(title="#{~g(Add a reaction)}")
-      span.icon-people-plus
+      span.icon-people-plus(rebel-click="reaction_open")
 = Phoenix.HTML.raw "</li>"
