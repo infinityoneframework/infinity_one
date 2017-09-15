@@ -1080,6 +1080,11 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  def mousedown(socket, sender) do
+    Logger.info "mousedown sender: #{inspect sender}"
+    socket
+  end
+
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
   defdelegate flex_tab_open(socket, sender), to: FlexTabChannel
   defdelegate flex_call(socket, sender), to: FlexTabChannel

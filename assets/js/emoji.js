@@ -119,6 +119,7 @@ class ChatEmoji {
     })
   }
   open_picker(offset) {
+    console.log('offset', offset);
     $('.emoji-picker').addClass('show')
     if (offset) {
       let height = window.innerHeight
@@ -136,19 +137,32 @@ class ChatEmoji {
       if (top < 0) {
         bottom = bottom - picker.height() - 50
       }
-
+      this.add_mousedown_handler();
       $('.emoji-picker').css('bottom', bottom + 'px').css('left', left + 'px')
     }
+  }
+  mousedown_handler(e) {
+    console.log('mousedown', e);
+    chat_emoji.close_picker();
+  }
+  add_mousedown_handler() {
+    var el = document.getElementById('ucx-chat');
+    el.addEventListener('mousedown', this.mousedown_handler, true);
+  }
+  remove_mousedown_handler() {
+    var el = document.getElementById('ucx-chat');
+    el.removeEventListener('mousedown', this.mousedown_handler);
   }
   close_picker() {
     this.reactions = false
     $('.emoji-picker').removeClass('show')
+    this.remove_mousedown_handler();
   }
-  toggle_picker() {
+  toggle_picker(offset) {
     if ($('.emoji-picker').hasClass('show')) {
       this.close_picker();
     } else {
-      this.open_picker();
+      this.open_picker(offset);
     }
   }
   init_picker() {

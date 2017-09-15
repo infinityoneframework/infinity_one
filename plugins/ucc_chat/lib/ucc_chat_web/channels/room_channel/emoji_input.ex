@@ -15,7 +15,8 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   use UccChatWeb.RoomChannel.Constants
 
   def emoji_show(socket, sender, client \\ Client) do
-    client.send_js socket, "chat_emoji.toggle_picker();"
+    offset = ~s/{top: #{sender["event"]["clientY"]}, left: #{sender["event"]["clientX"]}}/
+    client.send_js socket, "chat_emoji.toggle_picker(#{offset});"
     socket
   end
 
@@ -154,10 +155,11 @@ IO.inspect category, label: "cat"
   def reaction_open(socket, sender, client \\ Client) do
     message_id = client.closest socket, this(sender), "li.message", :id
     Logger.info "reaction_open message_id: #{message_id}, sender: #{inspect sender}"
+    offset = ~s/{top: #{sender["event"]["clientY"]}, left: #{sender["event"]["clientX"]}}/
 
     put_assigns socket, :reaction, message_id
     client.send_js socket, """
-      chat_emoji.toggle_picker();
+      chat_emoji.open_picker(#{offset});
       Rebel.set_event_handlers('.emoji-picker');
       """
     socket
