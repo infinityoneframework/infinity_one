@@ -34,7 +34,7 @@ defmodule UccChatWeb.RoomChannel.Reaction do
       chat_emoji.close_picker();
       document.querySelector('#{@message_box}').focus();
       """
-    socket
+    emoji
   end
 
   def insert_reaction(socket, emoji, message_id, user_id) do

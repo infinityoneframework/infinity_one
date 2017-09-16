@@ -38,12 +38,13 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
 
   def emoji_select(socket, sender, client \\ Client) do
     Logger.info "emoji_select sender: #{inspect sender}"
-
-    if Rebel.get_assigns socket, :reaction do
-      Reaction.select(socket, sender, client)
-    else
-      select(socket, sender, client)
-    end
+    emoji =
+      if Rebel.get_assigns socket, :reaction do
+        Reaction.select(socket, sender, client)
+      else
+        select(socket, sender, client)
+      end
+    update_recent socket, String.replace(emoji, ":", ""), client
   end
 
   def select(socket, sender, client \\ Client) do
@@ -63,8 +64,8 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
       chat_emoji.close_picker();
       te.focus();
       """
-    update_recent socket, String.replace(emoji, ":", ""), client
     put_assigns socket, :reaction, false
+    emoji
   end
 
   def update_recent(socket, emoji, client \\ Client) do
