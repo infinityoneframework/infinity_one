@@ -29,6 +29,13 @@ defmodule UccChatWeb.RoomChannel.Message.Client do
     js = push_message_js(html, message) <> RebelClient.scroll_bottom_js('#{@wrapper}')
     broadcast_js socket, js
   end
+
+  def delete_message!(message_id, socket) do
+    delete! socket, "li.message#" <> message_id
+  end
+
   defdelegate toastr!(socket, which, message), to: UccChatWeb.RebelChannel.Client
   defdelegate toastr(socket, which, message), to: UccChatWeb.RebelChannel.Client
+  defdelegate closest(socket, selector, class, attr), to: UccChatWeb.Client
+  defdelegate send_js(socket, js), to: UccChatWeb.Client
 end

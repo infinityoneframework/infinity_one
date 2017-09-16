@@ -317,8 +317,6 @@ defmodule UccChatWeb.MessageView do
   end
 
   defp rebel_event("reaction-message"), do: ["rebel-click": "reaction_open"]
-  defp rebel_event(_), do: []
-  defp rebel_event(_), do: []
-  defp rebel_event(_), do: []
-  defp rebel_event(_), do: []
+  defp rebel_event("delete-message"), do: ["rebel-click": "message_action"]
+  defp rebel_event(_), do: ["rebel-click": "message_action"]
 end

@@ -37,5 +37,9 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
     # client.send_js socket, "$('##{message_id} .message-cog-container').append(#{html})"
     socket
   end
+
+  def close_cog(socket, sender, client \\ Client) do
+    client.send_js socket, ~s/$('#{Rebel.Core.this(sender)}').closest('.message-dropdown').remove()/
+  end
 end
 

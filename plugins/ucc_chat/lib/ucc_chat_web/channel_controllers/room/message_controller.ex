@@ -215,6 +215,7 @@ defmodule UccChatWeb.MessageChannelController do
     {:reply, resp, socket}
   end
 
+  # new version of this in room_channel/message.ex
   def delete(%{assigns: assigns} = socket, params) do
     user = Helpers.get_user assigns.user_id
     if user.id == params["message_id"] ||

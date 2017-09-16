@@ -1,15 +1,18 @@
 defmodule UccChatWeb.RoomChannel.Message do
   use UccLogger
+  use UccChatWeb.Channel.Utils
 
   import UcxUccWeb.Gettext
   import UcxUccWeb.Utils
 
   alias UcxUcc.{Accounts, Repo, Permissions}
-  alias UccChat.{ChannelService, RobotService}
+  alias UccChat.{ChannelService, RobotService, MessageService}
   alias UccChat.{Channel, Message}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.MessageService, as: Service
   alias __MODULE__.Client
+  alias Rebel.SweetAlert
+  alias UccChatWeb.RoomChannel.MessageCog
 
   alias UccChatWeb.MessageView
 
@@ -144,5 +147,52 @@ defmodule UccChatWeb.RoomChannel.Message do
     |> create_message(user_id, channel_id, opts)
     |> render_message
     |> client.push_message(socket)
+  end
+
+  def message_action(socket, sender, client \\ Client)
+  def message_action(socket, Utils.dataset("id", "delete-message") = sender, client) do
+    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+    # Logger.info "delete-message: id: #{message_id}, #{inspect sender}"
+    SweetAlert.swal_modal socket, ~g(Are you sure?),
+      ~g(You will not be able to recover this message), "warning",
+      [
+        showCancelButton: true, closeOnConfirm: false, closeOnCancel: true,
+        confirmButtonColor: "#DD6B55", confirmButtonText: ~g(Yes, delete it)
+      ],
+      confirm: fn _result ->
+        close_cog socket, sender, client
+        delete(socket, message_id, client)
+        SweetAlert.swal socket, ~g"Deleted!", ~g"Your entry was been deleted", "success",
+          timer: 2000, showConfirmButton: false
+      end
+  end
+
+  def message_action(socket, sender, client) do
+    action = sender["dataset"]["id"]
+    Logger.info "message action: #{action}, sender: #{inspect sender}"
+    close_cog socket, sender, client
+  end
+
+  def delete(%{assigns: assigns} = socket, message_id, client \\ Client) do
+    user = Accounts.get_user assigns.user_id, preload: [:account, :roles]
+    if user.id == message_id ||
+      Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
+      message = Message.get message_id, preload: [:attachments]
+      case MessageService.delete_message message do
+        {:ok, _} ->
+          client.delete_message! message_id, socket
+        _ ->
+          client.toastr! socket, :error,
+            ~g(There was an error deleting that message)
+      end
+    else
+      client.toastr! socket, :error, ~g(You are not authorized to delete that message)
+    end
+    socket
+  end
+
+  defp close_cog(socket, sender, client) do
+    MessageCog.close_cog socket, sender, client
+    socket
   end
 end
