@@ -34,6 +34,7 @@ defmodule UccChatWeb.RoomChannel.Message.Client do
     delete! socket, "li.message#" <> message_id
   end
 
+  defdelegate broadcast!(socket, event, bindings), to: Phoenix.Channel
   defdelegate toastr!(socket, which, message), to: UccChatWeb.RebelChannel.Client
   defdelegate toastr(socket, which, message), to: UccChatWeb.RebelChannel.Client
   defdelegate closest(socket, selector, class, attr), to: UccChatWeb.Client

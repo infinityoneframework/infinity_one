@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   alias UcxUcc.{Accounts, Repo, Permissions}
   alias UccChat.{ChannelService, RobotService, MessageService}
-  alias UccChat.{Channel, Message}
+  alias UccChat.{Channel, Message, StaredMessage, PinnedMessage}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.MessageService, as: Service
   alias __MODULE__.Client
@@ -165,6 +165,45 @@ defmodule UccChatWeb.RoomChannel.Message do
         SweetAlert.swal socket, ~g"Deleted!", ~g"Your entry was been deleted", "success",
           timer: 2000, showConfirmButton: false
       end
+  end
+  def message_action(socket, Utils.dataset("id", "star-message") = sender, client) do
+    assigns = socket.assigns
+    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+    _star = StaredMessage.create! %{message_id: message_id,
+      user_id: assigns.user_id, channel_id: assigns.channel_id}
+    close_cog socket, sender, client
+    client.broadcast! socket, "update:stared", %{}
+  end
+
+  def message_action(socket, Utils.dataset("id", "unstar-message") = sender, client) do
+    assigns = socket.assigns
+    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+    StaredMessage.delete! StaredMessage.get_by(user_id: assigns.user_id,
+      message_id: message_id, channel_id: assigns.channel_id)
+    close_cog socket, sender, client
+    client.broadcast! socket, "update:stared", %{}
+  end
+
+  def message_action(socket, Utils.dataset("id", "pin-message") = sender, client) do
+    assigns = socket.assigns
+    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+    message = Message.get message_id
+    PinnedMessage.create!  %{message_id: message_id,
+      user_id: assigns.user_id, channel_id: assigns.channel_id}
+    close_cog socket, sender, client
+    client.broadcast! socket, "update:pinned", %{}
+  end
+
+  def message_action(socket, Utils.dataset("id", "unpin-message") = sender, client) do
+    assigns = socket.assigns
+    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+    PinnedMessage.delete! PinnedMessage.get_by(message_id: message_id)
+    close_cog socket, sender, client
+    client.broadcast! socket, "update:pinned", %{}
+  end
+
+  def message_action(socket, Utils.dataset("id", "edit-message") = sender, client) do
+    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
   end
 
   def message_action(socket, sender, client) do

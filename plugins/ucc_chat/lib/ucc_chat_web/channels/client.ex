@@ -29,6 +29,7 @@ defmodule UccChatWeb.Client do
     Rebel.Query.insert socket, html, append: selector
   end
 
+  defdelegate broadcast!(socket, event, bindings), to: Phoenix.Channel
   defdelegate render_to_string(view, templ, bindings), to: Phoenix.View
   defdelegate insert_html(socket, selector, position, html), to: Rebel.Element
 end
