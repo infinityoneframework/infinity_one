@@ -2,8 +2,6 @@ defmodule UccChatWeb.RoomChannel.MessageInputTest do
   use UccChatWeb.ChannelCase
   use UccChatWeb.RoomChannel.Constants
 
-  import UccChat.TestHelpers
-
   alias UccChatWeb.RoomChannel.MessageInput
 
   defmodule Client do
@@ -237,7 +235,7 @@ defmodule UccChatWeb.RoomChannel.MessageInputTest do
    )
   end
 
-  defp set_sender(app, value, key, start \\ nil, finish \\ nil) do
+  defp set_sender(app, value, key, start, _finish) do
     len = String.length value
 
     {opened, app} = if app, do: {true, app}, else: {false, ""}

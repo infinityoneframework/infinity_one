@@ -3,14 +3,11 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
   use UcxUccWeb.Gettext
   use UccChatWeb.RoomChannel.Constants
 
-  import UccChatWeb.RebelChannel.Client
   import Rebel.Core, only: [this: 1]
 
   alias UccChatWeb.Client
-  alias UccChat.{Emoji, EmojiService, AccountService, StaredMessage, PinnedMessage}
-  alias UccChatWeb.{EmojiView, MessageView}
-  alias UcxUcc.Accounts
-
+  alias UccChat.{StaredMessage, PinnedMessage}
+  alias UccChatWeb.{MessageView}
 
   def message_cog_click(socket, sender, client \\ Client) do
     assigns = socket.assigns

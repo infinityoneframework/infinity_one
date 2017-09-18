@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   alias UcxUcc.{Accounts, Repo, Permissions}
   alias UccChat.{ChannelService, RobotService, MessageService}
-  alias UccChat.{Channel, Message, StaredMessage, PinnedMessage}
+  alias UccChat.{Channel, Message, Attachment, StaredMessage, PinnedMessage}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.MessageService, as: Service
   alias __MODULE__.Client
@@ -68,36 +68,33 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
-  def update(body, channel_id, user_id, message_id, socket, client \\ Client) do
+  def update(body, _channel_id, user_id, message_id, socket, client \\ Client) do
     assigns = socket.assigns
     user = Accounts.get_user user_id
     channel_id = assigns.channel_id
 
     value = body
     message = Message.get(message_id, preload: [:attachments])
-    resp =
-      case message.attachments do
-        [] ->
-          {body, mentions} = Service.encode_mentions(body, channel_id)
-          Message.update(message, %{body: body, edited_id: user.id})
-        [att|_] ->
-          update_attachment_description(att, message, value, user)
-      end
-      |> case do
-        {:ok, message} ->
-          message = Repo.preload(message, MessageService.preloads())
-          client.broadcast_update_message({message, message.body}, socket)
-        _error ->
-          client.toastr socket, :error,
-            ~g(Problem updating your message)
-      end
-
+    case message.attachments do
+      [] ->
+        {body, _mentions} = Service.encode_mentions(body, channel_id)
+        Message.update(message, %{body: body, edited_id: user.id})
+      [att|_] ->
+        update_attachment_description(att, message, value, user)
+    end
+    |> case do
+      {:ok, message} ->
+        message = Repo.preload(message, MessageService.preloads())
+        client.broadcast_update_message({message, message.body}, socket)
+      _error ->
+        client.toastr socket, :error,
+          ~g(Problem updating your message)
+    end
 
     MessageService.stop_typing(socket, user_id, channel_id)
-    # {:reply, resp, socket}
   end
 
-  defp handle_new_message(socket, message_body, opts, client \\ Client) do
+  defp handle_new_message(socket, message_body, opts, client) do
     Logger.debug "handle_new_message #{inspect message_body}"
     user = opts[:user]
     channel = opts[:channel]
@@ -240,7 +237,6 @@ defmodule UccChatWeb.RoomChannel.Message do
   def message_action(socket, Utils.dataset("id", "pin-message") = sender, client) do
     assigns = socket.assigns
     message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
-    message = Message.get message_id
     PinnedMessage.create!  %{message_id: message_id,
       user_id: assigns.user_id, channel_id: assigns.channel_id}
     close_cog socket, sender, client
@@ -248,7 +244,6 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   def message_action(socket, Utils.dataset("id", "unpin-message") = sender, client) do
-    assigns = socket.assigns
     message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
     PinnedMessage.delete! PinnedMessage.get_by(message_id: message_id)
     close_cog socket, sender, client
@@ -308,7 +303,7 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
-  def new_message(socket, sender, client \\ Client) do
+  def new_message(socket, _sender, client \\ Client) do
     assigns = socket.assigns
 
     message =
@@ -334,7 +329,7 @@ defmodule UccChatWeb.RoomChannel.Message do
     client.send_js socket, clear_editing_js(message_id)
   end
 
-  def cancel_edit(socket, sender, client \\ Client) do
+  def cancel_edit(socket, _sender, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
     Logger.info "cancel edit #{inspect message_id}"
     client.clear_message_box(socket)

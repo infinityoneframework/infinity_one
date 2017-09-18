@@ -43,13 +43,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def logit1(cx) do
-    Logger.error("app: #{inspect cx[:app]}, key: #{inspect cx.key}")
+    Logger.info("app: #{inspect cx[:app]}, key: #{inspect cx.key}")
     cx
   end
 
 
   defp set_app(context, sender) do
-    Logger.error "popup app: #{inspect sender}"
+    Logger.info "popup app: #{inspect sender}"
     context
     |> Map.put(:open?, sender["message_popup"])
     |> Map.put(:app, Module.concat(sender["popup_app"], nil))
@@ -107,7 +107,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def click_slash_popup(socket, sender) do
-    Logger.error "click_slash_popup: sender: " <> inspect(sender)
+    Logger.info "click_slash_popup: sender: " <> inspect(sender)
 
     # self = socket.assigns[:self]
     # user_id = socket.assigns[:user_id]

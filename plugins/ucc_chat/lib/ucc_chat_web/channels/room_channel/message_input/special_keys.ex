@@ -61,13 +61,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
     Message.cancel_edit context.socket, context.sender, context.client
   end
 
-  def handle_in(%{app: _, client: client} = context, @dn_arrow) do
-    Logger.info "down arrow"
+  def handle_in(%{app: _} = context, @dn_arrow) do
+    # Logger.info "down arrow"
     MessageInput.send_js context, "UccUtils.downArrow()"
   end
 
   def handle_in(%{app: _, open?: true} = context, @up_arrow) do
-    Logger.info "up arrow"
+    # Logger.info "up arrow"
     MessageInput.send_js context, "UccUtils.upArrow()"
   end
 
@@ -76,11 +76,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   end
 
   def handle_in(context, _key), do: context
-
-  defp update_state_backspace(context) do
-    update_in(context, [:state, :head], &String.replace(&1, ~r/.$/, ""))
-    context
-  end
 
   defp editing?(%{"classes" => classes}) do
     Enum.any? classes, fn {_, class} -> class == "editing" end

@@ -117,7 +117,6 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
     category = Rebel.Core.exec_js! socket,
       "document.querySelector('.filter-item.active').getAttribute('data-name')"
 
-IO.inspect category, label: "cat"
     sender["value"]
     |> String.replace(":", "")
     |> IO.inspect(label: "value")
@@ -136,8 +135,7 @@ IO.inspect category, label: "cat"
     Emoji.search(pattern, category)
   end
 
-  defp update_emoji_list(emojis, account, selector, socket, client \\ Client) do
-    IO.inspect emojis, label: "emojis"
+  defp update_emoji_list(emojis, account, selector, socket, client) do
     html =
       EmojiView
       |> Phoenix.View.render_to_string("emoji_category.html",

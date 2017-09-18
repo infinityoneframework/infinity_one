@@ -94,7 +94,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Buffer do
           if app, do: :close, else: :ok
         {match, app_key} -> {:open, {match, @app_lookup[app_key]}}
       end
-    Logger.error "key: #{inspect key}, buffer: #{inspect buffer}, text_len: #{text_len}, caret: #{inspect caret}, result: #{inspect result}"
+    # Logger.error "key: #{inspect key}, buffer: #{inspect buffer}, text_len: #{text_len}, caret: #{inspect caret}, result: #{inspect result}"
     result
   end
 
@@ -142,7 +142,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Buffer do
       [_, _, match] -> match
       [_, match] -> match
       other ->
-        Logger.error "other: #{inspect other}"
+        # Logger.error "other: #{inspect other}"
         nil
     end
   end

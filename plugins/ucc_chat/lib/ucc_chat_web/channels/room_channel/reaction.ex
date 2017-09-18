@@ -3,11 +3,9 @@ defmodule UccChatWeb.RoomChannel.Reaction do
   use UcxUccWeb.Gettext
 
   import UccChatWeb.RebelChannel.Client
-  import Rebel
 
   alias UccChatWeb.Client
-  alias UccChat.{Reaction, Emoji, EmojiService, AccountService, Message, MessageService}
-  alias UccChatWeb.EmojiView
+  alias UccChat.{Reaction, Message, MessageService}
   alias UcxUcc.{Accounts, Repo}
 
   use UccChatWeb.RoomChannel.Constants
@@ -88,7 +86,7 @@ defmodule UccChatWeb.RoomChannel.Reaction do
     username = user.username
     reaction
     |> reaction_user_ids
-    |> Enum.map(&Helpers.get_user(&1, preload: []))
+    |> Enum.map(&Accounts.get_user/1)
     |> Enum.reject(&(is_nil &1))
     |> Enum.map(fn user ->
       case user.username do

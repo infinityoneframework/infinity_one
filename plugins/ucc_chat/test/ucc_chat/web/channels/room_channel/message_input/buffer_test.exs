@@ -1,4 +1,4 @@
-defmodule UccChatWeb.RoomChannel.MessageInputTest do
+defmodule UccChatWeb.RoomChannel.MessageInput.BufferTest do
   use UccChatWeb.ChannelCase
   use UccChatWeb.RoomChannel.Constants
 
