@@ -41,6 +41,29 @@ defmodule UccChatWeb.FlexBar.Helpers do
     |> Enum.reverse
   end
 
+  def do_pinned_messages_args(collection, user_id, channel_id) do
+    collection
+    |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
+      day = DateTime.to_date(m.updated_at)
+      msg =
+        %{
+          channel_id: channel_id,
+          message: m.message,
+          username: m.message.user.username,
+          user: m.message.user,
+          own: m.message.user_id == user_id,
+          id: m.id,
+          new_day: day != last_day,
+          date: Helpers.format_date(m.message.updated_at),
+          time: Helpers.format_time(m.message.updated_at),
+          timestamp: m.message.timestamp
+        }
+      {day, [msg|acc]}
+    end)
+    |> elem(1)
+    |> Enum.reverse
+  end
+
   def settings_form_fields(channel, user_id) do
     user = Helpers.get_user! user_id
     disabled = !Permissions.has_permission?(user, "edit-room", channel.id)

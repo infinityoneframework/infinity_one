@@ -68,6 +68,35 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
+  def update(body, channel_id, user_id, message_id, socket, client \\ Client) do
+    assigns = socket.assigns
+    user = Accounts.get_user user_id
+    channel_id = assigns.channel_id
+
+    value = body
+    message = Message.get(message_id, preload: [:attachments])
+    resp =
+      case message.attachments do
+        [] ->
+          {body, mentions} = Service.encode_mentions(body, channel_id)
+          Message.update(message, %{body: body, edited_id: user.id})
+        [att|_] ->
+          update_attachment_description(att, message, value, user)
+      end
+      |> case do
+        {:ok, message} ->
+          message = Repo.preload(message, MessageService.preloads())
+          client.broadcast_update_message({message, message.body}, socket)
+        _error ->
+          client.toastr socket, :error,
+            ~g(Problem updating your message)
+      end
+
+
+    MessageService.stop_typing(socket, user_id, channel_id)
+    # {:reply, resp, socket}
+  end
+
   defp handle_new_message(socket, message_body, opts, client \\ Client) do
     Logger.debug "handle_new_message #{inspect message_body}"
     user = opts[:user]
@@ -149,6 +178,30 @@ defmodule UccChatWeb.RoomChannel.Message do
     |> client.push_message(socket)
   end
 
+  defp update_attachment_description(attachment, message, value, user) do
+    Repo.transaction(fn ->
+      message
+      |> Message.update(%{edited_id: user.id})
+      |> case do
+        {:ok, message} ->
+          attachment
+          |> Attachment.update(%{description: value})
+          |> case do
+            {:ok, _attachment} ->
+              {:ok, message}
+            error ->
+              Repo.rollback(:attachment_error)
+              error
+          end
+        error -> error
+      end
+    end)
+    |> case do
+      {:ok, res} -> res
+      {:error, _} -> {:error, nil}
+    end
+  end
+
   def message_action(socket, sender, client \\ Client)
   def message_action(socket, Utils.dataset("id", "delete-message") = sender, client) do
     message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
@@ -204,12 +257,37 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def message_action(socket, Utils.dataset("id", "edit-message") = sender, client) do
     message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+    start_editing socket, message_id, client
+    close_cog socket, sender, client
   end
 
   def message_action(socket, sender, client) do
     action = sender["dataset"]["id"]
     Logger.info "message action: #{action}, sender: #{inspect sender}"
     close_cog socket, sender, client
+  end
+
+  def start_editing(socket, message_id, client \\ Client) do
+    Rebel.put_assigns socket, :edit_message_id, message_id
+    Logger.info "editing #{message_id}"
+    message = Message.get message_id, preload: [:attachments]
+    body =
+      case message.attachments do
+        [] -> strip_mentions message.body
+        [att | _] -> att.description
+      end
+      |> Poison.encode!
+      |> IO.inspect(label: "body")
+    client.send_js socket, set_editing_js(message_id, body)
+  end
+
+  def open_edit(socket, client \\ Client) do
+    message_id = client.send_js! socket, "$('li.message.own').last().attr('id')"
+    start_editing socket, message_id, client
+  end
+
+  defp strip_mentions(body) do
+    String.replace body, ~r/<a.+?mention-link[^@]+?(@[^<]+?)<\/a>/, "\\g{1}"
   end
 
   def delete(%{assigns: assigns} = socket, message_id, client \\ Client) do
@@ -230,8 +308,61 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
+  def new_message(socket, sender, client \\ Client) do
+    assigns = socket.assigns
+
+    message =
+      socket
+      |> client.get_message_box_value
+      |> String.trim_trailing
+
+    if message != "" do
+      create(message, assigns.channel_id, assigns.user_id, socket)
+    end
+
+    client.clear_message_box(socket)
+    socket
+  end
+
+  def edit_message(%{assigns: assigns} = socket, sender, client \\ Client) do
+    message_id = Rebel.get_assigns socket, :edit_message_id
+    value = sender["value"]
+    Logger.info "edit_message.... sender: #{inspect sender}"
+    Logger.info "edit_message.... value: #{inspect value}, message_id: #{message_id}"
+    update(value, assigns.channel_id, assigns.user_id, message_id, socket, client)
+    client.clear_message_box(socket)
+    client.send_js socket, clear_editing_js(message_id)
+  end
+
+  def cancel_edit(socket, sender, client \\ Client) do
+    message_id = Rebel.get_assigns socket, :edit_message_id
+    Logger.info "cancel edit #{inspect message_id}"
+    client.clear_message_box(socket)
+    client.send_js socket, clear_editing_js(message_id)
+  end
+
   defp close_cog(socket, sender, client) do
     MessageCog.close_cog socket, sender, client
     socket
   end
+
+  defp set_editing_js(message_id, body) do
+    """
+    var input = $('.input-message');
+    input.addClass('editing').val(#{body});
+    input.closest('form').addClass('editing');
+    input.autogrow();
+    $('#' + '#{message_id}').addClass('editing');
+    """
+  end
+
+  defp clear_editing_js(message_id) do
+    """
+    var input = $('.input-message');
+    input.removeClass('editing').val('');
+    input.closest('form').removeClass('editing');
+    $('#' + '#{message_id}').removeClass('editing');
+    """
+  end
+
 end

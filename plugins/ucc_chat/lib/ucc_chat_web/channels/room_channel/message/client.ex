@@ -1,5 +1,6 @@
 defmodule UccChatWeb.RoomChannel.Message.Client do
   # use UccChatWeb, :channel
+  use UccChatWeb.Client
   use UccLogger
 
   import Rebel.{Query, Core}, warn: false
@@ -22,6 +23,7 @@ defmodule UccChatWeb.RoomChannel.Message.Client do
     var elem = document.querySelector('#{@wrapper_list}');
     elem.append(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
+    UccChat.normalize_message('#{message.id}');
     """ |> strip_nl()
   end
 
@@ -30,13 +32,21 @@ defmodule UccChatWeb.RoomChannel.Message.Client do
     broadcast_js socket, js
   end
 
+  def broadcast_update_message({message, html}, socket) do
+    broadcast_js socket, update_message_js(html, message)
+  end
+
+  def update_message_js(html, message) do
+    encoded = Poison.encode! html |> strip_nl()
+    """
+    $('#' + '#{message.id}').replaceWith(#{encoded});
+    Rebel.set_event_handlers('[id="#{message.id}"]');
+    UccChat.normalize_message('#{message.id}');
+    """ |> strip_nl()
+  end
+
   def delete_message!(message_id, socket) do
     delete! socket, "li.message#" <> message_id
   end
 
-  defdelegate broadcast!(socket, event, bindings), to: Phoenix.Channel
-  defdelegate toastr!(socket, which, message), to: UccChatWeb.RebelChannel.Client
-  defdelegate toastr(socket, which, message), to: UccChatWeb.RebelChannel.Client
-  defdelegate closest(socket, selector, class, attr), to: UccChatWeb.Client
-  defdelegate send_js(socket, js), to: UccChatWeb.Client
 end

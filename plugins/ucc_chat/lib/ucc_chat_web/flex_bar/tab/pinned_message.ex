@@ -20,7 +20,7 @@ defmodule UccChatWeb.FlexBar.Tab.PinnedMessage do
     pinned =
       channel_id
       |> PinnedMessage.get_by_channel_id()
-      |> do_messages_args(user_id, channel_id)
+      |> do_pinned_messages_args(user_id, channel_id)
 
     {[pinned: pinned], socket}
   end

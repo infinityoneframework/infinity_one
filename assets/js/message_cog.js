@@ -70,16 +70,16 @@ class MessageCog {
         let message_id = $(ct).closest('li.message').attr('id')
         let input = $('.input-message')
         if (data_id == "edit-message") {
-          cc.push('message:get-body:' + message_id)
-            .receive("ok", resp => {
-              console.log('body', resp.body)
-              input.addClass('editing').val(resp.body)
-              input.closest('form').addClass('editing')
-              input.autogrow()
-              this.original_text = resp.body
-              $('#' + message_id).addClass('editing')
-              this.close_cog($(ct))
-            })
+          // cc.push('message:get-body:' + message_id)
+          //   .receive("ok", resp => {
+          //     console.log('body', resp.body)
+          //     input.addClass('editing').val(resp.body)
+          //     input.closest('form').addClass('editing')
+          //     input.autogrow()
+          //     this.original_text = resp.body
+          //     $('#' + message_id).addClass('editing')
+          //     this.close_cog($(ct))
+          //   })
         } else if (data_id == "reaction-message") {
           // console.log('clicked reaction-message', $(ct))
           // chat_emoji.open_reactions(ct, message_id)

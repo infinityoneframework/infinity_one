@@ -11,7 +11,7 @@ defmodule UccChat.PinnedMessage do
   def get_by_channel_id(channel_id) do
     @schema
     |> where([m], m.channel_id == ^channel_id)
-    |> preload([:user, message: [:user]])
+    |> preload([message: [:user]])
     |> order_by([m], desc: m.inserted_at)
     |> @repo.all
   end

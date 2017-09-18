@@ -162,6 +162,16 @@ window.UccChat = {
     for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
   },
+  normalize_message: (message_id) => {
+    var message = $('#' + message_id);
+    var username = UccChat.ucxchat.username;
+    console.log('normalize message', message_id, message);
+    if (message.data('username') != username){
+      message.removeClass('own');
+    }
+    message.find(`a.mention-link[data-username="${username}"]`)
+      .addClass('mention-link-me background-primary-action-color');
+  },
   onload: function() {
     console.log('socket ready ...')
 

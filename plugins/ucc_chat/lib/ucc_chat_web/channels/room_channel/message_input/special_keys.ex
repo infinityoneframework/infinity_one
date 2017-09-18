@@ -42,23 +42,23 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   end
 
   def handle_in(context, @cr) do
-    assigns = context.socket.assigns
-
-    message =
-      context.socket
-      |> context.client.get_message_box_value
-      |> String.trim_trailing
-
-    if message != "" do
-      Message.create(message, assigns.channel_id, assigns.user_id, context.socket)
+    Logger.info "cr event: #{inspect context.sender["event"]}"
+    unless context.sender["event"]["shiftKey"] do
+      if editing?(context.sender) do
+        Message.edit_message(context.socket, context.sender, context.client)
+      else
+        Message.new_message(context.socket, context.sender, context.client)
+      end
     end
-
-    context.client.clear_message_box(context.socket)
-    context
   end
 
-  def handle_in(%{app: _} = context, @esc) do
+
+  def handle_in(%{app: _, open?: true} = context, @esc) do
     MessageInput.close_popup context
+  end
+
+  def handle_in(context, @esc) do
+    Message.cancel_edit context.socket, context.sender, context.client
   end
 
   def handle_in(%{app: _, client: client} = context, @dn_arrow) do
@@ -66,9 +66,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
     MessageInput.send_js context, "UccUtils.downArrow()"
   end
 
-  def handle_in(%{app: _} = context, @up_arrow) do
+  def handle_in(%{app: _, open?: true} = context, @up_arrow) do
     Logger.info "up arrow"
     MessageInput.send_js context, "UccUtils.upArrow()"
+  end
+
+  def handle_in(context, @up_arrow) do
+    Message.open_edit context.socket
   end
 
   def handle_in(context, _key), do: context
@@ -76,6 +80,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   defp update_state_backspace(context) do
     update_in(context, [:state, :head], &String.replace(&1, ~r/.$/, ""))
     context
+  end
+
+  defp editing?(%{"classes" => classes}) do
+    Enum.any? classes, fn {_, class} -> class == "editing" end
   end
 
 end

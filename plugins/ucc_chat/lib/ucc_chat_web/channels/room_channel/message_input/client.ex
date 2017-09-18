@@ -1,11 +1,11 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.Client do
 
-  import UcxUccWeb.Utils
+  use UccChatWeb.Client
+  use UccChatWeb.RoomChannel.Constants
+
   import Rebel.{Query, Core}, warn: false
 
   alias Rebel.Element
-
-  use UccChatWeb.RoomChannel.Constants
 
   def close_popup(socket) do
     update socket, :html, set: "", on: ".message-popup-results"
@@ -33,16 +33,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Client do
     update socket, :html, set: html, on: ".message-popup-results"
   end
 
-  def send_js(socket, js) do
-    exec_js socket, strip_nl(js)
-  end
-
   def get_selected_item(socket) do
     case Element.query_one socket, ".popup-item.selected", :dataset do
       {:ok, %{"dataset" => %{"name" => name}}} -> name
       _other -> nil
     end
   end
-  # defdelegate send_js(socket, js), to: UccChatWeb.Client
 
 end
