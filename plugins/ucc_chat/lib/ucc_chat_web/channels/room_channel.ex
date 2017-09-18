@@ -347,7 +347,7 @@ defmodule UccChatWeb.RoomChannel do
   end
 
   defdelegate message_keydown(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
-  defdelegate click_slash_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
+  defdelegate click_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate emoji_show(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_filter(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput

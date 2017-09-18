@@ -7,10 +7,10 @@
       .message-popup-items
         = if data = get_popup_data(@chatd) do
           - [item|tail] = data
-          .popup-item.selected(data-id="#{item[:id]}" data-name="#{item[:username]}")
+          .popup-item.selected(data-id="#{item[:id]}" data-name="#{item[:username]}" rebel-click="click_popup")
             = render @chatd[:templ], data: item
           = for item <- tail do
-            .popup-item(data-id="#{item[:id]}" data-name="#{item[:username]}")
+            .popup-item(data-id="#{item[:id]}" data-name="#{item[:username]}" rebel-click="click_popup")
               = render @chatd[:templ], data: item
         - else
           / - # {{#unless isLoading.get}}

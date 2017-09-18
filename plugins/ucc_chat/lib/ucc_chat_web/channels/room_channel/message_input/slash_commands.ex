@@ -22,11 +22,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
 
   def handle_select(buffer, selected, context) do
     if selected != "" do
-    context.client.send_js context.socket, """
-      var te = document.querySelector('#{@message_box}');
-      te.value = '#{Slash.special_text buffer} ';
-      te.focus();
-      """
+      context.client.send_js context.socket, """
+        var te = document.querySelector('#{@message_box}');
+        te.value = '#{Slash.special_text selected} ';
+        te.focus();
+        """
     end
   end
 

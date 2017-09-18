@@ -2,7 +2,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   use UccLogger
 
   # alias UccChatWeb.RoomChannel.KeyStore
-  alias UccChatWeb.RoomChannel.MessageInput.{Client, SpecialKeys}
+  alias UccChatWeb.RoomChannel.MessageInput.{Client, SpecialKeys, Buffer}
   # alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
 
@@ -18,17 +18,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def handle_keydown(socket, sender, key, client \\ Client) do
-    # self = socket.assigns[:self]
-    # user_id = socket.assigns[:user_id]
-
-    # ks_key = {user_id, self}
     socket
     |> create_context(sender, key, client)
     |> trace_data
     |> handle_in(key)
   end
 
-  def create_context(socket, sender, key, client) do
+  def create_context(socket, sender, key, client \\ Client) do
     %{
       socket: socket,
       sender: sender,
@@ -53,11 +49,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     context
     |> Map.put(:open?, sender["message_popup"])
     |> Map.put(:app, Module.concat(sender["popup_app"], nil))
-    # if sender["message_popup"] do
-    #   Map.put context, :app, Module.concat(sender["popup_app"], nil)
-    # else
-    #   context
-    # end
   end
 
   defp trace_data(context) do
@@ -106,17 +97,21 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     context
   end
 
-  def click_slash_popup(socket, sender) do
-    Logger.info "click_slash_popup: sender: " <> inspect(sender)
+  def handle_select(%{state: state, app: app} = context, selected) do
+    buffer = Buffer.replace_word(state.buffer, selected, state.start)
+    app
+    |> Buffer.app_module
+    |> apply(:handle_select, [buffer, selected, context])
+    close_popup(context)
+    context
+  end
 
-    # self = socket.assigns[:self]
-    # user_id = socket.assigns[:user_id]
-    # # command = sender["dataset"]["name"]
-
-    # ks_key = {user_id, self}
-    # info = %{socket: socket, sender: sender, ks_key: ks_key}
-
+  def click_popup(socket, sender, client \\ Client) do
+    # Logger.info "click_slash_popup: sender: " <> inspect(sender)
     socket
+    |> create_context(sender, @cr, client)
+    |> IO.inspect(label: "context")
+    |> handle_select(sender["dataset"]["name"])
   end
 
   def get_selected_item(context) do

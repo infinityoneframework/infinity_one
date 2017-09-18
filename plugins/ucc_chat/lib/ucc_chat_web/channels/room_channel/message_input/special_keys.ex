@@ -24,17 +24,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   end
 
   def handle_in(%{app: app, open?: true, state: state} = context, key) when key in [@tab, @cr] do
-    selected = MessageInput.get_selected_item(context)
 
     # app_key = @app_key_lookup[app]
     # updated_buffer = Regex.replace ~r/(#{app_key})[^\s]*$/, state.head, "\\1#{selected}"
     # Logger.info "updated_buffer: #{inspect updated_buffer}"
     # Logger.info "state: #{inspect state}"
-    buffer = Buffer.replace_word(state.buffer, selected, state.start)
-    app
-    |> Buffer.app_module
-    |> apply(:handle_select, [buffer, selected, context])
-    MessageInput.close_popup(context)
+    MessageInput.handle_select context, MessageInput.get_selected_item(context)
   end
 
   def handle_in(context, @tab) do

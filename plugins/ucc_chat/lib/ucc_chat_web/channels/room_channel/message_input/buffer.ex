@@ -46,7 +46,8 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Buffer do
   def get_buffer_state(sender, key) when key in @special_keys do
     value = sender["value"]
     {start, _} = caret sender
-    if sender["text_len"] == start do
+    len = sender["text_len"] || String.length value
+    if len == start do
       # cursor at the end of the buffer
       new value, "", start, sender["text_len"], value
     else
@@ -79,7 +80,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Buffer do
     {start, finish}
   end
 
-  def check_popup_state(app, key, buffer, text_len, caret) do
+  def check_popup_state(app, _key, buffer, text_len, caret) do
     pos =
       case caret["start"] do
         start when start > 0 -> start - 1
@@ -141,7 +142,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Buffer do
     case Regex.run pattern, buffer do
       [_, _, match] -> match
       [_, match] -> match
-      other ->
+      _other ->
         # Logger.error "other: #{inspect other}"
         nil
     end

@@ -16,9 +16,12 @@ function start_room_channel(ucc_chat, socket) {
   UccUtils.push_history();
 
   Rebel.additional_payloads.push(function(sender, event) {
-    console.log('additional_payloads', sender, event)
-    var className  = sender.className;
-    if (className && className.lastIndexOf('input-message') != -1) {
+    // console.log('additional_payloads', sender, event)
+    var handlers = ['message_keydown', 'click_popup'];
+    var handler = sender.getAttribute('rebel-handler');
+    var opened, results, position, app;
+
+    if (handler == 'message_keydown' || handler == 'click_popup') {
       var opened = false;
       var results = document.querySelector('.message-popup-results');
       var position = document.querySelector(
@@ -31,11 +34,32 @@ function start_room_channel(ucc_chat, socket) {
       if (results && results.innerHTML != "") {
         opened = true;
       }
+    }
 
+    if (handler == 'message_keydown') {
       // we have the text area
       return {
         text_len: sender.value.length,
         caret: UccUtils.getCaretPosition(sender),
+        message_popup: opened,
+        popup_app: app
+      }
+    } else if (handler == 'click_popup') {
+      // console.log('click_popup', sender);
+      var input = document.querySelector('.input-message');
+
+      var res =  {
+        value: input.value,
+        text_len: input.value.length,
+        caret: UccUtils.getCaretPosition(input),
+        message_popup: opened,
+        popup_app: app
+      }
+      // console.log('res', res);
+      return {
+        value: input.value,
+        text_len: input.value.length,
+        caret: UccUtils.getCaretPosition(input),
         message_popup: opened,
         popup_app: app
       }

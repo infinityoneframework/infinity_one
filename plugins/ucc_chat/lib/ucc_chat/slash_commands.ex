@@ -78,7 +78,7 @@ defmodule UccChat.SlashCommands do
 
   def format_command %{command: command, args: args, description: description}, class \\ "" do
     content_tag :div, class: "popup-item#{class}", "data-name": command,
-      "rebel-click": "click_slash_popup" do
+      "rebel-click": "click_popup" do
 
       [
         content_tag :strong do
