@@ -1,10 +1,13 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
   use UccChatWeb.RoomChannel.Constants
 
-  import UcxUccWeb.Utils
+  import UcxUccWeb.{Utils, Gettext}
 
   alias UccChat.SlashCommands, as: Slash
+  alias UccChat.{ChannelService, Channel}
   alias UccChatWeb.MessageView
+  alias UccChatWeb.Client
+  alias UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands
 
   require UccChatWeb.RoomChannel.MessageInput
   require Logger
@@ -41,4 +44,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
       chatd: %{open: true, data: commands})
     |> context.client.render_popup_results(context.socket)
   end
+
+  ######################
+  # Command handling
+
+
 end

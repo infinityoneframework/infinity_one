@@ -10,11 +10,11 @@ defmodule UccChatWeb.RoomChannel.Message do
   alias UccChat.{Channel, Message, Attachment, StaredMessage, PinnedMessage}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.MessageService, as: Service
-  alias __MODULE__.Client
+  # alias __MODULE__.Client
   alias Rebel.SweetAlert
   alias UccChatWeb.RoomChannel.MessageCog
 
-  alias UccChatWeb.MessageView
+  alias UccChatWeb.{MessageView, Client}
 
   @preloads [:user, :edited_by, :attachments, :reactions]
 

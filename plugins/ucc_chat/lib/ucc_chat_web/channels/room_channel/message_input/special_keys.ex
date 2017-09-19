@@ -3,6 +3,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   alias UccChatWeb.RoomChannel.MessageInput
   alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
+  alias MessageInput.SlashCommands
 
   use UccChatWeb.RoomChannel.Constants
   require Logger
@@ -38,11 +39,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
 
   def handle_in(context, @cr) do
     Logger.info "cr event: #{inspect context.sender["event"]}"
-    unless context.sender["event"]["shiftKey"] do
-      if editing?(context.sender) do
-        Message.edit_message(context.socket, context.sender, context.client)
-      else
-        Message.new_message(context.socket, context.sender, context.client)
+    if SlashCommands.Commands.run(context.state.buffer, context.sender, context.socket) do
+      unless context.sender["event"]["shiftKey"] do
+        if editing?(context.sender) do
+          Message.edit_message(context.socket, context.sender, context.client)
+        else
+          Message.new_message(context.socket, context.sender, context.client)
+        end
       end
     end
   end

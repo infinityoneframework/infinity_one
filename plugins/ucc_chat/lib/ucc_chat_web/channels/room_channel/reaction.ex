@@ -1,14 +1,14 @@
 defmodule UccChatWeb.RoomChannel.Reaction do
   use UccLogger
   use UcxUccWeb.Gettext
+  use UccChatWeb.RoomChannel.Constants
 
-  import UccChatWeb.RebelChannel.Client
+  # import UccChatWeb.RebelChannel.Client
 
   alias UccChatWeb.Client
   alias UccChat.{Reaction, Message, MessageService}
   alias UcxUcc.{Accounts, Repo}
 
-  use UccChatWeb.RoomChannel.Constants
 
   def select(socket, sender, client \\ Client) do
     Logger.info "sender: #{inspect sender}"
@@ -23,7 +23,7 @@ defmodule UccChatWeb.RoomChannel.Reaction do
 
     case Enum.find message.reactions, &(&1.emoji == emoji) do
       nil ->
-        insert_reaction socket, emoji, message.id, user.id
+        insert_reaction socket, emoji, message.id, user.id, client
       reaction ->
         update_reaction reaction, user.id
     end
@@ -35,13 +35,13 @@ defmodule UccChatWeb.RoomChannel.Reaction do
     emoji
   end
 
-  def insert_reaction(socket, emoji, message_id, user_id) do
+  def insert_reaction(socket, emoji, message_id, user_id, client \\ Client) do
     case Reaction.create(%{emoji: emoji, message_id: message_id,
       user_ids: user_id, count: 1}) do
       {:ok, _} ->
         nil
       {:error, _cs} ->
-        toastr! socket, :error, ~g(Problem adding reaction)
+        client.toastr! socket, :error, ~g(Problem adding reaction)
     end
   end
 

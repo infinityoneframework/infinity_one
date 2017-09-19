@@ -2,7 +2,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   use UccLogger
   use UcxUccWeb.Gettext
 
-  import UccChatWeb.RebelChannel.Client
+  # import UccChatWeb.RebelChannel.Client
   import Rebel
   import Rebel.Core, only: [this: 1]
 
@@ -11,6 +11,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   alias UccChatWeb.EmojiView
   alias UcxUcc.Accounts
   alias UccChatWeb.RoomChannel.Reaction
+  alias UccChatWeb.Client
 
   use UccChatWeb.RoomChannel.Constants
 
@@ -75,7 +76,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
         |> AccountService.emoji_recents
         |> update_emoji_list(account, ".emojis ul.recent", socket, client)
       {:error, _} ->
-        toastr! socket, :error, ~g(Problem updating emoji recent)
+        client.toastr! socket, :error, ~g(Problem updating emoji recent)
       nil -> :ok
     end
     socket

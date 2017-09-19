@@ -1,12 +1,12 @@
 defmodule UccChatWeb.RoomChannel.MessageInput do
   use UccLogger
+  use UccChatWeb.RoomChannel.Constants
 
   # alias UccChatWeb.RoomChannel.KeyStore
-  alias UccChatWeb.RoomChannel.MessageInput.{Client, SpecialKeys, Buffer}
+  alias UccChatWeb.RoomChannel.MessageInput.{SpecialKeys, Buffer}
   # alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
-
-  use UccChatWeb.RoomChannel.Constants
+  alias UccChatWeb.Client
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]

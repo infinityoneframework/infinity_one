@@ -861,7 +861,7 @@ defmodule UccChatWeb.UserChannel do
     trace "", inspect(assigns)
     html = SideNavService.render_rooms_list(assigns[:channel_id],
       assigns[:user_id])
-    push socket, "update:rooms", %{html: html}
+    Rebel.Query.update socket, :html, set: html, on: ".rooms-list"
     socket
   end
 

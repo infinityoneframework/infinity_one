@@ -17,6 +17,9 @@ function start_room_channel(ucc_chat, socket) {
 
   Rebel.additional_payloads.push(function(sender, event) {
     // console.log('additional_payloads', sender, event)
+    if (!sender) {
+      return {};
+    }
     var handlers = ['message_keydown', 'click_popup'];
     var handler = sender.getAttribute('rebel-handler');
     var opened, results, position, app;
