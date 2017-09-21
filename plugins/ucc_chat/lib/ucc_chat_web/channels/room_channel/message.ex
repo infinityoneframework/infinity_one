@@ -25,7 +25,8 @@ defmodule UccChatWeb.RoomChannel.Message do
 
     cond do
       ChannelService.user_muted? user_id, channel_id ->
-        push_system_message socket, channel_id,
+        push_private_message socket, channel_id,
+        # MessageService.broadcast_private_message(channel_id, user_id,
           ~g"You have been muted and cannot speak in this room", client
 
         # sys_msg = create_system_message(channel_id,
@@ -125,6 +126,15 @@ defmodule UccChatWeb.RoomChannel.Message do
       })
   end
 
+  def create_private_message(channel_id, body) do
+    bot_id = Helpers.get_bot_id()
+    create_message(body, bot_id, channel_id,
+      %{
+        system: true,
+        sequential: false,
+      })
+  end
+
   def create_message(body, user_id, channel_id, params \\ %{}) do
     sequential? =
       case Message.last_message(channel_id) do
@@ -161,9 +171,9 @@ defmodule UccChatWeb.RoomChannel.Message do
       user: user, previews: [])}
   end
 
-  def push_system_message(socket, channel_id, body, client \\ Client) do
+  def push_private_message(socket, channel_id, body, client \\ Client) do
     channel_id
-    |> create_system_message(body)
+    |> create_private_message(body)
     |> render_message
     |> client.push_message(socket)
   end

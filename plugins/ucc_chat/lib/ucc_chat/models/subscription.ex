@@ -17,9 +17,12 @@ defmodule UccChat.Subscription do
       preload: ^preload
   end
 
-  def get_by_channel_id_and_not_user_id(channel_id, user_id) do
+  def get_by_channel_id_and_not_user_id(channel_id, user_id, opts \\ []) do
+    preload = opts[:preload] || []
+
     @schema
     |> where([s], s.channel_id == ^channel_id and s.user_id != ^user_id)
+    |> preload(^preload)
     |> @repo.all
   end
 

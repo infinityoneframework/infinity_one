@@ -80,8 +80,15 @@ defmodule UccChat.MessageService do
       "message:new", resp
   end
 
-  def broadcast_system_message(%{} = channel, _user_id, body) do
-    message = create_system_message(channel.id, body)
+  def broadcast_bot_message(channel_id, user_id, body) do
+    channel_id
+    |> Channel.get
+    |> broadcast_bot_message(user_id, body)
+
+  end
+
+  def broadcast_system_message(%{} = channel, user_id, body) do
+    message = create_system_message(channel.id, user_id, body)
     html = render_message message
     resp = create_broadcast_message(message.id, channel.name, html)
     UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
@@ -91,6 +98,19 @@ defmodule UccChat.MessageService do
     channel_id
     |> Channel.get
     |> broadcast_system_message(user_id, body)
+  end
+
+  def broadcast_private_message(%{} = channel, _user_id, body) do
+    message = create_private_message(channel.id, body)
+    html = render_message message
+    resp = create_broadcast_message(message.id, channel.name, html)
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+      "message:new", resp
+  end
+  def broadcast_private_message(channel_id, user_id, body) do
+    channel_id
+    |> Channel.get
+    |> broadcast_private_message(user_id, body)
   end
 
   def broadcast_message(id, room, user_id, html, opts \\ []) #event \\ "new")
@@ -167,7 +187,15 @@ defmodule UccChat.MessageService do
     |> Helpers.safe_to_string
   end
 
-  def create_system_message(channel_id, body) do
+  def create_system_message(channel_id, user_id, body) do
+    create_message(body, user_id, channel_id,
+      %{
+        system: true,
+        sequential: false,
+      })
+  end
+
+  def create_private_message(channel_id, body) do
     bot_id = Helpers.get_bot_id()
     create_message(body, bot_id, channel_id,
       %{

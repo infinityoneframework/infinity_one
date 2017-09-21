@@ -90,8 +90,8 @@ defmodule UccChatWeb.Client do
     end
   end
   def push_message({message, html}, socket) do
-    exec_js message, push_message_js(html, message)
-    RebelClient.scroll_bottom(socket, '#{@wrapper}')
+    exec_js socket, push_message_js(html, message) <>
+      RebelClient.scroll_bottom_js('#{@wrapper}')
   end
 
   def push_message_js(html, message) do

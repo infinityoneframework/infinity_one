@@ -12,7 +12,7 @@ defmodule UccChat.ChannelService do
 
   alias UccChat.{
     Channel, Subscription, MessageService, UserService,
-    ChatDat, Direct, Mute, SideNavService, Message
+    ChatDat, Direct, Mute, SideNavService, Message, Settings
   }
   alias UccChatWeb.UserChannel
   alias UcxUcc.Repo
@@ -855,8 +855,7 @@ defmodule UccChat.ChannelService do
 
   def user_command(socket, :kick, %User{} = user, user_id, channel_id) do
     channel_id
-    |> Channel.get!
-    |> remove_user_from_channel(user.id)
+    |> kick_user(user, socket)
     |> case do
       nil ->
         {:error, ~g"User " <> "`#{user.username}`" <>
@@ -914,10 +913,6 @@ defmodule UccChat.ChannelService do
   def user_command(socket, :mute, %User{} = user, user_id, channel_id) do
     case mute_user(user, user_id, channel_id) do
       {:ok, msg} ->
-        unless UccSettings.hide_user_muted() do
-          notify_user_action2 socket, user, user_id, channel_id,
-            &format_binary_msg(&1, &2, "muted")
-        end
         Phoenix.Channel.broadcast socket, "user:action",
           %{action: "mute", user_id: user.id}
         {:ok, msg}
@@ -1058,13 +1053,17 @@ defmodule UccChat.ChannelService do
   end
 
   def mute_user(%{id: id} = user, user_id, channel_id) do
-    if Permissions.has_permission?(Helpers.get_user!(user_id), "mute-user",
-      channel_id) do
+    if Permissions.has_permission?(Helpers.get_user!(user_id), "mute-user", channel_id) do
       case Mute.create(%{user_id: id, channel_id: channel_id}) do
         {:error, _cs} ->
-          {:error, ~g"User" <> " `@" <> user.username <> "` " <>
-            ~g"already muted."}
+          message = ~g"User" <> " `@" <> user.username <> "` " <> ~g"already muted."
+          {:error, message}
         _mute ->
+          current_user = Accounts.get_user user_id
+          unless UccSettings.hide_user_muted() do
+            message = ~g(User ) <> user.username <> ~g( muted by ) <> current_user.username
+            MessageService.broadcast_system_message(channel_id, current_user.id, message)
+          end
           {:ok, ~g"muted"}
       end
     else
@@ -1081,6 +1080,11 @@ defmodule UccChat.ChannelService do
             ~g"is not muted."}
         mute ->
           Repo.delete mute
+          current_user = Accounts.get_user user_id
+          unless UccSettings.hide_user_muted() do
+            message = ~g(User ) <> user.username <> ~g( unmuted by ) <> current_user.username
+            MessageService.broadcast_system_message(channel_id, current_user.id, message)
+          end
           {:ok, ~g"unmuted"}
       end
     else
@@ -1149,14 +1153,14 @@ defmodule UccChat.ChannelService do
     end
   end
 
-  def invite_user(current_user, channel_id, user_id \\ [], opts \\ [])
-  def invite_user(%User{} = current_user, channel_id, user_id, opts)
-    when is_binary(user_id) do
-    current_user.id
+  def invite_user(user, channel_id, current_user_id \\ [], opts \\ [])
+  def invite_user(%User{} = user, channel_id, current_user_id, opts)
+    when is_binary(current_user_id) do
+    user.id
     |> invite_user(channel_id, opts)
     |> case do
       {:ok, subs} ->
-        notify_user_action(current_user, user_id, channel_id, "added")
+        notity_user_join(channel_id, user)
         {:ok, subs}
       error ->
         error
@@ -1167,6 +1171,18 @@ defmodule UccChat.ChannelService do
     channel_id
     |> Channel.get!
     |> add_user_to_channel(user_id, opts)
+  end
+
+  def kick_user(channel_id, user, socket) do
+    channel_id
+    |> Channel.get!
+    |> remove_user_from_channel(user.id)
+    |> case do
+      nil -> nil
+      other ->
+        notify_user_removed(channel_id, user)
+        other
+    end
   end
 
 
@@ -1212,15 +1228,12 @@ defmodule UccChat.ChannelService do
       nil ->
         nil
       subs ->
+        user = Accounts.get_user user_id
         Repo.delete! subs
         UserChannel.leave_room(user_id, channel.name)
         UccPubSub.broadcast "user:" <> user_id, "delete:subscription",
           %{channel_id: channel.id}
-
-        unless UccSettings.hide_user_leave() do
-          # here
-          # broadcast_message("Has left the channel.", channel.name, user_id, channel.id, system: true, sequential: false)
-        end
+        notity_user_leave(channel.id, user)
         {:ok, ~g"removed"}
     end
   end
@@ -1242,6 +1255,26 @@ defmodule UccChat.ChannelService do
     get_icon channel.type
   end
 
+  def notity_user_join(channel_id, user) do
+    unless Settings.hide_user_join do
+      MessageService.broadcast_system_message channel_id, user.id,
+        user.username <> ~g( has joined the channel.)
+    end
+  end
+
+  def notify_user_removed(channel_id, user) do
+    unless Settings.hide_user_removed do
+      MessageService.broadcast_system_message channel_id, user.id,
+        user.username <> ~g( has been removed from the channel.)
+    end
+  end
+
+  def notity_user_leave(channel_id, user) do
+    unless UccSettings.hide_user_leave() do
+      MessageService.broadcast_system_message channel_id, user.id,
+        user.username <> ~g( has left the channel.)
+    end
+  end
   # def get_route(@stared_room, name), do: "/direct/" <> name
   # def get_route(@direct_message, name), do: "/direct/" <> name
   # def get_route(_, name), do: "/channel/" <> name

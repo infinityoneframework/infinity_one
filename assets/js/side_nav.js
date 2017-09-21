@@ -162,6 +162,7 @@ class SideNav {
         $('.main-content').html($('.main-content-cache').html())
         $('.main-content-cache').html('')
         this.roomHistoryManager.restore_cached_room()
+        window.Rebel.set_event_handlers('body')
       }
       SideNav.hide_account_box_menu()
     })

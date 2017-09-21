@@ -16,55 +16,58 @@ defmodule UccChatWeb.MessageChannelController do
 
   require Logger
 
-  def create(%{assigns: assigns} = socket, params) do
-    # Logger.warn "++++ socket: #{inspect socket}"
-    message = params["message"]
-    user_id = assigns[:user_id]
-    channel_id = assigns[:channel_id]
+  # def create(%{assigns: assigns} = socket, params) do
+  #   # Logger.warn "++++ socket: #{inspect socket}"
+  #   message = params["message"]
+  #   user_id = assigns[:user_id]
+  #   channel_id = assigns[:channel_id]
 
-    create message, channel_id, user_id, socket
+  #   create message, channel_id, user_id, socket
 
-    {:noreply, socket}
-  end
+  #   {:noreply, socket}
+  # end
 
-  def create(message, channel_id, user_id, socket) do
-    user = Helpers.get_user user_id
-    channel = Channel.get!(channel_id)
-    msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
+  # def create(message, channel_id, user_id, socket) do
+  #   Logger.error "create ..."
+  #   user = Helpers.get_user user_id
+  #   channel = Channel.get!(channel_id)
+  #   msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
 
-    cond do
-      ChannelService.user_muted? user_id, channel_id ->
-        sys_msg = create_system_message(channel_id,
-          ~g"You have been muted and cannot speak in this room")
-        html = render_message(sys_msg)
-        push_message(socket, sys_msg.id, user_id, html)
+  #   cond do
+  #     ChannelService.user_muted? user_id, channel_id ->
+  #       # sys_msg = create_private_message(channel_id,
+  #       #   ~g"You have been muted and cannot speak in this room")
+  #       # html = render_message(sys_msg)
+  #       # push_message(socket, sys_msg.id, user_id, html)
+  #       MessageService.broadcast_private_message(channel_id, user_id,
+  #         ~g"You have been muted and cannot speak in this room")
 
-        msg = create_message(message, user_id, channel_id, %{ type: "p", })
-        html = render_message(msg)
-        push_message(socket, msg.id, user_id, html)
+  #       # msg = create_message(message, user_id, channel_id, %{ type: "p", })
+  #       # html = render_message(msg)
+  #       # push_message(socket, msg.id, user_id, html)
 
-      channel.read_only and
-        not Permissions.has_permission?(user, "post-readonly", channel_id) ->
+  #     channel.read_only and
+  #       not Permissions.has_permission?(user, "post-readonly", channel_id) ->
 
-        Client.toastr socket, :error,
-          ~g(You are not authorized to create a message)
-      channel.archived ->
-        Client.toastr socket, :error,
-          ~g(You are not authorized to create a message)
-      true ->
-        {body, mentions} = encode_mentions(message, channel_id)
-        UccChat.RobotService.new_message body, channel, user
+  #       Client.toastr socket, :error,
+  #         ~g(You are not authorized to create a message)
+  #     channel.archived ->
+  #       Client.toastr socket, :error,
+  #         ~g(You are not authorized to create a message)
+  #     true ->
+  #       {body, mentions} = encode_mentions(message, channel_id)
+  #       UccChat.RobotService.new_message body, channel, user
 
-        message = create_message(body, user_id, channel_id, msg_params)
-        create_mentions(mentions, message.id, message.channel_id, body)
-        update_direct_notices(channel, message)
-        message_html = render_message(message)
-        broadcast_message(socket, message.id, message.user.id,
-          message_html, body: body)
-    end
-    stop_typing(socket, user_id, channel_id)
-    socket
-  end
+  #       message = create_message(body, user_id, channel_id, msg_params)
+  #       create_mentions(mentions, message.id, message.channel_id, body)
+  #       update_direct_notices(channel, message)
+  #       message_html = render_message(message)
+  #       broadcast_message(socket, message.id, message.user.id,
+  #         message_html, body: body)
+  #   end
+  #   stop_typing(socket, user_id, channel_id)
+  #   socket
+  # end
 
   def index(%{assigns: assigns} = socket, params) do
     user = Helpers.get_user(assigns[:user_id], preload: [])
