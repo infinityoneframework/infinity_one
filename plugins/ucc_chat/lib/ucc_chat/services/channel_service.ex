@@ -1014,17 +1014,6 @@ defmodule UccChat.ChannelService do
     body = fun.(user.username, owner.username)
     broadcast_message2(socket, body, user_id, channel_id, system: true)
   end
-  defp notify_user_action(_user, _user_id, _channel_id, _action) do
-    # owner = Helpers.get(User, user_id)
-    # t1 = content_tag :em do
-    #  user.username
-    # end
-    # t2 = content_tag :em do
-    #  owner.username
-    # end
-    # broadcast_message(body, room, user_id, channel_id)
-    #Helpers.response_message(channel_id, text: "User ", tag: t1, text: " #{action} by ", tag: t2, text: ".")
-  end
 
   def block_user(%{id: _id}, _user_id, channel_id) do
     channel_id
@@ -1173,7 +1162,7 @@ defmodule UccChat.ChannelService do
     |> add_user_to_channel(user_id, opts)
   end
 
-  def kick_user(channel_id, user, socket) do
+  def kick_user(channel_id, user, _socket) do
     channel_id
     |> Channel.get!
     |> remove_user_from_channel(user.id)

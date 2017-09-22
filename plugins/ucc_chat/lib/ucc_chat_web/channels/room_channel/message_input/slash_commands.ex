@@ -1,13 +1,10 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
   use UccChatWeb.RoomChannel.Constants
 
-  import UcxUccWeb.{Utils, Gettext}
+  import UcxUccWeb.{Utils}
 
   alias UccChat.SlashCommands, as: Slash
-  alias UccChat.{ChannelService, Channel}
   alias UccChatWeb.MessageView
-  alias UccChatWeb.Client
-  alias UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands
 
   require UccChatWeb.RoomChannel.MessageInput
   require Logger
@@ -23,7 +20,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
     |> render_commands(context)
   end
 
-  def handle_select(buffer, selected, context) do
+  def handle_select(_buffer, selected, context) do
     if selected != "" do
       context.client.send_js context.socket, """
         var te = document.querySelector('#{@message_box}');

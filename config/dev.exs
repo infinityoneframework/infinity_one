@@ -45,7 +45,7 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
       ~r{lib/ucx_ucc/web/templates/.*(eex|slim|slime)$},
       ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
-      ~r{plugins/.*/lib/.*/web/templates/.*(eex|slim|slime)$},
+      ~r{plugins/.*/lib/.*/web/templates/.*(eex|slim|slime|md)$},
     ]
   ]
 

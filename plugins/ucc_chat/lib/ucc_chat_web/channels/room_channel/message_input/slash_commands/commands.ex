@@ -1,11 +1,11 @@
 defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   use UccChatWeb.RoomChannel.Constants
 
-  import UcxUccWeb.{Utils, Gettext}
+  import UcxUccWeb.{Gettext}
 
-  alias UccChat.SlashCommands, as: Slash
+  # alias UccChat.SlashCommands, as: Slash
   alias UccChat.{ChannelService, Channel, Subscription}
-  alias UccChatWeb.MessageView
+  # alias UccChatWeb.MessageView
   alias UccChatWeb.Client
   alias UcxUcc.Accounts
   alias Accounts.User
@@ -39,7 +39,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command(command, args, sender, socket, client \\ Client)
 
-  def run_command("join", args, sender, socket, client) do
+  def run_command("join", args, _sender, socket, client) do
     if name = get_channel_name(args, socket, client) do
       assigns = socket.assigns
       case ChannelService.channel_command socket, :join, name, assigns.user_id,
@@ -53,7 +53,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command(command, [], sender, socket, client) when command in ~w(leave part) do
+  def run_command(command, [], _sender, socket, client) when command in ~w(leave part) do
     assigns = socket.assigns
     with channel when not is_nil(channel) <- Channel.get(assigns.channel_id),
          {:ok, message} <- ChannelService.channel_command(socket, :leave, channel,
@@ -65,11 +65,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command(command, args, sender, socket, client) when command in ~w(leave part) do
+  def run_command(command, args, _sender, socket, client) when command in ~w(leave part) do
     invalid_args_error args, socket, client
   end
 
-  def run_command("create", args, sender, socket, client) do
+  def run_command("create", args, _sender, socket, client) do
     assigns = socket.assigns
     name = get_channel_name(args, socket, client)
     with name when not is_nil(name) <- name,
@@ -86,7 +86,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("open", args, sender, socket, client) do
+  def run_command("open", args, _sender, socket, client) do
     if name = get_channel_name args, socket, client do
       if Channel.get_by(name: name) do
         Phoenix.Channel.push socket, "room:open", %{room: name}
@@ -115,7 +115,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("unarchive", [], sender, socket, client) do
+  def run_command("unarchive", [], _sender, socket, client) do
     client.toastr! socket, :error, ~g(The unarchive command requires a room name)
   end
 
@@ -141,7 +141,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("unarchive", args, sender, socket, client) do
     if name = get_channel_name args, socket, client do
-      assigns = socket.assigns
+      # assigns = socket.assigns
       if channel = Channel.get_by name: name do
         unarchive_channel(channel, sender, socket, client)
       else
@@ -150,7 +150,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("invite", args, sender, socket, client) do
+  def run_command("invite", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
       case ChannelService.invite_user user, socket.assigns.channel_id, current_user.id do
@@ -164,7 +164,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("kick", args, sender, socket, client) do
+  def run_command("kick", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       channel_id = socket.assigns.channel_id
       case ChannelService.kick_user channel_id, user, socket do
@@ -178,7 +178,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("mute", args, sender, socket, client) do
+  def run_command("mute", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       assigns = socket.assigns
       case ChannelService.mute_user user, assigns.user_id, assigns.channel_id do
@@ -190,7 +190,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("unmute", args, sender, socket, client) do
+  def run_command("unmute", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       assigns = socket.assigns
       case ChannelService.unmute_user user, assigns.user_id, assigns.channel_id do
@@ -257,11 +257,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   defp no_room_message, do: ~g(No room by that name)
   defp sorry_message, do: ~g(Sorry, something went wrong.)
 
-  defp archive_channel(%{archived: true} = channel, sender, socket, client) do
+  defp archive_channel(%{archived: true} = _channel, _sender, socket, client) do
     client.toastr! socket, :error, ~g(Room is already archived.)
   end
 
-  defp archive_channel(%{id: id} = channel, sender, socket, client) do
+  defp archive_channel(%{id: id} = channel, _sender, socket, client) do
     user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
     case Channel.update channel, %{archived: true} do
       {:ok, _} ->
@@ -275,11 +275,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  defp unarchive_channel(%{archived: false} = channel, sender, socket, client) do
+  defp unarchive_channel(%{archived: false} = _channel, _sender, socket, client) do
     client.toastr! socket, :error, ~g(Room is not archived.)
   end
 
-  defp unarchive_channel(%{id: id} = channel, sender, socket, client) do
+  defp unarchive_channel(%{id: id} = channel, _sender, socket, client) do
     user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
     case Channel.update channel, %{archived: false} do
       {:ok, _} ->
@@ -313,7 +313,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   def invite_user(current_user, channel_id, user_id \\ [], opts \\ [])
-  def invite_user(%User{} = current_user, channel_id, user_id, opts) when is_binary(user_id) do
+  def invite_user(%User{} = _current_user, channel_id, user_id, opts) when is_binary(user_id) do
     user_id
     |> invite_user(channel_id, opts)
     |> case do

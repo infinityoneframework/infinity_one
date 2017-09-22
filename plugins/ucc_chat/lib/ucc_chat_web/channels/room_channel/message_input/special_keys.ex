@@ -24,12 +24,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
     end
   end
 
-  def handle_in(%{app: app, open?: true, state: state} = context, key) when key in [@tab, @cr] do
-
-    # app_key = @app_key_lookup[app]
-    # updated_buffer = Regex.replace ~r/(#{app_key})[^\s]*$/, state.head, "\\1#{selected}"
-    # Logger.info "updated_buffer: #{inspect updated_buffer}"
-    # Logger.info "state: #{inspect state}"
+  def handle_in(%{app: _app, open?: true} = context, key) when key in [@tab, @cr] do
     MessageInput.handle_select context, MessageInput.get_selected_item(context)
   end
 

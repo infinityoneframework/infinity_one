@@ -38,7 +38,8 @@ config :ucx_ucc, :settings_modules, [
 config :phoenix, :template_engines,
   # haml: PhoenixHaml.Engine,
   slim: PhoenixSlime.Engine,
-  slime: PhoenixSlime.Engine
+  slime: PhoenixSlime.Engine,
+  md:   PhoenixMarkdown.Engine
 
 # %% Coherence Configuration %%   Don't remove this line
 config :coherence,

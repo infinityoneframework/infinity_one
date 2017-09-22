@@ -5,14 +5,14 @@ defmodule UccChatWeb.MessageChannelController do
   import UccChat.MessageService
 
   alias UccChat.{
-    Message, ChannelService, Channel, MessageService, Attachment,
+    Message, MessageService, Attachment,
     AttachmentService
   }
   alias UcxUcc.Permissions
   # alias UcxUcc.Accounts.User
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.Schema.Message, as: MessageSchema
-  alias UccChatWeb.RebelChannel.Client
+  # alias UccChatWeb.RebelChannel.Client
 
   require Logger
 

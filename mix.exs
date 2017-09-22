@@ -99,6 +99,7 @@ defmodule UcxUcc.Mixfile do
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
       {:floki, "~> 0.0", override: true},
+      {:phoenix_markdown, "~> 0.1"},
     ]
   end
 
