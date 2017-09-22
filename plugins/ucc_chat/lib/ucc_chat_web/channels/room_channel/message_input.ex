@@ -10,7 +10,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]
-    Logger.warn "message_keydown: #{inspect key}"
+    # Logger.warn "message_keydown: #{inspect key}"
     unless key in @ignore_keys do
       handle_keydown(socket, sender, key)
     end
@@ -39,20 +39,20 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def logit1(cx) do
-    Logger.info("app: #{inspect cx[:app]}, key: #{inspect cx.key}")
+    # Logger.info("app: #{inspect cx[:app]}, key: #{inspect cx.key}")
     cx
   end
 
 
   defp set_app(context, sender) do
-    Logger.info "popup app: #{inspect sender}"
+    # Logger.info "popup app: #{inspect sender}"
     context
     |> Map.put(:open?, sender["message_popup"])
     |> Map.put(:app, Module.concat(sender["popup_app"], nil))
   end
 
   defp trace_data(context) do
-    Logger.warn "message_keydown: " <> inspect(context)
+    # Logger.warn "message_keydown: " <> inspect(context)
     context
   end
 
@@ -60,33 +60,33 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   # handle_in Handlers
 
   defp handle_in(%{state: :ignore} = context, _key) do
-    Logger.info "handle in"
+    # Logger.info "handle in"
     context
   end
 
   defp handle_in(context, key) when key in @special_keys do
-    Logger.info "key: #{inspect key}, state: #{inspect context.state}"
+    # Logger.info "key: #{inspect key}, state: #{inspect context.state}"
     SpecialKeys.handle_in context, key
   end
 
   defp handle_in(%{state: state} = context, key) when key in @app_keys do
-    Logger.info "state: #{inspect state}"
+    # Logger.info "state: #{inspect state}"
     if match = Buffer.match_app_pattern state.head do
-      Logger.info "matched: "
+      # Logger.info "matched: "
       dispatch_handle_in(key, match, context)
     else
-      Logger.info "did not match: "
+      # Logger.info "did not match: "
       context
     end
   end
 
   defp handle_in(%{app: app, state: state} = context, _key) do
-    Logger.info "handle in"
+    # Logger.info "handle in"
     if match = Buffer.pattern_mod_match? app, state.buffer do
-      Logger.info "matched: "
+      # Logger.info "matched: "
       dispatch_handle_in(app, match, context)
     else
-      Logger.info "did not match: "
+      # Logger.info "did not match: "
       check_and_close :close, context
     end
   end
@@ -110,7 +110,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     # Logger.info "click_slash_popup: sender: " <> inspect(sender)
     socket
     |> create_context(sender, @cr, client)
-    |> IO.inspect(label: "context")
     |> handle_select(sender["dataset"]["name"])
   end
 
@@ -137,17 +136,16 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def dispatch_handle_in(key, pattern, context) when is_binary(key) do
-    Logger.info "pattern 1 #{inspect pattern}"
+    # Logger.info "pattern 1 #{inspect pattern}"
     key
     |> Buffer.key_to_app
     |> dispatch_handle_in(pattern, context)
   end
 
   def dispatch_handle_in(module, pattern, context) when is_atom(module) do
-    Logger.info "pattern 2 #{inspect pattern}, module: #{inspect module}"
+    # Logger.info "pattern 2 #{inspect pattern}, module: #{inspect module}"
     __MODULE__
     |> Module.concat(module)
-    |> IO.inspect(label: "after concat")
     |> apply(:handle_in, [pattern, context])
     |> check_and_close(Map.put(context, :app, module))
   end

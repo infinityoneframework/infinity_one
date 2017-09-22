@@ -16,7 +16,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
     handle_in pattern, context
   end
   def handle_in(pattern, context) do
-    Logger.warn "Users handle_in pattern: #{inspect pattern}"
+    # Logger.warn "Users handle_in pattern: #{inspect pattern}"
     "%" <> pattern <> "%"
     |> get_users(context.channel_id, context.user_id)
     |> render_users(context)
@@ -37,7 +37,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
     :close
   end
   defp render_users(users, context) do
-    Logger.warn "users: #{inspect users}"
+    # Logger.warn "users: #{inspect users}"
     MessageView
     |> render_to_string("popup.html", chatd: %{
       app: "Users",
@@ -50,7 +50,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
   end
 
   defp get_users(pattern, channel_id, user_id) do
-    IO.inspect pattern, label: "pattern....."
     channel_id
     |> get_users_by_pattern(user_id, pattern)
     |> add_extra_users

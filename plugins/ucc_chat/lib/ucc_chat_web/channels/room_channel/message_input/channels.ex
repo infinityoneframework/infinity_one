@@ -16,7 +16,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
   end
 
   def handle_in(pattern, context) do
-    Logger.warn "Channels handle_in pattern: #{inspect pattern}"
+    # Logger.warn "Channels handle_in pattern: #{inspect pattern}"
     "%" <> pattern <> "%"
     |> get_channels(context.user_id)
     |> render_channels(context)
@@ -38,7 +38,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
   end
 
   defp render_channels(channels, context) do
-    Logger.error "channels: #{inspect channels}"
+    # Logger.error "channels: #{inspect channels}"
     MessageView
     |> render_to_string("popup.html", chatd: %{
         app: "Channels",

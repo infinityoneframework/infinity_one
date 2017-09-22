@@ -26,7 +26,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   # end
   def run("/" <> buffer, sender, socket, client) do
-    Logger.info "Command #{buffer}, sender: #{inspect sender}"
+    # Logger.info "Command #{buffer}, sender: #{inspect sender}"
     [command | args] = String.split buffer, " ", trim: true
     run_command(command, args, sender, socket, client)
     client.clear_message_box socket
@@ -141,7 +141,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("unarchive", args, sender, socket, client) do
     if name = get_channel_name args, socket, client do
-      # assigns = socket.assigns
       if channel = Channel.get_by name: name do
         unarchive_channel(channel, sender, socket, client)
       else
@@ -324,11 +323,5 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
         error
     end
   end
-
-  # def invite_user(user_id, channel_id, opts, _) when is_list(opts) do
-  #   channel_id
-  #   |> Channel.get!
-  #   |> add_user_to_channel(user_id, opts)
-  # end
 
 end

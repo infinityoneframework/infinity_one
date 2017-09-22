@@ -60,12 +60,13 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def page_loaded(socket) do
-    Logger.info "page_loaded, assigns: #{inspect socket.assigns}"
+    # Logger.info "page_loaded, assigns: #{inspect socket.assigns}"
     socket
   end
 
+  # TODO: This needs to be removed
   def topic_click(socket, _sender) do
-    Logger.debug "topic_click socket: #{inspect socket}"
+    # Logger.debug "topic_click socket: #{inspect socket}"
     send socket.assigns.self, :do_topic_click
     # do_topic_click socket
     # SweetAlert.swal_modal socket, "My Title", "are you sure?", "warning",
@@ -113,7 +114,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def join(other, params, socket) do
-    Logger.error "another join #{other}"
+    # Logger.error "another join #{other}"
     super other, params, socket
   end
 
@@ -518,7 +519,7 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-
+  # TODO: This needs to be removed
   defp do_topic_click(socket) do
     SweetAlert.swal_modal socket, "My Title", "are you sure?", nil,
       [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
@@ -532,6 +533,7 @@ defmodule UccChatWeb.UserChannel do
           timer: 2000, showConfirmButton: false
       end
   end
+
   ###############
   # Info messages
 
@@ -661,8 +663,7 @@ defmodule UccChatWeb.UserChannel do
 
     if room in assigns.subscribed do
       channel = Channel.get_by(name: room)
-      Logger.debug "in the room ... #{assigns.user_id}, room: #{inspect room}"
-      # unless channel.id == assigns.channel_id and assigns.user_state != "idle" do
+      # Logger.debug "in the room ... #{assigns.user_id}, room: #{inspect room}"
       if channel.id != assigns.channel_id or assigns.user_state == "idle" do
         if channel.type == 2 do
           # Logger.warn "private channel ..."
@@ -815,7 +816,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def handle_info(payload, socket) do
-    Logger.error "default handle info payload: #{inspect payload}"
+    Logger.warn "default handle info payload: #{inspect payload}"
     {:noreply, socket}
   end
 
@@ -1000,7 +1001,7 @@ defmodule UccChatWeb.UserChannel do
     [channel_id: channel_id]
     |> Subscription.list_by
     |> Enum.each(fn %{user_id: user_id} ->
-      Logger.info "broadcast update room room-visibility to user_id: #{inspect user_id}"
+      Logger.debug "broadcast update room room-visibility to user_id: #{inspect user_id}"
       socket.endpoint.broadcast CC.chan_user <> user_id, "update:room-visibility",
         %{visible: visible?, room_name: room_name, user_id: user_id, channel_id: channel_id}
     end)
@@ -1018,8 +1019,6 @@ defmodule UccChatWeb.UserChannel do
 
   def webrtc_offer(event, payload, socket) do
     trace event, payload, inspect(socket.assigns)
-
-    IO.inspect Map.get(payload, :name), label: "keys"
     socket
   end
 
@@ -1076,12 +1075,12 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def phone_call(socket, sender) do
-    Logger.warn "click to call... #{inspect sender}"
+    Logger.debug "click to call... #{inspect sender}"
     socket
   end
 
   def mousedown(socket, sender) do
-    Logger.info "mousedown sender: #{inspect sender}"
+    Logger.debug "mousedown sender: #{inspect sender}"
     socket
   end
 

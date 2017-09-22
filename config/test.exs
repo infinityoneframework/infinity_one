@@ -7,7 +7,12 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :error
+config :logger, :console,
+  level: :error,
+  # level: :error,
+  format: "\n$time [$level]$levelpad$metadata$message\n",
+  metadata: [:module, :function, :line]
 
 config :ucx_ucc, UcxUcc.Repo,
   adapter: Ecto.Adapters.Postgres,

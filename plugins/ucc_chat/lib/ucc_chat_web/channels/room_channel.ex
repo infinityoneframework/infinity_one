@@ -86,7 +86,7 @@ defmodule UccChatWeb.RoomChannel do
   # Socket stuff
 
   def join(ev = CC.chan_room <> "lobby", msg, socket) do
-    Logger.info "user joined lobby msg: #{inspect msg}, socket: #{inspect socket}"
+    Logger.debug "user joined lobby msg: #{inspect msg}, socket: #{inspect socket}"
     super ev, msg, socket
   end
 
@@ -247,7 +247,7 @@ defmodule UccChatWeb.RoomChannel do
   end
 # [[{{"bc47810a-29a3-4cd5-893b-13a5a2ebdd31", #PID<0.4000.0>}, %{keys: ""}}]]
   def terminate(_reason, %{assigns: assigns}) do
-    Logger.error "terminate: " <> inspect({assigns[:user_id], assigns[:self]})
+    Logger.debug "terminate: " <> inspect({assigns[:user_id], assigns[:self]})
     KeyStore.delete {assigns[:user_id], assigns[:self]}
     :ok
   end

@@ -55,15 +55,6 @@ defmodule UccChatWeb.RoomChannel.Message do
           user: user,
           msg_params: msg_params], client
 
-        # {body, mentions} = encode_mentions(message, channel_id)
-        # UccChat.RobotService.new_message body, channel, user
-
-        # message = create_message(body, user_id, channel_id, msg_params)
-        # create_mentions(mentions, message.id, message.channel_id, body)
-        # update_direct_notices(channel, message)
-        # message_html = render_message(message)
-        # broadcast_message(socket, message.id, message.user.id,
-        #   message_html, body: body)
     end
     Service.stop_typing(socket, user_id, channel_id)
     socket
@@ -332,8 +323,8 @@ defmodule UccChatWeb.RoomChannel.Message do
   def edit_message(%{assigns: assigns} = socket, sender, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
     value = sender["value"]
-    Logger.info "edit_message.... sender: #{inspect sender}"
-    Logger.info "edit_message.... value: #{inspect value}, message_id: #{message_id}"
+    # Logger.info "edit_message.... sender: #{inspect sender}"
+    # Logger.info "edit_message.... value: #{inspect value}, message_id: #{message_id}"
     update(value, assigns.channel_id, assigns.user_id, message_id, socket, client)
     client.clear_message_box(socket)
     client.send_js socket, clear_editing_js(message_id)
@@ -341,7 +332,6 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def cancel_edit(socket, _sender, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
-    Logger.info "cancel edit #{inspect message_id}"
     client.clear_message_box(socket)
     client.send_js socket, clear_editing_js(message_id)
   end

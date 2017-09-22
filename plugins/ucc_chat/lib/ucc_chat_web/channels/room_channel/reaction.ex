@@ -11,12 +11,12 @@ defmodule UccChatWeb.RoomChannel.Reaction do
 
 
   def select(socket, sender, client \\ Client) do
-    Logger.info "sender: #{inspect sender}"
+    # Logger.info "sender: #{inspect sender}"
     emoji = ":" <> sender["dataset"]["emoji"] <> ":"
     user = Accounts.get_user socket.assigns.user_id
     message_id = Rebel.get_assigns socket, :reaction
     Rebel.put_assigns socket, :reaction, nil
-    IO.inspect {message_id, emoji}
+    # IO.inspect {message_id, emoji}
 
     message = Message.get message_id,
       preload: MessageService.preloads()

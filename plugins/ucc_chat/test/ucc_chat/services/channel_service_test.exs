@@ -9,6 +9,7 @@ defmodule UccChat.ChannelServiceTest do
     UcxUcc.TestHelpers.insert_role "owner"
     user = UcxUcc.TestHelpers.insert_role_user "user"
     channel = insert_channel user
+    UccSettings.init_all
     {:ok, %{user: user, channel: channel}}
   end
 

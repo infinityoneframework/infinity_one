@@ -22,7 +22,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   end
 
   def emoji_filter(socket, sender, client \\ Client) do
-    Logger.info "filter sender: #{inspect sender}"
+    # Logger.info "filter sender: #{inspect sender}"
     name = sender["dataset"]["name"]
     id = sender["rebel_id"]
     client.send_js socket, """
@@ -38,7 +38,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   end
 
   def emoji_select(socket, sender, client \\ Client) do
-    Logger.info "emoji_select sender: #{inspect sender}"
+    # Logger.info "emoji_select sender: #{inspect sender}"
     emoji =
       if Rebel.get_assigns socket, :reaction do
         Reaction.select(socket, sender, client)
@@ -49,7 +49,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   end
 
   def select(socket, sender, client \\ Client) do
-    Logger.info "select sender: #{inspect sender}"
+    # Logger.info "select sender: #{inspect sender}"
     start = sender["caret"]["start"]
     content = sender["content"]
     emoji =
@@ -82,14 +82,14 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
     socket
   end
 
-  def emoji_tone_open(socket, sender, client \\ Client) do
-    Logger.info "tone open sender: #{inspect sender}"
+  def emoji_tone_open(socket, _sender, client \\ Client) do
+      # Logger.info "tone open sender: #{inspect sender}"
     client.send_js socket, "document.querySelector('ul.tone-selector').classList.toggle('show')"
     socket
   end
 
   def emoji_tone_select(socket, sender, client \\ Client) do
-    Logger.info "tone select sender: #{inspect sender}"
+      # Logger.info "tone select sender: #{inspect sender}"
     tone = sender["dataset"]["tone"]
     EmojiService.set_emoji_tone(socket.assigns.user_id, tone)
 
@@ -97,7 +97,6 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
       tone
       |> Emoji.tone_list
       |> Poison.encode!
-      |> IO.inspect(label: "tone list")
 
     client.send_js socket, """
       var tl = #{tone_list};
@@ -113,16 +112,14 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
   end
 
   def emoji_search(socket, sender, client \\ Client) do
-    Logger.info "emoji_search sender: #{inspect sender}"
+    # Logger.info "emoji_search sender: #{inspect sender}"
     user = Accounts.get_user socket.assigns.user_id, preload: [:account]
     category = Rebel.Core.exec_js! socket,
       "document.querySelector('.filter-item.active').getAttribute('data-name')"
 
     sender["value"]
     |> String.replace(":", "")
-    |> IO.inspect(label: "value")
     |> search(category, user.account)
-    |> IO.inspect(label: "search")
     |> update_emoji_list(user.account, ".emojis ul." <> category, socket, client)
   end
 
@@ -154,7 +151,7 @@ defmodule UccChatWeb.RoomChannel.EmojiInput do
 
   def reaction_open(socket, sender, client \\ Client) do
     message_id = client.closest socket, this(sender), "li.message", :id
-    Logger.info "reaction_open message_id: #{message_id}, sender: #{inspect sender}"
+    # Logger.info "reaction_open message_id: #{message_id}, sender: #{inspect sender}"
     offset = ~s/{top: #{sender["event"]["clientY"]}, left: #{sender["event"]["clientX"]}}/
 
     put_assigns socket, :reaction, message_id

@@ -71,7 +71,7 @@ defmodule UccChatWeb.RoomChannel.MessageInputTest do
       assert_receive {:render_popup_results, html}
       assert Floki.find(html, ".message-popup-items .popup-item") |> length == 10
 
-      sender = set_sender Commands, "j", "o"
+      sender = set_sender SlashCommands, "/j", "o"
       MessageInput.handle_keydown(socket, sender, "o", Client)
       assert_receive {:render_popup_results, html}
       assert Floki.find(html, ".message-popup-items .popup-item") |> length == 1

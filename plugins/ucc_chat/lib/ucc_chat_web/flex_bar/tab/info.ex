@@ -51,7 +51,7 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     trace "assigns", socket.assigns
 
     params = %{channel_id: opts.resource.id, field: socket.assigns.toggle_field}
-    Logger.warn "params: " <> inspect(params)
+    Logger.debug "params: " <> inspect(params)
     broadcast socket, "room:update", params
   end
 
@@ -70,7 +70,7 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   end
 
   def flex_form_toggle(socket, _sender, resource, "#channel_archived" = id, true = val) do
-    Logger.error "channel_archived true"
+    Logger.debug "channel_archived true"
     {_params, socket} = set_toggle_field socket, id, val
     case Channel.archive resource, socket.assigns.user_id do
       {:ok, _}            -> {:ok, socket}
@@ -81,12 +81,12 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   end
 
   def flex_form_toggle(socket, _sender, resource, "#channel_archived" = id, false = val) do
-    Logger.error "channel_archived false"
+    Logger.debug "channel_archived false"
     {_params, socket} = set_toggle_field socket, id, val
     case Channel.unarchive resource, socket.assigns.user_id do
       {:ok, _}            -> {:ok, socket}
       {:error, changeset} ->
-        Logger.error "changeset: #{inspect changeset.errors}"
+        Logger.warn "changeset: #{inspect changeset.errors}"
         {:error, changeset, socket}
     end
   end

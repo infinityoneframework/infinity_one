@@ -16,7 +16,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Emojis do
   end
 
   def handle_in(pattern, context) do
-    Logger.info "pattern: #{inspect pattern}"
+    # Logger.info "pattern: #{inspect pattern}"
     pattern
     |> get_emojis
     |> render_emojis(context)

@@ -39,7 +39,6 @@ defmodule UccChatWeb.Client do
 
   # not sure how to do this
   def closest(socket, selector, class, attr) do
-    IO.inspect selector
     exec_js! socket, """
       var el = document.querySelector('#{selector}');
       console.log('selector', '#{selector}');

@@ -14,7 +14,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
   end
 
   def handle_in(pattern, context) do
-    Logger.warn "Slash commands handle_in"
+    # Logger.warn "Slash commands handle_in"
     pattern
     |> Slash.commands
     |> render_commands(context)

@@ -16,9 +16,6 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
     pin_count = PinnedMessage.count(message_id)
     opts = [stared: star_count > 0, pinned: pin_count > 0]
 
-    Logger.info "message_cog_click id: #{message_id}, sender: #{inspect sender}"
-    Logger.info "message_cog_click opts: #{inspect opts}"
-
     html =
       MessageView
       |> client.render_to_string("message_cog.html", opts: opts)
