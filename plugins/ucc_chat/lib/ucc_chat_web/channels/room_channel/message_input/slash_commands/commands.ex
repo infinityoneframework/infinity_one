@@ -17,6 +17,14 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run(buffer, sender, socket, client \\ Client)
 
+  # def run("/msg" <> buffer, sender, socket, client) do
+  #   Logger.info "Command /msg #{buffer}, sender: #{inspect sender}"
+  #   case Regex.run ~r/\s*@([^\s]+) (.+)$/, buffer do
+  #     [_, name, message] ->
+
+  #   end
+
+  # end
   def run("/" <> buffer, sender, socket, client) do
     Logger.info "Command #{buffer}, sender: #{inspect sender}"
     [command | args] = String.split buffer, " ", trim: true
@@ -45,7 +53,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("leave", [], sender, socket, client) do
+  def run_command(command, [], sender, socket, client) when command in ~w(leave part) do
     assigns = socket.assigns
     with channel when not is_nil(channel) <- Channel.get(assigns.channel_id),
          {:ok, message} <- ChannelService.channel_command(socket, :leave, channel,
@@ -57,7 +65,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("leave", args, sender, socket, client) do
+  def run_command(command, args, sender, socket, client) when command in ~w(leave part) do
     invalid_args_error args, socket, client
   end
 
@@ -111,7 +119,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     client.toastr! socket, :error, ~g(The unarchive command requires a room name)
   end
 
-  def run_command("invite_all_to", args, sender, socket, client) do
+  def run_command("invite-all-to", args, sender, socket, client) do
     if name = get_channel_name args, socket, client do
       if channel = Channel.get_by name: name do
         invite_all_to(channel, sender, socket, client)
@@ -121,7 +129,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("invite_all_from", args, sender, socket, client) do
+  def run_command("invite-all-from", args, sender, socket, client) do
     if name = get_channel_name args, socket, client do
       if channel = Channel.get_by name: name do
         invite_all_from(channel, sender, socket, client)
@@ -194,15 +202,21 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     end
   end
 
-  def run_command("block_user", args, sender, socket, client) do
-    if user = get_user args, socket, client do
-    end
-  end
+  # def run_command("msg", args, sender, socket, client) do
+  #   if user = get_user args, socket, client do
 
-  def run_command("unbloack_user", args, sender, socket, client) do
-    if user = get_user args, socket, client do
-    end
-  end
+  #   end
+  # end
+
+  # def run_command("block_user", args, sender, socket, client) do
+  #   if user = get_user args, socket, client do
+  #   end
+  # end
+
+  # def run_command("unbloack_user", args, sender, socket, client) do
+  #   if user = get_user args, socket, client do
+  #   end
+  # end
 
   # Default catch all
   def run_command(unsupported, _args, sender, socket, _client) do
