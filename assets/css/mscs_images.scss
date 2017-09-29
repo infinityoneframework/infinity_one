@@ -1,0 +1,165 @@
+.mscs-container {
+  .display-container {
+    .icon-field {
+      background-repeat:no-repeat !important;
+      background-position: 0% 50%;
+      &.email-flicker {
+        background-image: url('../images/mscs/email-flicker.gif');
+      }
+      &.email-flash {
+        background-image: url('../images/mscs/email-flash.gif');
+      }
+    }
+  }
+  .keys {
+    background-repeat: no-repeat !important;
+    background-position: 50% 50% !important;
+
+    &.image.volume .buttn div {
+      background-repeat:no-repeat !important;
+    }
+  }
+
+  .key-strip {
+    .keys {
+      .label.lamp {
+        width: 6px;
+        height: 31px;
+        margin-top: 20px !important;
+        margin-left: 8px;
+        background-repeat: no-repeat !important;
+        &.dark-lamp {
+          background-image: url('../images/mscs/lamb-black-inactive.jpg');
+        }
+        &.light-lamp {
+          background-image: url('../images/mscs/lamb-light-inactive.jpg');
+        }
+        &.on {
+          background-image: url('../images/mscs/lamb-active.jpg');
+        }
+      }
+      background-repeat: no-repeat !important;
+      &.image.release  {
+        background-image: url('../images/mscs/goodbye-ico4.png');
+      }
+      &.image.handsfree {
+        background-position: 60% 50% !important;
+        background-image: url('../images/mscs/vol-loudspeaker-ico.png');
+      }
+      &.image.headset {
+        background-position: 60% 50% !important;
+        background-image: url('../images/mscs/headset2-ico.png');
+      }
+      &.image.hold {
+        background-image: url('../images/mscs/hold-ico2.png');
+      }
+
+      &.image.volume {
+        background-image: url('../images/mscs/vol-up-ico.png');
+        background-position: 50% 50% !important;
+      }
+
+      &.image.mute {
+        background-image: url('../images/mscs/vol-mute-ico.png');
+      }
+
+      &.image.volume {
+        .vol-up {
+          padding: 0;
+          background-image: url('../images/mscs/nav-arrow-top-ico.png');
+          background-position: 55% 20% !important;
+        }
+        .vol-down {
+          padding: 0;
+          background-image: url('../images/mscs/nav-arrow-btm-ico.png');
+          background-position: 55% 80% !important;
+        }
+      }
+      &.image.shift {
+        background-image: url('../images/mscs/shift-ico.png');
+        background-position: 50% 35% !important;
+      }
+
+    }
+  } // .key-strip
+  .aux-pad {
+    .keys {
+      background-position: 50% 35% !important;
+      &.cancel {
+        background-image: url('../images/mscs/cancel-ico.png');
+      }
+      &.settings {
+        background-image: url('../images/mscs/settings-ico.png');
+      }
+      &.favorites {
+        background-image: url('../images/mscs/favorites-ico.png');
+      }
+      &.services {
+        background-image: url('../images/mscs/web-services-ico.png');
+      }
+      &.voice-message {
+        background-image: url('../images/mscs/message-ico.png');
+      }
+      &.portal {
+        background-image: url('../images/mscs/copy-ico.png');
+      }
+      &.history {
+        background-image: url('../images/mscs/history-ico.png');
+      }
+      &.record {
+        background-image: url('../images/mscs/history-ico.png');
+      }
+      &.directory {
+        background-image: url('../images/mscs/record-ico.png');
+      }
+
+    }
+    .cursor-keys-container {
+      .cursor-arrows {
+        background-repeat:no-repeat !important;
+        background-position: 50% 50%;
+        &.top-arrow {
+          background-position: 50% 45% !important;
+          background-image: url('../images/mscs/nav-arrow-top-ico.png');
+        }
+        &.left-arrow {
+          background-position: 20% 50% !important;
+          background-image: url('../images/mscs/nav-arrow-left-ico.png');
+        }
+        &.right-arrow {
+          background-position: 80% 50% !important;
+          background-image: url('../images/mscs/nav-arrow-right-ico.png');
+        }
+        &.enter-key {
+          background-image: url('../images/mscs/nav-mid-ico.png');
+        }
+        &.bottom-arrow {
+          background-image: url('../images/mscs/nav-arrow-btm-ico.png');
+        }
+      }
+    }
+  }
+  .pk {
+    background-repeat: no-repeat;
+    background-position: 5% 50% !important;
+    background-size: 15px;
+
+    &.phone-i-idle {
+      background-image: url('../images/mscs/prgm-phone-i-idle-gray.png');
+    }
+    &.feature-active {
+      background-image: url('../images/mscs/prgm-feature-active-gray.png');
+    }
+    &.phone-i-active {
+      background-image: url('../images/mscs/prgm-phone-i-active-gray.png');
+    }
+    &.phone-i-hold {
+      background-image: url('../images/mscs/prgm-phone-i-hold-gray.png');
+      background-size: 30px;
+    }
+    &.phone-i-ring-flash {
+      background-image: url('../images/mscs/phone-i-ring-flash.gif');
+      background-size: 17px;
+    }
+  }
+}

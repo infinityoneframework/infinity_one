@@ -1,3 +1,4 @@
+require('./device_manager');
 (function() {
   console.log('loading webrtc')
 
@@ -32,16 +33,31 @@
     // localAudio: undefined,
     remoteAudio: undefined,
     constraints: function() {
-      var devicemanager = UcxUcc.DeviceManager
-      if (this.callType == 'mscs' || this.callType == 'audio') {
-        return {
-          audio: {deviceid: {exact: devicemanager.get_device("handsfree_input_id")}}
+      console.log('UcxUcc', UcxUcc);
+      console.log('Mscs', UcxUcc.Mscs);
+      var dm = false;
+      console.log('DeviceManager', UcxUcc.DeviceManager);
+      if (UcxUcc.DeviceManager) {
+      console.log('dm 1', dm);
+        dm = UcxUcc.DeviceManager;
+      } else if (UcxUcc.Mscs) {
+      console.log('dm 2', dm);
+        dm = UcxUcc.Mscs.DeviceManager;
+      }
+      console.log('dm', dm);
+      if (dm) {
+        if (this.callType == 'mscs' || this.callType == 'audio') {
+          return {
+            audio: {deviceid: {exact: dm.get_device("handsfree_input_id")}}
+          }
+        } else {
+          return {
+            video: {deviceid: {exact: dm.get_device("video_input_id")}},
+            audio: {deviceid: {exact: dm.get_device("handsfree_input_id")}}
+          }
         }
       } else {
-        return {
-          video: {deviceid: {exact: devicemanager.get_device("video_input_id")}},
-          audio: {deviceid: {exact: devicemanager.get_device("handsfree_input_id")}}
-        }
+        console.error('DeviceManager not defined!');
       }
     },
     setVideoElements: function() {

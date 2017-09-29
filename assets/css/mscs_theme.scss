@@ -1,0 +1,421 @@
+
+
+.mscs-container {
+  $font-family: sans-serif;
+
+  $yellow: #f4f461;
+  $primary-font-color: white;
+  $secondary-font-color: $yellow;
+
+  $primary-background-color: #999;
+  $secondary-background-color: #656565;
+  $tertiary-background-color: #767676;
+
+  $main-background: black;
+  $display-background: $tertiary-background-color;
+  $keys-primary-background: $primary-background-color;
+  $keys-primary-font-color: $primary-font-color;
+  $keys-secondary-font-color: $secondary-font-color;
+
+  $softkeys-font-color: $secondary-font-color;
+  $alpha-font-color: $secondary-font-color;
+
+  $pk-strip-background-color: $tertiary-background-color;
+
+  $release-key-background: #ff7f00;
+  $handsfree-key-background: #b8cd00;
+  $headset-key-background: #94d3eb;
+
+  $display-container-font-color: white;
+  $date-time-font-color: $secondary-font-color;
+
+  $small-font-size: 12px;
+  $medium-font-size: 14px;
+
+  $keys-box-shadow: inset 4px 4px 12px -4px rgba(0,0,0,.75);
+
+  font-family: $font-family;
+  font-size: 1em;
+  line-height: 1.3;
+
+  .keys {
+    background-color: $keys-primary-background;
+    box-shadow: $keys-box-shadow;
+    &:hover {
+      opacity: 0.90;
+      box-shadow: inset 4px 4px 18px -4px rgba(0,0,0,.55);
+    }
+    &:active {
+      opacity: 0.80;
+      box-shadow: inset 4px 4px 18px -4px rgba(0,0,0,.35);
+    }
+    &.disabled {
+      &:hover {
+        opacity: 1.0;
+        box-shadow: $keys-box-shadow;
+      }
+      &:active {
+        opacity: 1.0;
+        box-shadow: $keys-box-shadow;
+      }
+
+    }
+    .buttn[data-id="star"] {
+      .numero {
+        font-size: 48px;
+        padding-top: 5px;
+      }
+    }
+    .buttn {
+      .numero {
+        font-size: 32px;
+        color: $keys-primary-font-color;
+        font-weight: 300;
+      }
+
+      .alpha {
+        font-size: 12px;
+        color: $alpha-font-color;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+    }
+    &.softkeys {
+      color: $softkeys-font-color;
+      background: $secondary-background-color;
+      .buttn {
+        .label {
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  .keys-container {
+    .release  {
+      background-color: $release-key-background !important;
+    }
+    .handsfree {
+      background-color: $handsfree-key-background !important;
+    }
+
+    .headset {
+      background-color: $headset-key-background !important;
+    }
+
+    .key-strip {
+      .keys {
+        background-color: $secondary-background-color;
+        .buttn {
+          .label {
+            font-size: $small-font-size;
+            text-transform: uppercase;
+            color: $secondary-font-color;
+          }
+        }
+      }
+    }
+    .aux-pad {
+
+      .cursor-keys-container {
+        &:hover {
+          opacity: 1.0;
+          box-shadow: $keys-box-shadow;
+        }
+        .cursor-arrows {
+          background-repeat:no-repeat !important;
+          background-position: 50% 50%;
+          &:hover {
+            opacity: 0.4;
+          }
+          &:active {
+            opacity: 0.2;
+          }
+        }
+      }
+      .keys .buttn .label {
+        color: $primary-font-color;
+        font-size: 11px;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .display-container {
+    color: $display-container-font-color;
+    font-size: $medium-font-size;
+    font-weight: 400;
+    background: $display-background;
+    .text-highlight {
+      color: $display-background;
+      background: $display-container-font-color;
+    }
+
+    .dt {
+      color: $date-time-font-color;
+    }
+  }
+  .pk-strips-container {
+    .pk-strip {
+      background: $pk-strip-background-color;
+      .pk {
+        background-color: #c1c1c1;
+        border-radius: 5px;
+        box-shadow: 2px 3px 10px -4px rgba(0, 0, 0, 0.85);
+        &:hover {
+          box-shadow: inset 2px 3px 4px -4px rgba(0, 0, 0, 0.65);
+          background-color: #b5b5b5;
+        }
+        &:active {
+          box-shadow: inset 2px 3px 10px -4px rgba(0, 0, 0, 0.95);
+          background-color: #b0b0b0;
+        }
+
+        .buttn {
+          /*background: #c1c1c1;*/
+          /*box-shadow: inset 2px 2px 8px -4px rgba(0,0,0,.45);*/
+          .label {
+            color: #444;
+            font-size: 12px;
+            font-weight: 550;
+          }
+        }
+      }
+    }
+  }
+}
+
+.mscs-container.light {
+  $font-family: sans-serif;
+
+  $yellow: #f4f461;
+  $primary-font-color: #333;
+  $secondary-font-color: $yellow;
+
+  $primary-background-color: #999;
+  $secondary-background-color: #656565;
+  $tertiary-background-color: #767676;
+
+  $main-background: #444;
+  $display-background: $tertiary-background-color;
+  $keys-primary-background: $primary-background-color;
+  $keys-primary-font-color: $primary-font-color;
+  $keys-secondary-font-color: $secondary-font-color;
+  $keys-secondary-background: $secondary-background-color;
+  $auxpad-keys-font-color: white;
+
+  $dialpad-keys-background-color: gray;
+
+  $softkeys-font-color: $secondary-font-color;
+  $numero-font-color: white;
+  $alpha-font-color: $secondary-font-color;
+
+  $pk-strip-background-color: $tertiary-background-color;
+
+  $release-key-background: #ff7f00;
+  $handsfree-key-background: #b8cd00;
+  $headset-key-background: #94d3eb;
+
+  $display-container-font-color: white;
+  $date-time-font-color: $secondary-font-color;
+
+  $small-font-size: 12px;
+  $medium-font-size: 14px;
+
+  $keys-box-shadow: 4px 4px 12px -4px rgba(0,0,0,.75);
+  $keys-hover-box-shadow: inset 1px 1px 2px 0 rgba(0,0,0,.5);
+  $keys-active-box-shadow: inset 2px 1px 2px 1px rgba(0,0,0,.6);
+
+  font-family: $font-family;
+  font-size: 1em;
+  line-height: 1.3;
+
+  header,
+  .footer {
+    color: $primary-font-color;
+  }
+
+  .keys {
+    background-color: $keys-primary-background;
+    box-shadow: $keys-box-shadow;
+    overflow: hidden;
+    transition: background-color .3s;
+    display: block;
+    &> * {
+      position: relative;
+    }
+    &:before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: block;
+      width: 0;
+      padding-top: 0;
+
+      border-radius: 100%;
+
+      background-color: rgba(236, 240, 241, .3);
+      -webkit-transform: translate(-50%, -50%);
+      -moz-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      -o-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+    &:hover {
+      opacity: 0.80;
+      // box-shadow: inset 4px 4px 18px -4px rgba(0,0,0,.55);
+      box-shadow: $keys-hover-box-shadow;
+    }
+    &:active {
+      position: relative;
+
+      &:before {
+        background-color: #656565;
+        opacity: 0.5;
+        width: 140%;
+        padding-top: 140%;
+        transition: width .2s ease-out, padding-top .2s ease-out;
+      }
+    }
+    &.disabled {
+      &:hover {
+        opacity: 1.0;
+        box-shadow: $keys-box-shadow;
+      }
+      &:active {
+        opacity: 1.0;
+        box-shadow: $keys-box-shadow;
+      }
+    }
+    .buttn[data-id="star"] {
+      .numero {
+        font-size: 48px;
+        padding-top: 5px;
+      }
+    }
+    .buttn {
+      .numero {
+        font-size: 32px;
+        color: $numero-font-color;
+        font-weight: 300;
+      }
+      .alpha {
+        font-size: 12px;
+        color: $alpha-font-color;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+    }
+    &.softkeys {
+      color: $softkeys-font-color;
+      background: $secondary-background-color;
+      .buttn {
+        .label {
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  .keys-container {
+    .release  {
+      background-color: $release-key-background !important;
+    }
+    .handsfree {
+      background-color: $handsfree-key-background !important;
+    }
+
+    .headset {
+      background-color: $headset-key-background !important;
+    }
+
+    .key-strip {
+      .keys {
+        background-color: $secondary-background-color;
+        .buttn {
+          .label {
+            font-size: $small-font-size;
+            text-transform: uppercase;
+            color: $secondary-font-color;
+          }
+        }
+      }
+    }
+    .dial-pad {
+      .keys.digit {
+        background-color: $dialpad-keys-background-color;
+      }
+    }
+    .aux-pad {
+
+      .cursor-keys-container {
+        &:hover {
+          opacity: 1.0;
+          box-shadow: $keys-box-shadow;
+        }
+        .cursor-arrows {
+          background-repeat:no-repeat !important;
+          background-position: 50% 50%;
+          &:hover {
+            opacity: 0.4;
+          }
+          &:active {
+            opacity: 0.2;
+          }
+        }
+      }
+      .keys {
+        background-color: $keys-secondary-background;
+      }
+      .keys .buttn .label {
+        color: $auxpad-keys-font-color;
+        font-size: 11px;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .display-container {
+    color: $display-container-font-color;
+    font-size: $medium-font-size;
+    font-weight: 400;
+    background: $display-background;
+    .text-highlight {
+      color: $display-background;
+      background: $display-container-font-color;
+    }
+
+    .dt {
+      color: $date-time-font-color;
+    }
+  }
+  .pk-strips-container {
+    .pk-strip {
+      background: $pk-strip-background-color;
+      .pk {
+        background-color: #c1c1c1;
+        border-radius: 5px;
+        box-shadow: 2px 3px 10px -4px rgba(0, 0, 0, 0.85);
+        &:hover {
+          box-shadow: inset 2px 3px 4px -4px rgba(0, 0, 0, 0.65);
+          background-color: #b5b5b5;
+        }
+        &:active {
+          box-shadow: inset 2px 3px 10px -4px rgba(0, 0, 0, 0.95);
+          background-color: #b0b0b0;
+        }
+
+        .buttn {
+          /*background: #c1c1c1;*/
+          /*box-shadow: inset 2px 2px 8px -4px rgba(0,0,0,.45);*/
+          .label {
+            color: #444;
+            font-size: 12px;
+            font-weight: 550;
+          }
+        }
+      }
+    }
+  }
+}

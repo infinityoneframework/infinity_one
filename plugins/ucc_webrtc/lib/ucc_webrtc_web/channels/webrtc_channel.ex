@@ -32,7 +32,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     case exec_js(socket, "window.UcxUcc.DeviceManager.installed_devices") do
       {:ok, installed_devices} ->
         socket =
-          ClientDevice.get_by(user_id: socket.assigns.user_id)
+          socket
+          |> get_client_device
           |> set_client_devices(installed_devices, socket)
         # exec_js(socket, "window.WebRTC.start();")
         socket
@@ -45,7 +46,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
 
   def on_connect(socket) do
     # called from the User socket.
-    case ClientDevice.get_by user_id: socket.assigns.user_id do
+    Logger.error "on_connect: assigns: #{inspect socket.assigns}"
+    case get_client_device socket do
       nil ->
         exec_js socket, "window.UccChat.devices = {}"
         socket
@@ -361,6 +363,10 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       nil -> ""
       {device, _} -> device
     end
+  end
+
+  defp get_client_device(socket) do
+    ClientDevice.get_by user_id: socket.assigns.user_id, ip_addr: String.to_integer(socket.assigns.ip_address)
   end
 
   defp kind(:input), do: "audioinput"

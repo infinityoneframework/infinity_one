@@ -24,10 +24,13 @@ require('./ucc_chat');
 require('./typing');
 require('./ucc_webrtc');
 require('./tone_generator');
+require('./device_manager');
 
+require('mscs');
 // import configured plugin js
 var plugins = window.ucx_ucc_plugins;
 for(var i = 0; i < plugins.length; ++i) {
-  require(plugins[i]);
+  // console.log('!!!!!!!!!!!!!!!!!!!!!!!!1 plugin', plugins[i]);;
+  // require(plugins[i]);
 }
 window.moment = require('moment');

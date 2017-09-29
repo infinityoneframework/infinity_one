@@ -311,7 +311,7 @@ defmodule UccChat.ChannelService do
     chan = cc.channel
     open = chan.id == channel_id
     type = get_chan_type(cc.type, chan.type)
-    {display_name, user_status, phone_status} =
+    {display_name, user_status, user} =
       get_channel_display_name(type, chan, id)
     unread = if cc.unread == 0, do: false, else: cc.unread
     # cc = unhide_current_channel(cc, channel_id)
@@ -333,8 +333,9 @@ defmodule UccChat.ChannelService do
       display_name: display_name,
       active: chan.active,
       last_read: cc.last_read,
-      phone_status: phone_status
+      user: user
     }
+    |> Hooks.build_sidenav_room()
   end
 
   defp side_nav_rooms(user, channel, channel_id, chat_mode) do
@@ -395,8 +396,11 @@ defmodule UccChat.ChannelService do
     case Direct.get_by channel_id: id, user_id: user_id do
       %{} = direct ->
         username = Map.get(direct, :users)
-        user = Accounts.get_by_user username: username, preload: [:account]
-        {username, UccChat.PresenceAgent.get(user.id), Hooks.preload_user(user, [])}
+        user =
+          [username: username]
+          |> Accounts.get_by_user
+          |> Hooks.preload_user([:account])
+        {username, UccChat.PresenceAgent.get(user.id), user}
       _ ->
         {name, "offline", nil}
     end

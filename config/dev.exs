@@ -54,7 +54,7 @@ config :ucx_ucc, :ucc_tracer_level, :debug
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console,
-  level: :debug,
+  level: :info,
   # level: :error,
   format: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]

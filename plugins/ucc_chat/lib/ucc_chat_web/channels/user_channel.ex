@@ -622,6 +622,7 @@ defmodule UccChatWeb.UserChannel do
     subscribe_callback "user:" <> user_id, "webrtc:leave", {WebrtcChannel, :webrtc_leave}
     # TODO: add Hooks for this
     # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
+    subscribe_callback "user:all", "callback", :user_all_event
     {:noreply, socket}
   end
 
@@ -804,6 +805,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   handle_callback("user:" <>  _user_id)
+  handle_callback("user:all")
 
   def handle_info({"phone:presence", "presence:change", meta, {mod, fun}} = _payload, socket) do
     # Logger.info "payload: #{inspect payload}"
@@ -1048,21 +1050,9 @@ defmodule UccChatWeb.UserChannel do
     execute(socket, :click, on: ".tab-button.active")
   end
 
-  def phone_presence_change(_event, %{state: state, username: username} = _payload, socket) do
-    # Logger.info "state change #{inspect state}, username: #{username}" #, assigns: " <> inspect(socket.assigns)
-     # exec_js socket, ~s/$('[data-phone-status="#{username}"]').removeClass('phone-idle').addClass('phone-busy')/
-    exec_js socket, set_data_status_js(username, state)
-     #{}~s/$('[data-phone-status="#{username}"]').data('status', '#{state}')/
+  def user_all_event(event, payload, socket) do
+    IO.inspect {event, payload}, label: "{event, payload}"
     socket
-  end
-
-  defp set_data_status_js(username, state) do
-    """
-    var e = document.querySelectorAll('[data-phone-status="#{username}"]');
-    for(var i = 0; i < e.length; i++) {e[i].dataset.status = '#{state}'}
-    console.log('done...');
-    """
-    |> String.replace("\n", "")
   end
 
   def click_status(socket, sender) do

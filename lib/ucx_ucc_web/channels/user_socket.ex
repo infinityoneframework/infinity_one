@@ -13,8 +13,7 @@ defmodule UcxUccWeb.UserSocket do
   channel CC.chan_user <> "*", UccChatWeb.UserChannel  # "user:"
   channel CC.chan_system <> "*", UccChatWeb.SystemChannel  # "system:"
   channel CC.chan_webrtc <> "*", UccWebrtcWeb.WebrtcChannel
-  # channel CC.chan_client <> "*", MscsWeb.ClientChannel
-  # channel "ui:*", UccChatWeb.UiChannel
+  channel CC.chan_client <> "*", MscsWeb.ClientChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

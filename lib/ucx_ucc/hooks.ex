@@ -65,4 +65,5 @@ defmodule UcxUcc.Hooks do
   defhook :ucc_chat_channel_controller_channels, 1
 
   defhook :register_admin_pages, 1
+  defhook :build_sidenav_room, 1
 end

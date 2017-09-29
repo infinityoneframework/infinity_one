@@ -30,4 +30,10 @@ defmodule UccConsole do
   defp channel_name(:user), do: CC.chan_user
   defp channel_name(:room), do: CC.chan_room
 
+  @doc """
+  Get a user by username.
+  """
+  def user(username) do
+    Accounts.get_by_user username: username, preload: [:account, :roles]
+  end
 end
