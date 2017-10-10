@@ -46,7 +46,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
 
   def on_connect(socket) do
     # called from the User socket.
-    Logger.error "on_connect: assigns: #{inspect socket.assigns}"
+    # Logger.error "on_connect: assigns: #{inspect socket.assigns}"
     case get_client_device socket do
       nil ->
         exec_js socket, "window.UccChat.devices = {}"
@@ -59,6 +59,14 @@ defmodule UccWebrtcWeb.WebrtcChannel do
           |> Enum.join(", ")
 
         exec_js socket, "window.UcxUcc.devices = {" <> str <> "}"
+
+        # TODO: First attempt at notifing mscs that devices are ready, but
+        # can't find common key to broadcast on.
+
+        # spawn fn ->
+        #   Process.sleep 500
+        #   UccPubSub.broadcast "ip:" <> socket.assigns[:ip_address], "devices:ready"
+        # end
         socket
     end
   end

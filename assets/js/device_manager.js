@@ -88,6 +88,8 @@
     },
     has_headset_device: function() {
       var status = false;
+      console.log('has_headset_device devices', this.devices);
+      console.log('has_headset_device installed devices', this.installed_devices);
       if(this.devices.headset_input_id && this.devices.headset_output_id)
         status = true;
       if (this.debug) console.log("has_headset_device", status)

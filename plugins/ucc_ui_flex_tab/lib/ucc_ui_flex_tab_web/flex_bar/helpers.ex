@@ -3,6 +3,12 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
 
   """
+
+  import Rebel.Query
+  alias UcxUcc.TabBar
+
+  require Logger
+
   defmacro __using__(_) do
     quote do
       use UcxUccWeb.Gettext
@@ -39,23 +45,35 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
         case tab.template do
           "" -> socket
           templ ->
+            handle_on_change(socket, sender)
+
             {args, socket} = args socket, {user_id, channel_id, nil, sender}, args
-            # IO.inspect args, label: "... args"
             html = Phoenix.View.render_to_string(tab.view, templ, args)
 
-            # Logger.warn "html: #{html}"
             js = [
-              "$('section.flex-tab').parent().addClass('opened')",
+              "$('section.flex-tab-main').parent().addClass('opened')",
               "$('.tab-button.active').removeClass('active')",
-              set_tab_button_active_js(tab.id)
+              set_tab_button_active_js(tab.id),
+              add_nane_to_section_js(tab.id)
             ] |> Enum.join(";")
 
             socket
-            |> update(:html, set: html, on: "section.flex-tab")
+            |> update(:html, set: html, on: "section.flex-tab-main")
             |> exec_js(js)
 
             socket
         end
+      end
+
+      @doc """
+      Callback when leaving a given tab.
+
+      Allows the tab to cleanup before the next tab is opened.
+
+      Override-able
+      """
+      def on_change(socket, sender) do
+        socket
       end
 
       @doc """
@@ -96,7 +114,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       @spec notify_update_success(socket, tab, map, map) :: socket
       def notify_update_success(socket, tab, _sender, _opts), do: socket
 
-      defoverridable [open: 3, close: 2, args: 3, notify_update_success: 4]
+      defoverridable [open: 3, close: 2, args: 3, notify_update_success: 4, on_change: 2]
     end
   end
 
@@ -118,5 +136,22 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
     socket
   end
 
+  def add_nane_to_section_js(name) do
+    "$('.flex-tab-container.opened section.flex-tab')[0].dataset['tab'] = '#{name}'"
+  end
+
+  def notify_on_change(nil, _socket, _sender), do: nil
+  def notify_on_change(id, socket, sender) do
+    tab = TabBar.get_button! id
+    if module = tab.module do
+      apply module, :on_change, [socket, sender]
+    end
+  end
+
+  def handle_on_change(socket, sender) do
+    socket
+    |> select(data: "id", from: ".tab-button.active")
+    |> notify_on_change(socket, sender)
+  end
 end
 

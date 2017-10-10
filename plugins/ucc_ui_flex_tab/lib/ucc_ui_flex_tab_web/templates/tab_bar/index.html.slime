@@ -1,4 +1,4 @@
-section.flex-tab.content-background-color
+section.flex-tab-main.flex-tab.content-background-color
 .flex-tab-bar.content-background-color(role="toolbar")
   .tab-button.hidden(title="Visitor Info")
     button(aria-label="Visitor Info")
@@ -6,7 +6,7 @@ section.flex-tab.content-background-color
   = for tab <- buttons() do
     = if visible? tab, @groups do
       = if tab.type == :separator do
-        div.tab-separator &nbsp;
+        div.tab-separator(data-id="#{tab.id}") &nbsp;
       - else
         div(class="tab-button" title="#{tab.title}" data-id="#{tab.id}" rebel-click="flex_tab_click")
           button(aria-label="#{tab.title}")

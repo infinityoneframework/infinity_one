@@ -9,6 +9,6 @@ li(class="room-link #{chat_room_item_li_class(@room)}")
       = @room[:display_name]
 
     span.opt
-      i.icon-eye-off.hide-room(title="Hide_room" aria-label="Hide_room")
+      i.icon-eye-off.hide-room(title="Hide room" aria-label="Hide room")
       = if @room[:can_leave] do
-        i.icon-logout.leave-room(title="Leave_room" aria-label="Leave_room")
+        i.icon-logout.leave-room(title="Leave room" aria-label="Leave room")

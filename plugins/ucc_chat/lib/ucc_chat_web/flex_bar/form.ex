@@ -29,7 +29,7 @@ defmodule UccChatWeb.FlexBar.Form do
   # TODO: this it not implemented and should be removed later if we don't
   #       need it
   def flex_form_change(socket, sender) do
-    Logger.debug "sender: " <> inspect(sender)
+    # Logger.debug "sender: " <> inspect(sender)
     socket
   end
 
@@ -117,11 +117,13 @@ defmodule UccChatWeb.FlexBar.Form do
 
   def flex_form_select_change(socket, sender) do
     trace "flex_form_toggle", sender
+    # Logger.warn "..... #{inspect sender}"
     form = sender["form"]
 
     tab = TabBar.get_button(form["flex-id"])
     field = form_field sender["name"]
     value = sender["value"]
+    # Logger.warn inspect({form["flex-id"], field, value, tab})
 
     # {_assigns, _resource_key, resource} = get_assigns_and_resource(socket)
     {resource, _prefix} = get_resource_and_prefix tab, form
@@ -155,7 +157,7 @@ defmodule UccChatWeb.FlexBar.Form do
   defp get_resource_and_prefix(tab, form) do
     prefix = tab.opts[:prefix]
     id = form["#{prefix}[id]"]
-    Logger.debug "prefix: " <> inspect(prefix) <> ", id: " <> inspect(id) <> "form: " <> inspect(form)
+    Logger.debug "prefix: " <> inspect(prefix) <> ", id: " <> inspect(id) <> ", form: " <> inspect(form)
     {apply(tab.opts[:model], :get, [form["#{prefix}[id]"]]), prefix}
   end
 

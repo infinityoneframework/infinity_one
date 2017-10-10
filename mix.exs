@@ -101,17 +101,7 @@ defmodule UcxUcc.Mixfile do
       {:floki, "~> 0.0", override: true},
       {:phoenix_markdown, "~> 0.1"},
 
-      # Deps for mscs
-      # {:ex_ami, github: "smpallen99/ex_ami"},
-      {:ex_ami, path: "../ex_ami"},
-      # {:gen_fsm, git: "git@bitbucket.org:emetrotel/gen_fsm.git"},
-      {:ex_data, git: "git@bitbucket.org:emetrotel/ex_data.git"},
-      {:rudp, git: "git@bitbucket.org:emetrotel/rudp.git"},
-      {:ucx_license_manager,
-        git: "git@bitbucket.org:emetrotel/ucx_license_manager.git", env: Mix.env},
-      {:ucx_alarm_manager,
-        git: "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", env: Mix.env},
-    ]
+    ] ++ plugin_deps()
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
@@ -126,5 +116,14 @@ defmodule UcxUcc.Mixfile do
      "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
      "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
      # "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
+  end
+
+  defp plugin_deps do
+    "plugins/*/deps.exs"
+    |> Path.wildcard
+    |> Enum.reduce([], fn fname, acc ->
+      {deps, _} = Code.eval_file fname
+      acc ++ deps
+    end)
   end
 end

@@ -18,7 +18,11 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
       "icon-mic",
       FlexBarView,
       "device.html",
-      95)
+      95,
+      [
+        model: UccWebrtc.ClientDevice,
+        prefix: "client_device"
+      ])
 
     TabBar.add_button Tab.new(
       MembersList,
@@ -27,8 +31,10 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
 
   @spec args(socket, {id, id, any, map}, args) :: {List.t, socket}
   def args(socket, {user_id, _channel_id, _, _}, _) do
+    # Logger.error "assigns: #{inspect socket.assigns}"
     current_user = Helpers.get_user! user_id
-    client_device = ClientDevice.get_by(user_id: current_user.id) ||
+    client_device = ClientDevice.get_by(user_id: current_user.id, ip_addr: socket.assigns.ip_address) ||
+    # client_device = ClientDevice.get_by(user_id: current_user.id) ||
       ClientDevice.new()
 
     changeset = ClientDevice.change client_device, %{user_id: current_user.id}
@@ -62,7 +68,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.Webrtc do
   defp build_client_devices(nil), do: %{}
   defp build_client_devices(devices) do
     devices
-    |> IO.inspect(label: "installed_devices")
+    # |> IO.inspect(label: "installed_devices")
     |> Enum.reduce(%{input: [], output: [], video: []}, fn
       %{"kind" => "audioinput", "id" => id, "label" => label}, acc ->
         update_in acc, [:input], &([{label, id} | &1])

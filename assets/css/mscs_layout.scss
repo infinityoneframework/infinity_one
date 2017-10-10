@@ -28,6 +28,51 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
 // html, body {
 //   background: black;
 // }
+// #flex-tabs section.flex-tab[data-tab=mscs] {
+//   width: 500px;
+// }
+
+#flex-tabs.opened {
+  section.flex-tab-mscs {
+    display: none;
+  }
+  .tab-separator[data-id='mscs_separator'] {
+    display: none;
+  }
+  .tab-button[data-id='mscs_settings'] {
+    display: none;
+  }
+}
+#flex-tabs.opened.mscs {
+  section.flex-tab-main {
+    display: none;
+  }
+  section.flex-tab-mscs {
+    display: block;
+    width: 500px;
+  }
+  .tab-separator[data-id='mscs_separator'] {
+    display: block;
+  }
+  .tab-button[data-id='mscs_settings'] {
+    display: block;
+  }
+}
+#flex-tabs.opened.mscs_settings {
+  section.flex-tab-main {
+    display: block;
+  }
+  section.flex-tab-mscs {
+    display: none;
+  }
+  .tab-separator[data-id='mscs_separator'] {
+    display: block;
+  }
+  .tab-button[data-id='mscs_settings'] {
+    display: block;
+  }
+}
+
 .mscs-container {
 
   margin-right: auto;

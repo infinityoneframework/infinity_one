@@ -8,10 +8,12 @@
     .title
       h2= ~g"Device Settings"
     = form_for @changeset, "#", fn f ->
-      input(type="hidden" name="id" value="device-settings")
+      / input(type="hidden" name="id" value="device-settings")
+      = hidden_input f, :id
       = hidden_input f, :headset_input_id, value: nil
       = hidden_input f, :headset_output_id, value: nil
       = hidden_input f, :user_id
+      input(type="hidden" name="flex-id" value="device-settings")
       fieldset
         legend Audio Handsfree
         ul.list.clearfix
