@@ -21,6 +21,7 @@ defmodule UccChat.ChannelService do
   alias UccChat.ServiceHelpers, as: Helpers
   alias Ecto.Multi
   alias UcxUcc.{UccPubSub, Hooks, Accounts}
+  alias UccChatWeb.RoomChannel.Channel, as: WebChannel
 
   require UccChat.ChatConstants, as: CC
   require Logger
@@ -31,54 +32,39 @@ defmodule UccChat.ChannelService do
   # @direct_message  2
   # @stared_room     3
 
-  # def can_view_room?(channel, user) do
-  #   cond do
-  #     channel.type == 0 and Permissions.has_permission?(user, "post-readonly", assigns.channel_id) ->
-  #   end
+    # # def can_view_room?(channel, user) do
+    # #   cond do
+    # #     channel.type == 0 and Permissions.has_permission?(user, "post-readonly", assigns.channel_id) ->
+    # #   end
+    # # end
+    # def create_subscription(%ChannelSchema{} = channel, user_id) do
+    #   case Subscription.create(%{user_id: user_id, channel_id: channel.id}) do
+    #     {:ok, _} = ok ->
+    #       UccPubSub.broadcast "user:" <> user_id, "new:subscription",
+    #         %{channel_id: channel.id}
+    #       ok
+    #     other ->
+    #       other
+    #   end
+    # end
+
+  # @doc """
+  # Create a channel subscription
+
+  # Creates the subscription but does not account the join
+  # """
+  # def create_subscription(channel_id, user_id) do
+  #   channel_id
+  #   |> Channel.get!
+  #   |> WebChannel.join(user_id)
   # end
-  def create_subscription(%ChannelSchema{} = channel, user_id) do
-    case Subscription.create(%{user_id: user_id, channel_id: channel.id}) do
-      {:ok, _} = ok ->
-        UccPubSub.broadcast "user:" <> user_id, "new:subscription",
-          %{channel_id: channel.id}
-        ok
-      other ->
-        other
-    end
-  end
-
-  @doc """
-  Create a channel subscription
-
-  Creates the subscription but does not account the join
-  """
-  def create_subscription(channel_id, user_id) do
-    channel_id
-    |> Channel.get!
-    |> create_subscription(user_id)
-  end
 
   @doc """
   Create a channel subscription and announce the join if configured.
   """
   def join_channel(channel, user_id, opts \\ [])
-  def join_channel(%ChannelSchema{} = channel, user_id, opts) do
-    channel
-    |> create_subscription(user_id)
-    |> case do
-      {:ok, subs} ->
-        unless opts[:channel] == false do
-          UserChannel.join_room(user_id, channel.name)
-          unless UccSettings.hide_user_join() do
-            # here
-            # broadcast_message(~g"Has joined the channel.", channel.name, user_id, channel.id, system: true, sequential: false)
-            # notify_action(socket, :join, channel.name, user_id, channel.id)
-          end
-        end
-        {:ok, subs}
-      error ->
-        error
-    end
+  def join_channel(%ChannelSchema{} = channel, user_id, _opts) do
+    WebChannel.join channel, user_id
   end
   def join_channel(channel_id, user_id, opts) do
     channel_id
@@ -719,8 +705,8 @@ defmodule UccChat.ChannelService do
   def channel_command(_socket, :leave, %ChannelSchema{} = channel, user_id,
     _channel_id) do
     # Logger.error ".... channel.name: #{inspect channel.name}, user_id: #{inspect user_id}, channel.id: #{inspect channel.id}"
-    case remove_user_from_channel(channel, user_id) do
-      nil ->
+    case WebChannel.leave(channel, user_id) do
+      {:error, _} ->
         {:error, ~g"Your not subscribed to the " <> "`#{channel.name}`" <>
           ~g" channel."}
       _subs ->
@@ -1134,7 +1120,7 @@ defmodule UccChat.ChannelService do
     owners = Repo.all(from r in UserRole, where: r.user_id != ^id and
       r.role == "owner" and  r.scope == ^channel_id)
     if length(owners) > 0 do
-      case remove_user_from_channel(channel, id) do
+      case WebChannel.remove_user(channel, id) do
         nil ->
           {:error, ~g"User is not a member of this room."}
         _ ->
@@ -1150,34 +1136,20 @@ defmodule UccChat.ChannelService do
   def invite_user(%User{} = user, channel_id, current_user_id, opts)
     when is_binary(current_user_id) do
     user.id
-    |> invite_user(channel_id, opts)
-    |> case do
-      {:ok, subs} ->
-        notity_user_join(channel_id, user)
-        {:ok, subs}
-      error ->
-        error
-    end
+    invite_user(user.id, channel_id, opts)
   end
 
   def invite_user(user_id, channel_id, opts, _) when is_list(opts) do
     channel_id
     |> Channel.get!
-    |> add_user_to_channel(user_id, opts)
+    |> WebChannel.add_user(user_id)
   end
 
   def kick_user(channel_id, user, _socket) do
     channel_id
     |> Channel.get!
-    |> remove_user_from_channel(user.id)
-    |> case do
-      nil -> nil
-      other ->
-        notify_user_removed(channel_id, user)
-        other
-    end
+    |> WebChannel.remove_user(user.id)
   end
-
 
   def remove_role(nil) do
     {:error, ~g"Role not found"}
@@ -1216,20 +1188,20 @@ defmodule UccChat.ChannelService do
     MessageService.broadcast_message(socket, message.id, user_id, html)
   end
 
-  def remove_user_from_channel(channel, user_id) do
-    case Subscription.get_by channel_id: channel.id, user_id: user_id do
-      nil ->
-        nil
-      subs ->
-        user = Accounts.get_user user_id
-        Repo.delete! subs
-        UserChannel.leave_room(user_id, channel.name)
-        UccPubSub.broadcast "user:" <> user_id, "delete:subscription",
-          %{channel_id: channel.id}
-        notity_user_leave(channel.id, user)
-        {:ok, ~g"removed"}
-    end
-  end
+  # def remove_user_from_channel(channel, user_id) do
+  #   case Subscription.get_by channel_id: channel.id, user_id: user_id do
+  #     nil ->
+  #       nil
+  #     subs ->
+  #       user = Accounts.get_user user_id
+  #       Repo.delete! subs
+  #       UserChannel.leave_room(user_id, channel.name)
+  #       UccPubSub.broadcast "user:" <> user_id, "delete:subscription",
+  #         %{channel_id: channel.id}
+  #       notity_user_leave(channel.id, user)
+  #       {:ok, ~g"removed"}
+  #   end
+  # end
 
   def add_user_to_channel(channel, user_id, opts \\ []) do
     case join_channel(channel, user_id, opts) do
