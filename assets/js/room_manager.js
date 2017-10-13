@@ -580,16 +580,16 @@ class RoomManager {
           toastr.error(resp.error)
         })
     })
-    .on('click', 'button.unmute-user', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      cc.put("/room/unmute-user/" + username)
-        .receive("ok", resp => {
-        })
-        .receive("error", resp => {
-          toastr.error(resp.error)
-        })
-    })
+    // .on('click', 'button.unmute-user', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   cc.put("/room/unmute-user/" + username)
+    //     .receive("ok", resp => {
+    //     })
+    //     .receive("error", resp => {
+    //       toastr.error(resp.error)
+    //     })
+    // })
     .on('click', 'button.unblock-user', e => {
       let username = $(e.currentTarget).parent().attr('data-username')
       e.preventDefault()
@@ -610,34 +610,34 @@ class RoomManager {
           toastr.error(resp.error)
         })
     })
-    .on('click', 'button.mute-user', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      sweetAlert({
-        title: gettext.are_you_sure,
-        text: gettext.the_user_wont_able_type + ' ' + ucxchat.room,
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: gettext.yes_mute_user,
-        closeOnConfirm: false
-      },
-      function(){
-        cc.put("/room/mute-user/" + username)
-          .receive("ok", resp => {
-            swal({
-                title: gettext.muted,
-                text: gettext.the_user_wont_able_type + ' ' + ucxchat.room,
-                type: 'success',
-                timer: 2000,
-                showConfirmButton: false,
-            })
-          })
-          .receive("error", resp => {
-            toastr.error(resp.error)
-          })
-      });
-    })
+    // .on('click', 'button.mute-user', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   sweetAlert({
+    //     title: gettext.are_you_sure,
+    //     text: gettext.the_user_wont_able_type + ' ' + ucxchat.room,
+    //     type: "warning",
+    //     showCancelButton: true,
+    //     confirmButtonColor: "#DD6B55",
+    //     confirmButtonText: gettext.yes_mute_user,
+    //     closeOnConfirm: false
+    //   },
+    //   function(){
+    //     cc.put("/room/mute-user/" + username)
+    //       .receive("ok", resp => {
+    //         swal({
+    //             title: gettext.muted,
+    //             text: gettext.the_user_wont_able_type + ' ' + ucxchat.room,
+    //             type: 'success',
+    //             timer: 2000,
+    //             showConfirmButton: false,
+    //         })
+    //       })
+    //       .receive("error", resp => {
+    //         toastr.error(resp.error)
+    //       })
+    //   });
+    // })
     .on('click', 'button.remove-user', e => {
       let username = $(e.currentTarget).parent().attr('data-username')
       e.preventDefault()

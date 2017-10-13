@@ -16,9 +16,12 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   alias UccChatWeb.{MessageView, Client}
 
+  require UccChat.ChatConstants, as: CC
+
   @preloads [:user, :edited_by, :attachments, :reactions]
 
   def create(body, channel_id, user_id, socket, client \\ Client) do
+    Logger.info "message create body: #{inspect body}"
     user = Accounts.get_user user_id
     channel = Channel.get!(channel_id)
     msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
@@ -360,4 +363,79 @@ defmodule UccChatWeb.RoomChannel.Message do
     """
   end
 
+  def broadcast_bot_message(%{} = channel, _user_id, body) do
+    Logger.debug "broadcast_bot_message body: #{inspect body}"
+    bot_id = Helpers.get_bot_id()
+    message = create_message(String.replace(body, "\n", "<br>"), bot_id,
+      channel.id,
+      %{
+        system: true,
+        sequential: false,
+      })
+
+    html = render_message message
+    resp = create_broadcast_message(message.id, channel.name, html)
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+      "message:new", resp
+  end
+
+  def broadcast_bot_message(channel_id, user_id, body) do
+    channel_id
+    |> Channel.get
+    |> broadcast_bot_message(user_id, body)
+
+  end
+
+  def broadcast_system_message(%{} = channel, user_id, body) do
+    message = create_system_message(channel.id, user_id, body)
+    {_, html} = render_message message
+    resp = create_broadcast_message(message.id, channel.name, html)
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+      "message:new", resp
+  end
+  def broadcast_system_message(channel_id, user_id, body) do
+    channel_id
+    |> Channel.get
+    |> broadcast_system_message(user_id, body)
+  end
+
+  def broadcast_private_message(%{} = channel, _user_id, body) do
+    message = create_private_message(channel.id, body)
+    html = render_message message
+    resp = create_broadcast_message(message.id, channel.name, html)
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+      "message:new", resp
+  end
+  def broadcast_private_message(channel_id, user_id, body) do
+    channel_id
+    |> Channel.get
+    |> broadcast_private_message(user_id, body)
+  end
+
+  defp create_broadcast_message(id, user_id, html, opts \\ []) do
+    Enum.into opts,
+      %{
+        html: html,
+        id: id,
+        user_id: user_id
+      }
+  end
+
+  def create_system_message(channel_id, user_id, body) do
+    create_message(body, user_id, channel_id,
+      %{
+        system: true,
+        sequential: false,
+      })
+  end
+
+  def create_private_message(channel_id, body) do
+    bot_id = Helpers.get_bot_id()
+    create_message(body, bot_id, channel_id,
+      %{
+        type: "p",
+        system: true,
+        sequential: false,
+      })
+  end
 end

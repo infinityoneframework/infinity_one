@@ -49,95 +49,95 @@ defmodule UccChat.MessageService do
     end
   end
 
-  def broadcast_updated_message(message, _opts \\ []) do
-    message = Message.get message.id, preload: @preloads
-    channel = Channel.get message.channel_id
-    html =
-      message
-      |> Repo.preload(@preloads)
-      |> render_message
-    broadcast_message message.id, channel.name, message.user_id, html,
-      event: "update"
-    # event = if opts[:reaction], do: "code:update:reaction", else: "code:update"
-    # UccUcc.Web.Endpoint.broadcast! CC.chan_room <> channel.name, "code:update:reaction",
-    #   %{selector: "##{message.id}", html: html, action: "replaceWith"}
+  # def broadcast_updated_message(message, _opts \\ []) do
+  #   message = Message.get message.id, preload: @preloads
+  #   channel = Channel.get message.channel_id
+  #   html =
+  #     message
+  #     |> Repo.preload(@preloads)
+  #     |> render_message
+  #   broadcast_message message.id, channel.name, message.user_id, html,
+  #     event: "update"
+  #   # event = if opts[:reaction], do: "code:update:reaction", else: "code:update"
+  #   # UccUcc.Web.Endpoint.broadcast! CC.chan_room <> channel.name, "code:update:reaction",
+  #   #   %{selector: "##{message.id}", html: html, action: "replaceWith"}
 
-  end
+  # end
 
-  def broadcast_bot_message(%{} = channel, _user_id, body) do
-    Logger.debug "broadcast_bot_message body: #{inspect body}"
-    bot_id = Helpers.get_bot_id()
-    message = create_message(String.replace(body, "\n", "<br>"), bot_id,
-      channel.id,
-      %{
-        system: true,
-        sequential: false,
-      })
+  # def broadcast_bot_message(%{} = channel, _user_id, body) do
+  #   Logger.debug "broadcast_bot_message body: #{inspect body}"
+  #   bot_id = Helpers.get_bot_id()
+  #   message = create_message(String.replace(body, "\n", "<br>"), bot_id,
+  #     channel.id,
+  #     %{
+  #       system: true,
+  #       sequential: false,
+  #     })
 
-    html = render_message message
-    resp = create_broadcast_message(message.id, channel.name, html)
-    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-      "message:new", resp
-  end
+  #   html = render_message message
+  #   resp = create_broadcast_message(message.id, channel.name, html)
+  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+  #     "message:new", resp
+  # end
 
-  def broadcast_bot_message(channel_id, user_id, body) do
-    channel_id
-    |> Channel.get
-    |> broadcast_bot_message(user_id, body)
+  # def broadcast_bot_message(channel_id, user_id, body) do
+  #   channel_id
+  #   |> Channel.get
+  #   |> broadcast_bot_message(user_id, body)
 
-  end
+  # end
 
-  def broadcast_system_message(%{} = channel, user_id, body) do
-    message = create_system_message(channel.id, user_id, body)
-    html = render_message message
-    resp = create_broadcast_message(message.id, channel.name, html)
-    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-      "message:new", resp
-  end
-  def broadcast_system_message(channel_id, user_id, body) do
-    channel_id
-    |> Channel.get
-    |> broadcast_system_message(user_id, body)
-  end
+  # def broadcast_system_message(%{} = channel, user_id, body) do
+  #   message = create_system_message(channel.id, user_id, body)
+  #   html = render_message message
+  #   resp = create_broadcast_message(message.id, channel.name, html)
+  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+  #     "message:new", resp
+  # end
+  # def broadcast_system_message(channel_id, user_id, body) do
+  #   channel_id
+  #   |> Channel.get
+  #   |> broadcast_system_message(user_id, body)
+  # end
 
-  def broadcast_private_message(%{} = channel, _user_id, body) do
-    message = create_private_message(channel.id, body)
-    html = render_message message
-    resp = create_broadcast_message(message.id, channel.name, html)
-    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-      "message:new", resp
-  end
-  def broadcast_private_message(channel_id, user_id, body) do
-    channel_id
-    |> Channel.get
-    |> broadcast_private_message(user_id, body)
-  end
+  # def broadcast_private_message(%{} = channel, _user_id, body) do
+  #   message = create_private_message(channel.id, body)
+  #   html = render_message message
+  #   resp = create_broadcast_message(message.id, channel.name, html)
+  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
+  #     "message:new", resp
+  # end
+  # def broadcast_private_message(channel_id, user_id, body) do
+  #   channel_id
+  #   |> Channel.get
+  #   |> broadcast_private_message(user_id, body)
+  # end
 
-  def broadcast_message(id, room, user_id, html, opts \\ []) #event \\ "new")
-  def broadcast_message(%{} = socket, id, user_id, html, opts) do
-    event = opts[:event] || "new"
-    Phoenix.Channel.broadcast! socket, "message:" <> event,
-      create_broadcast_message(id, user_id, html, opts)
-  end
-  def broadcast_message(id, room, user_id, html, opts) do
-    event = opts[:event] || "new"
-    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:" <> event,
-      create_broadcast_message(id, user_id, html, opts)
-  end
+  # def broadcast_message(id, room, user_id, html, opts \\ []) #event \\ "new")
+  # def broadcast_message(%{} = socket, id, user_id, html, opts) do
+  #   event = opts[:event] || "new"
+  #   Phoenix.Channel.broadcast! socket, "message:" <> event,
+  #     create_broadcast_message(id, user_id, html, opts)
+  # end
+  # def broadcast_message(id, room, user_id, html, opts) do
+  #   event = opts[:event] || "new"
+  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:" <> event,
+  #     create_broadcast_message(id, user_id, html, opts)
+  # end
 
-  def push_message(socket, id, user_id, html, opts \\ []) do
-    Phoenix.Channel.push socket, "message:new",
-      create_broadcast_message(id, user_id, html, opts)
-  end
+  # def push_message(socket, id, user_id, html, opts \\ []) do
+  #   Phoenix.Channel.push socket, "message:new",
+  #     create_broadcast_message(id, user_id, html, opts)
+  # end
 
-  defp create_broadcast_message(id, user_id, html, opts \\ []) do
-    Enum.into opts,
-      %{
-        html: html,
-        id: id,
-        user_id: user_id
-      }
-  end
+  # defp create_broadcast_message(id, user_id, html, opts \\ []) do
+  #   Enum.into opts,
+  #     %{
+  #       html: html,
+  #       id: id,
+  #       user_id: user_id
+  #     }
+  # end
 
   def get_messages_info(messages, channel_id, user) do
     subscription = SubscriptionService.get(channel_id, user.id)
@@ -178,60 +178,60 @@ defmodule UccChat.MessageService do
     end
   end
 
-  def render_message(message) do
-    user_id = message.user.id
-    user = Repo.one(from u in User, where: u.id == ^user_id)
+  # def render_message(message) do
+  #   user_id = message.user.id
+  #   user = Repo.one(from u in User, where: u.id == ^user_id)
 
-    "message.html"
-    |> MessageView.render(message: message, user: user, previews: [])
-    |> Helpers.safe_to_string
-  end
+  #   "message.html"
+  #   |> MessageView.render(message: message, user: user, previews: [])
+  #   |> Helpers.safe_to_string
+  # end
 
-  def create_system_message(channel_id, user_id, body) do
-    create_message(body, user_id, channel_id,
-      %{
-        system: true,
-        sequential: false,
-      })
-  end
+  # def create_system_message(channel_id, user_id, body) do
+  #   create_message(body, user_id, channel_id,
+  #     %{
+  #       system: true,
+  #       sequential: false,
+  #     })
+  # end
 
-  def create_private_message(channel_id, body) do
-    bot_id = Helpers.get_bot_id()
-    create_message(body, bot_id, channel_id,
-      %{
-        type: "p",
-        system: true,
-        sequential: false,
-      })
-  end
+  # def create_private_message(channel_id, body) do
+  #   bot_id = Helpers.get_bot_id()
+  #   create_message(body, bot_id, channel_id,
+  #     %{
+  #       type: "p",
+  #       system: true,
+  #       sequential: false,
+  #     })
+  # end
 
-  def create_message(body, user_id, channel_id, params \\ %{}) do
-    sequential? =
-      case Message.last_message(channel_id) do
-        nil -> false
-        lm ->
-          Timex.after?(Timex.shift(lm.inserted_at,
-            seconds: UccSettings.grouping_period_seconds()), Timex.now) and
-            user_id == lm.user_id
-      end
+  # def create_message(body, user_id, channel_id, params \\ %{}) do
+  #   sequential? =
+  #     case Message.last_message(channel_id) do
+  #       nil -> false
+  #       lm ->
+  #         Timex.after?(Timex.shift(lm.inserted_at,
+  #           seconds: UccSettings.grouping_period_seconds()), Timex.now) and
+  #           user_id == lm.user_id
+  #     end
 
-    message =
-      Message.create!(Map.merge(
-        %{
-          sequential: sequential?,
-          channel_id: channel_id,
-          user_id: user_id,
-          body: body
-        }, params))
-      |> Repo.preload(@preloads)
+  #   message =
+  #     Message.create!(Map.merge(
+  #       %{
+  #         sequential: sequential?,
+  #         channel_id: channel_id,
+  #         user_id: user_id,
+  #         body: body
+  #       }, params))
+  #     |> Repo.preload(@preloads)
 
-    if params[:type] == "p" do
-      Repo.delete(message)
-    else
-      embed_link_previews(body, channel_id, message.id)
-    end
-    message
-  end
+  #   if params[:type] == "p" do
+  #     Repo.delete(message)
+  #   else
+  #     embed_link_previews(body, channel_id, message.id)
+  #   end
+  #   message
+  # end
 
   def embed_link_previews(body, channel_id, message_id) do
     if UccSettings.embed_link_previews() do
@@ -444,10 +444,10 @@ defmodule UccChat.MessageService do
   end
   def update_direct_notices(_channel, _message), do: nil
 
-  def create_and_render(body, user_id, channel_id, opts \\ []) do
-    message = create_message(body, user_id, channel_id, Enum.into(opts, %{}))
-    {message, render_message(message)}
-  end
+  # def create_and_render(body, user_id, channel_id, opts \\ []) do
+  #   message = create_message(body, user_id, channel_id, Enum.into(opts, %{}))
+  #   {message, render_message(message)}
+  # end
 
   def render_message_box(channel_id, user_id) do
     user = Helpers.get_user! user_id

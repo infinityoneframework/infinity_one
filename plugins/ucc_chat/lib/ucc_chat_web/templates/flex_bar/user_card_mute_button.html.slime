@@ -1,0 +1,7 @@
+= if has_permission? @current_user, "mute-user", @channel_id do
+  = if user_muted? @user, @channel_id do
+    button.button.button-block.secondary.primary.mute-unmute(rebel-click="unmute_user" data-id="#{@user.id}")
+      span= ~g"Unmute user"
+  - else
+    button.button.button-block.danger.mute-unmute(rebel-click="mute_user" data-id="#{@user.id}")
+      span= ~g"Mute user"

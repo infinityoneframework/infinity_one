@@ -10,6 +10,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   alias UcxUcc.Accounts
   alias Accounts.User
   alias UccChat.NotifierService, as: Notifier
+  alias UccChatWeb.RoomChannel.Channel, as: WebChannel
 
   require UccChat.ChatConstants, as: CC
   require UccChatWeb.RoomChannel.MessageInput
@@ -41,14 +42,16 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("join", args, _sender, socket, client) do
     if name = get_channel_name(args, socket, client) do
-      assigns = socket.assigns
-      case ChannelService.channel_command socket, :join, name, assigns.user_id,
-        assigns.channel_id do
-
-        {:ok, message} ->
-          client.toastr! socket, :success, message
-        {:error, message} ->
-          client.toastr! socket, :error, message
+      if channel = Channel.get_by name: name do
+        assigns = socket.assigns
+        case WebChannel.join channel, assigns.user_id do
+          {:ok, _message} ->
+            client.toastr! socket, :success, ~g(Successfully joined the channel)
+          {:error, message} ->
+            client.toastr! socket, :error, message
+        end
+      else
+        client.toastr! socket, :error, no_room_message()
       end
     end
   end
@@ -56,9 +59,8 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   def run_command(command, [], _sender, socket, client) when command in ~w(leave part) do
     assigns = socket.assigns
     with channel when not is_nil(channel) <- Channel.get(assigns.channel_id),
-         {:ok, message} <- ChannelService.channel_command(socket, :leave, channel,
-          assigns.user_id, assigns.channel_id) do
-      client.toastr! socket, :success, message
+         {:ok, message} <- WebChannel.leave(channel, assigns.user_id) do
+      client.toastr! socket, :success, ~g(Successfully left the channel)
     else
       {:error, message} -> client.toastr! socket, :error, message
       _ -> client.toastr! socket, :error, ~g(Sorry, could not do that!)
@@ -74,10 +76,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     name = get_channel_name(args, socket, client)
     with name when not is_nil(name) <- name,
          nil <- Channel.get_by(name: name),
-         {:ok, message} <- ChannelService.channel_command(socket, :create,
+         {:ok, _message} <- ChannelService.channel_command(socket, :create,
             name, assigns.user_id, assigns.channel_id) do
 
-      client.toastr! socket, :success, message
+      client.toastr! socket, :success, ~g(You have left the channel)
     else
       {:error, message} ->
         client.toastr! socket, :error, message

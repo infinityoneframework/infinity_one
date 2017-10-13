@@ -22,6 +22,7 @@ defmodule UccChat.ChannelService do
   alias Ecto.Multi
   alias UcxUcc.{UccPubSub, Hooks, Accounts}
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
+  alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
   require UccChat.ChatConstants, as: CC
   require Logger
@@ -1002,7 +1003,7 @@ defmodule UccChat.ChannelService do
   def notify_user_action2(socket, user, user_id, channel_id, fun) do
     owner = Helpers.get_user user_id, preload: []
     body = fun.(user.username, owner.username)
-    broadcast_message2(socket, body, user_id, channel_id, system: true)
+    # broadcast_message2(socket, body, user_id, channel_id, system: true)
   end
 
   def block_user(%{id: _id}, _user_id, channel_id) do
@@ -1041,7 +1042,7 @@ defmodule UccChat.ChannelService do
           current_user = Accounts.get_user user_id
           unless UccSettings.hide_user_muted() do
             message = ~g(User ) <> user.username <> ~g( muted by ) <> current_user.username
-            MessageService.broadcast_system_message(channel_id, current_user.id, message)
+            WebMessage.broadcast_system_message(channel_id, current_user.id, message)
           end
           {:ok, ~g"muted"}
       end
@@ -1062,7 +1063,7 @@ defmodule UccChat.ChannelService do
           current_user = Accounts.get_user user_id
           unless UccSettings.hide_user_muted() do
             message = ~g(User ) <> user.username <> ~g( unmuted by ) <> current_user.username
-            MessageService.broadcast_system_message(channel_id, current_user.id, message)
+            WebMessage.broadcast_system_message(channel_id, current_user.id, message)
           end
           {:ok, ~g"unmuted"}
       end
@@ -1182,11 +1183,11 @@ defmodule UccChat.ChannelService do
   #   MessageService.broadcast_message(message.id, room, user_id, html)
   # end
 
-  def broadcast_message2(socket, body, user_id, channel_id, opts \\ []) do
-    {message, html} =
-      MessageService.create_and_render(body, user_id, channel_id, opts)
-    MessageService.broadcast_message(socket, message.id, user_id, html)
-  end
+  # def broadcast_message2(socket, body, user_id, channel_id, opts \\ []) do
+  #   {message, html} =
+  #     MessageService.create_and_render(body, user_id, channel_id, opts)
+  #   MessageService.broadcast_message(socket, message.id, user_id, html)
+  # end
 
   # def remove_user_from_channel(channel, user_id) do
   #   case Subscription.get_by channel_id: channel.id, user_id: user_id do

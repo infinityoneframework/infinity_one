@@ -4,10 +4,14 @@ defmodule UccChat.SlashCommands do
 
   @default_count 10
 
+  # @commands [
+  #   "join", "archive", "kick", "lennyface", "leave", "gimme", "create", "invite",
+  #   "invite-all-to", "invite-all-from", "msg", "part", "unarchive", "tableflip",
+  #   "topic", "mute", "me", "open", "unflip", "shrug", "unmute", "unhide"]
   @commands [
     "join", "archive", "kick", "lennyface", "leave", "gimme", "create", "invite",
-    "invite-all-to", "invite-all-from", "msg", "part", "unarchive", "tableflip",
-    "topic", "mute", "me", "open", "unflip", "shrug", "unmute", "unhide"]
+    "invite-all-to", "invite-all-from", "part", "unarchive", "tableflip",
+    "topic", "mute", "open", "unflip", "shrug", "unmute", "unhide"]
 
   @special_text %{
     "gimme" => "༼ つ ◕_◕ ༽つ",
@@ -49,6 +53,7 @@ defmodule UccChat.SlashCommands do
   def commands(pattern, count \\ @default_count) do
     pattern
     |> find(count)
+    |> IO.inspect(label: "find result")
     |> Enum.reduce([], fn
       cmd, [] -> [format_command(@command_map[cmd], " selected")]
       cmd, acc -> [format_command(@command_map[cmd])|acc]

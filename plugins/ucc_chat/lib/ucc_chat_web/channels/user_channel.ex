@@ -47,6 +47,7 @@ defmodule UccChatWeb.UserChannel do
 
   alias UccWebrtcWeb.WebrtcChannel
   alias UccChatWeb.RebelChannel.Client
+  alias UccChatWeb.RoomChannel.Channel, as: WebChannel
 
   require UccChat.ChatConstants, as: CC
 
@@ -1028,10 +1029,14 @@ defmodule UccChatWeb.UserChannel do
   #   socket
   # end
 
-  defp update_message_box(socket, user_id, channel_id) do
+  defp update_message_box(%{assigns: %{channel_id: channel_id}} = socket, user_id, channel_id) do
     update socket, :html,
       set: MessageService.render_message_box(channel_id, user_id),
       on: ".room-container footer.footer"
+    socket
+  end
+
+  defp update_message_box(socket, _user_id, _channel_id) do
     socket
   end
 
@@ -1071,6 +1076,51 @@ defmodule UccChatWeb.UserChannel do
     UccPubSub.broadcast "user:" <> socket.assigns.user_id, "phone:call",
       %{username: username}
     socket
+  end
+
+  def mute_user(socket, sender) do
+    user_id = sender["dataset"]["id"]
+    Logger.warn "mute #{user_id}"
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    user = Accounts.get_user user_id
+    channel_id = socket.assigns.channel_id
+    case WebChannel.mute_user channel_id, user, current_user do
+      {:ok, _message} ->
+        socket
+        |> update_mute_unmute_button(channel_id, user, current_user)
+        |> Client.toastr!(:success, ~g(User muted))
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+  end
+
+  def unmute_user(socket, sender) do
+    user_id = sender["dataset"]["id"]
+    Logger.warn "unmute #{user_id}"
+    channel_id = socket.assigns.channel_id
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    user = Accounts.get_user user_id
+    case WebChannel.unmute_user socket.assigns.channel_id, user, current_user do
+      {:ok, _message} ->
+        socket
+        |> update_mute_unmute_button(channel_id, user, current_user)
+        |> Client.toastr!(:success, ~g(User unmuted))
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+  end
+
+  defp update_mute_unmute_button(socket, channel_id, user, current_user) do
+    html =
+      Phoenix.View.render_to_string UccChatWeb.FlexBarView,
+        "user_card_mute_button.html", [
+          channel_id: channel_id,
+          user: user,
+          current_user: current_user
+        ]
+    socket
+    |> execute(replaceWith: html, on: ".user-view button.mute-unmute")
+    |> set_event_handles(".user-view button.mute-unmute")
   end
 
   def mousedown(socket, sender) do
