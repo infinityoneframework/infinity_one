@@ -10,7 +10,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   alias UcxUcc.Accounts
   alias Accounts.User
   alias UccChat.NotifierService, as: Notifier
-  alias UccChatWeb.RoomChannel.Channel, as: WebChannel
+  alias UccChatWeb.RoomChannel
+  alias RoomChannel.Channel, as: WebChannel
+  alias UccChatWeb.UserChannel
 
   require UccChat.ChatConstants, as: CC
   require UccChatWeb.RoomChannel.MessageInput
@@ -181,25 +183,27 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("mute", args, _sender, socket, client) do
     if user = get_user args, socket, client do
-      assigns = socket.assigns
-      case ChannelService.mute_user user, assigns.user_id, assigns.channel_id do
-        {:ok, message} ->
-          client.toastr! socket, :success, message
-        {:error, message} ->
-          client.toastr! socket, :error, message
-      end
+      UserChannel.mute_user socket, user.id
+      # assigns = socket.assigns
+      # case ChannelService.mute_user user, assigns.user_id, assigns.channel_id do
+      #   {:ok, message} ->
+      #     client.toastr! socket, :success, message
+      #   {:error, message} ->
+      #     client.toastr! socket, :error, message
+      # end
     end
   end
 
   def run_command("unmute", args, _sender, socket, client) do
     if user = get_user args, socket, client do
-      assigns = socket.assigns
-      case ChannelService.unmute_user user, assigns.user_id, assigns.channel_id do
-        {:ok, message} ->
-          client.toastr! socket, :success, message
-        {:error, message} ->
-          client.toastr! socket, :error, message
-      end
+      UserChannel.unmute_user socket, user.id
+      # assigns = socket.assigns
+      # case ChannelService.unmute_user user, assigns.user_id, assigns.channel_id do
+      #   {:ok, message} ->
+      #     client.toastr! socket, :success, message
+      #   {:error, message} ->
+      #     client.toastr! socket, :error, message
+      # end
     end
   end
 

@@ -1078,9 +1078,11 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  def mute_user(socket, sender) do
-    user_id = sender["dataset"]["id"]
-    Logger.warn "mute #{user_id}"
+  def mute_user(socket, %{} = sender) do
+    mute_user socket, sender["dataset"]["id"]
+  end
+
+  def mute_user(socket, user_id) do
     current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
     user = Accounts.get_user user_id
     channel_id = socket.assigns.channel_id
@@ -1094,9 +1096,11 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
-  def unmute_user(socket, sender) do
-    user_id = sender["dataset"]["id"]
-    Logger.warn "unmute #{user_id}"
+  def unmute_user(socket, %{} = sender) do
+    unmute_user socket, sender["dataset"]["id"]
+  end
+
+  def unmute_user(socket, user_id) do
     channel_id = socket.assigns.channel_id
     current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
     user = Accounts.get_user user_id
@@ -1111,6 +1115,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   defp update_mute_unmute_button(socket, channel_id, user, current_user) do
+    # Logger.warn "assigns: #{inspect socket.assigns}"
     html =
       Phoenix.View.render_to_string UccChatWeb.FlexBarView,
         "user_card_mute_button.html", [
@@ -1118,9 +1123,8 @@ defmodule UccChatWeb.UserChannel do
           user: user,
           current_user: current_user
         ]
+    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room, "update:mute_unmute", %{username: user.username, html: html}
     socket
-    |> execute(replaceWith: html, on: ".user-view button.mute-unmute")
-    |> set_event_handles(".user-view button.mute-unmute")
   end
 
   def mousedown(socket, sender) do

@@ -20,7 +20,8 @@ defmodule UccChatWeb.RoomChannel do
     "update:name:change",
     "update:room-icon",
     "send:message",
-    "js:execjs"
+    "js:execjs",
+    "update:mute_unmute"
   ]
 
   alias UccChat.{
@@ -243,6 +244,14 @@ defmodule UccChatWeb.RoomChannel do
     end
 
     # push socket, event, msg
+    {:noreply, socket}
+  end
+
+  def handle_out("update:mute_unmute", %{username: username, html: html}, socket) do
+    selector = ~s/.user-view[data-username="#{username}"] button.mute-unmute/
+    socket
+    |> execute(replaceWith: html, on: selector)
+    |> set_event_handlers(selector)
     {:noreply, socket}
   end
 # [[{{"bc47810a-29a3-4cd5-893b-13a5a2ebdd31", #PID<0.4000.0>}, %{keys: ""}}]]
