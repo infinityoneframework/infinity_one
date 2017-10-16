@@ -40,7 +40,7 @@
           span= ~g"Set as moderator"
     = render "user_card_mute_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
     = if has_permission?(@current_user, "remove-user", @channel_id) do
-      button.button.button-block.danger.remove-user
+      button.button.button-block.danger.remove-user(rebel-click="remove_user" data-id="#{@user.id}")
         span= ~g"Remove from room"
     = if @user_info[:view_mode] do
       button.button.back(rebel-click="flex_call" data-fun="view_all" data-id="members-list")

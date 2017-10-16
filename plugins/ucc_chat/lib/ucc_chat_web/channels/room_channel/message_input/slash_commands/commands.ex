@@ -159,7 +159,8 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       case ChannelService.invite_user user, socket.assigns.channel_id, current_user.id do
         {:ok, _} ->
           client.toastr! socket, :success, ~g(User added successfully)
-        {:error, _} ->
+        {:error, changeset} ->
+          Logger.warn "invite failed #{inspect changeset.errors}"
           client.toastr! socket, :error, sorry_message()
         nil ->
           nil
@@ -169,41 +170,31 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("kick", args, _sender, socket, client) do
     if user = get_user args, socket, client do
-      channel_id = socket.assigns.channel_id
-      case ChannelService.kick_user channel_id, user, socket do
-        {:ok, _} ->
-          client.toastr! socket, :success, ~g(User removed successfully)
-        {:error, _} ->
-          client.toastr! socket, :error, sorry_message()
-        nil ->
-          nil
-      end
+      # channel_id = socket.assigns.channel_id
+      # channel = Channel.get channel_id
+      # current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+      # case WebChannel.remove_user channel, user.id, current_user do
+      UserChannel.remove_user socket, user.id
+      # case UserChannel.remove_user socket, user.id  do
+      #   {:ok, _} ->
+      #     client.toastr! socket, :success, ~g(User removed successfully)
+      #   {:error, _} ->
+      #     client.toastr! socket, :error, sorry_message()
+      #   nil ->
+      #     nil
+      # end
     end
   end
 
   def run_command("mute", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       UserChannel.mute_user socket, user.id
-      # assigns = socket.assigns
-      # case ChannelService.mute_user user, assigns.user_id, assigns.channel_id do
-      #   {:ok, message} ->
-      #     client.toastr! socket, :success, message
-      #   {:error, message} ->
-      #     client.toastr! socket, :error, message
-      # end
     end
   end
 
   def run_command("unmute", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       UserChannel.unmute_user socket, user.id
-      # assigns = socket.assigns
-      # case ChannelService.unmute_user user, assigns.user_id, assigns.channel_id do
-      #   {:ok, message} ->
-      #     client.toastr! socket, :success, message
-      #   {:error, message} ->
-      #     client.toastr! socket, :error, message
-      # end
     end
   end
 

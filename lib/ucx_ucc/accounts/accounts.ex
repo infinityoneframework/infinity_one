@@ -503,4 +503,8 @@ defmodule UcxUcc.Accounts do
       select: u.id,
       limit: 1
   end
+
+  def preload_schema(schema, preload) do
+    Repo.preload schema, preload
+  end
 end

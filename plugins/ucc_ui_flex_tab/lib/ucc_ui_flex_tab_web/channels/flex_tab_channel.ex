@@ -37,8 +37,10 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
     Ftab.toggle socket.assigns.user_id, channel_id, sender["dataset"]["id"],
       nil, fn
-       :open, {_, args} -> apply(tab.module, :open, [socket, {user_id, channel_id, tab, sender}, args])
-       :close, nil -> apply(tab.module, :close, [socket, sender])
+       :open, {_, args} ->
+         apply(tab.module, :open, [socket, {user_id, channel_id, tab, sender}, args])
+       :close, nil ->
+         apply(tab.module, :close, [socket, sender])
      end
   end
 

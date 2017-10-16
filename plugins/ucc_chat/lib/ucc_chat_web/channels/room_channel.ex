@@ -21,7 +21,8 @@ defmodule UccChatWeb.RoomChannel do
     "update:room-icon",
     "send:message",
     "js:execjs",
-    "update:mute_unmute"
+    "update:mute_unmute",
+    "update:remove_user"
   ]
 
   alias UccChat.{
@@ -254,6 +255,13 @@ defmodule UccChatWeb.RoomChannel do
     |> set_event_handlers(selector)
     {:noreply, socket}
   end
+
+  def handle_out("update:remove_user", %{username: username, js: js}, socket) do
+    Logger.warn "......... username: #{username}"
+    exec_js socket, js
+    {:noreply, socket}
+  end
+
 # [[{{"bc47810a-29a3-4cd5-893b-13a5a2ebdd31", #PID<0.4000.0>}, %{keys: ""}}]]
   def terminate(_reason, %{assigns: assigns}) do
     Logger.debug "terminate: " <> inspect({assigns[:user_id], assigns[:self]})

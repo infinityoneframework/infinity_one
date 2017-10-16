@@ -638,34 +638,34 @@ class RoomManager {
     //       })
     //   });
     // })
-    .on('click', 'button.remove-user', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      sweetAlert({
-        title: gettext.are_you_sure,
-        text: gettext.the_user_will_be_removed_from + ' ' + ucxchat.room,
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Yes, remove user!",
-        closeOnConfirm: false
-      },
-      function(){
-        cc.put("/room/remove-user/" + username)
-          .receive("ok", resp => {
-            swal({
-                title: gettext.removed,
-                text: gettext.the_user_was_remove_from + ' ' + ucxchat.room,
-                type: 'success',
-                timer: 2000,
-                showConfirmButton: false,
-            })
-          })
-          .receive("error", resp => {
-            toastr.error(resp.error)
-          })
-      });
-    })
+    // .on('click', 'button.remove-user', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   sweetAlert({
+    //     title: gettext.are_you_sure,
+    //     text: gettext.the_user_will_be_removed_from + ' ' + ucxchat.room,
+    //     type: "warning",
+    //     showCancelButton: true,
+    //     confirmButtonColor: "#DD6B55",
+    //     confirmButtonText: "Yes, remove user!",
+    //     closeOnConfirm: false
+    //   },
+    //   function(){
+    //     cc.put("/room/remove-user/" + username)
+    //       .receive("ok", resp => {
+    //         swal({
+    //             title: gettext.removed,
+    //             text: gettext.the_user_was_remove_from + ' ' + ucxchat.room,
+    //             type: 'success',
+    //             timer: 2000,
+    //             showConfirmButton: false,
+    //         })
+    //       })
+    //       .receive("error", resp => {
+    //         toastr.error(resp.error)
+    //       })
+    //   });
+    // })
     .on('click', 'button.join', e => {
       cc.put("/room/join/" + ucxchat.username)
         .receive("ok", resp => {

@@ -1097,11 +1097,10 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def unmute_user(socket, %{} = sender) do
-    unmute_user socket, sender["dataset"]["id"]
+    unmute_user socket, sender["dataset"]["id"], socket.assigns.channel_id
   end
 
-  def unmute_user(socket, user_id) do
-    channel_id = socket.assigns.channel_id
+  def unmute_user(socket, user_id, channel_id) do
     current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
     user = Accounts.get_user user_id
     case WebChannel.unmute_user socket.assigns.channel_id, user, current_user do
@@ -1109,6 +1108,32 @@ defmodule UccChatWeb.UserChannel do
         socket
         |> update_mute_unmute_button(channel_id, user, current_user)
         |> Client.toastr!(:success, ~g(User unmuted))
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+  end
+
+  def remove_user(socket, %{} = sender) do
+    remove_user socket, sender["dataset"]["id"]
+  end
+
+  def remove_user(socket, user_id) do
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    user = Accounts.get_user user_id
+    channel = Channel.get socket.assigns.channel_id
+    case WebChannel.remove_user channel, user.id, current_user do
+      {:ok, _message} ->
+        js = """
+          var user_view = $('.user-view[data-username="#{user.username}"]');
+          if (!user_view.hasClass('animated-hidden')) {
+            user_view.find('.button.back').click();
+          }
+        """
+        |> String.replace("\n", "")
+
+        socket.endpoint.broadcast CC.chan_room <> channel.name,
+          "update:remove_user", %{username: user.username, js: js}
+        Client.toastr! socket, :success, ~g(User removed)
       {:error, message} ->
         Client.toastr! socket, :error, message
     end
@@ -1123,7 +1148,8 @@ defmodule UccChatWeb.UserChannel do
           user: user,
           current_user: current_user
         ]
-    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room, "update:mute_unmute", %{username: user.username, html: html}
+    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
+      "update:mute_unmute", %{username: user.username, html: html}
     socket
   end
 

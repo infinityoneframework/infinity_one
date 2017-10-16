@@ -43,19 +43,29 @@ defmodule UccChatWeb.RoomChannel.Channel do
     end
   end
 
-  def remove_user(%{id: channel_id} = channel, user_id) do
-    case delete_subscription channel, user_id do
-      {:ok, message} ->
-        user = Accounts.get_user user_id
-        notify_user_removed(channel_id, user)
-        {:ok, message}
-      error ->
-        error
+  def remove_user(%{id: channel_id} = channel, user_id, %{} = current_user) do
+    current_user = Accounts.preload_schema current_user, [:roles]
+    if Permissions.has_permission? current_user, "remove-user", channel_id do
+      case delete_subscription channel, user_id do
+        {:ok, message} ->
+          user = Accounts.get_user user_id
+          notify_user_removed(channel_id, user)
+          {:ok, message}
+        error ->
+          error
+      end
+    else
+      {:error, permission_error()}
     end
   end
 
+  def remove_user(%{} = channel, user_id, current_user_id) do
+    remove_user channel, user_id, Accounts.get_user!(current_user_id)
+  end
+
   def mute_user(channel_id, %{} = user, %{} = current_user) do
-    if Permissions.has_permission?(Accounts.get_user!(current_user.id, preload: [:roles]), "mute-user", channel_id) do
+    current_user = Accounts.preload_schema current_user, [:roles]
+    if Permissions.has_permission? current_user, "mute-user", channel_id do
       case Mute.create(%{user_id: user.id, channel_id: channel_id}) do
         {:error, _cs} ->
           message = ~g"User" <> " `@" <> user.username <> "` " <> ~g"already muted."
@@ -70,8 +80,8 @@ defmodule UccChatWeb.RoomChannel.Channel do
   end
 
   def unmute_user(channel_id, %{} = user, %{} = current_user) do
-    if Permissions.has_permission?(Accounts.get_user!(current_user.id, preload: [:roles]), "mute-user",
-      channel_id) do
+    current_user = Accounts.preload_schema current_user, [:roles]
+    if Permissions.has_permission? current_user, "mute-user", channel_id do
       case Mute.get_by user_id: user.id, channel_id: channel_id do
         nil ->
           {:error, ~g"User" <> " `@" <> user.username <> "` " <>
