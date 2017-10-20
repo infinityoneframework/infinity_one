@@ -61,7 +61,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   def run_command(command, [], _sender, socket, client) when command in ~w(leave part) do
     assigns = socket.assigns
     with channel when not is_nil(channel) <- Channel.get(assigns.channel_id),
-         {:ok, message} <- WebChannel.leave(channel, assigns.user_id) do
+         {:ok, _message} <- WebChannel.leave(channel, assigns.user_id) do
       client.toastr! socket, :success, ~g(Successfully left the channel)
     else
       {:error, message} -> client.toastr! socket, :error, message

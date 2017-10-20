@@ -2,10 +2,11 @@ defmodule UccChat.ReactionService do
   use UccChat.Shared, :service
 
   alias UccChat.{Message, MessageService, Reaction}
+  alias UccChatWeb.Client
 
   require Logger
 
-  def select("select", params, %{assigns: assigns} = _socket) do
+  def select("select", params, %{assigns: assigns} = socket) do
     # Logger.warn "ReactionService.select message_id: " <> params["message_id"]
     user = Helpers.get_user assigns.user_id
     emoji = params["reaction"]
@@ -19,7 +20,8 @@ defmodule UccChat.ReactionService do
       reaction ->
         update_reaction reaction, user.id
     end
-    MessageService.broadcast_updated_message message, reaction: true
+    # MessageService.broadcast_updated_message message, reaction: true
+    Client.broadcast_update_message {message, message.body}, socket
     nil
   end
 

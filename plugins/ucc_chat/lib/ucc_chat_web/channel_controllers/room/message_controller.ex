@@ -2,7 +2,7 @@ defmodule UccChatWeb.MessageChannelController do
   use UccChatWeb, :channel_controller
   use UccLogger
 
-  import UccChat.MessageService
+  # import UccChat.MessageService
 
   alias UccChat.{
     Message, MessageService, Attachment,
@@ -191,31 +191,32 @@ defmodule UccChatWeb.MessageChannelController do
       user, %{html: messages_html})}, socket}
   end
 
-  def update(%{assigns: assigns} = socket, params) do
-    user = Helpers.get_user assigns[:user_id], preload: []
-    channel_id = assigns[:channel_id]
-    id = params["id"]
+  def update(%{assigns: _assigns} = _socket, _params) do
+    raise "update is not supported"
+    # user = Helpers.get_user assigns[:user_id], preload: []
+    # channel_id = assigns[:channel_id]
+    # id = params["id"]
 
-    value = params["message"]
-    message = Message.get(id, preload: [:attachments])
-    resp =
-      case message.attachments do
-        [] ->
-          update_message_body(message, value, user)
-        [att|_] ->
-          update_attachment_description(att, message, value, user)
-      end
-      |> case do
-        {:ok, message} ->
-          message = Repo.preload(message, MessageService.preloads())
-          MessageService.broadcast_updated_message message
-          {:ok, %{}}
-        _error ->
-          {:error, %{error: ~g(Problem updating your message)}}
-      end
+    # value = params["message"]
+    # message = Message.get(id, preload: [:attachments])
+    # resp =
+    #   case message.attachments do
+    #     [] ->
+    #       update_message_body(message, value, user)
+    #     [att|_] ->
+    #       update_attachment_description(att, message, value, user)
+    #   end
+    #   |> case do
+    #     {:ok, message} ->
+    #       message = Repo.preload(message, MessageService.preloads())
+    #       MessageService.broadcast_updated_message message
+    #       {:ok, %{}}
+    #     _error ->
+    #       {:error, %{error: ~g(Problem updating your message)}}
+    #   end
 
-    stop_typing(socket, user.id, channel_id)
-    {:reply, resp, socket}
+    # stop_typing(socket, user.id, channel_id)
+    # {:reply, resp, socket}
   end
 
   # new version of this in room_channel/message.ex
@@ -242,33 +243,33 @@ defmodule UccChatWeb.MessageChannelController do
     Phoenix.Channel.push socket, "toastr:error", %{error: error}
   end
 
-  defp update_attachment_description(attachment, message, value, user) do
-    Repo.transaction(fn ->
-      message
-      |> Message.update(%{edited_id: user.id})
-      |> case do
-        {:ok, message} ->
-          attachment
-          |> Attachment.update(%{description: value})
-          |> case do
-            {:ok, _attachment} ->
-              {:ok, message}
-            error ->
-              Repo.rollback(:attachment_error)
-              error
-          end
-        error -> error
-      end
-    end)
-    |> case do
-      {:ok, res} -> res
-      {:error, _} -> {:error, nil}
-    end
-  end
+  # defp update_attachment_description(attachment, message, value, user) do
+  #   Repo.transaction(fn ->
+  #     message
+  #     |> Message.update(%{edited_id: user.id})
+  #     |> case do
+  #       {:ok, message} ->
+  #         attachment
+  #         |> Attachment.update(%{description: value})
+  #         |> case do
+  #           {:ok, _attachment} ->
+  #             {:ok, message}
+  #           error ->
+  #             Repo.rollback(:attachment_error)
+  #             error
+  #         end
+  #       error -> error
+  #     end
+  #   end)
+  #   |> case do
+  #     {:ok, res} -> res
+  #     {:error, _} -> {:error, nil}
+  #   end
+  # end
 
-  defp update_message_body(message, value, user) do
-    Message.update(message, %{body: value, edited_id: user.id})
-  end
+  # defp update_message_body(message, value, user) do
+  #   Message.update(message, %{body: value, edited_id: user.id})
+  # end
 
   def delete_attachment(%{assigns: assigns} = socket, params) do
     user = Helpers.get_user assigns[:user_id], preload: []

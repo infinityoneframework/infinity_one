@@ -1,8 +1,9 @@
 defmodule UccChat.ServiceHelpers do
   # use UccChatWeb, :service
-  alias UccChat.{
-    Channel, MessageService
-  }
+  # alias UccChat.{
+  #   Channel, MessageService
+  #)}
+  alias UccChat.Channel
 
   require UccChatWeb.SharedView
   use UcxUccWeb.Gettext
@@ -129,25 +130,26 @@ defmodule UccChat.ServiceHelpers do
   def month(11), do: ~g"November"
   def month(12), do: ~g"December"
 
-  def response_message(channel_id, body) do
-    # body = UccChatWeb.MessageView.render("message_response_body.html", message: message)
-    # |> Phoenix.HTML.safe_to_string
+  def response_message(_channel_id, _body) do
+    raise "response_message is not supported"
+    # # body = UccChatWeb.MessageView.render("message_response_body.html", message: message)
+    # # |> Phoenix.HTML.safe_to_string
 
-    bot_id = get_bot_id()
-    message = MessageService.create_message(body, bot_id, channel_id,
-      %{
-        type: "p",
-        system: true,
-        sequential: false,
-      })
+    # bot_id = get_bot_id()
+    # message = MessageService.create_message(body, bot_id, channel_id,
+    #   %{
+    #     type: "p",
+    #     system: true,
+    #     sequential: false,
+    #   })
 
-    html = MessageService.render_message(message)
-    # message =
-    #   message
-    #   |> Enum.filter(&elem(&1, 0) == :text)
-    #   |> Enum.join("")
+    # html = MessageService.render_message(message)
+    # # message =
+    # #   message
+    # #   |> Enum.filter(&elem(&1, 0) == :text)
+    # #   |> Enum.join("")
 
-    %{html: html, message: message.body}
+    # %{html: html, message: message.body}
   end
   def get_bot_id do
     UcxUcc.Accounts.get_bot_id()
@@ -218,11 +220,12 @@ defmodule UccChat.ServiceHelpers do
     broadcast_message(body, channel.name, user_id, channel_id)
   end
 
-  def broadcast_message(body, room, user_id, channel_id, opts \\ []) do
-    UccChat.TypingAgent.stop_typing(channel_id, user_id)
-    MessageService.update_typing(channel_id, room)
-    {message, html} = MessageService.create_and_render(body, user_id, channel_id, opts)
-    MessageService.broadcast_message(message.id, room, user_id, html)
+  def broadcast_message(_body, _room, _user_id, _channel_id, _opts \\ []) do
+    raise "broadcast_message is not supported"
+    # UccChat.TypingAgent.stop_typing(channel_id, user_id)
+    # MessageService.update_typing(channel_id, room)
+    # {message, html} = MessageService.create_and_render(body, user_id, channel_id, opts)
+    # MessageService.broadcast_message(message.id, room, user_id, html)
   end
 
   def show_sweet_dialog(socket, opts) do

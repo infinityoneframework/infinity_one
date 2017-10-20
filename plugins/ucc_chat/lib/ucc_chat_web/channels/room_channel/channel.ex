@@ -3,9 +3,8 @@ defmodule UccChatWeb.RoomChannel.Channel do
   use UccChatWeb.Channel.Utils
 
   import UcxUccWeb.Gettext
-  import UcxUccWeb.Utils
 
-  alias UccChat.{Subscription, Settings, MessageService, Mute}
+  alias UccChat.{Subscription, Settings, Mute}
   alias UcxUcc.{Accounts, UccPubSub, Permissions}
   alias UccChatWeb.UserChannel
   alias UccChatWeb.RoomChannel.Message, as: WebMessage

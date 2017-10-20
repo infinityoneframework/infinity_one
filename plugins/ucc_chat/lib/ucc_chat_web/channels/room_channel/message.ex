@@ -429,13 +429,13 @@ defmodule UccChatWeb.RoomChannel.Message do
       })
   end
 
-  def create_private_message(channel_id, body) do
-    bot_id = Helpers.get_bot_id()
-    create_message(body, bot_id, channel_id,
-      %{
-        type: "p",
-        system: true,
-        sequential: false,
-      })
-  end
+  # def create_private_message(channel_id, body) do
+  #   bot_id = Helpers.get_bot_id()
+  #   create_message(body, bot_id, channel_id,
+  #     %{
+  #       type: "p",
+  #       system: true,
+  #       sequential: false,
+  #     })
+  # end
 end

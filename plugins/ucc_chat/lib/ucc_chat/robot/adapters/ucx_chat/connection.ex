@@ -28,8 +28,8 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
     {:noreply, state}
   end
 
-  def handle_info({:reply, %{text: text, room: room, user: %{id: user_id, name: _name}}}, %{} = state) do
-    body = if Regex.match? ~r/^http.+?(jpg|jpeg|png|gif)$/, text do
+  def handle_info({:reply, %{text: text, room: _room, user: %{id: _user_id, name: _name}}}, %{} = state) do
+    _body = if Regex.match? ~r/^http.+?(jpg|jpeg|png|gif)$/, text do
       # body = String.replace(text, ~r/^https?:\/\//, "")
       ~s(<img src="#{text}" class="bot-img">)
     else
@@ -38,7 +38,10 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
     # this is where we send a message to the users.
     # need to figure out if this is a private message, or a channel message
     # Logger.error "reply text: #{inspect text} "
-    UccChat.MessageService.broadcast_bot_message room, user_id, body
+    # TODO: This needs to be changed. Need to do a broadcast to the room channel
+    #       so that the socket can be picked up so to the broadcast with
+    #       rebel
+    # UccChat.MessageService.broadcast_bot_message room, user_id, body
     {:noreply, state}
   end
 

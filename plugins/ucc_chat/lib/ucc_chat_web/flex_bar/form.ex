@@ -28,7 +28,7 @@ defmodule UccChatWeb.FlexBar.Form do
 
   # TODO: this it not implemented and should be removed later if we don't
   #       need it
-  def flex_form_change(socket, sender) do
+  def flex_form_change(socket, _sender) do
     # Logger.debug "sender: " <> inspect(sender)
     socket
   end
