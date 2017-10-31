@@ -29,7 +29,7 @@ $(document).ready(() => {
       if (chat_settings.allow_upload) {
         let e = event.originalEvent || event
         let files = e.dataTransfer.files || []
-        fileUpload.handleFileUpload(files, obj)
+        UccChat.fileUpload.handleFileUpload(files, obj)
       }
     })
   }

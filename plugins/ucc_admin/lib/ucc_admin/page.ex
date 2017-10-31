@@ -41,15 +41,18 @@ defmodule UccAdmin.Page do
       end
 
       def get_user!(%{assigns: %{user_id: user_id}}) do
-        UcxUcc.Accounts.get_user! user_id, preload: [:account, :roles]
+        UcxUcc.Accounts.get_user! user_id, preload: [:account, :roles, user_roles: :role]
       end
 
       def has_permission?(user, permission, scope \\ nil) do
         UcxUcc.Permissions.has_permission?(user, permission, scope)
       end
 
-      def has_role?(user, role, scope \\ nil),
-        do: UcxUcc.Accounts.User.has_role?(user, role, scope)
+      def has_role?(user, role),
+        do: UcxUcc.Accounts.has_role?(user, role)
+
+      def has_role?(user, role, scope),
+        do: UcxUcc.Accounts.has_role?(user, role, scope)
 
       defoverridable [
         get_user!: 1,
@@ -57,7 +60,8 @@ defmodule UccAdmin.Page do
         args: 4,
         render_to_string: 1,
         has_permission?: 3,
-        has_role?: 3
+        has_role?: 3,
+        has_role?: 2
       ]
     end
   end
