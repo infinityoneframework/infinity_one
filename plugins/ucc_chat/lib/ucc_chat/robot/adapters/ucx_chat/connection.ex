@@ -38,7 +38,7 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
     # this is where we send a message to the users.
     # need to figure out if this is a private message, or a channel message
     # Logger.error "reply text: #{inspect text} "
-    UccChat.MessageService.broadcast_bot_message room, user_id, body
+    UccChatWeb.RoomChannel.broadcast_bot_message room, user_id, body
     {:noreply, state}
   end
 

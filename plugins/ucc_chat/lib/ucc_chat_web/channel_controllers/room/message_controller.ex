@@ -192,6 +192,7 @@ defmodule UccChatWeb.MessageChannelController do
   end
 
   def update(%{assigns: assigns} = socket, params) do
+    raise "update not supported"
     user = Helpers.get_user assigns[:user_id], preload: []
     channel_id = assigns[:channel_id]
     id = params["id"]
@@ -207,8 +208,8 @@ defmodule UccChatWeb.MessageChannelController do
       end
       |> case do
         {:ok, message} ->
-          message = Repo.preload(message, MessageService.preloads())
-          MessageService.broadcast_updated_message message
+          _message = Repo.preload(message, MessageService.preloads())
+          # MessageService.broadcast_updated_message message
           {:ok, %{}}
         _error ->
           {:error, %{error: ~g(Problem updating your message)}}

@@ -22,7 +22,9 @@ defmodule UcxUcc.Accounts.User do
     field :uri, :string
     field :active, :boolean
 
-    many_to_many :roles, UcxUcc.Accounts.Role, join_through: UcxUcc.Accounts.UserRole
+    has_many :user_roles, UcxUcc.Accounts.UserRole
+    has_many :roles, through: [:user_roles, :role]
+    # many_to_many :roles, UcxUcc.Accounts.Role, join_through: UcxUcc.Accounts.UserRole
     has_one :account, UcxUcc.Accounts.Account
 
     coherence_schema()
@@ -75,21 +77,26 @@ defmodule UcxUcc.Accounts.User do
   end
 
   def tags(user, channel_id) do
-    user.roles
+    user.user_roles
     |> Enum.reduce([], fn
-      %{role: role, scope: ^channel_id}, acc -> [role | acc]
-      %{role: "user"}, acc -> acc
-      %{role: role}, acc when role in ~w(bot guest admin) -> [role | acc]
+      %{role: %{name: role}, scope: ^channel_id}, acc -> [role | acc]
+      %{role: %{name: "user"}}, acc -> acc
+      %{role: %{name: role}}, acc when role in ~w(bot guest admin) -> [role | acc]
       _, acc -> acc
     end)
     |> Enum.map(&String.capitalize/1)
     |> Enum.sort
   end
+  # def tags(user, channel_id) do
+  #   user.roles
+  #   |> Enum.reduce([], fn
+  #     %{role: role, scope: ^channel_id}, acc -> [role | acc]
+  #     %{role: "user"}, acc -> acc
+  #     %{role: role}, acc when role in ~w(bot guest admin) -> [role | acc]
+  #     _, acc -> acc
+  #   end)
+  #   |> Enum.map(&String.capitalize/1)
+  #   |> Enum.sort
+  # end
 
-  def has_role?(user, role, scope  \\ "global") do
-    Enum.any?(user.roles, fn
-      %{name: ^role, scope: ^scope} -> true
-      _ -> false
-    end)
-  end
 end

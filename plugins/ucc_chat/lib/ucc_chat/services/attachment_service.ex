@@ -1,7 +1,9 @@
 defmodule UccChat.AttachmentService do
   use UccChat.Shared, :service
 
-  alias UccChat.{Attachment, Message, MessageService, Channel}
+  # alias UccChat.{Attachment, Message, MessageService, Channel}
+  alias UccChat.{Attachment, Message}
+  alias UccChatWeb.RoomChannel
   alias Ecto.Multi
 
   require Logger
@@ -16,7 +18,7 @@ defmodule UccChat.AttachmentService do
 
     case Repo.transaction(multi) do
       {:ok, %{message: message}} = ok ->
-        broadcast_message(message)
+        RoomChannel.broadcast_message(message)
         ok
       error ->
         error
@@ -44,14 +46,14 @@ defmodule UccChat.AttachmentService do
     end
   end
 
-  defp broadcast_message(message) do
-    channel = Channel.get message.channel_id
-    html =
-      message
-      |> Repo.preload(MessageService.preloads())
-      |> MessageService.render_message
-    MessageService.broadcast_message(message.id, channel.name, message.user_id, html)
-  end
+  # defp broadcast_message(message) do
+  #   channel = Channel.get message.channel_id
+  #   html =
+  #     message
+  #     |> Repo.preload(MessageService.preloads())
+  #     |> MessageService.render_message
+  #   MessageService.broadcast_message(message.id, channel.name, message.user_id, html)
+  # end
 
   def count(message_id) do
     Attachment.count message_id

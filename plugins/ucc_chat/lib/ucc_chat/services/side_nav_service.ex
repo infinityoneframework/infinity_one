@@ -25,7 +25,7 @@ defmodule UccChat.SideNavService do
 
   def render_more_users(user_id) do
     user = Helpers.get_user! user_id
-    preload = UcxUcc.Hooks.user_preload [:roles]
+    preload = UcxUcc.Hooks.user_preload [:roles, user_roles: :role]
     users =
       Repo.all(from u in User,
         left_join: d in DirectSchema, on: u.id == d.user_id and

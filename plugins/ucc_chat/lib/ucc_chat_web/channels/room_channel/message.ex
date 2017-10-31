@@ -290,7 +290,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   def delete(%{assigns: assigns} = socket, message_id, client \\ Client) do
-    user = Accounts.get_user assigns.user_id, preload: [:account, :roles]
+    user = Accounts.get_user assigns.user_id, preload: [:account, :roles, user_roles: :role]
     if user.id == message_id ||
       Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
       message = Message.get message_id, preload: [:attachments]
@@ -429,13 +429,13 @@ defmodule UccChatWeb.RoomChannel.Message do
       })
   end
 
-  def create_private_message(channel_id, body) do
-    bot_id = Helpers.get_bot_id()
-    create_message(body, bot_id, channel_id,
-      %{
-        type: "p",
-        system: true,
-        sequential: false,
-      })
-  end
+  # def create_private_message(channel_id, body) do
+  #   bot_id = Helpers.get_bot_id()
+  #   create_message(body, bot_id, channel_id,
+  #     %{
+  #       type: "p",
+  #       system: true,
+  #       sequential: false,
+  #     })
+  # end
 end

@@ -1078,47 +1078,12 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  def mute_user(socket, %{} = sender) do
-    mute_user socket, sender["dataset"]["id"]
-  end
-
-  def mute_user(socket, user_id) do
-    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
-    user = Accounts.get_user user_id
-    channel_id = socket.assigns.channel_id
-    case WebChannel.mute_user channel_id, user, current_user do
-      {:ok, _message} ->
-        socket
-        |> update_mute_unmute_button(channel_id, user, current_user)
-        |> Client.toastr!(:success, ~g(User muted))
-      {:error, message} ->
-        Client.toastr! socket, :error, message
-    end
-  end
-
-  def unmute_user(socket, %{} = sender) do
-    unmute_user socket, sender["dataset"]["id"], socket.assigns.channel_id
-  end
-
-  def unmute_user(socket, user_id, channel_id) do
-    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
-    user = Accounts.get_user user_id
-    case WebChannel.unmute_user socket.assigns.channel_id, user, current_user do
-      {:ok, _message} ->
-        socket
-        |> update_mute_unmute_button(channel_id, user, current_user)
-        |> Client.toastr!(:success, ~g(User unmuted))
-      {:error, message} ->
-        Client.toastr! socket, :error, message
-    end
-  end
-
   def remove_user(socket, %{} = sender) do
     remove_user socket, sender["dataset"]["id"]
   end
 
   def remove_user(socket, user_id) do
-    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     user = Accounts.get_user user_id
     channel = Channel.get socket.assigns.channel_id
     case WebChannel.remove_user channel, user.id, current_user do
@@ -1137,20 +1102,6 @@ defmodule UccChatWeb.UserChannel do
       {:error, message} ->
         Client.toastr! socket, :error, message
     end
-  end
-
-  defp update_mute_unmute_button(socket, channel_id, user, current_user) do
-    # Logger.warn "assigns: #{inspect socket.assigns}"
-    html =
-      Phoenix.View.render_to_string UccChatWeb.FlexBarView,
-        "user_card_mute_button.html", [
-          channel_id: channel_id,
-          user: user,
-          current_user: current_user
-        ]
-    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
-      "update:mute_unmute", %{username: user.username, html: html}
-    socket
   end
 
   def mousedown(socket, sender) do

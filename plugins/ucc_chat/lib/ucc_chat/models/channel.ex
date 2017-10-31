@@ -219,7 +219,7 @@ defmodule UccChat.Channel do
   end
 
   defp get_user!(user_id) do
-    Accounts.get_user! user_id, preload: [:roles]
+    Accounts.get_user! user_id, preload: [:roles, user_roles: :role]
   end
 
 end

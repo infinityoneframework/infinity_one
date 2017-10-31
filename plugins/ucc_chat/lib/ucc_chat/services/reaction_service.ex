@@ -19,7 +19,7 @@ defmodule UccChat.ReactionService do
       reaction ->
         update_reaction reaction, user.id
     end
-    MessageService.broadcast_updated_message message, reaction: true
+    UccChatWeb.RoomChannel.broadcast_updated_message message, reaction: true
     nil
   end
 

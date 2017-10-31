@@ -1,0 +1,7 @@
+= if has_permission? @current_user, "set-moderator", @channel_id do
+  = if has_role? @user, "moderator", @channel_id do
+    button.button.button-block.danger.set-remove-moderator(rebel-click='flex_call' data-id='members-list' data-fun='unset_moderator')
+      span= ~g"Remove as moderator"
+  - else
+    button.button.button-block.tertiary.set-remove-moderator(rebel-click='flex_call' data-id='members-list' data-fun='set_moderator')
+      span= ~g"Set as moderator"

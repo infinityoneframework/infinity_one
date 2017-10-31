@@ -34,6 +34,6 @@ defmodule UccConsole do
   Get a user by username.
   """
   def user(username) do
-    Accounts.get_by_user username: username, preload: [:account, :roles]
+    Accounts.get_by_user username: username, preload: [:account, :roles, user_roles: :role]
   end
 end

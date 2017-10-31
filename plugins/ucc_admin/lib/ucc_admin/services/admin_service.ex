@@ -157,7 +157,7 @@ defmodule UccAdmin.AdminService do
     debug ev, params
     assigns = socket.assigns
     current_user = Helpers.get_user!(assigns.user_id)
-    user = Helpers.get_user_by_name(name, preload: [:roles, :account])
+    user = Helpers.get_user_by_name(name, preload: [:roles, :account, user_roles: :role])
     user = struct(user, status: UccChat.PresenceAgent.get(user.id))
     html =
       "user_card.html"

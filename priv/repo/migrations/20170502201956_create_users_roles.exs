@@ -15,6 +15,7 @@ defmodule UcxUcc.Repo.Migrations.CreateUsersRoles do
     create index(:users_roles, [:user_id])
     create index(:users_roles, [:role_id])
     create index(:users_roles, [:scope])
+    create unique_index(:users_roles, [:user_id, :role_id, :scope])
 
   end
 end

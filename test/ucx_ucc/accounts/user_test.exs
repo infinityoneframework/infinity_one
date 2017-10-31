@@ -20,7 +20,7 @@ defmodule UcxUcc.UserTest do
     refute User.has_role?(user, "admin")
     admin_role = Accounts.get_role_by_name "admin"
     Accounts.add_role_to_user user, admin_role
-    admin = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles]
+    admin = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles, user_roles: :role]
     assert User.has_role?(admin, "user")
     assert User.has_role?(admin, "admin")
   end

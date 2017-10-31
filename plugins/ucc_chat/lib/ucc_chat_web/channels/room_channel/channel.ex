@@ -3,9 +3,8 @@ defmodule UccChatWeb.RoomChannel.Channel do
   use UccChatWeb.Channel.Utils
 
   import UcxUccWeb.Gettext
-  import UcxUccWeb.Utils
 
-  alias UccChat.{Subscription, Settings, MessageService, Mute}
+  alias UccChat.{Subscription, Settings, Mute}
   alias UcxUcc.{Accounts, UccPubSub, Permissions}
   alias UccChatWeb.UserChannel
   alias UccChatWeb.RoomChannel.Message, as: WebMessage
@@ -44,7 +43,7 @@ defmodule UccChatWeb.RoomChannel.Channel do
   end
 
   def remove_user(%{id: channel_id} = channel, user_id, %{} = current_user) do
-    current_user = Accounts.preload_schema current_user, [:roles]
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
     if Permissions.has_permission? current_user, "remove-user", channel_id do
       case delete_subscription channel, user_id do
         {:ok, message} ->
@@ -64,7 +63,7 @@ defmodule UccChatWeb.RoomChannel.Channel do
   end
 
   def mute_user(channel_id, %{} = user, %{} = current_user) do
-    current_user = Accounts.preload_schema current_user, [:roles]
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
     if Permissions.has_permission? current_user, "mute-user", channel_id do
       case Mute.create(%{user_id: user.id, channel_id: channel_id}) do
         {:error, _cs} ->
@@ -80,18 +79,76 @@ defmodule UccChatWeb.RoomChannel.Channel do
   end
 
   def unmute_user(channel_id, %{} = user, %{} = current_user) do
-    current_user = Accounts.preload_schema current_user, [:roles]
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
     if Permissions.has_permission? current_user, "mute-user", channel_id do
       case Mute.get_by user_id: user.id, channel_id: channel_id do
         nil ->
           {:error, ~g"User" <> " `@" <> user.username <> "` " <>
             ~g"is not muted."}
         mute ->
-          Logger.warn "mute: #{inspect mute}"
           Mute.delete! mute
-          Logger.warn "after delete"
           notify_user_unmuted channel_id, user, current_user
           {:ok, ~g"unmuted"}
+      end
+    else
+      {:error, permission_error()}
+    end
+  end
+
+  def set_owner(channel_id, %{} = user, %{} = current_user) do
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
+    if Permissions.has_permission? current_user, "set-owner", channel_id do
+      case Accounts.set_users_role user, "owner", channel_id do
+        %{} = user ->
+          {:ok, user}
+        error ->
+          Logger.warn "set_owner error: #{inspect error}"
+          {:error, ~g(Problem setting owner)}
+      end
+    else
+      {:error, permission_error()}
+    end
+  end
+
+  def unset_owner(channel_id, %{} = user, %{} = current_user) do
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
+    if Permissions.has_permission? current_user, "set-owner", channel_id do
+      case Accounts.delete_users_role user, "owner", channel_id do
+        :ok ->
+          {:ok, nil}
+        error ->
+          Logger.warn "set_owner error: #{inspect error}"
+          {:error, ~g(Problem removing owner)}
+      end
+    else
+      {:error, permission_error()}
+    end
+  end
+
+  def set_moderator(channel_id, %{} = user, %{} = current_user) do
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
+    if Permissions.has_permission? current_user, "set-moderator", channel_id do
+      case Accounts.set_users_role user, "moderator", channel_id do
+        %{} = user ->
+          {:ok, user}
+        error ->
+          Logger.warn "set_moderator error: #{inspect error}"
+          {:error, ~g(Problem setting moderator)}
+      end
+    else
+      {:error, permission_error()}
+    end
+  end
+
+  def unset_moderator(channel_id, %{} = user, %{} = current_user) do
+    current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
+    if Permissions.has_permission? current_user, "set-moderator", channel_id do
+      case Accounts.delete_users_role user, "moderator", channel_id do
+        :ok ->
+          {:ok, nil}
+        error ->
+          Logger.warn "set_moderator error: #{inspect error}"
+          {:error, ~g(Problem removing moderator)}
       end
     else
       {:error, permission_error()}

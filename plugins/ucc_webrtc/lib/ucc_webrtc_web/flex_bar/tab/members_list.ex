@@ -77,7 +77,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   end
 
   def flex_video_open(socket, sender) do
-    Logger.debug "flex_video_open, assigns: #{inspect socket.assigns}"
+    Logger.info "flex_video_open, assigns: #{inspect socket.assigns}"
     channel_id = Rebel.get_assigns(socket, :channel_id)
     user_id = sender["dataset"]["user_id"]
 

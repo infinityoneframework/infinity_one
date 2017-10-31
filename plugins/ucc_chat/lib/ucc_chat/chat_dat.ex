@@ -14,7 +14,7 @@ defmodule UccChat.ChatDat do
   def new(%User{roles: %Ecto.Association.NotLoaded{}} = user,
     %ChannelSchema{} = channel, messages) do
     user
-    |> Repo.preload([:roles])
+    |> Repo.preload([:roles, user_roles: :role])
     |> new(channel, messages)
   end
   def new(%User{} = user, %ChannelSchema{} = channel, messages) do

@@ -10,17 +10,21 @@ defmodule UccChat.ChannelService do
 
   alias UccChat.Schema.Channel, as: ChannelSchema
 
+  # alias UccChat.{
+  #   Channel, Subscription, MessageService, UserService,
+  #   ChatDat, Direct, Mute, SideNavService, Message, Settings
+  # }
   alias UccChat.{
-    Channel, Subscription, MessageService, UserService,
-    ChatDat, Direct, Mute, SideNavService, Message, Settings
+    Channel, Subscription, UserService,
+    ChatDat, Direct, Mute, SideNavService, Message
   }
-  alias UccChatWeb.UserChannel
+  # alias UccChatWeb.UserChannel
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.{User, UserRole}
   alias UcxUcc.Permissions
   alias UccChat.ServiceHelpers, as: Helpers
   alias Ecto.Multi
-  alias UcxUcc.{UccPubSub, Hooks, Accounts}
+  alias UcxUcc.{Hooks, Accounts}
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
   alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
@@ -182,7 +186,7 @@ defmodule UccChat.ChannelService do
 
   def insert_channel!(%{user_id: user_id} = params) do
     user_id
-    |> Helpers.get_user!(preload: [:roles])
+    |> Helpers.get_user!(preload: [:roles, user_roles: :role])
     |> insert_channel!(params)
   end
 
@@ -194,7 +198,7 @@ defmodule UccChat.ChannelService do
   end
 
   def insert_channel(%{user_id: user_id} = params) do
-    user = Helpers.get_user!(user_id, preload: [:roles])
+    user = Helpers.get_user!(user_id, preload: [:roles, user_roles: :role])
     insert_channel(user, params)
   end
 
@@ -1000,10 +1004,11 @@ defmodule UccChat.ChannelService do
   end
   # def notify_action(socket, action, resource, owner_id, channel_id)
 
-  def notify_user_action2(socket, user, user_id, channel_id, fun) do
+  def notify_user_action2(socket, user, user_id, _channel_id, fun) do
     owner = Helpers.get_user user_id, preload: []
-    body = fun.(user.username, owner.username)
+    _body = fun.(user.username, owner.username)
     # broadcast_message2(socket, body, user_id, channel_id, system: true)
+    socket
   end
 
   def block_user(%{id: _id}, _user_id, channel_id) do
@@ -1116,21 +1121,22 @@ defmodule UccChat.ChannelService do
     |> remove_role
   end
 
-  def remove_user(%{id: id}, _user_id, channel_id) do
-    channel = Channel.get channel_id
-    owners = Repo.all(from r in UserRole, where: r.user_id != ^id and
-      r.role == "owner" and  r.scope == ^channel_id)
-    if length(owners) > 0 do
-      case WebChannel.remove_user(channel, id) do
-        nil ->
-          {:error, ~g"User is not a member of this room."}
-        _ ->
-          {:ok, ""}
-      end
-    else
-      {:error, ~g"You are the last owner. Please set a new owner before " <>
-        "leaving this room."}
-    end
+  def remove_user(%{id: _id}, _user_id, _channel_id) do
+    raise "not implemented"
+    # channel = Channel.get channel_id
+    # owners = Repo.all(from r in UserRole, where: r.user_id != ^id and
+    #   r.role == "owner" and  r.scope == ^channel_id)
+    # if length(owners) > 0 do
+    #   case WebChannel.remove_user(channel, id) do
+    #     nil ->
+    #       {:error, ~g"User is not a member of this room."}
+    #     _ ->
+    #       {:ok, ""}
+    #   end
+    # else
+    #   {:error, ~g"You are the last owner. Please set a new owner before " <>
+    #     "leaving this room."}
+    # end
   end
 
   def invite_user(user, channel_id, current_user_id \\ [], opts \\ [])
@@ -1146,10 +1152,11 @@ defmodule UccChat.ChannelService do
     |> WebChannel.add_user(user_id)
   end
 
-  def kick_user(channel_id, user, _socket) do
-    channel_id
-    |> Channel.get!
-    |> WebChannel.remove_user(user.id)
+  def kick_user(_channel_id, _user, _socket) do
+    raise "not implemented"
+    # channel_id
+    # |> Channel.get!
+    # |> WebChannel.remove_user(user.id)
   end
 
   def remove_role(nil) do
@@ -1221,25 +1228,28 @@ defmodule UccChat.ChannelService do
     get_icon channel.type
   end
 
-  def notity_user_join(channel_id, user) do
-    unless Settings.hide_user_join do
-      MessageService.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has joined the channel.)
-    end
+  def notity_user_join(_channel_id, _user) do
+    raise "not implemented"
+    # unless Settings.hide_user_join do
+    #   MessageService.broadcast_system_message channel_id, user.id,
+    #     user.username <> ~g( has joined the channel.)
+    # end
   end
 
-  def notify_user_removed(channel_id, user) do
-    unless Settings.hide_user_removed do
-      MessageService.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has been removed from the channel.)
-    end
+  def notify_user_removed(_channel_id, _user) do
+    raise "not implemented"
+    # unless Settings.hide_user_removed do
+    #   MessageService.broadcast_system_message channel_id, user.id,
+    #     user.username <> ~g( has been removed from the channel.)
+    # end
   end
 
-  def notity_user_leave(channel_id, user) do
-    unless UccSettings.hide_user_leave() do
-      MessageService.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has left the channel.)
-    end
+  def notity_user_leave(_channel_id, _user) do
+    raise "not implemented"
+    # unless UccSettings.hide_user_leave() do
+    #   MessageService.broadcast_system_message channel_id, user.id,
+    #     user.username <> ~g( has left the channel.)
+    # end
   end
   # def get_route(@stared_room, name), do: "/direct/" <> name
   # def get_route(@direct_message, name), do: "/direct/" <> name

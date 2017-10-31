@@ -7,7 +7,10 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   alias TabBar.Ftab
   alias TabBar.Tab
   alias UccWebrtcWeb.FlexBar.Tab.MembersList, as: WebrtcMembersList
+  alias UccChatWeb.RoomChannel.Channel, as: WebChannel
+  alias UccChatWeb.RebelChannel.Client
 
+  require UccChat.ChatConstants, as: CC
   require Logger
 
   def add_buttons do
@@ -24,14 +27,14 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
   def args(socket, {user_id, channel_id, _, _}, opts) do
     current_user = Helpers.get_user!(user_id)
-    channel = Channel.get!(channel_id, preload: [users: :roles])
+    channel = Channel.get!(channel_id, preload: [users: [:roles, user_roles: :role]])
 
     {user, user_mode} =
       case opts["username"] do
         nil ->
           {Helpers.get_user!(user_id), false}
         username ->
-          {Helpers.get_user_by_name(username, preload: [:roles]), true}
+          {Helpers.get_user_by_name(username, preload: [:roles, user_roles: :role]), true}
       end
 
     users =
@@ -50,8 +53,8 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   end
 
   def user_args(socket, user_id, channel_id, username) do
-    channel = Channel.get!(channel_id, preload: [users: :roles])
-    preload = UcxUcc.Hooks.user_preload [:roles]
+    channel = Channel.get!(channel_id, preload: [users: [:roles, user_roles: :role]])
+    preload = UcxUcc.Hooks.user_preload [:roles, user_roles: :role]
     {[
       user: Helpers.get_user_by_name(username, preload: preload),
       user_info: user_info(channel, user_mode: true, view_mode: true),
@@ -145,6 +148,185 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
     update(socket, :class, toggle: "animated-hidden",
       on: ".flex-tab-container .user-view")
+  end
+
+  # def mute_user(socket, %{} = sender) do
+  #   mute_user socket, sender["dataset"]["id"]
+  # end
+
+  # def mute_user(socket, user_id) do
+  #   current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+  #   user = Accounts.get_user user_id
+  #   channel_id = socket.assigns.channel_id
+  #   case WebChannel.mute_user channel_id, user, current_user do
+  #     {:ok, _message} ->
+  #       socket
+  #       |> update_mute_unmute_button(channel_id, user, current_user)
+  #       |> Client.toastr!(:success, ~g(User muted))
+  #     {:error, message} ->
+  #       Client.toastr! socket, :error, message
+  #   end
+  # end
+
+  # def unmute_user(socket, %{} = sender) do
+  #   unmute_user socket, sender["dataset"]["id"], socket.assigns.channel_id
+  # end
+
+  # def unmute_user(socket, user_id, channel_id) do
+  #   current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+  #   user = Accounts.get_user user_id
+  #   case WebChannel.unmute_user socket.assigns.channel_id, user, current_user do
+  #     {:ok, _message} ->
+  #       socket
+  #       |> update_mute_unmute_button(channel_id, user, current_user)
+  #       |> Client.toastr!(:success, ~g(User unmuted))
+  #     {:error, message} ->
+  #       Client.toastr! socket, :error, message
+  #   end
+  # end
+
+  def set_mute(socket, sender) do
+    username = select socket, data: "username", from: ".user-view[data-username]"
+    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    user = UcxUcc.Accounts.get_by_user username: username
+    channel_id = socket.assigns.channel_id
+    current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    case WebChannel.mute_user channel_id, user, current_user do
+      {:ok, _} ->
+        user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
+        update_mute_unmute_button socket, channel_id, user, current_user
+        Client.toastr! socket, :success, ~g"User muted"
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+    socket
+  end
+
+  def unset_mute(socket, sender) do
+    username = select socket, data: "username", from: ".user-view[data-username]"
+    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    user = UcxUcc.Accounts.get_by_user username: username
+    channel_id = socket.assigns.channel_id
+    current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    case WebChannel.unmute_user channel_id, user, current_user do
+      {:ok, _} ->
+        user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
+        update_mute_unmute_button socket, channel_id, user, current_user
+        Client.toastr! socket, :success, ~g(User unmuted)
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+    socket
+  end
+
+  def set_owner(socket, sender) do
+    username = select socket, data: "username", from: ".user-view[data-username]"
+    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    user = UcxUcc.Accounts.get_by_user username: username
+    channel_id = socket.assigns.channel_id
+    current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    case WebChannel.set_owner channel_id, user, current_user do
+      {:ok, _} ->
+        user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
+        update_set_remove_owner_button socket, channel_id, user, current_user
+        Client.toastr! socket, :success, ~g"Set user as owner"
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+    socket
+  end
+
+  def unset_owner(socket, sender) do
+    username = select socket, data: "username", from: ".user-view[data-username]"
+    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    user = UcxUcc.Accounts.get_by_user username: username
+    channel_id = socket.assigns.channel_id
+    current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    case WebChannel.unset_owner channel_id, user, current_user do
+      {:ok, _} ->
+        user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
+        update_set_remove_owner_button socket, channel_id, user, current_user
+        Client.toastr! socket, :success, ~g(Removed user as owner)
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+    socket
+  end
+
+  def set_moderator(socket, sender) do
+    username = select socket, data: "username", from: ".user-view[data-username]"
+    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    user = UcxUcc.Accounts.get_by_user username: username
+    channel_id = socket.assigns.channel_id
+    current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    case WebChannel.set_moderator channel_id, user, current_user do
+      {:ok, _} ->
+        user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
+        update_set_remove_moderator_button socket, channel_id, user, current_user
+        Client.toastr! socket, :success, ~g(Set user as moderator)
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+    socket
+  end
+
+  def unset_moderator(socket, sender) do
+    username = select socket, data: "username", from: ".user-view[data-username]"
+    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    user = UcxUcc.Accounts.get_by_user username: username
+    channel_id = socket.assigns.channel_id
+    current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    case WebChannel.unset_moderator channel_id, user, current_user do
+      {:ok, _} ->
+        user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
+        update_set_remove_moderator_button socket, channel_id, user, current_user
+        Client.toastr! socket, :success, ~g(Set user as moderator)
+      {:error, message} ->
+        Client.toastr! socket, :error, message
+    end
+    socket
+  end
+
+  defp update_set_remove_owner_button(socket, channel_id, user, current_user) do
+    # Logger.warn "assigns: #{inspect socket.assigns}"
+    html =
+      Phoenix.View.render_to_string UccChatWeb.FlexBarView,
+        "user_card_owner_button.html", [
+          channel_id: channel_id,
+          user: user,
+          current_user: current_user
+        ]
+    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
+      "update:flex-button", %{username: user.username, html: html, button: "set-remove-owner"}
+    socket
+  end
+
+  defp update_set_remove_moderator_button(socket, channel_id, user, current_user) do
+    # Logger.warn "assigns: #{inspect socket.assigns}"
+    html =
+      Phoenix.View.render_to_string UccChatWeb.FlexBarView,
+        "user_card_moderator_button.html", [
+          channel_id: channel_id,
+          user: user,
+          current_user: current_user
+        ]
+    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
+      "update:flex-button", %{username: user.username, html: html, button: "set-remove-moderator"}
+    socket
+  end
+
+  defp update_mute_unmute_button(socket, channel_id, user, current_user) do
+    # Logger.warn "assigns: #{inspect socket.assigns}"
+    html =
+      Phoenix.View.render_to_string UccChatWeb.FlexBarView,
+        "user_card_mute_button.html", [
+          channel_id: channel_id,
+          user: user,
+          current_user: current_user
+        ]
+    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
+      "update:flex-button", %{username: user.username, html: html, button: "mute-unmute"}
+    socket
   end
 
 end
