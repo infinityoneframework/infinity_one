@@ -187,14 +187,26 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   def run_command("mute", args, _sender, socket, client) do
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     if user = get_user args, socket, client do
-      UserChannel.mute_user socket, user.id
+      case WebChannel.mute_user(socket.assigns.channel_id, user, current_user) do
+        {:ok, _} ->
+          client.toastr! socket, :success, "User muted successfully"
+        {:error, message} ->
+          client.toastr! socket, :error, message
+      end
     end
   end
 
   def run_command("unmute", args, _sender, socket, client) do
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     if user = get_user args, socket, client do
-      UserChannel.unmute_user socket, user.id
+      case WebChannel.unmute_user(socket.assigns.channel_id, user, current_user) do
+        {:ok, _} ->
+          client.toastr! socket, :success, "User unmuted successfully"
+        {:error, message} ->
+          client.toastr! socket, :error, message
+      end
     end
   end
 
