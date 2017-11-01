@@ -38,6 +38,7 @@ defmodule UccChatWeb.RoomChannel do
   alias UcxUcc.{Permissions, Accounts}, warn: false
   alias UcxUccWeb.Endpoint
   alias UccChatWeb.RoomChannel.KeyStore
+  alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
@@ -306,8 +307,8 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_out("broadcast:message:update", %{message: _message}, socket) do
-
+  def handle_out("broadcast:message:update", %{message: message}, socket) do
+    WebMessage.update(message.body, message.channel_id, socket.assigns.user_id, message.id, socket)
     {:noreply, socket}
   end
 

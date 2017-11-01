@@ -69,7 +69,7 @@ defmodule UccChatWeb.RoomChannel.Message do
     channel_id = assigns.channel_id
 
     value = body
-    message = Message.get(message_id, preload: [:attachments])
+    message = Message.get(message_id, preload: @preloads)
     case message.attachments do
       [] ->
         {body, _mentions} = Service.encode_mentions(body, channel_id)
