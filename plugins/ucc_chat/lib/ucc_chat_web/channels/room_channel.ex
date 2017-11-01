@@ -25,7 +25,8 @@ defmodule UccChatWeb.RoomChannel do
     # "update:mute_unmute",
     "update:remove_user",
     # "update:set_remove_owner",
-    "broadcast:message"
+    "broadcast:message",
+    "broadcast:message:update"
   ]
 
   alias UccChat.{
@@ -85,9 +86,13 @@ defmodule UccChatWeb.RoomChannel do
     raise "TBD: Implement this"
   end
 
-  def broadcast_updated_message(_message, _opts) do
+  def broadcast_updated_message(message, _opts) do
+    # IO.inspect message
+    channel = Channel.get message.channel_id
+    Endpoint.broadcast! CC.chan_room <> channel.name, "broadcast:message:update",
+      %{message: message, channel: channel}
     # need to get channel_id from message
-    raise "TBD: Implement this"
+    # raise "TBD: Implement this"
   end
 
   def user_join(nil), do: Logger.warn "join for nil username"
@@ -298,6 +303,11 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_out("broadcast:message", %{message: _message}, socket) do
     Logger.error "TBD: Implement this"
+    {:noreply, socket}
+  end
+
+  def handle_out("broadcast:message:update", %{message: _message}, socket) do
+
     {:noreply, socket}
   end
 

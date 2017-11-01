@@ -79,8 +79,10 @@ defmodule UccChatWeb.RoomChannel.Message do
     end
     |> case do
       {:ok, message} ->
-        message = Repo.preload(message, MessageService.preloads())
-        client.broadcast_update_message({message, message.body}, socket)
+        message
+        |> Repo.preload(MessageService.preloads())
+        |> render_message
+        |> client.broadcast_update_message(socket)
       _error ->
         client.toastr socket, :error,
           ~g(Problem updating your message)

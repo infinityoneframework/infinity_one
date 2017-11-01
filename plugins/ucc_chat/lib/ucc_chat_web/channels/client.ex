@@ -114,9 +114,12 @@ defmodule UccChatWeb.Client do
   end
 
   def update_message_js(html, message) do
+    Logger.warn "html: #{inspect html}"
     encoded = Poison.encode! html |> strip_nl()
+    Logger.warn "message_id: #{message.id}"
+    Logger.warn ".................. #{inspect encoded}"
     """
-    $('#' + '#{message.id}').replaceWith(#{encoded});
+    $('[id="#{message.id}"]').replaceWith(#{encoded});
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
     """ |> strip_nl()
