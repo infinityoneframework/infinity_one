@@ -268,6 +268,11 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  def more_channels(socket, _sender, client \\ Client) do
+    client.more_channels socket, SideNavService.render_more_channels(socket.assigns.user_id)
+    socket
+  end
+
   def push_update_direct_message(msg, socket) do
     Process.send_after self(),
       {:update_direct_message, msg, socket.assigns.user_id}, 250

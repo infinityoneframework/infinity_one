@@ -18,14 +18,14 @@ class SideNav {
   get navMenu() { return this.ucc_chat.navMenu }
   get desktop_notifier() { return this.ucc_chat.desktop_notifier }
 
-  more_channels() {
-    // console.log('cliecked more channels')
-    this.userchan.push('side_nav:more_channels')
-      .receive("ok", resp => {
-         $('.flex-nav section').html(resp.html).parent().removeClass('animated-hidden')
-         $('.arrow').toggleClass('close', 'bottom')
-      })
-  }
+  // more_channels() {
+  //   // console.log('cliecked more channels')
+  //   this.userchan.push('side_nav:more_channels')
+  //     .receive("ok", resp => {
+  //        $('.flex-nav section').html(resp.html).parent().removeClass('animated-hidden')
+  //        $('.arrow').toggleClass('close', 'bottom')
+  //     })
+  // }
   more_users() {
     // console.log('cliecked more channels')
     this.userchan.push('side_nav:more_users')
@@ -202,11 +202,11 @@ class SideNav {
           }
         })
     })
-    .on('click', 'button.more-channels', e =>  {
-      e.preventDefault()
-      this.more_channels()
-      return false
-    })
+    // .on('click', 'button.more-channels', e =>  {
+    //   e.preventDefault()
+    //   this.more_channels()
+    //   return false
+    // })
     .on('click', 'button.more-users', e =>  {
       e.preventDefault()
       this.more_users()
