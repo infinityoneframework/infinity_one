@@ -130,6 +130,7 @@ class RoomHistoryManager {
         this.is_loading = false
         this.has_more = resp.has_more
         this.ucc_chat.main.run(this.ucc_chat)
+        Rebel.set_event_handlers(container);
       })
   }
   get getMoreNext() {
@@ -159,6 +160,7 @@ class RoomHistoryManager {
         this.is_loading = false
         this.has_more_next = resp.has_more_next
         this.ucc_chat.main.run(this.ucc_chat)
+        Rebel.set_event_handlers(container);
       })
   }
 
@@ -244,6 +246,7 @@ class RoomHistoryManager {
         this.has_more = resp.has_more
         this.is_loading = false
         this.ucc_chat.main.run(this.ucc_chat)
+        Rebel.set_event_handlers(container);
       })
   }
 
