@@ -25,6 +25,7 @@ require('./typing');
 require('./ucc_webrtc');
 require('./tone_generator');
 require('./device_manager');
+require('./chat_tooltip');
 
 require('mscs');
 // import configured plugin js
