@@ -38,12 +38,12 @@ class Typing {
   }
   update_typing(typing) {
     if (debug) { console.log('Typing.update_typing', typing) }
-    let ucxchat = this.ucxchat
+    let ucxchat = UccChat.ucxchat;
 
     if (typing.indexOf(ucxchat.username) < 0) {
       this.do_update_typing(false, typing)
     } else {
-      ucc_chat.utils.remove(typing, ucxchat.username)
+      UccUtils.remove(typing, ucxchat.username)
       this.do_update_typing(true, typing)
     }
   }
