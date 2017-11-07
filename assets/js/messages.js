@@ -15,6 +15,7 @@ class Messages {
   }
 
   static new_message(msg) {
+    // TODO: I'm not sure that this code is still used. Check and remove.
     let html = msg.html
     let ucc_chat = window.UccChat
     let ucxchat = ucc_chat.ucxchat

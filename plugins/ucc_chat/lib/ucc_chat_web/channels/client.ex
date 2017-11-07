@@ -101,6 +101,7 @@ defmodule UccChatWeb.Client do
     elem.append(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
+    UccChat.roomManager.updateMentionsMarksOfRoom();
     """
   end
 
@@ -119,6 +120,7 @@ defmodule UccChatWeb.Client do
     $('[id="#{message.id}"]').replaceWith(#{encoded});
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
+    UccChat.roomManager.updateMentionsMarksOfRoom();
     """
   end
 

@@ -264,6 +264,7 @@ class RoomManager {
 
   new_message(id, user_id) {
     if (user_id != ucxchat.user_id) {
+      console.log('new_message...')
       if (!this.focus && !this.unread) {
         this.set_unread(id)
       }
