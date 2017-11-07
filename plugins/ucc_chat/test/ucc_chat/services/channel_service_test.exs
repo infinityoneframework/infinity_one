@@ -24,7 +24,7 @@ defmodule UccChat.ChannelServiceTest do
 
   test "invite_user", %{user: user, channel: channel} do
     user2 = UcxUcc.TestHelpers.insert_user
-    {:ok, result} = Service.invite_user user, channel.id, user2.id, channel: false
+    {:ok, _result} = Service.invite_user user, channel.id, user2.id, channel: false
     [sub] = UccChat.Subscription.list
     assert sub.user_id == user.id
   end

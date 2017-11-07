@@ -7,7 +7,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   # alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
   alias UccChatWeb.Client
-  alias UccChat.TypingAgent
   alias UccChat.MessageService
 
   def message_keydown(socket, sender) do
