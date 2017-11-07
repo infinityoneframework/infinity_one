@@ -94,14 +94,14 @@ defmodule UccChatWeb.Client do
   end
 
   def push_message_js(html, message) do
-    encoded = Poison.encode! html |> strip_nl()
+    encoded = Poison.encode! html
     """
     var node = document.createRange().createContextualFragment(#{encoded});
     var elem = document.querySelector('#{@wrapper_list}');
     elem.append(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
-    """ |> strip_nl()
+    """
   end
 
   def broadcast_message({message, html}, socket) do
@@ -114,12 +114,12 @@ defmodule UccChatWeb.Client do
   end
 
   def update_message_js(html, message) do
-    encoded = Poison.encode! html |> strip_nl()
+    encoded = Poison.encode! html
     """
     $('[id="#{message.id}"]').replaceWith(#{encoded});
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
-    """ |> strip_nl()
+    """
   end
 
   def delete_message!(message_id, socket) do

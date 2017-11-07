@@ -171,6 +171,9 @@ window.UccChat = {
     }
     message.find(`a.mention-link[data-username="${username}"]`)
       .addClass('mention-link-me background-primary-action-color');
+    message.find('pre code').each(function(i, block) {
+        hljs.highlightBlock(block)
+    });
   },
   onload: function() {
     console.log('socket ready ...')
@@ -179,7 +182,7 @@ window.UccChat = {
       if (this.debug) { console.log('message-form submit', e) }
     })
     .on('keydown', '.message-form-text', e => {
-      console.log('keydown', e)
+      // console.log('keydown', e)
     })
     //   let event = new jQuery.Event('user:input')
     //   switch(e.keyCode) {
@@ -198,7 +201,7 @@ window.UccChat = {
     // })
     .on('keypress', '.message-form-text', e => {
       // if (this.debug) { console.log('message-form-text keypress', e) }
-      console.log('keypress', e)
+      // console.log('keypress', e)
     })
     //   if (e.keyCode == 13 && e.shiftKey) {
     //     return true

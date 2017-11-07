@@ -27,7 +27,7 @@ exports.config = {
       joinTo: {
         "css/app.css": [
           /^(css)/,
-          "node_modules/highlight.js/styles/default.css",
+          "node_modules/highlight.js/styles/solarized-dark.css",
           "node_modules/sweetalert/dist/sweetalert.css",
           "../plugins/ucc_admin/priv/static/ucc_admin.scss"
           // "node_modules/emojionearea/dist/emojionearea.min.css",
@@ -96,7 +96,7 @@ exports.config = {
     // whitelist: ["ucc_admin"],
     styles: {
       // toastr: ["toastr.css"],
-      "highlight.js": ['styles/default.css'],
+      "highlight.js": ['styles/solarized-dark.css'],
       sweetalert: ['dist/sweetalert.css']
       // ucc_admin: ['priv/static/ucc_admin.scss']  // this isn't working
       // emojionearea: ['dist/emojionearea.min.css']

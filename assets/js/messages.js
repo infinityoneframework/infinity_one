@@ -3,6 +3,7 @@ import hljs from "highlight.js"
 
 const debug = true;
 
+window.hljs = hljs;
 console.log('loading messages');
 
 window.UccChat.on_load(function(ucc_chat) {
@@ -19,6 +20,9 @@ class Messages {
     let ucxchat = ucc_chat.ucxchat
 
     let at_bottom = ucc_chat.roomManager.at_bottom
+
+    console.log('new message', msg);
+
     if (debug) console.log('new_message', msg)
     $('.messages-box .wrapper > ul').append(html)
 
