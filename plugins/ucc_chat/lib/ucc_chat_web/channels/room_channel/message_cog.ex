@@ -33,7 +33,7 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
   end
 
   def flex_message_cog_click(socket, sender, client \\ Client) do
-    assigns = socket.assigns
+    # assigns = socket.assigns
     message_id = client.closest socket, this(sender), "li.message", :id
 
     html =
