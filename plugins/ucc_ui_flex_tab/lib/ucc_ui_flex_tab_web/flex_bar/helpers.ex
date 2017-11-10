@@ -48,13 +48,14 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
             handle_on_change(socket, sender)
 
             {args, socket} = args socket, {user_id, channel_id, nil, sender}, args
+
             html = Phoenix.View.render_to_string(tab.view, templ, args)
 
             js = [
               "$('section.flex-tab-main').parent().addClass('opened')",
               "$('.tab-button.active').removeClass('active')",
               set_tab_button_active_js(tab.id),
-              add_nane_to_section_js(tab.id)
+              add_name_to_section_js(tab.id)
             ] |> Enum.join(";")
 
             socket
@@ -136,7 +137,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
     socket
   end
 
-  def add_nane_to_section_js(name) do
+  def add_name_to_section_js(name) do
     "$('.flex-tab-container.opened section.flex-tab')[0].dataset['tab'] = '#{name}'"
   end
 
@@ -152,6 +153,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
     socket
     |> select(data: "id", from: ".tab-button.active")
     |> notify_on_change(socket, sender)
+    socket
   end
 end
 
