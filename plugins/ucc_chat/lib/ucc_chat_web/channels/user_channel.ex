@@ -1103,7 +1103,7 @@ defmodule UccChatWeb.UserChannel do
   def phone_call(socket, sender) do
     Logger.warn "click to call... #{inspect sender}"
     username = sender["dataset"]["phoneStatus"]
-    # TODO: Need to us a unique Id here instead of the userkame
+    # TODO: Need to use a unique Id here instead of the userkame
     UccPubSub.broadcast "user:" <> socket.assigns.user_id, "phone:call",
       %{username: username}
     socket
