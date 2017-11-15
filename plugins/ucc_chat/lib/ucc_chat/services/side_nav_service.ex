@@ -1,6 +1,7 @@
 defmodule UccChat.SideNavService do
   use UccChat.Shared, :service
 
+  alias UcxUcc.Accounts
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.{ChatDat, Channel, ChannelService}
   alias UccChat.Schema.Direct, as: DirectSchema
@@ -16,7 +17,9 @@ defmodule UccChat.SideNavService do
   end
 
   def render_more_channels(user_id) do
+    # user = Helpers.get_user! user_id, preload: [:roles, user_roles: :role]
     user = Helpers.get_user! user_id
+
     channels = ChannelService.get_side_nav_rooms user
 
     render_to_string UccChatWeb.SideNavView, "list_combined_flex.html",
@@ -25,7 +28,7 @@ defmodule UccChat.SideNavService do
 
   def render_more_users(user_id) do
     user = Helpers.get_user! user_id
-    preload = UcxUcc.Hooks.user_preload [:roles]
+    preload = UcxUcc.Hooks.user_preload [:roles, user_roles: :role]
     users =
       Repo.all(from u in User,
         left_join: d in DirectSchema, on: u.id == d.user_id and
@@ -37,7 +40,7 @@ defmodule UccChat.SideNavService do
         order_by: [asc: u.username],
         preload: ^preload,
         select: {u, s})
-      |> Enum.reject(fn {user, _} -> User.has_role?(user, "bot") || user.active != true end)
+      |> Enum.reject(fn {user, _} -> Accounts.has_role?(user, "bot") || user.active != true end)
       |> UcxUcc.Hooks.process_user_subscription
       |> Enum.map(fn
         {user, nil} ->

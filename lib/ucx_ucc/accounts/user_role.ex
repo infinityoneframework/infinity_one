@@ -2,7 +2,7 @@ defmodule UcxUcc.Accounts.UserRole do
   use Ecto.Schema
   import Ecto.{Query, Changeset}, warn: false
 
-  @scopes ~w(global rooms)
+  # @scopes ~w(global rooms)
 
   schema "users_roles" do
     field :scope, :binary_id, default: nil  # id of room
@@ -16,6 +16,6 @@ defmodule UcxUcc.Accounts.UserRole do
     struct
     |> cast(params, [:scope, :user_id, :role_id])
     |> validate_required([:user_id, :role_id])
-    |> validate_inclusion(:scope, @scopes)
+    # |> validate_inclusion(:scope, @scopes)
   end
 end

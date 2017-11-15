@@ -1,9 +1,9 @@
 defmodule UccChat.ServiceHelpers do
   # use UccChatWeb, :service
-  # alias UccChat.{
-  #   Channel, MessageService
-  #)}
-  alias UccChat.Channel
+  alias UccChat.{
+    # Channel, MessageService
+    Channel
+  }
 
   require UccChatWeb.SharedView
   use UcxUccWeb.Gettext
@@ -12,7 +12,7 @@ defmodule UccChat.ServiceHelpers do
 
   import Ecto.Query
 
-  @default_user_preload [:account, :roles]
+  @default_user_preload [:account, :roles, user_roles: :role]
 
   def default_user_preloads, do: Hooks.user_preload(@default_user_preload)
 
@@ -131,9 +131,9 @@ defmodule UccChat.ServiceHelpers do
   def month(12), do: ~g"December"
 
   def response_message(_channel_id, _body) do
-    raise "response_message is not supported"
-    # # body = UccChatWeb.MessageView.render("message_response_body.html", message: message)
-    # # |> Phoenix.HTML.safe_to_string
+    raise "response_message not supported"
+    # body = UccChatWeb.MessageView.render("message_response_body.html", message: message)
+    # |> Phoenix.HTML.safe_to_string
 
     # bot_id = get_bot_id()
     # message = MessageService.create_message(body, bot_id, channel_id,
@@ -221,7 +221,7 @@ defmodule UccChat.ServiceHelpers do
   end
 
   def broadcast_message(_body, _room, _user_id, _channel_id, _opts \\ []) do
-    raise "broadcast_message is not supported"
+    raise "broadcast_message not supported"
     # UccChat.TypingAgent.stop_typing(channel_id, user_id)
     # MessageService.update_typing(channel_id, room)
     # {message, html} = MessageService.create_and_render(body, user_id, channel_id, opts)

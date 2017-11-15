@@ -5,7 +5,7 @@
       h2= ~g(Pinned Messages)
     = if @pinned == [] do
       h2= ~g(No pinned messages)
-  .ul.list.clearfix
+  .ul.list.clearfix(rebel-channel="room")
     = for pin <- @pinned do
       li(id="#{pin[:id]}" class="#{get_li_class(pin, :pinned)}" data-username="#{pin[:username]}" data-date="#{pin[:date]}" data-timestamp="#{pin[:timestamp]}")
         button.thumb.user-card-message(data-username="#{pin[:username]}" tabindex="1")
@@ -15,7 +15,7 @@
           = pin[:username]
         span.info.border-component-color.color-info-font-color
           span.time(title="#{pin[:date]}")= pin[:time]
-          .message-cog-container
+          .message-cog-container(class="#{UccChatWeb.MessageView.hide_cog(pin[:message])}" rebel-click="flex_message_cog_click")
             i.icon-cog.message-cog(aria-label="#{~g(Actions)}")
         .body.color-primary-font-color(dir="auto")
           = UccChatWeb.MessageView.format_message_body(pin[:message])

@@ -1,4 +1,4 @@
-require('./chat_tooltip')
+// require('./chat_tooltip')
 console.log('loading reaction');
 
 $(document).ready(() => {

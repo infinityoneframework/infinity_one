@@ -100,9 +100,9 @@ defmodule UccChat.Channel do
   def get_authorized_channels(user_id) do
     user = UccChat.ServiceHelpers.get_user!(user_id)
     cond do
-      User.has_role?(user, "admin") ->
+      Accounts.has_role?(user, "admin") ->
         from c in @schema, where: c.type == 0 or c.type == 1
-      User.has_role?(user, "user") ->
+      Accounts.has_role?(user, "user") ->
         from c in @schema,
           left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
           where: (c.type == 0 or (c.type == 1 and not is_nil(s.id))) and (not s.hidden or c.user_id == ^user_id)
@@ -116,9 +116,9 @@ defmodule UccChat.Channel do
   # and all channels I own
   def get_all_channels(%User{id: user_id} = user) do
     cond do
-      User.has_role?(user, "admin") ->
+      Accounts.has_role?(user, "admin") ->
         from c in @schema, where: c.type == 0 or c.type == 1, preload: [:subscriptions]
-      User.has_role?(user, "user") ->
+      Accounts.has_role?(user, "user") ->
         from c in @schema,
           left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
           where: c.type == 0 or (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
@@ -219,7 +219,7 @@ defmodule UccChat.Channel do
   end
 
   defp get_user!(user_id) do
-    Accounts.get_user! user_id, preload: [:roles]
+    Accounts.get_user! user_id, preload: [:roles, user_roles: :role]
   end
 
 end

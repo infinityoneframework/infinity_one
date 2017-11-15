@@ -24,20 +24,8 @@
       button.button.button-block.danger.block-user
         span=~g"Block User"
   - else
-    = if has_permission? @current_user, "set-owner", @channel_id do
-      = if has_role? @user, "owner", @channel_id do
-        button.button.button-block.danger.unset-owner
-          span= ~g"Remove as owner"
-      - else
-        button.button.button-block.tertiary.set-owner
-          span=~g"Set as owner"
-    = if has_permission? @current_user, "set-moderator", @channel_id do
-      = if has_role? @user, "moderator", @channel_id do
-        button.button.button-block.danger.unset-moderator
-          span= ~g"Remove as moderator"
-      - else
-        button.button.button-block.tertiary.set-moderator
-          span= ~g"Set as moderator"
+    = render "user_card_owner_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
+    = render "user_card_moderator_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
     = render "user_card_mute_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
     = if has_permission?(@current_user, "remove-user", @channel_id) do
       button.button.button-block.danger.remove-user(rebel-click="remove_user" data-id="#{@user.id}")

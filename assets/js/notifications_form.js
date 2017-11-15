@@ -18,7 +18,7 @@ class NotificationsForm {
         UccChat.userchan.push('notifications_form:play')
           .receive("ok", resp => {
             if (resp.sound) {
-              desktop_notifier.notify_audio(resp.sound)
+              notifier.audio(resp.sound)
             }
           })
       })

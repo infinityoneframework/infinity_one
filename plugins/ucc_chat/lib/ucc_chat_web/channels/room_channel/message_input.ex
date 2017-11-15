@@ -7,6 +7,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   # alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
   alias UccChatWeb.Client
+  alias UccChat.MessageService
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]
@@ -21,7 +22,15 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     socket
     |> create_context(sender, key, client)
     |> trace_data
+    |> typing_notification
     |> handle_in(key)
+  end
+
+  def typing_notification(%{sender: sender} = context) do
+    if sender["value"] == "" do
+      MessageService.start_typing context.socket
+    end
+    context
   end
 
   def create_context(socket, sender, key, client \\ Client) do
@@ -39,8 +48,8 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def logit1(cx) do
-    # Logger.info("app: #{inspect cx[:app]}, key: #{inspect cx.key}")
     cx
+    # |> IO.inspect(label: "cx")
   end
 
 

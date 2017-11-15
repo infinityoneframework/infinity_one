@@ -1,0 +1,7 @@
+= if has_permission? @current_user, "set-owner", @channel_id do
+  = if has_role? @user, "owner", @channel_id do
+    button.button.button-block.danger.set-remove-owner(rebel-click='flex_call' data-id='members-list' data-fun='unset_owner')
+      span= ~g"Remove as owner"
+  - else
+    button.button.button-block.tertiary.set-remove-owner(rebel-click='flex_call' data-id='members-list' data-fun='set_owner')
+      span=~g"Set as owner"

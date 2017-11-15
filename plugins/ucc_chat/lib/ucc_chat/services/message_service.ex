@@ -319,6 +319,22 @@ defmodule UccChat.MessageService do
     Enum.map list, &({&1, MessageAgent.get_preview(&1)})
   end
 
+  def start_typing(%{assigns: assigns} = socket) do
+    %{channel_id: channel_id, user_id: user_id, username: username} = assigns
+    start_typing(socket, user_id, channel_id, username)
+  end
+
+  def start_typing(socket, user_id, channel_id, username) do
+    # Logger.warn "#{@module_name} create params: #{inspect params}, socket: #{inspect socket}"
+    TypingAgent.start_typing(channel_id, user_id, username)
+    update_typing(socket, channel_id)
+  end
+
+  def stop_typing(%{assigns: assigns} = socket) do
+    %{channel_id: channel_id, user_id: user_id} = assigns
+    stop_typing socket, user_id, channel_id
+  end
+
   def stop_typing(socket, user_id, channel_id) do
     TypingAgent.stop_typing(channel_id, user_id)
     update_typing(socket, channel_id)

@@ -14,7 +14,7 @@ defmodule UcxUcc.AccountsTest do
       [role] = user.roles
       assert role.name == "user"
       Accounts.add_role_to_user user, admin_role
-      user = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles]
+      user = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles, user_roles: :role]
       names = Enum.map user.roles, &(&1.name)
       assert "user" in names
       assert "admin" in names
@@ -25,7 +25,7 @@ defmodule UcxUcc.AccountsTest do
       insert_role "admin", %{scope: "global"}
       user = insert_user()
       Accounts.add_role_to_user user, "admin"
-      user = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles]
+      user = Repo.one from u in User, where: u.id == ^(user.id), preload: [:roles, user_roles: :role]
       names = Enum.map user.roles, &(&1.name)
       assert "user" in names
       assert "admin" in names
@@ -95,6 +95,45 @@ defmodule UcxUcc.AccountsTest do
     test "change_role/1 returns a role changeset" do
       role = role_fixture()
       assert %Ecto.Changeset{} = Accounts.change_role(role)
+    end
+
+    test "set_users_role" do
+      _admin_role = insert_role "admin", %{scope: "global"}
+      _owner_role = insert_role "owner", %{scope: "rooms"}
+      id = insert_user() |> Map.get(:id)
+      user =
+        insert_user()
+        |> Accounts.set_users_role("admin", nil)
+        |> Accounts.set_users_role("owner", id)
+
+      user = Accounts.get_user user.id, preload: [user_roles: :role]
+
+      urs = user.user_roles
+
+      assert length(urs) == 3
+      assert Enum.find(urs, & &1.role.name == "owner") |> Map.get(:scope) == id
+      assert Enum.find(urs, & &1.role.name == "user") |> Map.get(:scope) |> is_nil
+      assert Enum.find(urs, & &1.role.name == "admin") |> Map.get(:scope) |> is_nil
+    end
+
+    test "delete_users_role" do
+      _admin_role = insert_role "admin", %{scope: "global"}
+      _owner_role = insert_role "owner", %{scope: "rooms"}
+      id = insert_user() |> Map.get(:id)
+      user =
+        insert_user()
+        |> Accounts.set_users_role("admin", nil)
+        |> Accounts.set_users_role("owner", id)
+
+      user = Accounts.get_user user.id, preload: [user_roles: :role]
+
+      :ok = Accounts.delete_users_role(user, "owner", id)
+      :ok = Accounts.delete_users_role(user, "admin", nil)
+
+      nil = Accounts.delete_users_role(user, "owner", user.id)
+
+      user = Accounts.get_user user.id, preload: [user_roles: :role]
+      assert length(user.user_roles) == 1
     end
   end
 end

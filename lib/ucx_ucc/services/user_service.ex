@@ -26,7 +26,7 @@ defmodule UcxUcc.UserService do
 
   def delete_user(user) do
     Account
-    |> Repo.get(user.account_id)
+    |> Repo.get(user.account.id)
     |> Account.changeset
     |> Repo.delete
   end

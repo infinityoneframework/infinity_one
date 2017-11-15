@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
 
   alias UccChatWeb.Client
   alias UccChat.{StaredMessage, PinnedMessage}
-  alias UccChatWeb.{MessageView}
+  alias UccChatWeb.{MessageView, FlexBarView}
 
   def message_cog_click(socket, sender, client \\ Client) do
     assigns = socket.assigns
@@ -32,8 +32,49 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
     socket
   end
 
+  def flex_message_cog_click(socket, sender, client \\ Client) do
+    # assigns = socket.assigns
+    message_id = client.closest socket, this(sender), "li.message", :id
+
+    html =
+      FlexBarView
+      |> client.render_to_string("flex_cog.html", [])
+
+    client.append(socket, ~s([id="#{message_id}"] .message-cog-container), html)
+    client.send_js socket, """
+      Rebel.set_event_handlers('[id="#{message_id}"]');
+      $('##{message_id} .message-dropdown').click(function(e) {
+        e.stopPropagation();
+      })
+      """
+    # client.send_js socket, "$('##{message_id} .message-cog-container').append(#{html})"
+    socket
+  end
+
+  def jump_to_message(socket, sender, client \\ Client) do
+    id = sender["rebel_id"] |> IO.inspect(label: "rebel_id")
+    client.send_js socket, """
+      var ts = $('[rebel-id="#{id}"]').closest('li.message').data('timestamp');
+      var target = $('.messages-box li[data-timestamp="' + ts + '"]');
+      if (target.offset()) {
+        UccChat.roomManager.scroll_to(target, -400);
+      } else {
+        UccChat.roomHistoryManager.getSurroundingMessages(ts);
+      }
+      """
+      socket
+      |> close_cog(sender, client)
+      |> message_box_focus(client)
+    socket
+  end
+
   def close_cog(socket, sender, client \\ Client) do
     client.send_js socket, ~s/$('#{Rebel.Core.this(sender)}').closest('.message-dropdown').remove()/
+    socket
+  end
+
+  def message_box_focus(socket, client \\ Client) do
+    client.send_js socket, ~s/UccChat.roomManager.message_box_focus();/
     socket
   end
 end

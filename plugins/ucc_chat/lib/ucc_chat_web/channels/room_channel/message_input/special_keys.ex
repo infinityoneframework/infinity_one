@@ -4,16 +4,22 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
   alias MessageInput.SlashCommands
+  alias UccChat.MessageService
 
   use UccChatWeb.RoomChannel.Constants
   require Logger
 
   def handle_in(%{open?: true, state: %{buffer: ""}} = context, @bs) do
     MessageInput.close_popup(context)
+    MessageService.stop_typing context.socket
   end
 
   def handle_in(context,  key) when key in [@bs, @left_arrow, @right_arrow] do
     # Logger.info "state: #{inspect context.state}"
+    if key == @bs and context.sender["text_len"] <= 1 do
+      MessageService.stop_typing context.socket
+    end
+
     case Buffer.match_all_patterns context.state.head do
       nil ->
         Logger.info "got nil"
@@ -41,6 +47,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
         else
           Message.new_message(context.socket, context.sender, context.client)
         end
+        MessageService.stop_typing context.socket
       end
     end
   end

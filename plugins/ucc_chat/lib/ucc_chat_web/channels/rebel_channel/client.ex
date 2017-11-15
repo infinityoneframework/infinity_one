@@ -232,4 +232,17 @@ defmodule UccChatWeb.RebelChannel.Client do
     UccChat.utils.setCaretPosition(elem, #{start}, #{finish});
     """ |> strip_nl
   end
+
+  def more_channels(socket, html) do
+    exec_js socket, more_channels_js(html)
+  end
+
+  def more_channels_js(html) do
+    encoded = Poison.encode! html |> strip_nl()
+    """
+    $('.flex-nav section').html(#{encoded}).parent().removeClass('animated-hidden');
+    $('.arrow').toggleClass('close', 'bottom');
+    """
+  end
+
 end

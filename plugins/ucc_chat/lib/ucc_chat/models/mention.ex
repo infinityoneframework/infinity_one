@@ -10,7 +10,7 @@ defmodule UccChat.Mention do
   def get_by_user_id_and_channel_id(user_id, channel_id) do
     @schema
     |> where([m], m.user_id == ^user_id and m.channel_id == ^channel_id)
-    |> preload([:user, :message])
+    |> preload([:user, message: :user])
     |> @repo.all
   end
 end

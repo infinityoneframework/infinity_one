@@ -4,7 +4,7 @@ defmodule UccChatWeb.SharedView do
 
   import Phoenix.HTML.Tag, warn: false
 
-  alias UcxUcc.{Permissions, Repo, Accounts.User, Hooks}
+  alias UcxUcc.{Permissions, Repo, Accounts, Accounts.User, Hooks}
   alias UccChat.{Subscription, ChatDat}
 
   require Logger
@@ -158,7 +158,8 @@ defmodule UccChatWeb.SharedView do
   end
 
   def has_permission?(user, permission, scope \\ nil), do: Permissions.has_permission?(user, permission, scope)
-  def has_role?(user, role, scope \\ nil), do: User.has_role?(user, role, scope)
+  def has_role?(user, role, scope), do: Accounts.has_role?(user, role, scope)
+  def has_role?(user, role), do: Accounts.has_role?(user, role)
 
   def user_muted?(%{} = user, channel_id), do: UccChat.ChannelService.user_muted?(user.id, channel_id)
 

@@ -41,8 +41,6 @@ defmodule UccChatWeb.Client do
   def closest(socket, selector, class, attr) do
     exec_js! socket, """
       var el = document.querySelector('#{selector}');
-      console.log('selector', '#{selector}');
-      console.log('el', el);
       el = el.closest('#{class}');
       if (el) {
         el.getAttribute('#{attr}');
@@ -94,14 +92,15 @@ defmodule UccChatWeb.Client do
   end
 
   def push_message_js(html, message) do
-    encoded = Poison.encode! html |> strip_nl()
+    encoded = Poison.encode! html
     """
     var node = document.createRange().createContextualFragment(#{encoded});
     var elem = document.querySelector('#{@wrapper_list}');
     elem.append(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
-    """ |> strip_nl()
+    UccChat.roomManager.updateMentionsMarksOfRoom();
+    """
   end
 
   def broadcast_message({message, html}, socket) do
@@ -114,16 +113,43 @@ defmodule UccChatWeb.Client do
   end
 
   def update_message_js(html, message) do
-    encoded = Poison.encode! html |> strip_nl()
+    encoded = Poison.encode! html
     """
-    $('#' + '#{message.id}').replaceWith(#{encoded});
+    $('[id="#{message.id}"]').replaceWith(#{encoded});
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
-    """ |> strip_nl()
+    UccChat.roomManager.updateMentionsMarksOfRoom();
+    """
   end
 
   def delete_message!(message_id, socket) do
     delete! socket, "li.message#" <> message_id
+  end
+
+  def desktop_notify(socket, name, body, message, duration) do
+    name = inspect name
+    body = Poison.encode! body
+    id = inspect message.id
+    channel_id = inspect message.channel_id
+    channel_name = inspect message.channel.name
+
+    exec_js socket, """
+      UccChat.notifier.desktop(#{name}, #{body}, {
+        duration: #{duration},
+        onclick: function(event) {
+          UccChat.userchan.push("notification:click",
+            {message_id: #{id}, name: #{name}, channel_id: #{channel_id}, channel_name: #{channel_name}});
+        }
+      });
+      """
+      |> String.replace("\n", "")
+    socket
+  end
+
+
+  def notify_audio(socket, sound) do
+    exec_js socket, ~s/UccChat.notifier.audio('#{sound}')/
+    socket
   end
 
   defdelegate broadcast!(socket, event, bindings), to: Phoenix.Channel

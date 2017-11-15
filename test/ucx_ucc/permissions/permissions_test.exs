@@ -19,6 +19,7 @@ defmodule UcxUcc.PermissionsTest do
       %{name: "perm-1", roles: ["admin"] },
       %{name: "perm-2", roles: ["admin", "owner", "user"] },
       %{name: "perm-3", roles: ["admin", "user"] },
+      %{name: "perm-4", roles: ["owner", "admin"] },
     ]
     roles = Accounts.create_roles [admin: :global, owner: :rooms, user: :global]
     Permissions.create_permissions permissions, roles
@@ -105,10 +106,22 @@ defmodule UcxUcc.PermissionsTest do
       assert Permissions.has_at_least_one_permission?(u1, ~w(perm-1 perm-3))
     end
 
-    # @tag new_tag: true
-    @tag pending: true
+    @tag integration: true
     test "three" do
+      u = insert_user()
+      user =
+        insert_user()
+        |> Accounts.set_users_role("owner", u.id)
+      user2 =
+        insert_user()
+        |> Accounts.set_users_role("admin", nil)
 
+      user = Accounts.get_user user.id, preload: [:roles, user_roles: :role]
+      user2 = Accounts.get_user user2.id, preload: [:roles, user_roles: :role]
+
+      assert Permissions.has_permission?(user, "perm-4", u.id)
+      refute Permissions.has_permission?(user, "perm-4", user.id)
+      assert Permissions.has_permission?(user2, "perm-4", user.id)
     end
   end
 end

@@ -2,13 +2,14 @@ defmodule UccChatWeb.AdminView do
   use UccChatWeb, :view
 
   import UccAdminWeb.View.Utils, warn: false
+  alias UcxUcc.Accounts
 
   def room_type(0), do: ~g"Channel"
   def room_type(1), do: ~g"Private Group"
   def room_type(2), do: ~g"Direct Message"
 
   def render_user_action_button(user, "admin") do
-    if User.has_role? user, "admin", nil do
+    if Accounts.has_role? user, "admin" do
       render "user_action_buttons.html", opts: %{type: :danger, action: "remove-admin", icon: :shield, label: ~g(REMOVE ADMIN)}
     else
       render "user_action_buttons.html", opts: %{type: :secondary, action: "make-admin", icon: :shield, label: ~g(MAKE ADMIN)}

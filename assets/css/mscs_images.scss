@@ -79,6 +79,10 @@
         background-image: url('../images/mscs/shift-ico.png');
         background-position: 50% 35% !important;
       }
+      &.image.shift.auxpad {
+        background-image: url('../images/mscs/dialpad-ico.png');
+        background-position: 50% 35% !important;
+      }
 
     }
   } // .key-strip

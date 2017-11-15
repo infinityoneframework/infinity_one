@@ -147,10 +147,16 @@ defmodule UcxUcc.Permissions do
 
   defp do_has_permission?(state, user, permission, scope) do
     roles = state[:permissions][permission] || []
-    Enum.any?(user.roles, fn %{name: name, scope: value} ->
-      name in roles and (value == "global" or value == scope)
+    Enum.any?(user.user_roles, fn %{role: role, scope: value} ->
+      role.name in roles and (role.scope == "global" or value == scope)
     end)
   end
+  # defp do_has_permission?(state, user, permission, scope) do
+  #   roles = state[:permissions][permission] || []
+  #   Enum.any?(user.roles, fn %{name: name, scope: value} ->
+  #     name in roles and (value == "global" or value == scope)
+  #   end)
+  # end
 
   ##################
   # Permission

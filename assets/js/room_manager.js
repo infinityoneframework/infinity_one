@@ -168,10 +168,10 @@ class RoomManager {
   notification(resp) {
     if (!resp.badges_only) {
       if (resp.body) {
-        desktop_notifier.notify('@' + resp.username, resp.body, resp.duration)
+        notifier.desktop('@' + resp.username, resp.body, {duration: resp.duration})
       }
       if (resp.sound) {
-        desktop_notifier.notify_audio(resp.sound)
+        notifier.audio(resp.sound)
       }
     }
     this.set_badges()
@@ -264,6 +264,7 @@ class RoomManager {
 
   new_message(id, user_id) {
     if (user_id != ucxchat.user_id) {
+      console.log('new_message...')
       if (!this.focus && !this.unread) {
         this.set_unread(id)
       }
@@ -536,50 +537,50 @@ class RoomManager {
     //   e.preventDefault();
     //   this.add_private($(e.currentTarget))
     // })
-    .on('click', 'button.set-owner', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      cc.put("/room/set-owner/" + username)
-        .receive("ok", resp => {
-        })
-        .receive("error", resp => {
-          toastr.error(resp.error)
-        })
-    })
-    .on('click', 'button.unset-owner', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      cc.put("/room/unset-owner/" + username)
-        .receive("ok", resp => {
-        })
-        .receive("error", resp => {
-          toastr.error(resp.error)
-        })
-    })
-    .on('click', 'button.set-moderator', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      cc.put("/room/set-moderator/" + username)
-        .receive("ok", resp => {
-          if (resp.redirect) {
-            if (debug) { console.log('location') }
-            window.location = resp.redirect
-          }
-        })
-        .receive("error", resp => {
-          toastr.error(resp.error)
-        })
-    })
-    .on('click', 'button.unset-moderator', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
-      cc.put("/room/unset-moderator/" + username)
-        .receive("ok", resp => {
-        })
-        .receive("error", resp => {
-          toastr.error(resp.error)
-        })
-    })
+    // .on('click', 'button.set-owner', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   cc.put("/room/set-owner/" + username)
+    //     .receive("ok", resp => {
+    //     })
+    //     .receive("error", resp => {
+    //       toastr.error(resp.error)
+    //     })
+    // })
+    // .on('click', 'button.unset-owner', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   cc.put("/room/unset-owner/" + username)
+    //     .receive("ok", resp => {
+    //     })
+    //     .receive("error", resp => {
+    //       toastr.error(resp.error)
+    //     })
+    // })
+    // .on('click', 'button.set-moderator', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   cc.put("/room/set-moderator/" + username)
+    //     .receive("ok", resp => {
+    //       if (resp.redirect) {
+    //         if (debug) { console.log('location') }
+    //         window.location = resp.redirect
+    //       }
+    //     })
+    //     .receive("error", resp => {
+    //       toastr.error(resp.error)
+    //     })
+    // })
+    // .on('click', 'button.unset-moderator', e => {
+    //   let username = $(e.currentTarget).parent().attr('data-username')
+    //   e.preventDefault()
+    //   cc.put("/room/unset-moderator/" + username)
+    //     .receive("ok", resp => {
+    //     })
+    //     .receive("error", resp => {
+    //       toastr.error(resp.error)
+    //     })
+    // })
     // .on('click', 'button.unmute-user', e => {
     //   let username = $(e.currentTarget).parent().attr('data-username')
     //   e.preventDefault()

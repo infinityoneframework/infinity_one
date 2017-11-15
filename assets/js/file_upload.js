@@ -146,10 +146,10 @@ class FileUpload {
     })
   }
   validate_upload(file) {
-    let size = UccChat.settings.maximum_file_upload_size_kb * 1024
+    let size = chat_settings.maximum_file_upload_size_kb * 1024
     if (file.size > size) {
       console.log('file sizes', file.size, size)
-      toastr.error('File size exceeds the ' + UccChat.settings.maximum_file_upload_size_kb + 'KB maximum!')
+      toastr.error('File size exceeds the ' + chat_settings.maximum_file_upload_size_kb + 'KB maximum!')
       return false
     }
     if (!UccChat.fileUploadIsValidContentType(file.type)) {
@@ -167,7 +167,7 @@ class FileUpload {
       if (!files || files.length == 0) {
         files = e.dataTransfer.files || []
       }
-      fileUpload.handleFileUpload(files)
+      UccChat.fileUpload.handleFileUpload(files)
     })
     $('body').on('click', '.attachment .collapse-switch.icon-right-dir', e => {
       $(e.currentTarget).removeData('collapsed').removeClass('icon-right-dir').addClass('icon-down-dir')

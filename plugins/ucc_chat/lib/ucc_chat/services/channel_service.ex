@@ -10,6 +10,10 @@ defmodule UccChat.ChannelService do
 
   alias UccChat.Schema.Channel, as: ChannelSchema
 
+  # alias UccChat.{
+  #   Channel, Subscription, MessageService, UserService,
+  #   ChatDat, Direct, Mute, SideNavService, Message, Settings
+  # }
   alias UccChat.{
     Channel, Subscription, UserService,
     ChatDat, Direct, Mute, SideNavService, Message
@@ -181,7 +185,7 @@ defmodule UccChat.ChannelService do
 
   def insert_channel!(%{user_id: user_id} = params) do
     user_id
-    |> Helpers.get_user!(preload: [:roles])
+    |> Helpers.get_user!(preload: [:roles, user_roles: :role])
     |> insert_channel!(params)
   end
 
@@ -193,7 +197,7 @@ defmodule UccChat.ChannelService do
   end
 
   def insert_channel(%{user_id: user_id} = params) do
-    user = Helpers.get_user!(user_id, preload: [:roles])
+    user = Helpers.get_user!(user_id, preload: [:roles, user_roles: :role])
     insert_channel(user, params)
   end
 
@@ -1117,7 +1121,7 @@ defmodule UccChat.ChannelService do
   end
 
   def remove_user(%{id: _id}, _user_id, _channel_id) do
-    raise "remove_user is not suppoted"
+    raise "not implemented"
     # channel = Channel.get channel_id
     # owners = Repo.all(from r in UserRole, where: r.user_id != ^id and
     #   r.role == "owner" and  r.scope == ^channel_id)
@@ -1148,7 +1152,7 @@ defmodule UccChat.ChannelService do
   end
 
   def kick_user(_channel_id, _user, _socket) do
-    raise "kick_user is not supported"
+    raise "not implemented"
     # channel_id
     # |> Channel.get!
     # |> WebChannel.remove_user(user.id)
@@ -1224,7 +1228,7 @@ defmodule UccChat.ChannelService do
   end
 
   def notity_user_join(_channel_id, _user) do
-    raise "notity_user_join is not supported"
+    raise "not implemented"
     # unless Settings.hide_user_join do
     #   MessageService.broadcast_system_message channel_id, user.id,
     #     user.username <> ~g( has joined the channel.)
@@ -1232,7 +1236,7 @@ defmodule UccChat.ChannelService do
   end
 
   def notify_user_removed(_channel_id, _user) do
-    raise "notify_user_removed is not supported"
+    raise "not implemented"
     # unless Settings.hide_user_removed do
     #   MessageService.broadcast_system_message channel_id, user.id,
     #     user.username <> ~g( has been removed from the channel.)
@@ -1240,7 +1244,7 @@ defmodule UccChat.ChannelService do
   end
 
   def notity_user_leave(_channel_id, _user) do
-    raise "notity_user_leave is not supported"
+    raise "not implemented"
     # unless UccSettings.hide_user_leave() do
     #   MessageService.broadcast_system_message channel_id, user.id,
     #     user.username <> ~g( has left the channel.)

@@ -3,6 +3,7 @@ defmodule UccChat.MessagePopupService do
 
   import Ecto.Query
 
+  alias UcxUcc.Accounts
   alias UccChat.{Channel, SlashCommands, PresenceAgent, Emoji}
   alias UcxUcc.Repo
   alias UcxUcc.Accounts.User
@@ -147,7 +148,7 @@ defmodule UccChat.MessagePopupService do
     |> order_by([c], asc: c.username)
     |> limit(^count)
     |> Repo.all
-    |> Enum.reject(fn user -> User.has_role?(user, "bot", 0) end)
+    |> Enum.reject(fn user -> Accounts.has_role?(user, "bot") end)
     |> Enum.map(fn user ->
       %{id: user.id, username: user.username,
         status: PresenceAgent.get(user.id)}
@@ -169,7 +170,7 @@ defmodule UccChat.MessagePopupService do
     |> preload([c, r], [roles: c])
     |> select([c], c)
     |> Repo.all
-    |> Enum.reject(fn user -> User.has_role?(user, "bot", 0) end)
+    |> Enum.reject(fn user -> Accounts.has_role?(user, "bot") end)
     |> Enum.reverse
     |> Enum.take(5)
     |> Enum.map(fn user ->

@@ -9,4 +9,4 @@ ul
   - else
     p.empty= ~g(No channels yet)
 /# - unless defer do
-button.more.more-channels.background-transparent-darker-hover= ~g(More channels...)
+button.more.more-channels.background-transparent-darker-hover(rebel-click="more_channels")= ~g(More channels...)

@@ -21,8 +21,12 @@ defmodule UccChatWeb.RoomChannel do
     "update:room-icon",
     "send:message",
     "js:execjs",
-    "update:mute_unmute",
-    "update:remove_user"
+    "update:flex-button",
+    # "update:mute_unmute",
+    "update:remove_user",
+    # "update:set_remove_owner",
+    "broadcast:message",
+    "broadcast:message:update"
   ]
 
   alias UccChat.{
@@ -34,6 +38,7 @@ defmodule UccChatWeb.RoomChannel do
   alias UcxUcc.{Permissions, Accounts}, warn: false
   alias UcxUccWeb.Endpoint
   alias UccChatWeb.RoomChannel.KeyStore
+  alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
@@ -70,6 +75,25 @@ defmodule UccChatWeb.RoomChannel do
   def broadcast_message_box(room, channel_id, user_id) do
     Endpoint.broadcast! CC.chan_room <> room, "update:message_box",
       %{user_id: user_id, channel_id: channel_id, room: room}
+  end
+
+  def broadcast_message(message) do
+    channel = Channel.get message.channel_id
+    Endpoint.broadcast! CC.chan_room <> channel.name, "broadcast:message",
+      %{message: message}
+  end
+
+  def broadcast_bot_message(_room, _user_id, _body) do
+    raise "TBD: Implement this"
+  end
+
+  def broadcast_updated_message(message, _opts) do
+    # IO.inspect message
+    channel = Channel.get message.channel_id
+    Endpoint.broadcast! CC.chan_room <> channel.name, "broadcast:message:update",
+      %{message: message, channel: channel}
+    # need to get channel_id from message
+    # raise "TBD: Implement this"
   end
 
   def user_join(nil), do: Logger.warn "join for nil username"
@@ -248,17 +272,43 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_out("update:mute_unmute", %{username: username, html: html}, socket) do
-    selector = ~s/.user-view[data-username="#{username}"] button.mute-unmute/
+  def handle_out("update:flex-button", %{username: username, html: html} = data, socket) do
+    selector = ~s/.user-view[data-username="#{username}"] button.#{data.button}/
     socket
     |> execute(replaceWith: html, on: selector)
     |> set_event_handlers(selector)
     {:noreply, socket}
   end
 
+  # def handle_out("update:mute_unmute", %{username: username, html: html}, socket) do
+  #   selector = ~s/.user-view[data-username="#{username}"] button.mute-unmute/
+  #   socket
+  #   |> execute(replaceWith: html, on: selector)
+  #   |> set_event_handlers(selector)
+  #   {:noreply, socket}
+  # end
+
+  # def handle_out("update:set_remove_owner", %{username: username, html: html}, socket) do
+  #   selector = ~s/.user-view[data-username="#{username}"] button.set-remove-owner/
+  #   socket
+  #   |> execute(replaceWith: html, on: selector)
+  #   |> set_event_handlers(selector)
+  #   {:noreply, socket}
+  # end
+
   def handle_out("update:remove_user", %{username: username, js: js}, socket) do
     Logger.warn "......... username: #{username}"
     exec_js socket, js
+    {:noreply, socket}
+  end
+
+  def handle_out("broadcast:message", %{message: _message}, socket) do
+    Logger.error "TBD: Implement this"
+    {:noreply, socket}
+  end
+
+  def handle_out("broadcast:message:update", %{message: message}, socket) do
+    WebMessage.update(message.body, message.channel_id, socket.assigns.user_id, message.id, socket)
     {:noreply, socket}
   end
 
@@ -373,6 +423,8 @@ defmodule UccChatWeb.RoomChannel do
   defdelegate emoji_search(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate reaction_open(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate message_cog_click(socket, sender), to: UccChatWeb.RoomChannel.MessageCog
+  defdelegate jump_to_message(socket, sender), to: UccChatWeb.RoomChannel.MessageCog
+  defdelegate flex_message_cog_click(socket, sender), to: UccChatWeb.RoomChannel.MessageCog
   defdelegate close_cog(socket, sender), to: UccChatWeb.RoomChannel.MessageCog
   defdelegate message_action(socket, sender), to: UccChatWeb.RoomChannel.Message
 end

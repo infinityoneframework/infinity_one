@@ -10,9 +10,9 @@ defmodule UccChat.StaredMessage do
     |> @repo.one
   end
 
-  def get_by_channel_id(channel_id) do
+  def get_by_channel_id_and_user_id(channel_id, user_id) do
     @schema
-    |> where([m], m.channel_id == ^channel_id)
+    |> where([m], m.channel_id == ^channel_id and m.user_id == ^user_id)
     |> preload([:user, message: [:user]])
     |> order_by([m], desc: m.inserted_at)
     |> @repo.all

@@ -1,5 +1,6 @@
 .message-dropdown.content-background-color(style="display: block")
   ul
-    li.message-dropdown-close.secondary-background-color.border-component-color
+    li.message-dropdown-close.secondary-background-color.border-component-color(rebel-click="close_cog")
       i.icon-angle-left(aria-label="Close")
-    li.jump-to-message.message-action(title="Jump to message" data-id="jump-to-message")
+    li.jump-to-message.message-action(title="Jump to message" data-id="jump-to-message" rebel-click="jump_to_message")
+      i.icon-right-hand(aria-label="Jump to message")

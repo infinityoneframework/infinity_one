@@ -155,7 +155,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("invite", args, _sender, socket, client) do
     if user = get_user args, socket, client do
-      current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+      current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
       case ChannelService.invite_user user, socket.assigns.channel_id, current_user.id do
         {:ok, _} ->
           client.toastr! socket, :success, ~g(User added successfully)
@@ -187,14 +187,26 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   def run_command("mute", args, _sender, socket, client) do
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     if user = get_user args, socket, client do
-      UserChannel.mute_user socket, user.id
+      case WebChannel.mute_user(socket.assigns.channel_id, user, current_user) do
+        {:ok, _} ->
+          client.toastr! socket, :success, "User muted successfully"
+        {:error, message} ->
+          client.toastr! socket, :error, message
+      end
     end
   end
 
   def run_command("unmute", args, _sender, socket, client) do
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     if user = get_user args, socket, client do
-      UserChannel.unmute_user socket, user.id
+      case WebChannel.unmute_user(socket.assigns.channel_id, user, current_user) do
+        {:ok, _} ->
+          client.toastr! socket, :success, "User unmuted successfully"
+        {:error, message} ->
+          client.toastr! socket, :error, message
+      end
     end
   end
 
@@ -238,7 +250,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   defp get_user(args, socket, client) do
     if name = get_user_name args, socket, client do
-      if user = Accounts.get_by_user username: name, preload: [:roles] do
+      if user = Accounts.get_by_user username: name, preload: [:roles, user_roles: :role] do
         user
       else
         client.toastr! socket, :error, ~g(Could not find that user)
@@ -258,7 +270,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   defp archive_channel(%{id: id} = channel, _sender, socket, client) do
-    user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     case Channel.update channel, %{archived: true} do
       {:ok, _} ->
         Subscription.update_all_hidden(id, true)
@@ -276,7 +288,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   defp unarchive_channel(%{id: id} = channel, _sender, socket, client) do
-    user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     case Channel.update channel, %{archived: false} do
       {:ok, _} ->
         Subscription.update_all_hidden(id, false)

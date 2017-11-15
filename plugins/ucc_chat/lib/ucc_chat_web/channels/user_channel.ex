@@ -38,9 +38,9 @@ defmodule UccChatWeb.UserChannel do
   alias UccUiFlexTab.FlexTabChannel
   alias UccChatWeb.FlexBar.Form
   alias UccChat.{
-    Subscription, ChannelService, Channel, Web.RoomChannel,
+    Subscription, ChannelService, Channel, Web.RoomChannel, Message,
     SideNavService, ChannelService, SubscriptionService, InvitationService,
-    UserService, EmojiService, Settings, MessageService
+    UserService, EmojiService, Settings, MessageService, Mention
   }
   alias UccChatWeb.{RoomChannel, AccountView, UserSocket, MasterView}
   alias Rebel.SweetAlert
@@ -99,9 +99,10 @@ defmodule UccChatWeb.UserChannel do
       %{room: room, user_id: user_id})
   end
 
-  def notify_mention(%{user_id: user_id, channel_id: channel_id}, body) do
+  def notify_mention(%{user_id: user_id, channel_id: channel_id} = mention, body) do
+    mention = Mention.preload_schema mention, [message: :user]
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "room:mention",
-      %{channel_id: channel_id, user_id: user_id, body: body})
+      %{channel_id: channel_id, user_id: user_id, body: body, mention: mention})
   end
   def user_state(user_id, state) do
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "user:state",
@@ -268,6 +269,11 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  def more_channels(socket, _sender, client \\ Client) do
+    client.more_channels socket, SideNavService.render_more_channels(socket.assigns.user_id)
+    socket
+  end
+
   def push_update_direct_message(msg, socket) do
     Process.send_after self(),
       {:update_direct_message, msg, socket.assigns.user_id}, 250
@@ -276,6 +282,24 @@ defmodule UccChatWeb.UserChannel do
 
   ###############
   # Incoming Messages
+
+  def handle_in("notification:click", params, socket) do
+    message = Message.get params["message_id"]
+    if params["channel_id"] == socket.assigns.channel_id do
+      exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+    else
+      room = params["channel_name"]
+      exec_js socket, ~s/$('aside.side-nav a.open-room[data-room="#{room}"]').click()/
+
+      # TODO: This is a hack. We should have a notification when the room is loaded and then run the JS below.
+      spawn fn ->
+        Process.sleep 3500
+        exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+      end
+    end
+
+    {:noreply, socket}
+  end
 
   def handle_in(ev = "reaction:" <> action, params, socket) do
     trace ev, params
@@ -771,7 +795,7 @@ defmodule UccChatWeb.UserChannel do
         body = Helpers.strip_tags body
         user = Helpers.get_user user_id
         handle_notifications socket, user, channel, %{body: body,
-          username: socket.assigns.username}
+          username: socket.assigns.username, mention: payload[:mention]}
       end
     end
     {:noreply, socket}
@@ -831,20 +855,27 @@ defmodule UccChatWeb.UserChannel do
   ###############
   # Helpers
 
-  defp handle_notifications(socket, user, channel, payload) do
+  defp handle_notifications(socket, user, channel, payload, client \\ UccChatWeb.Client) do
+    message = payload.mention.message
     payload = case UccChat.Settings.get_new_message_sound(user, channel.id) do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
     end
 
     if UccSettings.enable_desktop_notifications() do
-      # Logger.warn "doing desktop notification"
-      push socket, "notification:new", Map.put(payload, :duration,
+      client.desktop_notify(socket,
+        message.user.username,
+        payload.body,
+        Message.preload_schema(message, [:channel]),
         Settings.get_desktop_notification_duration(user, channel))
     else
-      # Logger.warn "doing badges only notification"
       push socket, "notification:new", Map.put(payload, :badges_only, true)
     end
+
+    if sound = payload[:sound] do
+      client.notify_audio(socket, sound)
+    end
+
   end
 
   defp subscribe(channels, socket) do
@@ -1072,45 +1103,10 @@ defmodule UccChatWeb.UserChannel do
   def phone_call(socket, sender) do
     Logger.warn "click to call... #{inspect sender}"
     username = sender["dataset"]["phoneStatus"]
-    # TODO: Need to us a unique Id here instead of the userkame
+    # TODO: Need to use a unique Id here instead of the userkame
     UccPubSub.broadcast "user:" <> socket.assigns.user_id, "phone:call",
       %{username: username}
     socket
-  end
-
-  def mute_user(socket, %{} = sender) do
-    mute_user socket, sender["dataset"]["id"]
-  end
-
-  def mute_user(socket, user_id) do
-    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
-    user = Accounts.get_user user_id
-    channel_id = socket.assigns.channel_id
-    case WebChannel.mute_user channel_id, user, current_user do
-      {:ok, _message} ->
-        socket
-        |> update_mute_unmute_button(channel_id, user, current_user)
-        |> Client.toastr!(:success, ~g(User muted))
-      {:error, message} ->
-        Client.toastr! socket, :error, message
-    end
-  end
-
-  def unmute_user(socket, %{} = sender) do
-    unmute_user socket, sender["dataset"]["id"], socket.assigns.channel_id
-  end
-
-  def unmute_user(socket, user_id, channel_id) do
-    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
-    user = Accounts.get_user user_id
-    case WebChannel.unmute_user socket.assigns.channel_id, user, current_user do
-      {:ok, _message} ->
-        socket
-        |> update_mute_unmute_button(channel_id, user, current_user)
-        |> Client.toastr!(:success, ~g(User unmuted))
-      {:error, message} ->
-        Client.toastr! socket, :error, message
-    end
   end
 
   def remove_user(socket, %{} = sender) do
@@ -1118,7 +1114,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def remove_user(socket, user_id) do
-    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles]
+    current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
     user = Accounts.get_user user_id
     channel = Channel.get socket.assigns.channel_id
     case WebChannel.remove_user channel, user.id, current_user do
@@ -1137,20 +1133,6 @@ defmodule UccChatWeb.UserChannel do
       {:error, message} ->
         Client.toastr! socket, :error, message
     end
-  end
-
-  defp update_mute_unmute_button(socket, channel_id, user, current_user) do
-    # Logger.warn "assigns: #{inspect socket.assigns}"
-    html =
-      Phoenix.View.render_to_string UccChatWeb.FlexBarView,
-        "user_card_mute_button.html", [
-          channel_id: channel_id,
-          user: user,
-          current_user: current_user
-        ]
-    socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
-      "update:mute_unmute", %{username: user.username, html: html}
-    socket
   end
 
   def mousedown(socket, sender) do

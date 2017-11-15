@@ -69,7 +69,7 @@ defmodule UccChatWeb.RoomChannel.Message do
     channel_id = assigns.channel_id
 
     value = body
-    message = Message.get(message_id, preload: [:attachments])
+    message = Message.get(message_id, preload: @preloads)
     case message.attachments do
       [] ->
         {body, _mentions} = Service.encode_mentions(body, channel_id)
@@ -79,8 +79,10 @@ defmodule UccChatWeb.RoomChannel.Message do
     end
     |> case do
       {:ok, message} ->
-        message = Repo.preload(message, MessageService.preloads())
-        client.broadcast_update_message({message, message.body}, socket)
+        message
+        |> Repo.preload(MessageService.preloads())
+        |> render_message
+        |> client.broadcast_update_message(socket)
       _error ->
         client.toastr socket, :error,
           ~g(Problem updating your message)
@@ -290,7 +292,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   def delete(%{assigns: assigns} = socket, message_id, client \\ Client) do
-    user = Accounts.get_user assigns.user_id, preload: [:account, :roles]
+    user = Accounts.get_user assigns.user_id, preload: [:account, :roles, user_roles: :role]
     if user.id == message_id ||
       Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
       message = Message.get message_id, preload: [:attachments]

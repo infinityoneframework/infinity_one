@@ -5,6 +5,7 @@ defmodule UcxUcc.Accounts do
 
   # alias UcxUcc.Accounts.User
   alias UcxUcc.Accounts.{Role, UserRole, User, Account}
+  require Logger
   # alias UcxUcc.Permissions.{Permission, PermissionRole}
 
   ##################
@@ -301,6 +302,27 @@ defmodule UcxUcc.Accounts do
     Repo.one from r in Role, where: r.name == ^role
   end
 
+  def set_users_role(%{} = user, role_name, scope) do
+    with role when not is_nil(role) <- get_role_by_name(role_name),
+         {:ok, _} <- create_user_role(%{user_id: user.id, role_id: role.id, scope: scope}) do
+      user
+    else
+      other -> other
+    end
+  end
+
+  def delete_users_role(%{} = user, role_name, scope) do
+    with role when not is_nil(role) <- get_role_by_name(role_name),
+         user_role when not is_nil(user_role) <- get_by_user_role(user.id, role.id, scope),
+         {:ok, _} <- delete_user_role(user_role) do
+      :ok
+    else
+      other ->
+        Logger.warn "other: #{inspect other}"
+        other
+    end
+  end
+
   ##################
   # UserRole
 
@@ -334,6 +356,21 @@ defmodule UcxUcc.Accounts do
   def get_user_role!(id), do: Repo.get!(UserRole, id)
 
   @doc """
+  Gets a user_role by several fields
+  """
+  def get_by_user_role(opts) do
+    Repo.get_by UserRole, opts
+  end
+
+  def get_by_user_role(user_id, role_id, nil) do
+    get_by_user_role user_id: user_id, role_id: role_id
+  end
+
+  def get_by_user_role(user_id, role_id, scope) do
+    get_by_user_role user_id: user_id, role_id: role_id, scope: scope
+  end
+
+  @doc """
   Creates a user_role.
 
   ## Examples
@@ -349,6 +386,7 @@ defmodule UcxUcc.Accounts do
     %UserRole{}
     |> UserRole.changeset(attrs)
     |> Repo.insert()
+    # |> IO.inspect(label: "user role")
   end
 
   @doc """
@@ -413,6 +451,12 @@ defmodule UcxUcc.Accounts do
   def list_accounts do
     Repo.all(Account)
   end
+
+  @doc """
+  Gets a single account.
+
+  """
+  def get_account(id), do: Repo.get(Account, id)
 
   @doc """
   Gets a single account.
@@ -506,5 +550,25 @@ defmodule UcxUcc.Accounts do
 
   def preload_schema(schema, preload) do
     Repo.preload schema, preload
+  end
+
+  def has_role?(%User{} =user, role) do
+    Enum.any?(user.user_roles, fn
+      %{role: %{name: ^role, scope: "global"}} -> true
+      _ -> false
+    end)
+  end
+
+  def has_role?(%User{user_roles: %Ecto.Association.NotLoaded{}} = user, role, scope) do
+    user
+    |> Repo.preload([:roles, user_roles: :role])
+    |> has_role?(role, scope)
+  end
+
+  def has_role?(user, role_name, scope) do
+    Enum.any?(user.user_roles, fn
+      %{role: %{name: ^role_name}, scope: ^scope} -> true
+      _ -> false
+    end)
   end
 end
