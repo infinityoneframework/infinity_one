@@ -16,7 +16,7 @@ class SideNav {
   get roomManager() { return this.ucc_chat.roomManager }
   get roomHistoryManager() {return this.ucc_chat.roomHistoryManager }
   get navMenu() { return this.ucc_chat.navMenu }
-  get desktop_notifier() { return this.ucc_chat.desktop_notifier }
+  get notifier() { return this.ucc_chat.notifier }
 
   // more_channels() {
   //   // console.log('cliecked more channels')
@@ -89,7 +89,7 @@ class SideNav {
     $('body')
     .on('click', 'button.test-notifications', e => {
       e.preventDefault()
-      this.desktop_notifier.notify('Desktop Notification Test', 'This is a desktop notification.', 5)
+      this.notifier.desktop('Desktop Notification Test', 'This is a desktop notification.', {duration: 5})
       // console.log('test notifications')
       return false
     })

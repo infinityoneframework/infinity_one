@@ -8,7 +8,7 @@ defmodule UcxUcc.Settings.Schema.General do
     field :site_url, :string, default: "change-this"
     field :site_name, :string, default: "UccChat"
     field :enable_desktop_notifications, :boolean, default: true
-    field :desktop_notification_duration, :integer, default: 5
+    field :desktop_notification_duration, :integer, default: 8
   end
 
   @fields [

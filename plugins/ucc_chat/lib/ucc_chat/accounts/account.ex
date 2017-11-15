@@ -56,7 +56,7 @@ defmodule UccChat.Accounts.Account do
   def get(user_id) do
     from u in User,
       join: a in Account,
-      on: u.account_id == a.id,
+      on: a.user_id == u.id,
       where: u.id == ^user_id,
       select: a
   end

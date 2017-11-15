@@ -12,7 +12,7 @@ defmodule UccChat.Settings do
       not is_nil(user.account.desktop_notification_duration) ->
         user.account.desktop_notification_duration
       true ->
-        case Notification.get_notification(user.account_id, channel.id) do
+        case Notification.get_notification(user.account.id, channel.id) do
           nil ->
             desktop_notification_duration()
           %{settings: %{duration: nil}} ->
@@ -31,7 +31,7 @@ defmodule UccChat.Settings do
       user.account.new_message_notification != "system_default" ->
         user.account.new_message_notification
       true ->
-        case Notification.get_notification(user.account_id, channel_id) do
+        case Notification.get_notification(user.account.id, channel_id) do
           nil -> default
           %{settings: %{audio: "system_default"}} -> default
           %{settings: %{audio: "none"}} -> nil

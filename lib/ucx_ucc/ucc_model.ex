@@ -183,10 +183,14 @@ defmodule UccModel do
         |> @repo.one
       end
 
+      def preload_schema(schema, preload) do
+        @repo.preload schema, preload
+      end
+
       defoverridable [
         delete: 1, delete!: 1, update: 2, update!: 2, create: 1, create!: 1,
         get_by: 1, get_by!: 1, get: 2, get!: 2, list: 0, change: 2, change: 1,
-        delete_all: 0
+        delete_all: 0, preload_schema: 2
       ]
     end
   end

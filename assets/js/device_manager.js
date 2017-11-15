@@ -358,6 +358,7 @@
     set_tone_volume: function(level, key) {
       this.active_audio_ctrl = document.getElementById('audio-alerting');
       var tone_volume = 0;
+      var new_volume = 0;
 
       switch(key) {
         case "alerting":
@@ -376,14 +377,14 @@
       if (level > 8) level = 8;
       if (level < 1) level = 1;
 
-      let new_volume = tone_volume;
+      // let new_volume = tone_volume;
 
       if (level > 0) {
-        new_volume = level * tone_volume;
+        new_volume = level / tone_volume;
       }
 
       if (this.debug)
-        console.log('set_tone_volume', key, level, new_volume)
+        console.log('set_tone_volume', key, level, tone_volume, new_volume)
 
       this.active_audio_ctrl.volume = new_volume;
     },

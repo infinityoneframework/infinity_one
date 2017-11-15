@@ -2,7 +2,8 @@ defmodule UccChat.UserService do
   use UccChat.Shared, :service
   # alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.{Subscription, Channel, ChannelMonitor}
-  alias UcxUcc.Accounts.Account
+  alias UcxUcc.Accounts
+  alias Accounts.Account
   alias UcxUcc.Coherence.Schemas
   alias Ecto.Multi
 
@@ -29,7 +30,7 @@ defmodule UccChat.UserService do
 
   def delete_user(user) do
     Account
-    |> Repo.get(user.account_id)
+    |> Repo.get(user.account.id)
     |> Account.changeset
     |> Repo.delete
   end
@@ -60,9 +61,14 @@ defmodule UccChat.UserService do
   end
 
   defp do_insert_user(%{account: %{id: id}}, params, opts) do
-    changeset = User.changeset(%User{}, Map.put(params, "account_id", id))
+    changeset = User.changeset(%User{}, params)
     case Repo.insert changeset do
       {:ok, user} ->
+        id
+        |> Accounts.get_account
+        |> Account.changeset(%{user_id: id})
+        |> Repo.update
+
         %UserRole{}
         |> UserRole.changeset(%{user_id: user.id, role: "user"})
         |> Repo.insert!

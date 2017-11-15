@@ -455,6 +455,12 @@ defmodule UcxUcc.Accounts do
   @doc """
   Gets a single account.
 
+  """
+  def get_account(id), do: Repo.get(Account, id)
+
+  @doc """
+  Gets a single account.
+
   Raises `Ecto.NoResultsError` if the Account does not exist.
 
   ## Examples

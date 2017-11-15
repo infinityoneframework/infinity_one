@@ -38,9 +38,9 @@ defmodule UccChatWeb.UserChannel do
   alias UccUiFlexTab.FlexTabChannel
   alias UccChatWeb.FlexBar.Form
   alias UccChat.{
-    Subscription, ChannelService, Channel, Web.RoomChannel,
+    Subscription, ChannelService, Channel, Web.RoomChannel, Message,
     SideNavService, ChannelService, SubscriptionService, InvitationService,
-    UserService, EmojiService, Settings, MessageService
+    UserService, EmojiService, Settings, MessageService, Mention
   }
   alias UccChatWeb.{RoomChannel, AccountView, UserSocket, MasterView}
   alias Rebel.SweetAlert
@@ -99,9 +99,10 @@ defmodule UccChatWeb.UserChannel do
       %{room: room, user_id: user_id})
   end
 
-  def notify_mention(%{user_id: user_id, channel_id: channel_id}, body) do
+  def notify_mention(%{user_id: user_id, channel_id: channel_id} = mention, body) do
+    mention = Mention.preload_schema mention, [message: :user]
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "room:mention",
-      %{channel_id: channel_id, user_id: user_id, body: body})
+      %{channel_id: channel_id, user_id: user_id, body: body, mention: mention})
   end
   def user_state(user_id, state) do
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "user:state",
@@ -281,6 +282,24 @@ defmodule UccChatWeb.UserChannel do
 
   ###############
   # Incoming Messages
+
+  def handle_in("notification:click", params, socket) do
+    message = Message.get params["message_id"]
+    if params["channel_id"] == socket.assigns.channel_id do
+      exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+    else
+      room = params["channel_name"]
+      exec_js socket, ~s/$('aside.side-nav a.open-room[data-room="#{room}"]').click()/
+
+      # TODO: This is a hack. We should have a notification when the room is loaded and then run the JS below.
+      spawn fn ->
+        Process.sleep 3500
+        exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+      end
+    end
+
+    {:noreply, socket}
+  end
 
   def handle_in(ev = "reaction:" <> action, params, socket) do
     trace ev, params
@@ -776,7 +795,7 @@ defmodule UccChatWeb.UserChannel do
         body = Helpers.strip_tags body
         user = Helpers.get_user user_id
         handle_notifications socket, user, channel, %{body: body,
-          username: socket.assigns.username}
+          username: socket.assigns.username, mention: payload[:mention]}
       end
     end
     {:noreply, socket}
@@ -836,20 +855,27 @@ defmodule UccChatWeb.UserChannel do
   ###############
   # Helpers
 
-  defp handle_notifications(socket, user, channel, payload) do
+  defp handle_notifications(socket, user, channel, payload, client \\ UccChatWeb.Client) do
+    message = payload.mention.message
     payload = case UccChat.Settings.get_new_message_sound(user, channel.id) do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
     end
 
     if UccSettings.enable_desktop_notifications() do
-      # Logger.warn "doing desktop notification"
-      push socket, "notification:new", Map.put(payload, :duration,
+      client.desktop_notify(socket,
+        message.user.username,
+        payload.body,
+        Message.preload_schema(message, [:channel]),
         Settings.get_desktop_notification_duration(user, channel))
     else
-      # Logger.warn "doing badges only notification"
       push socket, "notification:new", Map.put(payload, :badges_only, true)
     end
+
+    if sound = payload[:sound] do
+      client.notify_audio(socket, sound)
+    end
+
   end
 
   defp subscribe(channels, socket) do

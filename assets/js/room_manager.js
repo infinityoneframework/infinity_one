@@ -168,10 +168,10 @@ class RoomManager {
   notification(resp) {
     if (!resp.badges_only) {
       if (resp.body) {
-        desktop_notifier.notify('@' + resp.username, resp.body, resp.duration)
+        notifier.desktop('@' + resp.username, resp.body, {duration: resp.duration})
       }
       if (resp.sound) {
-        desktop_notifier.notify_audio(resp.sound)
+        notifier.audio(resp.sound)
       }
     }
     this.set_badges()
