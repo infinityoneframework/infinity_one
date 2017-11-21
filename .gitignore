@@ -6,6 +6,7 @@
 start
 /plugins/mscs
 /plugins/ucx_presence
+/plugins/ucx_adapter
 
 .DS_Store
 

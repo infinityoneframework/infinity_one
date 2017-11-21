@@ -1,6 +1,10 @@
 defmodule UccDialerWeb.Channel.Dialer do
 
+  import Rebel.Core
+  import UcxUccWeb.Gettext
+
   alias UcxUcc.Accounts
+  alias Rebel.SweetAlert
 
   require Logger
 
@@ -11,10 +15,31 @@ defmodule UccDialerWeb.Channel.Dialer do
     dial(socket, number)
   end
 
-  def dial(socket, %{"dataset" => %{"phoneStatus" => username}}) do
+  def dial(socket, %{"dataset" => %{"phoneStatus" => username}} = sender) do
     # IO.inspect username, label: "username...."
     user = Accounts.get_by_user username: username, preload: [:extension]
-    dial socket, Map.get(user, :extension, %{}) |> Map.get(:extension)
+    number = extension user
+    title = gettext "Call %{user}", user: user.username
+    confirm_message = gettext "Place call to %{number}?", number: number
+    icon = "phone"
+
+    SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), confirm_message, nil,
+      [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
+      confirm: fn _result ->
+        dial socket, number
+
+        SweetAlert.swal socket,
+          ~g"Calling!",
+          gettext("Dialing %{user}", user: user.username),
+          "success",
+          timer: 2000,
+          showConfirmButton: false
+        true
+      end,
+      cancel: fn _result ->
+        true
+      end
+
   end
 
   def dial(socket, nil) do
@@ -23,7 +48,6 @@ defmodule UccDialerWeb.Channel.Dialer do
   end
 
   def dial(socket, number) do
-    # IO.inspect number, label: "number...."
     socket.assigns
     |> get_orig_into
     |> UccDialer.dial(number, [])
@@ -32,11 +56,13 @@ defmodule UccDialerWeb.Channel.Dialer do
 
   defp get_orig_into(%{user_id: user_id}) do
     user = Accounts.get_user user_id, preload: [:extension]
-    exten =
-      user
-      |> Map.get(:extension, %{})
-      |> Map.get(:extension)
-    {user, exten}
+    {user, extension(user)}
+  end
+
+  defp extension(user) do
+    user
+    |> Map.get(:extension, %{})
+    |> Map.get(:extension)
   end
 
 end

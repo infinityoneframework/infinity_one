@@ -65,29 +65,6 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  # TODO: This needs to be removed
-  def topic_click(socket, _sender) do
-    # Logger.debug "topic_click socket: #{inspect socket}"
-    send socket.assigns.self, :do_topic_click
-    # do_topic_click socket
-    # SweetAlert.swal_modal socket, "My Title", "are you sure?", "warning",
-    #   [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
-    #   confirm: fn result ->
-    #     Logger.warn "sweet confirmed! #{inspect result}"
-    #     SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
-    #       timer: 2000, showConfirmButton: false
-    #     Logger.warn "sweet notice complete!"
-    #   end,
-    #   cancel: fn result ->
-    #     Logger.warn "sweet canceled! result: #{inspect result}"
-    #     SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
-    #       timer: 2000, showConfirmButton: false
-    #     Logger.warn "sweet notice complete!"
-    #   end
-    # Logger.warn "res: #{inspect res}"
-    socket
-  end
-
   def join_room(user_id, room) do
     # Logger.debug ("...join_room user_id: #{inspect user_id}")
     Endpoint.broadcast!(CC.chan_user() <> "#{user_id}", "room:join",
@@ -544,28 +521,8 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  # TODO: This needs to be removed
-  defp do_topic_click(socket) do
-    SweetAlert.swal_modal socket, "My Title", "are you sure?", nil,
-      [showCancelButton: true, closeOnConfirm: false, closeOnCancel: false],
-      confirm: fn _result ->
-        SweetAlert.swal socket, "Confirmed!", "Your action was confirmed", "success",
-          timer: 2000, showConfirmButton: false
-      end,
-      cancel: fn _result ->
-        # Logger.warn "sweet canceled! result: #{inspect result}"
-        SweetAlert.swal socket, "Canceled!", "Your action was canceled", "error",
-          timer: 2000, showConfirmButton: false
-      end
-  end
-
   ###############
   # Info messages
-
-  def handle_info(:do_topic_click, socket) do
-    do_topic_click(socket)
-    noreply socket
-  end
 
   def handle_info({"webrtc:incoming_video_call" = ev, payload}, socket) do
 

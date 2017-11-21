@@ -277,15 +277,15 @@ a.phone-number {
   }
 }
 a.phone-number:hover {
-    text-decoration: underline;
-    .phone-cog,
-    .phone-cog:hover {
-      position: relative;
-      display: inline;
-      .message-dropdown {
-        position: absolute;
-        left: +1px;
-      }
+  text-decoration: underline;
+  .phone-cog,
+  .phone-cog:hover {
+    position: relative;
+    display: inline;
+    .message-dropdown {
+      position: absolute;
+      left: +1px;
     }
+  }
 }
 

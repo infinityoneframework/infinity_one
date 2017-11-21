@@ -6,4 +6,4 @@
   - class = get_room_icon_class @chatd, "offline"
   i(class="#{class}")
 span.room-title= @chatd.active_room[:display_name]
-span.room-topic(rebel-click="topic_click")= markdown @chatd.channel.topic
+span.room-topic= markdown @chatd.channel.topic
