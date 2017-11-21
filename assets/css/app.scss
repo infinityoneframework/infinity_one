@@ -269,3 +269,23 @@ section.flex-tab-container {
     }
   }
 }
+a.phone-number {
+  margin-right: -2px;
+  padding-right: 2px;
+  .phone-cog {
+    display: none;
+  }
+}
+a.phone-number:hover {
+    text-decoration: underline;
+    .phone-cog,
+    .phone-cog:hover {
+      position: relative;
+      display: inline;
+      .message-dropdown {
+        position: absolute;
+        left: +1px;
+      }
+    }
+}
+

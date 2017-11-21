@@ -54,6 +54,14 @@ defmodule UccChatWeb.Client do
     Rebel.Query.insert socket, html, append: selector
   end
 
+  def remove_closest(socket, selector, parent, children) do
+    js =
+      ~s/$('#{selector}').closest('#{parent}').find('#{children}').remove()/
+    # Logger.warn "remove closest js: #{inspect js}"
+    exec_js socket, js
+    socket
+  end
+
   def close_popup(socket) do
     update socket, :html, set: "", on: ".message-popup-results"
   end

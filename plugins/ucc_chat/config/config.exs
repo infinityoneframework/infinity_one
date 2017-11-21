@@ -40,6 +40,7 @@ config :ucx_ucc, UccChat.Robot, [
   ]
 ]
 
+config :auto_linker, :attributes, ["rebel-channel": "user", "rebel-click": "phone_number"]
 # General application configuration
 # config :ucc_chat,
 #   ecto_repos: [UccChat.Repo]

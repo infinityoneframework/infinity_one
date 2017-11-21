@@ -293,11 +293,13 @@ defmodule UccChatWeb.MessageView do
     |> raw
   end
 
-  defp message_formats(body) do
+  def message_formats(body) do
     body
-    |> String.replace(~r/_(.+?)_/, "<i>\\1</i>")
-    |> String.replace(~r/\*(.+?)\*/, "<strong>\\1</strong>")
-    |> String.replace(~r/\~(.+?)\~/, "<strike>\\1</strike>")
+    # TODO: Fix this. Don't convert content inside html tags
+    #       Probably should write an elixir parser
+    # |> String.replace(~r/_(.+?)_/, "<i>\\1</i>")
+    # |> String.replace(~r/\*(.+?)\*/, "<strong>\\1</strong>")
+    # |> String.replace(~r/\~(.+?)\~/, "<strike>\\1</strike>")
   end
 
   defp format_newlines(string, true, _), do: string

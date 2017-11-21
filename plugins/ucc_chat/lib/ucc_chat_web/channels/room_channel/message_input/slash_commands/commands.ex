@@ -13,6 +13,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   alias UccChatWeb.RoomChannel
   alias RoomChannel.Channel, as: WebChannel
   alias UccChatWeb.UserChannel
+  alias UccDialerWeb.Channel.Dialer
 
   require UccChat.ChatConstants, as: CC
   require UccChatWeb.RoomChannel.MessageInput
@@ -203,10 +204,25 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     if user = get_user args, socket, client do
       case WebChannel.unmute_user(socket.assigns.channel_id, user, current_user) do
         {:ok, _} ->
-          client.toastr! socket, :success, "User unmuted successfully"
+          client.toastr! socket, :success, ~g"User unmuted successfully"
         {:error, message} ->
           client.toastr! socket, :error, message
       end
+    end
+  end
+
+  def run_command("call", args, _sender, socket, client) do
+    # user = Accounts.get_user socket.assigns.user_id, preload: [:extension]
+    number_string = Enum.join(args, "")
+    number = String.replace(number_string, ~r/[\.\+\- x\(\)]+/, "")
+    # Logger.warn "slash call number: #{number}"
+    if Regex.match? ~r/^\d+$/, number do
+      client.toastr! socket, :success,
+        gettext("Calling %{number}", number: number_string)
+      Dialer.dial(socket, number)
+    else
+      client.toastr! socket, :error,
+        gettext("Invalid phone number, %{number}", number: number_string)
     end
   end
 

@@ -1,0 +1,7 @@
+.phone-cog
+  .message-dropdown.content-background-color(style="display: block")
+    ul
+      li.message-dropdown-close.secondary-background-color.border-component-color(rebel-click="close_phone_cog")
+        i.icon-angle-left(aria-label="Close")
+      li.phone(title="Call number" data-phone="#{@phone}" rebel-click="dial" rebel-channel="user")
+        i.icon-phone(aria-label="Call number")

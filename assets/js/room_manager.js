@@ -532,6 +532,11 @@ class RoomManager {
       e.preventDefault();
       this.toggle_favorite()
     })
+    .on('click', '.phone-status', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    })
     // .on('click', '.button.pvt-msg', e => {
     //   if (debug) { console.log('click .button.pvt-msg') }
     //   e.preventDefault();

@@ -70,7 +70,8 @@ defmodule UcxUcc.Mixfile do
       {:coherence, path: "../coherence3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.7.0"},
-      {:auto_linker, "~> 0.1"},
+      # {:auto_linker, "~> 0.2"},
+      {:auto_linker, path: "../auto_linker"},
       {:link_preview, "~> 1.0.0"},
       {:cowboy, "~> 1.0"},
       {:mogrify, "~> 0.5", override: true},
@@ -114,9 +115,9 @@ defmodule UcxUcc.Mixfile do
     ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
-     "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
+     # "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
      # # Use the following option if you want to run specific test files
-     # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
+     "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
   end
 
   defp plugin_deps do

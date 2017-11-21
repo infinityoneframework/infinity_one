@@ -11,7 +11,7 @@ defmodule UccChat.SlashCommands do
   @commands [
     "join", "archive", "kick", "lennyface", "leave", "gimme", "create", "invite",
     "invite-all-to", "invite-all-from", "part", "unarchive", "tableflip",
-    "topic", "mute", "open", "unflip", "shrug", "unmute", "unhide"]
+    "topic", "mute", "open", "unflip", "shrug", "unmute", "unhide", "call"]
 
   @special_text %{
     "gimme" => "༼ つ ◕_◕ ༽つ",
@@ -43,7 +43,8 @@ defmodule UccChat.SlashCommands do
     %{command: "unflip", args: ~g"your message (optional)", description: ~g"Displays ┬─┬﻿ ノ( ゜-゜ノ)"},
     %{command: "shrug", args: ~g"your message (optional)", description: ~g"Displays ¯\_(ツ)_/¯ after your message"},
     %{command: "unmute", args: "@username", description: ~g"Unmute someone in the room"},
-    %{command: "unhide", args: "#channel", description: ~g"Unhide a hidden channel"}
+    %{command: "unhide", args: "#channel", description: ~g"Unhide a hidden channel"},
+    %{command: "call", args: "phone number", description: ~g"Call a phone number"}
   ]
 
   @command_map @command_data |> Enum.reduce(%{}, fn %{command: command} = map, acc -> Map.put(acc, command, map) end)

@@ -67,6 +67,8 @@ config :coherence, UcxUccWeb.Coherence.Mailer,
 
 config :slime, :keep_lines, true
 
+config :auto_linker, opts: [phone: true]
+
 import_config("../plugins/*/config/config.exs")
 
 # Import environment specific config. This must remain at the bottom

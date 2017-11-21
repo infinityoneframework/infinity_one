@@ -1101,7 +1101,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def phone_call(socket, sender) do
-    Logger.warn "click to call... #{inspect sender}"
+    # Logger.warn "click to call... #{inspect sender}"
     username = sender["dataset"]["phoneStatus"]
     # TODO: Need to use a unique Id here instead of the userkame
     UccPubSub.broadcast "user:" <> socket.assigns.user_id, "phone:call",
@@ -1140,6 +1140,31 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  def delegate(socket, sender) do
+    # Logger.warn "delegate sender: #{inspect sender}"
+    dataset = sender["dataset"]
+    mod =  Module.concat(dataset["module"], nil)
+    fun = String.to_existing_atom dataset["fun"]
+    apply mod, fun, [socket, sender]
+  end
+
+  def phone_number(socket, sender, client \\ UccChatWeb.Client) do
+    # Logger.warn "phone_number sender: #{inspect sender}"
+    unless sender["html"] =~ "phone-cog" do
+      html = Phoenix.View.render_to_string UccChatWeb.FlexBarView, "phone_cog.html",
+        phone: sender["dataset"]["phone"]
+      # Logger.warn "phone_number html: #{inspect html}"
+      client.append(socket, this(sender), html)
+    end
+
+    socket
+  end
+
+  def close_phone_cog(socket, sender, client \\ UccChatWeb.Client) do
+    # Logger.warn "close_phone_cog sender: #{inspect sender}"
+    client.remove_closest socket, this(sender), "a.phone-number", ".phone-cog"
+  end
+
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
   defdelegate flex_tab_open(socket, sender), to: FlexTabChannel
   defdelegate flex_call(socket, sender), to: FlexTabChannel
@@ -1151,6 +1176,9 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+
+  # TODO: Figure out a way to inject this from the Dialer module
+  defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer
 
   # defdelegate click_admin(socket, sender), to: UccAdminWeb.AdminChannel
 
