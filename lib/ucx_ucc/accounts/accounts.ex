@@ -62,7 +62,7 @@ defmodule UcxUcc.Accounts do
       iex> get_user!(123)
       %User{}
 
-      iex> get_user!(456)
+      iex> get_user!(45
       ** (Ecto.NoResultsError)
 
   """
@@ -140,6 +140,12 @@ defmodule UcxUcc.Accounts do
     user
     |> User.changeset(attrs)
     |> Repo.update()
+  end
+
+  def update_user!(%User{} = user, attrs) do
+    user
+    |> User.changeset(attrs)
+    |> Repo.update!()
   end
 
   @doc """
@@ -571,4 +577,214 @@ defmodule UcxUcc.Accounts do
       _ -> false
     end)
   end
+
+  alias UcxUcc.Accounts.PhoneNumber
+
+  @doc """
+  Returns the list of phone_numbers.
+
+  ## Examples
+
+      iex> list_phone_numbers()
+      [%PhoneNumber{}, ...]
+
+  """
+  def list_phone_numbers do
+    Repo.all(PhoneNumber)
+  end
+
+  @doc """
+  Gets a single phone_number.
+
+  Raises `Ecto.NoResultsError` if the Phone number does not exist.
+
+  ## Examples
+
+      iex> get_phone_number!(123)
+      %PhoneNumber{}
+
+      iex> get_phone_number!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_phone_number!(id), do: Repo.get!(PhoneNumber, id)
+
+  @doc """
+  Creates a phone_number.
+
+  ## Examples
+
+      iex> create_phone_number(%{field: value})
+      {:ok, %PhoneNumber{}}
+
+      iex> create_phone_number(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_phone_number(attrs \\ %{}) do
+    %PhoneNumber{}
+    |> PhoneNumber.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_phone_number!(attrs \\ %{}) do
+    %PhoneNumber{}
+    |> PhoneNumber.changeset(attrs)
+    |> Repo.insert!()
+  end
+
+  @doc """
+  Updates a phone_number.
+
+  ## Examples
+
+      iex> update_phone_number(phone_number, %{field: new_value})
+      {:ok, %PhoneNumber{}}
+
+      iex> update_phone_number(phone_number, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_phone_number(%PhoneNumber{} = phone_number, attrs) do
+    phone_number
+    |> PhoneNumber.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PhoneNumber.
+
+  ## Examples
+
+      iex> delete_phone_number(phone_number)
+      {:ok, %PhoneNumber{}}
+
+      iex> delete_phone_number(phone_number)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_phone_number(%PhoneNumber{} = phone_number) do
+    Repo.delete(phone_number)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking phone_number changes.
+
+  ## Examples
+
+      iex> change_phone_number(phone_number)
+      %Ecto.Changeset{source: %PhoneNumber{}}
+
+  """
+  def change_phone_number(%PhoneNumber{} = phone_number) do
+    PhoneNumber.changeset(phone_number, %{})
+  end
+
+  alias UcxUcc.Accounts.PhoneNumberLabel
+
+  @doc """
+  Returns the list of phone number labels.
+
+  ## Examples
+
+      iex> list_phone_number_labels()
+      [%PhoneNumberLabel{}, ...]
+
+  """
+  def list_phone_number_labels do
+    Repo.all(PhoneNumberLabel)
+  end
+
+  @doc """
+  Gets a single phone_number_label.
+
+  Raises `Ecto.NoResultsError` if the Phone number label does not exist.
+
+  ## Examples
+
+      iex> get_phone_number_label!(123)
+      %PhoneNumberLabel{}
+
+      iex> get_phone_number_label!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_phone_number_label!(id), do: Repo.get!(PhoneNumberLabel, id)
+
+  @doc """
+  Creates a phone_number_label.
+
+  ## Examples
+
+      iex> create_phone_number_label(%{field: value})
+      {:ok, %PhoneNumberLabel{}}
+
+      iex> create_phone_number_label(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_phone_number_label(attrs \\ %{}) do
+    %PhoneNumberLabel{}
+    |> PhoneNumberLabel.changeset(to_map attrs)
+    |> Repo.insert()
+  end
+
+  def create_phone_number_label!(attrs \\ %{}) do
+    %PhoneNumberLabel{}
+    |> PhoneNumberLabel.changeset(to_map attrs)
+    |> Repo.insert!()
+  end
+
+
+  @doc """
+  Updates a phone_number_label.
+
+  ## Examples
+
+      iex> update_phone_number_label(phone_number_label, %{field: new_value})
+      {:ok, %PhoneNumberLabel{}}
+
+      iex> update_phone_number_label(phone_number_label, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_phone_number_label(%PhoneNumberLabel{} = phone_number_label, attrs) do
+    phone_number_label
+    |> PhoneNumberLabel.changeset(to_map attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a PhoneNumberLabel.
+
+  ## Examples
+
+      iex> delete_phone_number_label(phone_number_label)
+      {:ok, %PhoneNumberLabel{}}
+
+      iex> delete_phone_number_label(phone_number_label)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_phone_number_label(%PhoneNumberLabel{} = phone_number_label) do
+    Repo.delete(phone_number_label)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking phone_number_label changes.
+
+  ## Examples
+
+      iex> change_phone_number_label(phone_number_label)
+      %Ecto.Changeset{source: %PhoneNumberLabel{}}
+
+  """
+  def change_phone_number_label(%PhoneNumberLabel{} = phone_number_label) do
+    PhoneNumberLabel.changeset(phone_number_label, %{})
+  end
+
+  defp to_map(%{} = attrs), do: attrs
+  defp to_map(nil), do: %{}
+  defp to_map(attrs), do: Enum.into(attrs, %{})
+
 end

@@ -212,7 +212,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   def run_command("call", args, _sender, socket, client) do
-    # user = Accounts.get_user socket.assigns.user_id, preload: [:extension]
     number_string = Enum.join(args, "")
     number = String.replace(number_string, ~r/[\.\+\- x\(\)]+/, "")
     # Logger.warn "slash call number: #{number}"

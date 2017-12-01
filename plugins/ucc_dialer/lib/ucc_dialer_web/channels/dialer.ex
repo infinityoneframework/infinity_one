@@ -1,6 +1,5 @@
 defmodule UccDialerWeb.Channel.Dialer do
 
-  import Rebel.Core
   import UcxUccWeb.Gettext
 
   alias UcxUcc.Accounts
@@ -15,9 +14,9 @@ defmodule UccDialerWeb.Channel.Dialer do
     dial(socket, number)
   end
 
-  def dial(socket, %{"dataset" => %{"phoneStatus" => username}} = sender) do
+  def dial(socket, %{"dataset" => %{"phoneStatus" => username}}) do
     # IO.inspect username, label: "username...."
-    user = Accounts.get_by_user username: username, preload: [:extension]
+    user = Accounts.get_by_user username: username, preload: [:extensions]
     number = extension user
     title = gettext "Call %{user}", user: user.username
     confirm_message = gettext "Place call to %{number}?", number: number
@@ -59,9 +58,11 @@ defmodule UccDialerWeb.Channel.Dialer do
     {user, extension(user)}
   end
 
+  # TODO: This needs to be refactored for the extensions change
   defp extension(user) do
     user
-    |> Map.get(:extension, %{})
+    |> Map.get(:extensions, [])
+    |> hd
     |> Map.get(:extension)
   end
 

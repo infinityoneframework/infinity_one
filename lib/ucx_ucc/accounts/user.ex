@@ -24,6 +24,7 @@ defmodule UcxUcc.Accounts.User do
 
     has_many :user_roles, UcxUcc.Accounts.UserRole
     has_many :roles, through: [:user_roles, :role]
+    has_many :phone_numbers, UcxUcc.Accounts.PhoneNumber
     # many_to_many :roles, UcxUcc.Accounts.Role, join_through: UcxUcc.Accounts.UserRole
     has_one :account, UcxUcc.Accounts.Account
 
@@ -39,6 +40,7 @@ defmodule UcxUcc.Accounts.User do
     model
     |> cast(params, @all_params ++ coherence_fields())
     |> validate_required(@required)
+    |> cast_assoc(:phone_numbers)
     |> validate_exclusion(:username, ["all", "here"])
     |> validate_format(:username, ~r/^[\.a-zA-Z0-9-_]+$/)
     |> validate_format(:email, ~r/@/)

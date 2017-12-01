@@ -1,17 +1,19 @@
 alias UcxUcc.Repo
 alias UcxUcc.{Accounts, Permissions}
-alias Accounts.{User, Role, UserRole, Account}
+alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
-# alias Mscs.{Client, Apb}
 alias UcxPresence.Extension
+# alias Mscs.{Client, Apb}
 
-Extension.delete_all
+# Extension.delete_all
 Message.delete_all
 Subscription.delete_all
 Channel.delete_all
-Apb.delete_all
+Mscs.Apb.delete_all
 
+Repo.delete_all PhoneNumberLabel
+Repo.delete_all PhoneNumber
 Repo.delete_all PermissionRole
 Repo.delete_all UserRole
 Repo.delete_all Permission
@@ -91,7 +93,8 @@ create_username = fn name ->
   name
   |> String.downcase
   |> String.split(" ", trim: true)
-  |> Enum.join(".")
+  |> hd
+  # |> Enum.join(".")
 end
 
 create_user = fn name, email, password, admin ->
@@ -105,6 +108,7 @@ create_user = fn name, email, password, admin ->
     %User{}
     |> User.changeset(params)
     |> Repo.insert!
+    |> Repo.preload([:phone_numbers])
 
   Coherence.Controller.confirm! user
 
@@ -133,7 +137,7 @@ end)
 
 IO.puts "Creating First Users"
 # build the users
-u0 = create_user.("Bot", "bot@example.com", "test", :bot)
+_u0 = create_user.("Bot", "bot@example.com", "test", :bot)
 u1 = create_user.("Admin", "admin@spallen.com", "test", true)
 u2 = create_user.("Steve Pallen", "steve.pallen@spallen.com", "test", true)
 u3 = create_user.("Merilee Lackey", "merilee.lackey@spallen.com", "test", false)
@@ -267,11 +271,31 @@ UccSettings.init_all()
 #   Client.update(user, %{mac: mac})
 # end)
 
-# IO.puts "Setting extensions"
+IO.puts "Setting phone numbers"
 
-# add_extension = fn {extension, user} ->
-#   Extension.create(%{user_id: user.id, extension: "#{extension}"})
-# end
+[work, _home, _mobile] =
+  ~w(Work Home Mobile)
+  |> Enum.map(fn label ->
+      Accounts.create_phone_number_label! %{name: label}
+  end)
+
+add_phone_number =
+  fn {{numbers, labels}, user} ->
+    phonelist =
+      numbers
+      |> Enum.zip(labels)
+      |> Enum.map(fn {number, label} ->
+        default = if label.name == "Work", do: true, else: false
+        %{user_id: user.id, number: number, default: default, label_id: label.id }
+      end)
+    Accounts.update_user!(user, %{phone_numbers: phonelist})
+  end
+
+add_extension =
+  fn user ->
+    user = Repo.preload(user, [:phone_numbers])
+    Extension.create! %{default: true, user_id: user.id, extension_id: hd(user.phone_numbers) |> Map.get(:id)}
+  end
 
 # [
 #   2000: u2, 2001: u3, 2002: Enum.at(users, 0),
@@ -279,6 +303,14 @@ UccSettings.init_all()
 #   2004: Enum.at(users, 3)
 # ]
 
-# 2000..2009
-# |> Enum.zip([u2, u3] ++ users)
-# |> Enum.each(& add_extension.(&1))
+users =
+  2000..2009
+  |> Enum.map(& {[to_string(&1)], [work]})
+  |> Enum.zip([u2, u3] ++ users)
+  |> Enum.map(& add_phone_number.(&1))
+
+IO.puts "Adding extensions"
+
+Enum.map users, &add_extension.(&1)
+
+
