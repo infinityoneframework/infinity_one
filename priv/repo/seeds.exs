@@ -4,6 +4,7 @@ alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
 alias UcxPresence.Extension
+alias Mscs.Client
 # alias Mscs.{Client, Apb}
 
 # Extension.delete_all
