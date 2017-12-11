@@ -55,7 +55,7 @@ defmodule UccDialer do
   def dial({_user, nil}, _number, _opts), do: nil
 
   def dial({user, caller}, number, opts) do
-    Logger.warn "dial number: #{inspect number}"
+    # Logger.warn "dial number: #{inspect number}"
     adapter = opts[:adapter] || @adapter
     if adapter do
       adapter.dial(user, caller, translate_digits(number), opts)
