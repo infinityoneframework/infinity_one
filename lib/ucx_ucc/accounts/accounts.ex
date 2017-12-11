@@ -593,6 +593,7 @@ defmodule UcxUcc.Accounts do
     Repo.all(PhoneNumber)
   end
 
+
   @doc """
   Gets a single phone_number.
 
@@ -667,6 +668,10 @@ defmodule UcxUcc.Accounts do
     Repo.delete(phone_number)
   end
 
+  def change_phone_number do
+    PhoneNumber.changeset(%PhoneNumber{}, %{})
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking phone_number changes.
 
@@ -677,7 +682,15 @@ defmodule UcxUcc.Accounts do
 
   """
   def change_phone_number(%PhoneNumber{} = phone_number) do
-    PhoneNumber.changeset(phone_number, %{})
+    change_phone_number(phone_number, %{})
+  end
+
+  def change_phone_number(%{} = attrs) do
+    change_phone_number(%PhoneNumber{}, attrs)
+  end
+
+  def change_phone_number(%PhoneNumber{} = phone_number, attrs) do
+    PhoneNumber.changeset(phone_number, attrs)
   end
 
   alias UcxUcc.Accounts.PhoneNumberLabel

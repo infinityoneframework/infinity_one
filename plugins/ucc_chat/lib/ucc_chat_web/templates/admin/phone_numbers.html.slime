@@ -1,0 +1,10 @@
+.main-content-flex
+  section.page-container.page-list.flex-tab-main-content
+    header.fixed-title.border-component-color
+      .burger
+        i
+        i
+        i
+      h2
+        span.room-title= ~g"Phone Numbers"
+    .content

@@ -1,0 +1,33 @@
+section.page-container.page-home.page-static
+  header.fixed-title.border-component-color
+    = UccChatWeb.MasterView.render "burger.html"
+    h2
+      span.room-title= ~g"Phone"
+  .content
+    = form_for @phone_number_changeset, "#", [id: "account-phone-form"], fn f ->
+      .rocket-form
+        = hidden_input f, :id
+        = hidden_input f, :user_id
+        fieldset
+          .input-line
+            label(for="number")= ~g"Number"
+            div
+              = text_input f, :number, type: "tel", pattern: "\\d{2,11}"
+          input-line
+            label(for="label_id")= ~g"Label"
+            div
+              = select f, :label_id, @labels
+
+        fieldset
+          .submit
+            button.button.primary.send
+              i.icon-send
+              = if f.data.id do
+                span= ~g"Save changes"
+              - else
+                span= ~g"Create Phone Number"
+          = if f.data.id do
+            .delete-phone-number.text-right(style="margin-top: 2px;")
+              button.button.danger.delete
+                i.icon-trash
+                span= ~g"Delete my Phone Number"

@@ -1,5 +1,6 @@
 defmodule UcxUcc.Accounts.PhoneNumber do
-  use Ecto.Schema
+  # use Ecto.Schema
+  use Unbrella.Schema
   import Ecto.Changeset
   alias UcxUcc.Accounts.{PhoneNumber, User, PhoneNumberLabel}
 
@@ -22,5 +23,6 @@ defmodule UcxUcc.Accounts.PhoneNumber do
     |> validate_required([:number, :primary, :label_id, :user_id])
     |> foreign_key_constraint(:label_id, name: :phone_numbers_label_id_fkey)
     |> validate_format(:number, ~r/^[0-9\+\-\(\)\. ]+$/)
+    |> plugin_changesets(attrs, __MODULE__)
   end
 end

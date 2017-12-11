@@ -174,6 +174,19 @@ class SideNav {
       this.userchan.push('account_link:click:' + $(e.currentTarget).data('link'), {})
       this.navMenu.close()
     })
+    .on('click', '.delete-phone-number .button.delete', e => {
+      e.preventDefault();
+      this.userchan.push('account:phone:delete', $(e.currentTarget).closest('form').serializeArray())
+        .receive("ok", resp => {
+          if (resp.success) {
+            toastr.success(resp.success)
+            $('.account-link[data-link="phone"]').click();
+          } else if (resp.error) {
+            toastr.error(resp.error)
+          }
+        })
+      return false;
+    })
     // .on('click', '.admin-link', e => {
     //   console.log('admin link click')
     //   e.preventDefault()
@@ -197,6 +210,18 @@ class SideNav {
         .receive("ok", resp => {
           if (resp.success) {
             toastr.success(resp.success)
+          } else if (resp.error) {
+            toastr.error(resp.error)
+          }
+        })
+    })
+    .on('submit', '#account-phone-form', e => {
+      e.preventDefault()
+      this.userchan.push('account:phone:save', $(e.currentTarget).serializeArray())
+        .receive("ok", resp => {
+          if (resp.success) {
+            toastr.success(resp.success)
+            $('.account-link[data-link="phone"]').click();
           } else if (resp.error) {
             toastr.error(resp.error)
           }

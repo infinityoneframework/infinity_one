@@ -380,18 +380,122 @@ defmodule UccChatWeb.UserChannel do
     {:reply, resp, socket}
   end
 
+  def handle_in("account:phone:save" = ev, params, socket) do
+    trace ev, params, "assigns: #{inspect socket.assigns}"
+
+    # TODO: Need to validate parameters to ensure they were not changed on
+    #       the way from the client to the server. This includes the user_id
+    #       and the phone number id.
+    {id, phone_number_params} =
+      params
+      |> Helpers.normalize_form_params
+      |> Map.get("phone_number")
+      |> Map.pop("id")
+
+    resp =
+      case id do
+        nil ->
+          phone_number_params
+          |> Map.put("user_id", socket.assigns.user_id)
+          |> Map.put("primary", true)
+          |> Accounts.create_phone_number
+          |> case do
+            {:ok, phone_number} ->
+              if function_exported? UcxPresence.Extension, :create, 1 do
+                case UcxPresence.Extension.create(%{extension_id: phone_number.id, default: true}) do
+                  {:ok, _} ->
+                    {:ok, %{success: ~g"Phone Number created successfully"}}
+                  {:error, changeset} ->
+                    Logger.error "changeset error: #{inspect changeset}"
+                    {:ok, %{error: ~g"There was a problem creating the phone number"}}
+                end
+              else
+                {:ok, %{success: ~g"Phone Number created successfully"}}
+              end
+            {:error, cs} ->
+              Logger.error "cs.errors: #{inspect cs.errors}"
+              {:ok, %{error: ~g"There a problem creating your phone number."}}
+          end
+        id ->
+          id
+          |> Accounts.get_phone_number!
+          |> Accounts.update_phone_number(phone_number_params)
+          |> case do
+            {:ok, _phone_number} ->
+              {:ok, %{success: ~g"Phone Number updated successfully"}}
+            {:error, cs} ->
+              Logger.error "cs.errors: #{inspect cs.errors}"
+              {:ok, %{error: ~g"There a problem updating your phone number."}}
+          end
+      end
+
+    {:reply, resp, socket}
+  end
+
+  def handle_in("account:phone:delete" = ev, params, socket) do
+    # Logger.warn "#{ev} params: #{inspect params}"
+
+    user_id = socket.assigns.user_id
+    phone_number =
+      params
+      |> Helpers.normalize_form_params()
+      |> Map.get("phone_number")
+      |> Map.get("id")
+      |> Accounts.get_phone_number!
+
+    resp =
+      case phone_number.user_id do
+        ^user_id ->
+          case Accounts.delete_phone_number(phone_number) do
+            {:ok, _} ->
+              {:ok, %{success: ~g"Phone Number deleted successfully."}}
+            {:error, _} ->
+              {:ok, %{error: ~g"There was a problem deleting the phone number!"}}
+          end
+        _ ->
+          {:ok, %{error: ~g"You don't have permission to delete that phone number!"}}
+      end
+
+    {:reply, resp, socket}
+  end
+
   @links ~w(preferences profile)
-  def handle_in(ev = "account_link:click:" <> link, params, socket)
-    when link in @links do
+  def handle_in(ev = "account_link:click:" <> link, params, socket) when link in @links do
 
     trace ev, params
 
-    user = Helpers.get_user(socket.assigns.user_id)
+    user = Accounts.get_user(socket.assigns.user_id,
+      preload: [:account, :roles, user_roles: :role, phone_numbers: :label, extensions: :extension])
+
     user_cs = User.changeset(user, %{})
     account_cs = Account.changeset(user.account, %{})
 
     Client.update_main_content_html socket, AccountView, "account_#{link}.html",
         user: user, account_changeset: account_cs, user_changeset: user_cs
+
+    {:noreply, socket}
+  end
+
+  def handle_in(ev = "account_link:click:phone", params, socket) do
+
+    trace ev, params
+
+    user = Accounts.get_user(socket.assigns.user_id,
+      preload: [:account, :roles, user_roles: :role, phone_numbers: :label, extensions: :extension])
+
+    labels = Enum.map Accounts.list_phone_number_labels, & {String.to_atom(&1.name), &1.id}
+
+    phone_cs =
+      case user.phone_numbers do
+        [] ->
+          work = Enum.find labels |> IO.inspect(label: "labels"), & elem(&1, 0) == :Work
+          Accounts.change_phone_number(%{primary: true, label_id: elem(work, 1)})
+        [pn | _] ->
+          Accounts.change_phone_number(pn, %{})
+      end
+
+    Client.update_main_content_html socket, AccountView, "account_phone.html",
+        user: user, phone_number_changeset: phone_cs, labels: labels
 
     {:noreply, socket}
   end

@@ -57,7 +57,9 @@ section.page-container.page-home.page-static
             i.icon-send
             span= ~g"Save changes"
         = if allow_delete_own_account() do
-          .delete-account.text-right
+          / TODO: I'm not sure this works. I had to use a different approach
+          /       for the accounts phone page
+          .delete-account.text-right(style="margin-top: 2px;")
             button.button.danger.delete
               i.icon-trash
               span= ~g"Delete my account"

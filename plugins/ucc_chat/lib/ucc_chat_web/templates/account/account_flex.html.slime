@@ -10,6 +10,8 @@ header
       li
         / - #{{#if allowUserProfileChange}}
         a.account-link(data-link="profile")= ~g(Profile)
+      li
+        a.account-link(data-link="phone")= ~g(Phone)
       = unless defer do
         li
           / - #{{#if allowUserAvatarChange}}

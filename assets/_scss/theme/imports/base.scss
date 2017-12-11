@@ -555,6 +555,7 @@ input[type='text'],
 input[type='number'],
 input[type='email'],
 input[type='url'],
+input[type='tel'],
 input[type='password'] {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -599,6 +600,7 @@ form.inline {
   input[type='email'],
   input[type='url'],
   input[type='password'],
+  input[type='tel'],
   select {
     width: auto;
   }
@@ -1247,6 +1249,7 @@ label.required::after {
 
     input[type='text'],
     input[type='password'],
+    input[type='tel'],
     select {
       padding: 0 8px 0 30px;
       box-shadow: 0 0 0;

@@ -260,16 +260,14 @@ IO.puts "Creating Settings"
 
 UccSettings.init_all()
 
-# start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
+start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
 
-# IO.puts "Setting mac addresses"
+IO.puts "Setting mac addresses"
 
-# Client.list
-# |> Enum.with_index
-# |> Enum.each(fn {user, inx} ->
-#   mac = start_mac + inx + 1
-#   Client.update(user, %{mac: mac})
-# end)
+Client.list |> Enum.with_index |> Enum.each(fn {user, inx} ->
+  mac = start_mac + inx + 1
+  Client.update(user, %{mac: mac})
+end)
 
 IO.puts "Setting phone numbers"
 
