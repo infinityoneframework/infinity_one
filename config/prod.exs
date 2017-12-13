@@ -19,7 +19,29 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
-config :logger, level: :info
+#config :logger, level: :info
+
+config :logger, [
+  level: :info,
+  tracing: false,
+  compile_time_purge_tracing: false,
+  backends: [Logger.Backends.Syslog, :console],
+  console: [level: :warn, format: "[$level] $metadata$message\n",
+    metadata: [:catgy, :module, :function]
+  ],
+
+  # the following section controls logging to syslog
+  syslog: [
+    appid: "ucx_ucc", host: '127.0.0.1', facility: :local5,
+
+    # syslog already prints timestamp, so no $date and $time needed
+    # format: "$date $time [$level] $metadata$message\n",
+    format: "[$level] $metadata$message\n",
+    # to enable category, module, function, and line numbers, use the following:
+    # metadata: [:catgy, :module, :function, :line]
+    metadata: [:catgy, :module, :function]
+  ]
+]
 
 # ## SSL Support
 #
