@@ -14,10 +14,6 @@ config :logger, :console,
   format: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]
 
-config :ucx_ucc, UcxUcc.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "ucx_ucc_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+if File.exists? "config/test.secret.exs" do
+  import_config "prod.secret.exs"
+end

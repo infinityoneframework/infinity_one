@@ -5,7 +5,7 @@ defmodule UccWebrtc.Repo.Migrations.CreateClientDevices do
     # create table(:client_devices, primary_key: false) do
     create table(:client_devices) do
       # add :id, :binary_id, primary_key: true
-      add :ip_addr, :integer
+      add :ip_addr, :bigint
       add :handsfree_input_id, :string
       add :handsfree_output_id, :string
       add :headset_input_id, :string
