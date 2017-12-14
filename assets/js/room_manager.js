@@ -108,6 +108,14 @@ class RoomManager {
         $('aside .rooms-list').html(resp.side_nav_html)
       })
   }
+  new_message_scroll(user_id) {
+    let at_bottom = this.at_bottom
+    console.log('new_message_scroll', at_bottom);
+
+    if (at_bottom || user_id == ucxchat.user_id) {
+      UccUtils.scroll_bottom();
+    }
+  }
   // add_private(elem) {
   //   let username = elem.parent().attr('data-username')
   //   if (debug) { console.log('pvt-msg button clicked...', username) }
