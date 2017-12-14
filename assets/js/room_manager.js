@@ -69,7 +69,8 @@ class RoomManager {
     let ucxchat = this.ucc_chat.ucxchat
 
     $('.room-link').removeClass("active")
-    $('.main-content').html(resp.html)
+    $('.messages-container').replaceWith(resp.html)
+
     let last_read = resp.messages_info.last_read
     if (last_read && last_read != "") {
       setTimeout(() => {
@@ -342,7 +343,7 @@ class RoomManager {
 
     this.ucc_chat.roomchan.on('room:open', resp => {
       UccUtils.page_loading()
-      $('.main-content').html(UccUtils.loading_animation())
+      $('.page-loading-container').html(UccUtils.loading_animation())
       this.open_room(resp.room, resp.room)
       if (resp.state) {
         this.focus = true
@@ -457,6 +458,8 @@ class RoomManager {
   open_room(room, display_name, callback) {
     if (debug) { console.log('open_room', this) }
     console.log('open_room room', room, 'old_room', ucxchat.room)
+    console.log('open_room', $('.messages-container'))
+
     cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
       .receive("ok", resp => {
         console.log('open_room ok', resp)
@@ -524,7 +527,7 @@ class RoomManager {
       e.preventDefault();
       if (debug) { console.log('clicked a.open-room', e, $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
       UccUtils.page_loading()
-      $('.main-content').html(UccUtils.loading_animation())
+      $('.page-loading-container').html(UccUtils.loading_animation())
       this.open_room($(e.currentTarget).attr('data-room'), $(e.currentTarget).attr('data-name'))
     })
     .on('click', 'a.toggle-favorite', e => {
