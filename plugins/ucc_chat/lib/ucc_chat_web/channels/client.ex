@@ -108,11 +108,13 @@ defmodule UccChatWeb.Client do
     Rebel.set_event_handlers('[id="#{message.id}"]');
     UccChat.normalize_message('#{message.id}');
     UccChat.roomManager.updateMentionsMarksOfRoom();
+    UccChat.roomManager.new_message_scroll('#{message.user_id}');
+    UccChat.roomManager.new_message('#{message.id}', '#{message.user_id}');
     """
   end
 
   def broadcast_message({message, html}, socket) do
-    js = push_message_js(html, message) <> RebelClient.scroll_bottom_js('#{@wrapper}')
+    js = push_message_js(html, message)
     broadcast_js socket, js
   end
 

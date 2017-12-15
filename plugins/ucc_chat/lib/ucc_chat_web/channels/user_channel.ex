@@ -18,6 +18,7 @@ defmodule UccChatWeb.UserChannel do
     "webrtc:incoming_video_call",
     "webrtc:confirmed_video_call",
     "webrtc:declined_video_call",
+    "get",
   ]
 
   use UccChatWeb.RebelChannel.Macros
@@ -81,9 +82,25 @@ defmodule UccChatWeb.UserChannel do
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "room:mention",
       %{channel_id: channel_id, user_id: user_id, body: body, mention: mention})
   end
+
   def user_state(user_id, state) do
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "user:state",
       %{state: state})
+  end
+
+  @doc """
+  API to get internal state from a channel.
+
+  Used for debugging purposes.
+  """
+  @spec get(any, String.t) :: any
+  def get(item, user_id) do
+    Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "get", %{item: item, caller: self()})
+    receive do
+      {:get_response, response} -> {:ok, response}
+    after
+      1_500 -> {:error, :timeout}
+    end
   end
 
   def join(CC.chan_user() <> _user_id = event, payload, socket) do
@@ -159,6 +176,21 @@ defmodule UccChatWeb.UserChannel do
   #   trace ev, payload
   #   {:noreply, socket}
   # end
+
+  # Generic handler for retrieving internal information from a channel.
+  # This is only for debugging purposes.
+  def handle_out("get", payload, socket) do
+    response =
+      case payload[:item] do
+        :assigns -> socket.assigns
+        :socket -> socket
+        :pid -> self()
+        {:assigns, field} -> Map.get(socket.assigns, field)
+        _ -> :invalid
+      end
+    send payload[:caller], {:get_response, response}
+    {:noreply, socket}
+  end
 
   def handle_out("js:execjs" = ev, payload, socket) do
     trace ev, payload
@@ -786,7 +818,12 @@ defmodule UccChatWeb.UserChannel do
     trace event, payload, "assigns: #{inspect assigns}"
 
     channel_id = payload[:channel_id]
-    socket = %{assigns: _assigns} = assign(socket, :channel_id, channel_id)
+    new_channel = Channel.get(channel_id)
+    socket = %{assigns: _assigns} =
+      socket
+      |> assign(:channel_id, channel_id)
+      |> assign(:last_channel_id, assigns[:channel_id])
+      |> assign(:room, new_channel.name)
 
     UccPubSub.broadcast "user:" <> assigns.user_id, "room:join",
       %{channel_id: channel_id}

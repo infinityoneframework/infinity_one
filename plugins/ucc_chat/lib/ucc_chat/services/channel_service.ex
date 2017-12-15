@@ -478,7 +478,7 @@ defmodule UccChat.ChannelService do
     #   |> UccChat.View.MasterView.render(chatd: chatd)
     #   |> Helpers.safe_to_string
     html =
-      "room.html"
+      "messages_container.html"
       |> UccChatWeb.MasterView.render(chatd: chatd)
       |> Helpers.safe_to_string
 
