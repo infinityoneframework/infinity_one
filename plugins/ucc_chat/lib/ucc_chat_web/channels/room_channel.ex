@@ -26,7 +26,8 @@ defmodule UccChatWeb.RoomChannel do
     "update:remove_user",
     # "update:set_remove_owner",
     "broadcast:message",
-    "broadcast:message:update"
+    "broadcast:message:update",
+    "message:new"
   ]
 
   alias UccChat.{
@@ -165,6 +166,10 @@ defmodule UccChatWeb.RoomChannel do
 
   ##########
   # Outgoing message handlers
+
+  def handle_out("message:new", _, socket) do
+    {:noreply, socket}
+  end
 
   def handle_out("send:message" = ev, payload, socket) do
     trace ev, payload
