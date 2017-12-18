@@ -12,7 +12,7 @@
     =# message_cog_action_li("copy", ~g("Copy"), "paste", "clipboard")
     =# message_cog_action_li("quote-message", ~g("Quote"), "quote-left")
     = if UccSettings.allow_message_staring config do
-      = if @opts[:stared] do
+      = if @opts[:starred] do
         = message_cog_action_li("unstar-message", ~g("Remove Star"), "star")
       - else
         = message_cog_action_li("star-message", ~g("Star Message"), "star-empty")

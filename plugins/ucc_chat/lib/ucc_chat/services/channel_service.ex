@@ -34,7 +34,7 @@ defmodule UccChat.ChannelService do
   # @public_channel  0
   # @private_channel 1
   # @direct_message  2
-  # @stared_room     3
+  # @starred_room     3
 
     # # def can_view_room?(channel, user) do
     # #   cond do
@@ -79,7 +79,7 @@ defmodule UccChat.ChannelService do
   # def room_type(:public), do: @public_channel
   # def room_type(:private), do: @private_channel
   # def room_type(:direct), do: @direct_message
-  # def room_type(:stared), do: @stared_room
+  # def room_type(:starred), do: @starred_room
 
   def set_subscription_state(channel, user_id, state)
     when state in [true, false] do
@@ -159,15 +159,15 @@ defmodule UccChat.ChannelService do
   def room_type(0), do: :public
   def room_type(1), do: :private
   def room_type(2), do: :direct
-  def room_type(3), do: :stared
+  def room_type(3), do: :starred
 
   def room_type(:public), do: 0
   def room_type(:private), do: 1
   def room_type(:direct), do: 2
-  def room_type(:stared), do: 3
+  def room_type(:starred), do: 3
 
   def base_types do
-    [:stared, :public, :direct]
+    [:starred, :public, :direct]
     |> Enum.map(&(%{type: &1, can_show_room: true,
       template_name: get_templ(&1), rooms: []}))
   end
@@ -381,7 +381,7 @@ defmodule UccChat.ChannelService do
   end
 
   def get_channel_display_name(type, %ChannelSchema{id: id, name: name},
-    user_id) when type == :direct or type == :stared do
+    user_id) when type == :direct or type == :starred do
 
     case Direct.get_by channel_id: id, user_id: user_id do
       %{} = direct ->
@@ -401,10 +401,10 @@ defmodule UccChat.ChannelService do
 
   def favorite_room?(%{} = chatd, channel_id) do
     with room_types <- chatd.rooms,
-         stared when not is_nil(stared) <-
-            Enum.find(room_types, &(&1[:type] == :stared)),
+         starred when not is_nil(starred) <-
+            Enum.find(room_types, &(&1[:type] == :starred)),
          room when not is_nil(room) <-
-           Enum.find(stared, &(&1[:channel_id] == channel_id)) do
+           Enum.find(starred, &(&1[:channel_id] == channel_id)) do
       true
     else
       _ -> false
@@ -413,10 +413,10 @@ defmodule UccChat.ChannelService do
 
   def favorite_room?(user_id, channel_id) do
     {cc, _user} = get_subscription_and_user(user_id, channel_id)
-    cc.type == room_type(:stared)
+    cc.type == room_type(:starred)
   end
 
-  def get_chan_type(3, _), do: :stared
+  def get_chan_type(3, _), do: :starred
   def get_chan_type(_, type), do: room_type(type)
 
   def room_redirect(room, display_name) do
@@ -502,10 +502,10 @@ defmodule UccChat.ChannelService do
     {cc, user} = get_subscription_and_user(user_id, channel_id)
 
     cc_type =
-      if cc.type == room_type(:stared) do
+      if cc.type == room_type(:starred) do
         cc.channel.type # change it back
       else
-        room_type(:stared) # star it
+        room_type(:starred) # star it
       end
 
     Subscription.update!(cc, %{type: cc_type})
@@ -1170,7 +1170,8 @@ defmodule UccChat.ChannelService do
   #################
   # Helpers
 
-  def get_templ(:stared), do: "stared_rooms.html"
+  #def get_templ(:starred), do: "starred_rooms.html"
+  def get_templ(:starred), do: "stared_rooms.html"
   def get_templ(:direct), do: "direct_messages.html"
   def get_templ(_), do: "channels.html"
 
@@ -1181,7 +1182,7 @@ defmodule UccChat.ChannelService do
   def get_icon(3), do: "icon-at"
   # def get_icon(:public), do: "icon-hash"
   # def get_icon(:private), do: "icon-hash"
-  # def get_icon(:stared), do: "icon-hash"
+  # def get_icon(:starred), do: "icon-hash"
   # def get_icon(:direct), do: "icon-at"
 
   # def broadcast_message(body, room, user_id, channel_id, opts \\ []) do
@@ -1250,7 +1251,7 @@ defmodule UccChat.ChannelService do
     #     user.username <> ~g( has left the channel.)
     # end
   end
-  # def get_route(@stared_room, name), do: "/direct/" <> name
+  # def get_route(@starred_room, name), do: "/direct/" <> name
   # def get_route(@direct_message, name), do: "/direct/" <> name
   # def get_route(_, name), do: "/channel/" <> name
 end

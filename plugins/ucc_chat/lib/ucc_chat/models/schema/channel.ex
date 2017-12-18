@@ -2,7 +2,7 @@ defmodule UccChat.Schema.Channel do
   use UccChat.Shared, :schema
 
   alias UccChat.Schema.{
-    Message, Subscription, Attachment, StaredMessage, Notification
+    Message, Subscription, Attachment, StarredMessage, Notification
   }
   alias UcxUcc.Accounts.User
 
@@ -22,7 +22,7 @@ defmodule UccChat.Schema.Channel do
 
     has_many :subscriptions, Subscription, on_delete: :delete_all
     has_many :users, through: [:subscriptions, :user], on_delete: :nilify_all
-    has_many :stared_messages, StaredMessage, on_delete: :delete_all
+    has_many :starred_messages, StarredMessage, on_delete: :delete_all
     has_many :messages, Message, on_delete: :delete_all
     has_many :notifications, Notification, on_delete: :delete_all
     has_many :attachments, Attachment, on_delete: :delete_all

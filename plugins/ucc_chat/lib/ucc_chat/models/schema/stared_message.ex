@@ -1,10 +1,10 @@
-defmodule UccChat.Schema.StaredMessage do
+defmodule UccChat.Schema.StarredMessage do
   use UccChat.Shared, :schema
 
   alias UcxUcc.Accounts.User
   alias UccChat.Schema.{Message, Channel}
 
-  schema "stared_messages" do
+  schema "starred_messages" do
     belongs_to :user, User
     belongs_to :message, Message
     belongs_to :channel, Channel

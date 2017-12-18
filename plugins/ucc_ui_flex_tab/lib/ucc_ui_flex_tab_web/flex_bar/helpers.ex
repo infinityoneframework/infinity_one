@@ -10,28 +10,28 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
   The following is an example Tab module showing the basic usage.
 
-      defmodule UccChatWeb.FlexBar.Tab.StaredMessage do
+      defmodule UccChatWeb.FlexBar.Tab.StarredMessage do
         use UccChatWeb.FlexBar.Helpers
 
-        alias UccChat.StaredMessage
+        alias UccChat.StarredMessage
         alias UcxUcc.TabBar.Tab
 
         def add_buttons do
           TabBar.add_button Tab.new(
             __MODULE__,
             ~w[channel direct im],
-            "stared-messages",
-            ~g"Stared Messages",
+            "starred-messages",
+            ~g"Starred Messages",
             "icon-star",
             View,
-            "stared_messages.html",
+            "starred_messages.html",
             80)
         end
 
         def args(socket, {user_id, channel_id, _, _}, _) do
           stars =
             channel_id
-            |> StaredMessage.get_by_channel_id_and_user_id(user_id)
+            |> StarredMessage.get_by_channel_id_and_user_id(user_id)
             |> do_messages_args(user_id, channel_id)
           {[stars: stars], socket}
         end

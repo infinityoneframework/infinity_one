@@ -1,8 +1,8 @@
 .content
   = render "flex_close_button.html"
-  .list-view.stared-messages-list
+  .list-view.starred-messages-list
     .title
-      h2= ~g(Stared Messages)
+      h2= ~g(Starred Messages)
     = if @stars == [] do
       h2= ~g(No started messages)
   .ul.list.clearfix(rebel-channel="room")
