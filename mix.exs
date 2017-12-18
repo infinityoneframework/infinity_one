@@ -94,7 +94,7 @@ defmodule UcxUcc.Mixfile do
       {:slime, github: "smpallen99/slime", override: true},
       # {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.8"},
-      {:postgrex, ">= 0.0.0", only: :test},
+#     {:postgrex, ">= 0.0.0", only: :test},
       # {:rebel, path: "../rebel"},
       {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
@@ -105,6 +105,15 @@ defmodule UcxUcc.Mixfile do
       {:syslog, github: "smpallen99/syslog"},
       {:distillery, "~> 1.4"},
       {:gen_state_machine_helpers, "~> 0.1.0"},
+      {:conform, "~> 2.2"},
+      {:earmark, "~> 1.2"},
+      {:elixir_make, "~> 0.4.0"},
+      {:exjsx, "~> 4.0"},
+      {:neotoma, "~> 1.7"},
+      {:postgrex, "~> 0.13.3"},
+      {:sbroker, "~> 1.0"},
+      {:ucx_license_manager,
+        git: "git@bitbucket.org:emetrotel/ucx_license_manager.git", env: Mix.env}
 
     ] ++ plugin_deps()
   end
