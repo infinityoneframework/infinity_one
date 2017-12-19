@@ -5,4 +5,4 @@
       = UccChatWeb.FlexBarView.render "user_edit.html", user: @user, current_user: @current_user
     - else
       .about.clearfix
-        p(style="margin-left: 10px;")= ~g(Please select a User)
+        p(style="margin-left: 10px; margin-top: 40px")= ~g(Please select a User)

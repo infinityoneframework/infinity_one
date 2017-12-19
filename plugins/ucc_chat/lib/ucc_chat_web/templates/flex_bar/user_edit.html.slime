@@ -1,6 +1,6 @@
 - user = @user
 -# {{#unless canEditOrAdd}}
-- if false do
+= if not has_permission?(@current_user, "view-user-administration") do
   p.secondary-font-color= ~g(You are not authorized to view this page)
 - else
   .about.clearfix
@@ -20,6 +20,18 @@
       .input-line
         label(for="email")= ~g(Email)
         input#email(type="email" name="user[email]" autocomplete="off" value="#{user.email}")
+      fieldset
+        legend= ~g(Phone Numbers)
+        .input-line
+          label(for="phone_number_number1")= ~g(Number)
+          input#phone_number_number1(type="tel" name="user[phone_numbers][number]" pattern="\\d{2,11}" value="")
+        .input-line
+          label(for="phone_number_label1")= ~g(Label)
+          select#phone_number_label1(name="user[phone_numbers][label_id]")
+            option Work
+            option Home
+            option Mobile
+
       = if has_permission? @current_user, "edit-other-user-password" do
         .input-line
           label(for="password")= ~g(Password)
