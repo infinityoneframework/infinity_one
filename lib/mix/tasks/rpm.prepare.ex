@@ -75,7 +75,6 @@ defmodule Mix.Tasks.Rpm.Prepare do
   end
 
   defp clone_source(src, dst) do
-    IO.puts "src #{src} dst #{dst}"
     :os.cmd 'git clone #{src} #{dst}'
     dst
     |> Path.join(".git")
