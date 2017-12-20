@@ -61,11 +61,9 @@ config :ucx_ucc, :ucc_tracer_level, :debug
 
 config :logger, [
   level: :info,
-  tracing: false,
-  compile_time_purge_tracing: false,
   backends: [Logger.Backends.Syslog, :console],
   console: [level: :warn, format: "[$level] $metadata$message\n",
-    metadata: [:catgy, :module, :function]
+    metadata: [:module, :function]
   ],
 
   # the following section controls logging to syslog
@@ -77,7 +75,7 @@ config :logger, [
     format: "[$level] $metadata$message\n",
     # to enable category, module, function, and line numbers, use the following:
     # metadata: [:catgy, :module, :function, :line]
-    metadata: [:catgy, :module, :function]
+    metadata: [:module, :function]
   ]
 ]
 
