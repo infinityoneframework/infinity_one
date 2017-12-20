@@ -1,9 +1,11 @@
 defmodule UcxUcc.Mixfile do
   use Mix.Project
 
+  @version "1.0.0-alpha1"
+
   def project do
     [app: :ucx_ucc,
-     version: "0.0.1",
+     version: @version,
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,

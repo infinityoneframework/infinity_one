@@ -24,7 +24,7 @@
 %define debug_package         %{nil}
 
 # Use the following for pre-release versions
-%define release_tag           beta2
+%define release_tag           alpha1
 %define version_tag           -%{release_tag}
 
 # Use the following release and version tags for post-release versions
@@ -77,7 +77,8 @@ mkdir -p $RPM_BUILD_ROOT/etc/asterisk
 mkdir -p $RPM_BUILD_ROOT%{install_dir}/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 mkdir -p $RPM_BUILD_ROOT%{ucx_ucc_sbin_dir}
-tar xzf %{_topdir}/BUILD/%{name}/rel/%{name}/releases/%{version}%{version_tag}/%{name}.tar.gz -C %{buildroot}%{install_dir}/%{name}
+#tar xzf %{_topdir}/BUILD/%{name}/rel/%{name}/releases/%{version}%{version_tag}/%{name}.tar.gz -C %{buildroot}%{install_dir}/%{name}
+tar xzf %{_topdir}/BUILD/%{name}/_build/prod/rel/%{name}/releases/%{version}%{version_tag}/%{name}.tar.gz -C %{buildroot}%{install_dir}/%{name}
 cp -r $RPM_BUILD_DIR/%{name}/rpm/SOURCES/* %{buildroot}/
 #mv %{buildroot}%{install_dir}/%{name}/releases/%{version}%{version_tag}/ucx_ucc.conf %{buildroot}/etc/asterisk/ucx_mscs.conf
 

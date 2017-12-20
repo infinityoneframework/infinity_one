@@ -65,21 +65,34 @@ defmodule Mix.Tasks.Rpm.Prepare do
   end
 
   defp export_source(%Config{exportdir: exportdir, name: app} = config) do
-    :os.cmd 'git clone . #{Path.join(exportdir, app)}'
+    export_path = Path.join(exportdir, app)
+    clone_source(export_path, "")
+    clone_source(export_path, "plugins/mscs")
+    clone_source(export_path, "plugins/ucx_presence")
+    clone_source(export_path, "plugins/ucx_adapter")
     File.cp_r! "./priv/static", Path.join([exportdir, app | ~w(priv static)])
-    Path.join(exportdir, app)
-    |> Path.join(".git")
-    |> File.rm_rf!
     config
   end
 
+  defp clone_source(export_path, plugin) do
+    path = Path.join(export_path, plugin)
+    :os.cmd 'git clone . #{path}'
+    path
+    |> Path.join(".git")
+    |> File.rm_rf!
+  end
+
+  defp copy_source(path, plugin) do
+    File.cp_r! Path.join("./plugins/", Path.join(plugin, "/priv/repo/migrations")), Path.join(path, "priv/repo/migrations")
+  end
+
   defp copy_migration_files(%Config{exportdir: exportdir, name: app} = config) do
-  	home = Path.join(exportdir, app)
-    File.cp_r! "./plugins/mscs/priv/repo/migrations", Path.join(home, "./priv/repo/migrations")
-    File.cp_r! "./plugins/ucc_chat/priv/repo/migrations", Path.join(home, "./priv/repo/migrations")
-    File.cp_r! "./plugins/ucc_webrtc/priv/repo/migrations", Path.join(home, "./priv/repo/migrations")
-    File.cp_r! "./plugins/ucc_settings/priv/repo/migrations", Path.join(home, "./priv/repo/migrations")
-    File.cp_r! "./plugins/ucx_presence/priv/repo/migrations", Path.join(home, "./priv/repo/migrations")
+  	path = Path.join(exportdir, app)
+    copy_source(path, "mscs")
+    copy_source(path, "ucc_chat")
+    copy_source(path, "ucc_webrtc")
+    copy_source(path, "ucc_settings")
+    copy_source(path, "ucx_presence")
     config
   end
 
@@ -126,13 +139,9 @@ defmodule Mix.Tasks.Rpm.Prepare do
 
   defp parse_args(argv) do
     {args, _, _} = _res = OptionParser.parse(argv)
-    name = Mix.Project.config |> Keyword.get(:app) |> Atom.to_string
-    version = Mix.Project.config |> Keyword.get(:version)
-    IO.puts "name #{name} version #{version}"
     defaults = %Config{
       name:    Mix.Project.config |> Keyword.get(:app) |> Atom.to_string,
-      #TODO Fix version number
-      version: "1.0.0-alpha1", #Mix.Project.config |> Keyword.get(:version),
+      version: Mix.Project.config |> Keyword.get(:version),
       topdir:  Path.join(System.user_home, "rpmbuild"),
       exportdir: Path.join(System.user_home, "export"),
       build_opts: ["-bb"]
