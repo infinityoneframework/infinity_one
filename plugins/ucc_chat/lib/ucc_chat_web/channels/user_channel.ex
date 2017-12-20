@@ -775,6 +775,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
+    # Logger.warn "message:new, " <> room <> ", " <>  inspect(payload)
 
     trace event, ""  #socket.assigns
 
@@ -1032,7 +1033,7 @@ defmodule UccChatWeb.UserChannel do
       ChannelService.set_has_unread(channel_id, assigns.user_id, true)
 
       exec_js socket,
-        "$('link-room-#{room}').addClass('has-unread').addClass('has-alert');"
+        "$('.link-room-#{room}').addClass('has-unread').addClass('has-alert');"
       push socket, "update:alerts", %{}
     end
   end
