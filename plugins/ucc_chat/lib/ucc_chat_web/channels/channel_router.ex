@@ -84,7 +84,7 @@ end
   # Members List
   # Switch User
   # Mentions
-  # Stared Messages
+  # Starred Messages
   # ...
 
   # ChannelService

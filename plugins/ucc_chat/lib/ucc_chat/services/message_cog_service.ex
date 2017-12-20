@@ -1,12 +1,12 @@
 defmodule UccChat.MessageCogService do
   # import Ecto.Query
 
-  alias UccChat.{Message, StaredMessage, PinnedMessage}
+  alias UccChat.{Message, StarredMessage, PinnedMessage}
   alias UccChatWeb.{MessageView, FlexBarView}
 
   alias UcxUcc.Repo
   alias UccChat.ServiceHelpers, as: Helpers
-  # alias UccChat.Schema.StaredMessage, as: StaredMessageSchema
+  # alias UccChat.Schema.StarredMessage, as: StarredMessageSchema
 
   require Logger
 
@@ -20,9 +20,9 @@ defmodule UccChat.MessageCogService do
 
   def handle_in("open", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
     message_id = get_message_id msg["message_id"]
-    star_count = StaredMessage.count(user_id, message_id, channel_id)
+    star_count = StarredMessage.count(user_id, message_id, channel_id)
     pin_count = PinnedMessage.count(message_id)
-    opts = [stared: star_count > 0, pinned: pin_count > 0]
+    opts = [starred: star_count > 0, pinned: pin_count > 0]
     Logger.debug "MessageCogService: open, msg: #{inspect msg}, message_id: #{inspect message_id}"
 
     html =
@@ -35,16 +35,16 @@ defmodule UccChat.MessageCogService do
 
   def handle_in("star-message", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
     id = get_message_id msg["message_id"]
-    star = StaredMessage.create!(%{message_id: id, user_id: user_id,
+    star = StarredMessage.create!(%{message_id: id, user_id: user_id,
       channel_id: channel_id})
     Logger.debug "star: #{inspect star}"
-    {"update:stared", %{}}
+    {"update:starred", %{}}
   end
   def handle_in("unstar-message", %{"user_id" => user_id, "channel_id" => channel_id} = msg, _) do
     id = get_message_id msg["message_id"]
-    StaredMessage.delete! StaredMessage.get_by(user_id: user_id,
+    StarredMessage.delete! StarredMessage.get_by(user_id: user_id,
       message_id: id, channel_id: channel_id)
-    {"update:stared", %{}}
+    {"update:starred", %{}}
   end
 
   def handle_in("pin-message", %{"user_id" => _user_id, "channel_id" => channel_id} = msg, _) do

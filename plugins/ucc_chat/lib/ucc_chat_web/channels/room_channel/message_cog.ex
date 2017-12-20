@@ -6,15 +6,15 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
   import Rebel.Core, only: [this: 1]
 
   alias UccChatWeb.Client
-  alias UccChat.{StaredMessage, PinnedMessage}
+  alias UccChat.{StarredMessage, PinnedMessage}
   alias UccChatWeb.{MessageView, FlexBarView}
 
   def message_cog_click(socket, sender, client \\ Client) do
     assigns = socket.assigns
     message_id = client.closest socket, this(sender), "li.message", :id
-    star_count = StaredMessage.count(assigns.user_id, message_id, assigns.channel_id)
+    star_count = StarredMessage.count(assigns.user_id, message_id, assigns.channel_id)
     pin_count = PinnedMessage.count(message_id)
-    opts = [stared: star_count > 0, pinned: pin_count > 0]
+    opts = [starred: star_count > 0, pinned: pin_count > 0]
 
     html =
       MessageView

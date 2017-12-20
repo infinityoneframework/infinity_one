@@ -103,14 +103,14 @@ defmodule UccChatWeb.MasterView do
 
   def get_fav_icon(chatd) do
     case ChatDat.get_channel_data(chatd) do
-      %{type: :stared} -> "icon-star-empty"
+      %{type: :starred} -> "icon-star-empty"
       _ -> "icon-star-empty"
     end
   end
 
   def get_fav_icon_label(chatd) do
     case ChatDat.get_channel_data(chatd) do
-      %{type: :stared} ->
+      %{type: :starred} ->
         {"icon-star favorite-room pending-color", "Unfavorite"}
       _other ->
         {"icon-star-empty", "Favorite"}
@@ -118,7 +118,7 @@ defmodule UccChatWeb.MasterView do
   end
 
   def favorite_room?(chatd) do
-    ChatDat.get_channel_data(chatd)[:type] == :stared
+    ChatDat.get_channel_data(chatd)[:type] == :starred
   end
 
   def favorite_room?(%User{} = user, %ChannelSchema{} = channel) do
