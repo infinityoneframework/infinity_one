@@ -1,0 +1,16 @@
+# Copyright (C) E-MetroTel, 2015 - 2018 - All Rights Reserved.
+# This software contains material which is proprietary and confidential
+# to E-MetroTel and is made available solely pursuant to the terms of.
+# a written license agreement with E-MetroTel.
+
+/var/log/ucx/ucx_ucc.log {
+    missingok
+    notifempty
+    size 1M
+    rotate 10
+    copytruncate
+    postrotate
+        /usr/sbin/ucx_ucc -r -x resetlogfile > /dev/null 2> /dev/null || true
+    endscript
+}
+
