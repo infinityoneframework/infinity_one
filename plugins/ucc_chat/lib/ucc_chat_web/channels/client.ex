@@ -54,6 +54,10 @@ defmodule UccChatWeb.Client do
     Rebel.Query.insert socket, html, append: selector
   end
 
+  def html(socket, selector, html) do
+    Rebel.Query.update socket, :html, set: html, on: selector
+  end
+
   def remove_closest(socket, selector, parent, children) do
     js =
       ~s/$('#{selector}').closest('#{parent}').find('#{children}').remove()/

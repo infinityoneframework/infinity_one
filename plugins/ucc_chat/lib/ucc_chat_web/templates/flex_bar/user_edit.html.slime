@@ -1,10 +1,12 @@
 - user = @user
 -# {{#unless canEditOrAdd}}
+- labels = Enum.map UcxUcc.Accounts.list_phone_number_labels, & {String.to_atom(&1.name), &1.id}
 = if not has_permission?(@current_user, "view-user-administration") do
   p.secondary-font-color= ~g(You are not authorized to view this page)
 - else
   .about.clearfix
-    form.edit-form.user(autocomplete="off" data-username="#{user.username}")
+    - form_opts = [class: "edit-form user", autocomplete: :off, "data-username": user.username]
+    = form_for @changeset, "#", form_opts, fn f ->
       input(type="hidden" name="flex-id" value="admin_user_info")
       input(type="hidden" name="user[id]" value="#{user.id}")
       = if user do
@@ -12,34 +14,39 @@
       - else
         h3= ~g(Add User)
       .input-line
-        label(for="name")= ~g(Name)
-        input#name(type="text" name="user[name]" autocomplete="off" value="#{user.name}")
+        = label f, :name, ~g(Name)
+        = text_input f, :name, autocomplete: :off
       .input-line
-        label(for="username")= ~g(Username)
-        input#username(type="text" name="user[username]" autocomplete="off" value="#{user.username}")
+      = label f, :username, ~g(Username)
+        = text_input f, :username, autocomplete: :off
       .input-line
-        label(for="email")= ~g(Email)
-        input#email(type="email" name="user[email]" autocomplete="off" value="#{user.email}")
-      fieldset
-        legend= ~g(Phone Numbers)
-        .input-line
-          label(for="phone_number_number1")= ~g(Number)
-          input#phone_number_number1(type="tel" name="user[phone_numbers][number]" pattern="\\d{2,11}" value="")
-        .input-line
-          label(for="phone_number_label1")= ~g(Label)
-          select#phone_number_label1(name="user[phone_numbers][label_id]")
-            option Work
-            option Home
-            option Mobile
+        =label :email, ~g(Email)
+        = text_input f, :email, autocomplete: :off, type: :email
+      fieldset.phone-numbers
+        = if user.phone_numbers == [] do
+          = render "add_phone_number_button.html", user: user
+        - else
+          legend= ~g(Phone Numbers)
+          = inputs_for f, :phone_numbers, [], fn fp ->
+            .input-line
+              = label fp, :number, ~g(Number)
+              = text_input fp, :number, type: :tel, pattern: "\\d{2,11}"
+            .input-line
+              = label fp, :label, ~g(Label)
+              = select fp, :label_id, labels
+            .input-line
+              button.button.danger#remove-phone-number(rebel-click="delete_phone_number" data-number-id="#{fp.data.id}" title="#{~g(Delete)}")
+                i.icon-trash
+                = ~g"Delete"
 
       = if has_permission? @current_user, "edit-other-user-password" do
         .input-line
-          label(for="password")= ~g(Password)
-          input#password(type="password" name="user[password]" autocomplete="off" value="")
+          = label f, :password, ~g(Password)
+          = password_input f, :password, autocomplete: :off
           button#randomPassword.button= ~g(Random)
         .input-line
-          label(for="password_confirmation")= ~g(Password confirmation)
-          input#password_confirmation(type="password" name="user[password_confirmation]" autocomplete="off" value="")
+          = label f, :password_confirmation, ~g(Password confirmation)
+          = password_input f, :password_confirmation, autocomplete: :off
       = unless user do
         .input-line
           label(for="role")= ~g(Role)
