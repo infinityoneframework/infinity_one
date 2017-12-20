@@ -66,18 +66,18 @@ defmodule Mix.Tasks.Rpm.Prepare do
 
   defp export_source(%Config{exportdir: exportdir, name: app} = config) do
     export_path = Path.join(exportdir, app)
-    clone_source(export_path, "")
-    clone_source(export_path, "plugins/mscs")
-    clone_source(export_path, "plugins/ucx_presence")
-    clone_source(export_path, "plugins/ucx_adapter")
+    clone_source(".", Path.join(exportdir, app))
+    clone_source("./plugins/mscs", Path.join(export_path, "plugins/mscs"))
+    clone_source("./plugins/ucx_presence", Path.join(export_path, "plugins/ucx_presence"))
+    clone_source("./plugins/ucx_adapter", Path.join(export_path, "plugins/ucx_adapter"))
     File.cp_r! "./priv/static", Path.join([exportdir, app | ~w(priv static)])
     config
   end
 
-  defp clone_source(export_path, plugin) do
-    path = Path.join(export_path, plugin)
-    :os.cmd 'git clone . #{path}'
-    path
+  defp clone_source(src, dst) do
+    IO.puts "src #{src} dst #{dst}"
+    :os.cmd 'git clone #{src} #{dst}'
+    dst
     |> Path.join(".git")
     |> File.rm_rf!
   end

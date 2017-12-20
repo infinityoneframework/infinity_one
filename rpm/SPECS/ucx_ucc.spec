@@ -64,7 +64,7 @@ MIX_ENV=prod mix do deps.get, deps.compile
 cd assets && npm install mscs && npm install
 ./node_modules/brunch/bin/brunch b -p
 cd ..
-MIX_ENV=prod mix phoenix.digest
+MIX_ENV=prod mix phx.digest
 MIX_ENV=prod mix release
 
 %install
@@ -77,13 +77,11 @@ mkdir -p $RPM_BUILD_ROOT/etc/asterisk
 mkdir -p $RPM_BUILD_ROOT%{install_dir}/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 mkdir -p $RPM_BUILD_ROOT%{ucx_ucc_sbin_dir}
-#tar xzf %{_topdir}/BUILD/%{name}/rel/%{name}/releases/%{version}%{version_tag}/%{name}.tar.gz -C %{buildroot}%{install_dir}/%{name}
 tar xzf %{_topdir}/BUILD/%{name}/_build/prod/rel/%{name}/releases/%{version}%{version_tag}/%{name}.tar.gz -C %{buildroot}%{install_dir}/%{name}
 cp -r $RPM_BUILD_DIR/%{name}/rpm/SOURCES/* %{buildroot}/
-#mv %{buildroot}%{install_dir}/%{name}/releases/%{version}%{version_tag}/ucx_ucc.conf %{buildroot}/etc/asterisk/ucx_mscs.conf
 
 %clean
-#rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %pre
 
@@ -212,6 +210,7 @@ exit 0
 %files
 %defattr(-, asterisk, asterisk, -)
 %{_logrotated_dir}/%{name}.logrotate
+%config(noreplace) %{_rsyslogd_dir}/%{name}.conf
 
 %defattr(755, root, root, -)
 %{ucx_ucc_sbin_dir}/%{safe_name}
@@ -219,14 +218,8 @@ exit 0
 %defattr(755, asterisk, asterisk, 755)
 %{_initrddir}/%{name}
 %{install_dir}/%{name}/*
-#/var/lib/msc
-
-%defattr(644, asterisk, asterisk, -)
-#/var/lib/msc/*
-#%config(noreplace) /etc/asterisk/ucx_ucc.conf
-#%config(noreplace) %{_httpd_dir}/%{name}.conf
-%config(noreplace) %{_rsyslogd_dir}/%{name}.conf
+/var/lib/msc
 
 %changelog
-* Tue Dec 12 2017 Stephen Pallen <steve.pallen@emetrotel.com> 1.0.0-0beta2
+* Tue Dec 12 2017 Joseph Abraham Pallen <joseph.abraham@emetrotel.com> 1.0.0-0alpha1
  - first prototype rpm build for UCx UCC client
