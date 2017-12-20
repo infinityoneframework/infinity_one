@@ -55,17 +55,17 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   def notify_update_success(socket, tab, sender, _opts, client \\ UccChatWeb.Client)
 
-  def notify_update_success(socket, %{id: "admin_user_info"} = tab, sender, _opts, client) do
+  def notify_update_success(socket, %{id: "admin_user_info"}, _sender, _opts, client) do
     client.send_js socket, click_users_link_js()
     socket
   end
 
-  def notify_update_success(socket, tab, sender, _opts, _) do
+  def notify_update_success(socket, _tab, _sender, _opts, _) do
     # Logger.info "tab: #{inspect tab}, sender: #{inspect sender}"
     socket
   end
 
-  def notify_cancel(socket, tab, sender, client \\ UccChatWeb.Client) do
+  def notify_cancel(socket, _tab, _sender, client \\ UccChatWeb.Client) do
     client.send_js socket, click_users_link_js()
     socket
   end

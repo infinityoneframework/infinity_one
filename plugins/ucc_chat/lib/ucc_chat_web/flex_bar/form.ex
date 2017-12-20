@@ -165,9 +165,9 @@ defmodule UccChatWeb.FlexBar.Form do
 
     model =
       case tab.opts[:get] do
-        nil              -> apply(tab.opts[:model], :get, [form["#{prefix}[id]"]])
-        {mod, fun}       -> apply(mod, fun, [form["#{prefix}[id]"]])
-        {mod, fun, opts} -> apply(mod, fun, [form["#{prefix}[id]"]] ++ opts)
+        nil              -> apply(tab.opts[:model], :get, [id])
+        {mod, fun}       -> apply(mod, fun, [id])
+        {mod, fun, opts} -> apply(mod, fun, [id] ++ opts)
       end
 
     {model, prefix}

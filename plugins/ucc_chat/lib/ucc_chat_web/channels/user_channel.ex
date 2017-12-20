@@ -432,7 +432,7 @@ defmodule UccChatWeb.UserChannel do
           |> Map.put("extension", %{user_id: socket.assigns.user_id, default: true})
           |> Accounts.create_phone_number
           |> case do
-            {:ok, phone_number} ->
+            {:ok, _phone_number} ->
               {:ok, %{success: ~g"Phone Number created successfully"}}
             {:error, cs} ->
               Logger.error "cs.errors: #{inspect cs.errors}"

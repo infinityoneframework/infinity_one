@@ -26,7 +26,7 @@ defmodule UccAdminWeb.AdminChannel do
     {:noreply, apply(page.module, :open, [socket, sender, page])}
   end
 
-  def admin_flex(socket, sender) do
+  def admin_flex(socket, _sender) do
     # Logger.debug "sender: #{inspect sender}"
     {:noreply, socket}
   end
