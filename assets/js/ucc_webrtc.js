@@ -276,7 +276,7 @@ require('./device_manager');
     setupPeerConnection: function(stream) {
       trace('setupPeerConnection');
       var configuration = {
-        "iceServers": [{ "urls": ["stun:stun.1.google.com:19302"] }]
+        "iceServers": [{ "urls": window.UcxUcc.iceServers }]
       };
       WebRTC.yourConnection = new RTCPeerConnection(configuration);
 
