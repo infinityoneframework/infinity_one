@@ -107,6 +107,8 @@ defmodule UccChatWeb.RoomChannel.Message do
 
     Service.update_direct_notices(channel, message)
 
+    broadcast_message(socket, message.id, user.id, "", [])
+
     message
     |> render_message
     |> client.broadcast_message(socket)
@@ -412,6 +414,18 @@ defmodule UccChatWeb.RoomChannel.Message do
     channel_id
     |> Channel.get
     |> broadcast_private_message(user_id, body)
+  end
+
+  def broadcast_message(id, room, user_id, html, opts \\ []) #event \\ "new")
+  def broadcast_message(%{} = socket, id, user_id, html, opts) do
+    event = opts[:event] || "new"
+    Phoenix.Channel.broadcast! socket, "message:" <> event,
+      create_broadcast_message(id, user_id, html, opts)
+  end
+  def broadcast_message(id, room, user_id, html, opts) do
+    event = opts[:event] || "new"
+    UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:" <> event,
+      create_broadcast_message(id, user_id, html, opts)
   end
 
   defp create_broadcast_message(id, user_id, html, opts \\ []) do
