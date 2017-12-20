@@ -184,7 +184,7 @@
     background-color: #444
 }
 
-input,select,textarea {
+input,select,textarea,fieldset {
     color: #444;
     background-color: transparent;
     border-color: #e6e6e6;

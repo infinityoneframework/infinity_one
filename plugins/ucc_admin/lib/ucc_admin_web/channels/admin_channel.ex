@@ -9,23 +9,25 @@ defmodule UccAdminWeb.AdminChannel do
   require Logger
 
   def click_admin(socket, sender) do
+    # Logger.debug inspect(sender)
     SideNav.open socket
     admin_link "admin_info", socket, sender
   end
 
   def admin_link(socket, sender) do
+    # Logger.debug inspect(sender)
     admin_link sender["dataset"]["id"], socket, sender
   end
 
   def admin_link(id, socket, sender) do
     page = UccAdmin.get_page id
-    Logger.debug "page: #{inspect page}"
+    # Logger.debug "page: #{inspect page}"
     # Logger.warn "sender: #{inspect sender}"
     {:noreply, apply(page.module, :open, [socket, sender, page])}
   end
 
   def admin_flex(socket, sender) do
-    Logger.debug "sender: #{inspect sender}"
+    # Logger.debug "sender: #{inspect sender}"
     {:noreply, socket}
   end
 

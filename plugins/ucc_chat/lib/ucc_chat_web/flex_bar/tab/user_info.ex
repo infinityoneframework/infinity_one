@@ -2,7 +2,7 @@ defmodule UccChatWeb.FlexBar.Tab.UserInfo do
   use UccChatWeb.FlexBar.Helpers
 
   alias UccChat.{Channel, Direct}
-  alias UcxUcc.TabBar.Tab
+  alias UcxUcc.{Accounts, TabBar.Tab}
 
   def add_buttons do
     TabBar.add_button Tab.new(
@@ -15,7 +15,8 @@ defmodule UccChatWeb.FlexBar.Tab.UserInfo do
       "user_card.html",
       30,
       [
-        model: UcxUcc.User,
+        model: Accounts.User,
+        get: {Accounts, :get_user, [[preload: [phone_numbers: [:label]]]]},
         prefix: "user"
       ]
     )
