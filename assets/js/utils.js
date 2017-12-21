@@ -1,5 +1,6 @@
 (function() {
-  console.log('utils.js loading...')
+  console.log('loading utils');
+
   const debug = false;
 
   const item_selector = '.popup-item';

@@ -1,5 +1,7 @@
 import toastr from 'toastr'
 
+console.log('loading notifications_form');
+
 class NotificationsForm {
   constructor() {
     this.register_events()
