@@ -6,9 +6,8 @@
 use Mix.Config
 
 # General application configuration
-config :ucx_ucc, UcxUcc.Repo,
-# ecto_repos: [UcxUcc.Repo],
-  adapter: Ecto.Adapters.MySQL
+config :ucx_ucc,
+  ecto_repos: [UcxUcc.Repo]
 
 # Configures the endpoint
 config :ucx_ucc, UcxUccWeb.Endpoint,

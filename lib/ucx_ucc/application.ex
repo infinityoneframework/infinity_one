@@ -40,9 +40,13 @@ defmodule UcxUcc.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: UcxUcc.Supervisor]
     spawn(fn ->
-      :timer.sleep(1000)
-      create_and_migrate_db()
+      receive do
+        :run ->
+          create_and_migrate_db()
+      end
     end)
+    |> Process.send_after(:run, 1000)
+
     Supervisor.start_link(children, opts)
   end
 
