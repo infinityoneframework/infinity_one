@@ -1,0 +1,6 @@
+legend= ~g(Phone Numbers)
+.input-line
+  input(name="user[phone_numbers][]" value="" type="hidden")
+  button.button#add-phone-number(rebel-click="add_phone_number" data-user-id="#{@user.id}" title="#{~g(Add Phone Number)}")
+    i.icon-plus
+    = ~g(Add)

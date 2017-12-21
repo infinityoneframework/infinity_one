@@ -1,4 +1,4 @@
-console.log('typing.js loading')
+console.log('loading typing');
 
 // import * as cc from "./chat_channel"
 

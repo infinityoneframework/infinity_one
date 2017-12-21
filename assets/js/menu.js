@@ -1,4 +1,5 @@
-console.log('menu.js loading')
+console.log('loading menu.js');
+
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.navMenu = new Menu()
 })

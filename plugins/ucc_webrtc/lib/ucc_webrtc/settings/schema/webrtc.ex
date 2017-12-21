@@ -9,7 +9,7 @@ defmodule UccWebrtc.Settings.Schema.Webrtc do
     field :webrtc_enable_private, :boolean, default: true
     field :webrtc_enable_direct, :boolean, default: true
     field :webrtc_servers, :string,
-      default: "stun:stun.l.google.com:19302, stun:23.21.150.121"
+      default: "stun:stun.l.google.com:19302, stun:stun.emetrotel.org:3478"
   end
 
   @fields [

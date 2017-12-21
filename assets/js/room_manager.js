@@ -1,10 +1,11 @@
 import Favico from "./favico"
-console.log('room_manager.js loading')
 import * as socket from './socket'
 import * as cc from "./chat_channel"
 // import sweetAlert from "./sweetalert.min"
 // import * as device from './device_manager'
 // import toastr from 'toastr'
+
+console.log('loading room_manager');
 
 const debug = true;
 const new_message_unread_time = 5000;

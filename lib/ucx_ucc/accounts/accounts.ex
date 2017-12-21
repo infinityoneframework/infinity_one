@@ -177,6 +177,10 @@ defmodule UcxUcc.Accounts do
     User.changeset(user, %{})
   end
 
+  def change_user(%{} = params) do
+    User.changeset(%User{}, params)
+  end
+
   def add_role_to_user(%User{} = user, %Role{} = role) do
     create_user_role %{user_id: user.id, role_id: role.id}
   end
