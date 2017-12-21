@@ -24,7 +24,7 @@ defmodule UcxUcc.Accounts.User do
 
     has_many :user_roles, UcxUcc.Accounts.UserRole
     has_many :roles, through: [:user_roles, :role]
-    has_many :phone_numbers, UcxUcc.Accounts.PhoneNumber
+    has_many :phone_numbers, UcxUcc.Accounts.PhoneNumber, on_replace: :delete
     # many_to_many :roles, UcxUcc.Accounts.Role, join_through: UcxUcc.Accounts.UserRole
     has_one :account, UcxUcc.Accounts.Account
 
@@ -37,6 +37,15 @@ defmodule UcxUcc.Accounts.User do
   @required  ~w(name email username)a
 
   def changeset(model, params \\ %{}) do
+    # TODO: Not sure how to do this elegantly, but this hack works for removing
+    #       existing phone numbers
+    params =
+      if params["phone_numbers"] == [""] do
+        Map.put(params, "phone_numbers", [])
+      else
+        params
+      end
+
     model
     |> cast(params, @all_params ++ coherence_fields())
     |> validate_required(@required)

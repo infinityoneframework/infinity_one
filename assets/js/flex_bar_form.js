@@ -1,5 +1,7 @@
 import * as cc from "./chat_channel"
 import toastr from 'toastr'
+
+console.log('loading flex_bar_form');
 // import sweetAlert from "./sweetalert.min"
 
 // export function init() {

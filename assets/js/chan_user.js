@@ -1,4 +1,4 @@
-console.log('...chan_user.js loading')
+console.log('loading chan_user.js');
 
 function to_map(element) {
   var ret = {}

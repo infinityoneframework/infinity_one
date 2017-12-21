@@ -4,7 +4,7 @@
 // To use Phoenix channels, the first step is to import Socket
 // and connect at the socket path in "lib/my_app/endpoint.ex":
 
-console.log('ucc_chat.js loading...')
+console.log('loading ucc_chat');
 
 window.root = global || window
 

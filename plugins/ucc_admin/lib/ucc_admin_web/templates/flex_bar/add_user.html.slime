@@ -2,3 +2,4 @@
   = render "flex_close_button.html"
   .user-view
     h2 Adding a user
+    p Under construction ...

@@ -1,4 +1,4 @@
-console.log('...chan_system.js loading')
+console.log('loading chan_system.js');
 
 // new presence stuff
 let presences = {}
@@ -30,6 +30,34 @@ function update_presence(elem, status) {
   }
 }
 
+let onLine = true;
+
+const offlineContent = `
+  <div class="alert alert-warning text-center" role="alert">
+    <strong>
+      <span class="glyphicon glyphicon-warning-sign"></span>
+      Waiting for server connection,
+    </stong>
+    <a href="/" class="alert-link">Try now</a>
+  </div>`
+
+function handleOffLine() {
+  if (onLine) {
+    $('.connection-status').html('').append(offlineContent).removeClass('status-online')
+    $('.flex-tab-bar .tab-button.active').removeClass('active')
+    $('.flex-tab-container.opened').removeClass('opened')
+    onLine = false
+  }
+}
+function handleOnLine() {
+  if (!onLine) {
+    onLine = true
+    window.location.reload()
+    $('.connection-status').html('').addClass('status-online')
+  }
+
+}
+
 let render = (presences) => {
   Presence.list(presences, listBy)
     .map(presence => {
@@ -48,6 +76,21 @@ UccChat.on_connect(function(ucc_chat, socket) {
   let chan = socket.channel(ucc_chat.chan_system, {user: ucxchat.username, channel_id: ucxchat.channel_id})
 
   console.log('chan_system connect')
+
+  // onLine = false;
+
+  handleOnLine()
+
+  socket.onError( () => {
+    console.log('!! Socket error')
+    handleOffLine()
+    onLine = false
+  })
+  socket.onClose( () => {
+    console.log('!! Socket close')
+    handleOffLine()
+    onLine = false
+  })
 
   chan.onError( () => true )
   chan.onClose( () => true )
