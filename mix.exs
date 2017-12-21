@@ -64,7 +64,7 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.13"},
       # {:phoenix_haml, "~> 0.2"},
-      {:unbrella, github: "smpallen99/unbrella", branch: "mix-assets"},
+      {:unbrella, github: "smpallen99/unbrella"},
       # {:unbrella, path: "../unbrella"},
       {:coherence, github: "smpallen99/coherence", branch: "ucc_save"},
       # {:coherence, path: "../coherence3"},
