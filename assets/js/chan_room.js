@@ -1,6 +1,7 @@
  // window.Rebel.channels.user.channel
 
-console.log('... chan_room.js loading')
+console.log('loading chan_room.js');
+
 function start_room_channel(ucc_chat, socket) {
   console.log('chan_room connect')
   let ucxchat = ucc_chat.ucxchat
