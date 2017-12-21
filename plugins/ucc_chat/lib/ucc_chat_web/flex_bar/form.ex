@@ -61,7 +61,6 @@ defmodule UccChatWeb.FlexBar.Form do
     |> case do
       {:ok, resource} ->
         socket
-        # |> Phoenix.Socket.assign(resource_key, resource)
         |> flex_form_cancel(sender)
         |> toastr!(:success, gettext("%{prefix} updated successfully",
           prefix: prefix))
@@ -81,7 +80,12 @@ defmodule UccChatWeb.FlexBar.Form do
     tab = TabBar.get_button(tab_name)
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket
-    apply tab.module, :open, [socket, {user_id, channel_id, tab, sender}, %{}]
+
+    if ret_socket = notify_cancel(socket, tab, sender) do
+      ret_socket
+    else
+      apply tab.module, :open, [socket, {user_id, channel_id, tab, sender}, %{}]
+    end
   end
 
   def flex_form_toggle(socket, sender) do
@@ -157,12 +161,26 @@ defmodule UccChatWeb.FlexBar.Form do
   defp get_resource_and_prefix(tab, form) do
     prefix = tab.opts[:prefix]
     id = form["#{prefix}[id]"]
-    Logger.debug "prefix: " <> inspect(prefix) <> ", id: " <> inspect(id) <> ", form: " <> inspect(form)
-    {apply(tab.opts[:model], :get, [form["#{prefix}[id]"]]), prefix}
+    # Logger.warn "prefix: " <> inspect(prefix) <> ", id: " <> inspect(id) <> ", form: " <> inspect(form)
+
+    model =
+      case tab.opts[:get] do
+        nil              -> apply(tab.opts[:model], :get, [id])
+        {mod, fun}       -> apply(mod, fun, [id])
+        {mod, fun, opts} -> apply(mod, fun, [id] ++ opts)
+      end
+
+    {model, prefix}
   end
 
   defp notify_update_success(socket, tab, sender, opts) do
     apply tab.module, :notify_update_success, [socket, tab, sender, opts]
+  end
+
+  defp notify_cancel(socket, tab, sender) do
+    if function_exported? tab.module, :notify, 3 do
+      apply tab.module, :notify_cancel, [socket, tab, sender]
+    end
   end
 end
 

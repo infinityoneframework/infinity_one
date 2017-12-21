@@ -1,7 +1,7 @@
 .content
   = render "flex_close_button.html"
   .user-view.invite-users
-    - if has_permission? @user, "view-user-administration" do
+    = if has_permission? @user, "view-user-administration" do
       .about.clearfix
         form.edit-form(data-flex-id="admin_invite_users" rebel-change="flex_form_save")
           h3= ~g(Send invitation email)

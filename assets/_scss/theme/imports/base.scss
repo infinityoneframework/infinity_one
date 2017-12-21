@@ -3125,6 +3125,18 @@ body:not(.is-cordova) {
     width: $flex-tab-width;
     overflow-x: visible;
 
+    fieldset {
+      padding: 5px;
+      border-width: 1px;
+      border-radius: 4px;
+
+      legend {
+        padding: 0 3px;
+        margin-left: -9px;
+      }
+    }
+
+
     .control {
       .header {
         text-align: center;
@@ -3655,8 +3667,8 @@ body:not(.is-cordova) {
     > .input-line {
       margin-top: 20px;
 
-      #password {
-        width: 70%;
+      #user_password {
+        width: 73%;
         display: inline;
       }
     }

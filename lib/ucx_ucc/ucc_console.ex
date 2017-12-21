@@ -36,4 +36,28 @@ defmodule UccConsole do
   def user(username) do
     Accounts.get_by_user username: username, preload: [:account, :roles, user_roles: :role]
   end
+
+  @doc """
+  Set the runtime log level
+
+  ## Examples
+
+      UccConsole.log_level :debug
+      :ok
+  """
+  @spec log_level(atom) :: :ok
+  def log_level(level) when level in ~w(none error warn info debug)a do
+    Logger.configure level: level
+  end
+
+  @doc """
+  Get the current log level.
+
+      UccConsole.log_level()
+      :info
+  """
+  @spec log_level() :: atom
+  def log_level do
+    Logger.level
+  end
 end

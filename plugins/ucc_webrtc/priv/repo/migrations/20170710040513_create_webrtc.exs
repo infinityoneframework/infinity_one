@@ -8,7 +8,7 @@ defmodule UccWebrtc.Repo.Migrations.CreateWebrtc do
       add :webrtc_enable_private, :boolean, default: true
       add :webrtc_enable_direct, :boolean, default: true
       add :webrtc_servers, :string,
-        default: "stun:stun.emetrotel.org:3478"
+        default: "stun:stun.l.google.com:19302, stun:stun.emetrotel.org:3478"
     end
   end
 end

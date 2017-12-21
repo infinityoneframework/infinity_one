@@ -43,9 +43,8 @@ defmodule UccChatWeb.UserChannel do
     SideNavService, ChannelService, SubscriptionService, InvitationService,
     UserService, EmojiService, Settings, MessageService, Mention
   }
-  alias UccChatWeb.{RoomChannel, AccountView, UserSocket, MasterView}
+  alias UccChatWeb.{RoomChannel, AccountView, UserSocket, MasterView, FlexBarView}
   alias Rebel.SweetAlert
-
   alias UccWebrtcWeb.WebrtcChannel
   alias UccChatWeb.RebelChannel.Client
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
@@ -430,20 +429,11 @@ defmodule UccChatWeb.UserChannel do
           phone_number_params
           |> Map.put("user_id", socket.assigns.user_id)
           |> Map.put("primary", true)
+          |> Map.put("extension", %{user_id: socket.assigns.user_id, default: true})
           |> Accounts.create_phone_number
           |> case do
-            {:ok, phone_number} ->
-              if function_exported? UcxPresence.Extension, :create, 1 do
-                case UcxPresence.Extension.create(%{extension_id: phone_number.id, default: true}) do
-                  {:ok, _} ->
-                    {:ok, %{success: ~g"Phone Number created successfully"}}
-                  {:error, changeset} ->
-                    Logger.error "changeset error: #{inspect changeset}"
-                    {:ok, %{error: ~g"There was a problem creating the phone number"}}
-                end
-              else
-                {:ok, %{success: ~g"Phone Number created successfully"}}
-              end
+            {:ok, _phone_number} ->
+              {:ok, %{success: ~g"Phone Number created successfully"}}
             {:error, cs} ->
               Logger.error "cs.errors: #{inspect cs.errors}"
               {:ok, %{error: ~g"There a problem creating your phone number."}}
@@ -775,6 +765,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
+    # Logger.warn "message:new, " <> room <> ", " <>  inspect(payload)
 
     trace event, ""  #socket.assigns
 
@@ -1032,7 +1023,7 @@ defmodule UccChatWeb.UserChannel do
       ChannelService.set_has_unread(channel_id, assigns.user_id, true)
 
       exec_js socket,
-        "$('link-room-#{room}').addClass('has-unread').addClass('has-alert');"
+        "$('.link-room-#{room}').addClass('has-unread').addClass('has-alert');"
       push socket, "update:alerts", %{}
     end
   end
@@ -1258,7 +1249,7 @@ defmodule UccChatWeb.UserChannel do
   def phone_number(socket, sender, client \\ UccChatWeb.Client) do
     # Logger.warn "phone_number sender: #{inspect sender}"
     unless sender["html"] =~ "phone-cog" do
-      html = Phoenix.View.render_to_string UccChatWeb.FlexBarView, "phone_cog.html",
+      html = Phoenix.View.render_to_string FlexBarView, "phone_cog.html",
         phone: sender["dataset"]["phone"]
       # Logger.warn "phone_number html: #{inspect html}"
       client.append(socket, this(sender), html)
@@ -1270,6 +1261,20 @@ defmodule UccChatWeb.UserChannel do
   def close_phone_cog(socket, sender, client \\ UccChatWeb.Client) do
     # Logger.warn "close_phone_cog sender: #{inspect sender}"
     client.remove_closest socket, this(sender), "a.phone-number", ".phone-cog"
+  end
+
+  def add_phone_number(socket, sender, client \\ UccChatWeb.Client) do
+    user_id = sender["dataset"]["userId"]
+    html = Phoenix.View.render_to_string FlexBarView, "new_phone_number.html", user: %{id: user_id}
+    client.html socket, "fieldset.phone-numbers", html
+    socket
+  end
+
+  def delete_phone_number(socket, sender, client \\ UccChatWeb.Client) do
+    user_id = sender["form"]["user[id]"]
+    html = Phoenix.View.render_to_string FlexBarView, "add_phone_number_button.html", user: %{id: user_id}
+    client.html socket, "fieldset.phone-numbers", html
+    socket
   end
 
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel

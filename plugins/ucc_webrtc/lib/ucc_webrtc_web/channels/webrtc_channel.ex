@@ -49,7 +49,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     # Logger.error "on_connect: assigns: #{inspect socket.assigns}"
     case get_client_device socket do
       nil ->
-        exec_js socket, "window.UccChat.devices = {}"
+        exec_js socket, "window.UccChat.devices = {};" <> ice_servers_js()
         socket
       device ->
         str =
@@ -58,7 +58,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
           end)
           |> Enum.join(", ")
 
-        exec_js socket, "window.UcxUcc.devices = {" <> str <> "}"
+        exec_js socket, "window.UcxUcc.devices = {" <> str <> "};" <> ice_servers_js()
 
         # TODO: First attempt at notifing mscs that devices are ready, but
         # can't find common key to broadcast on.
@@ -69,6 +69,15 @@ defmodule UccWebrtcWeb.WebrtcChannel do
         # end
         socket
     end
+  end
+
+  def ice_servers_js do
+    servers_str =
+      UccSettings.webrtc_servers()
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
+      |> inspect
+    " window.UcxUcc.iceServers = #{servers_str};"
   end
 
   def join("webrtc:user-" <> _name, payload, socket) do
