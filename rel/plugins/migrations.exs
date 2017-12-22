@@ -13,13 +13,12 @@ defmodule UcxUcc.MigrationsPlugin do
       |> Path.join(@migrations_path)
       |> File.exists?()
     end)
-    |> IO.inspect(label: "migration paths")
   end
 
-  defp ls_migrations(release) do
-    path = Path.join([release.output_dir, "lib", "#{release.name}-#{release.version}" | ~w(priv repo migrations)])
-    info inspect(File.ls(path))
-  end
+  # defp ls_migrations(release) do
+  #   path = Path.join([release.output_dir, "lib", "#{release.name}-#{release.version}" | ~w(priv repo migrations)])
+  #   info inspect(File.ls(path))
+  # end
 
   defp migrations_path(release) do
     Path.join([release.output_dir, "lib", "#{release.name}-#{release.version}", @migrations_path])
@@ -34,21 +33,21 @@ defmodule UcxUcc.MigrationsPlugin do
   end
 
   def before_assembly(%Release{} = release, _opts) do
-    info "This is executed just prior to assembling the release"
+    # info "This is executed just prior to assembling the release"
     # info inspect(release)
     release # or nil
   end
 
   def after_assembly(%Release{} = release, _opts) do
-    info "This is executed just after assembling, and just prior to packaging the release"
-    info inspect(File.ls(release.output_dir))
+    # info "This is executed just after assembling, and just prior to packaging the release"
+    # info inspect(File.ls(release.output_dir))
     copy_migrations!(release)
     # info inspect(release)
     release # or nil
   end
 
   def before_package(%Release{} = release, _opts) do
-    info "This is executed just before packaging the release"
+    # info "This is executed just before packaging the release"
     # info inspect(release)
     release # or nil
   end

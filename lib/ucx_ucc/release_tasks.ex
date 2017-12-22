@@ -104,9 +104,13 @@ defmodule UcxUcc.ReleaseTasks do
   @doc """
   Drop the database for each configured Repo.
   """
-  @spec drop() :: :ok
-  def drop do
+  @spec drop_database(boolean) :: :ok
+  def drop_database(load? \\ true) do
+    if load?, do: load()
+
     Enum.each repos(), &drop/1
+
+    if load?, do: :init.stop()
   end
 
   @doc """

@@ -61,7 +61,8 @@ release :ucx_ucc do
   set commands: [
     "migrate": "rel/commands/migrate.sh",
     "setup": "rel/commands/setup.sh",
-    "create":  "rel/commands/create.sh"
+    "create":  "rel/commands/create.sh",
+    "drop_database": "rel/commands/drop_database.sh"
   ]
   plugin UcxUcc.MigrationsPlugin
 end
