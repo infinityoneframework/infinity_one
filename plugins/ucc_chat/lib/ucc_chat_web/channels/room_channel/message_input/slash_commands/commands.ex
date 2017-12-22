@@ -82,7 +82,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
          {:ok, _message} <- ChannelService.channel_command(socket, :create,
             name, assigns.user_id, assigns.channel_id) do
 
-      client.toastr! socket, :success, ~g(You have left the channel)
+      client.toastr! socket, :success, ~g(Channel created successfully)
     else
       {:error, message} ->
         client.toastr! socket, :error, message
