@@ -69,8 +69,18 @@ config :slime, :keep_lines, true
 
 config :auto_linker, opts: [phone: true]
 
+config :distillery,
+  no_warn_missing: [
+    :exjsx,
+    :postgrex
+  ]
+
 import_config("../plugins/*/config/config.exs")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
+
+if File.exists? Path.join("config", "unbrella.exs") do
+  import_config Path.join("config", "unbrella.exs")
+end

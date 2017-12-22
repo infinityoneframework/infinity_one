@@ -47,4 +47,16 @@ defmodule UcxUcc.Utils do
     |> Enum.join("")
   end
 
+  @doc """
+  Generate a random string.
+
+  Returns a random string, with the given length.
+  """
+  @spec random_string(integer) :: binary
+  def random_string(length) do
+    length
+    |> :crypto.strong_rand_bytes()
+    |> Base.url_encode64()
+    |> binary_part(0, length)
+  end
 end

@@ -3,8 +3,8 @@ defmodule UcxUcc.Mixfile do
 
   def project do
     [app: :ucx_ucc,
-     version: "0.0.1",
-     elixir: "~> 1.4",
+     version: "1.0.0-alhpa1",
+     elixir: "~> 1.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      start_permanent: Mix.env == :prod,
@@ -94,7 +94,7 @@ defmodule UcxUcc.Mixfile do
       {:slime, github: "smpallen99/slime", override: true},
       # {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.8"},
-      {:postgrex, ">= 0.0.0", only: :test},
+      {:postgrex, ">= 0.0.0", only: [:test]},
       # {:rebel, path: "../rebel"},
       {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
@@ -102,6 +102,7 @@ defmodule UcxUcc.Mixfile do
       {:sqlite_ecto2, "~> 2.0"},
       {:floki, "~> 0.0", override: true},
       {:phoenix_markdown, "~> 0.1"},
+      {:distillery, "~> 1.4"},
 
     ] ++ plugin_deps()
   end

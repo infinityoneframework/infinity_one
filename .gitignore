@@ -8,6 +8,7 @@ start
 /plugins/ucx_presence
 /plugins/ucx_adapter
 /assets/js/mscs
+/priv/static.bak
 
 .DS_Store
 
