@@ -5,6 +5,7 @@ defmodule UccWebrtc.Settings.Schema.Webrtc do
   @foreign_key_type :binary_id
 
   schema "settings_webrtc" do
+    field :webrtc_enabled, :boolean, default: false
     field :webrtc_enable_channel, :boolean, default: false
     field :webrtc_enable_private, :boolean, default: true
     field :webrtc_enable_direct, :boolean, default: true
@@ -14,7 +15,7 @@ defmodule UccWebrtc.Settings.Schema.Webrtc do
 
   @fields [
     :webrtc_enable_channel, :webrtc_enable_private, :webrtc_enable_direct,
-    :webrtc_servers,
+    :webrtc_servers, :webrtc_enabled
   ]
 
   def changeset(struct, params \\ %{}) do
