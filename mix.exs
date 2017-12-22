@@ -1,9 +1,11 @@
 defmodule UcxUcc.Mixfile do
   use Mix.Project
 
+  @version "1.0.0-alpha1"
+
   def project do
     [app: :ucx_ucc,
-     version: "0.0.1",
+     version: @version,
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -23,7 +25,7 @@ defmodule UcxUcc.Mixfile do
     [mod: {UcxUcc.Application, []},
      extra_applications: extra_applications(Mix.env)]
   end
-  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
+  defp extra_applications(:prod), do: [:logger, :syslog, :runtime_tools, :coherence]
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
@@ -94,7 +96,7 @@ defmodule UcxUcc.Mixfile do
       {:slime, github: "smpallen99/slime", override: true},
       # {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.8"},
-      {:postgrex, ">= 0.0.0", only: :test},
+#     {:postgrex, ">= 0.0.0", only: :test},
       # {:rebel, path: "../rebel"},
       {:rebel, github: "smpallen99/rebel"},
       # {:ucc_chat, path: "plugins/ucc_chat", app: false},
@@ -102,6 +104,18 @@ defmodule UcxUcc.Mixfile do
       {:sqlite_ecto2, "~> 2.0"},
       {:floki, "~> 0.0", override: true},
       {:phoenix_markdown, "~> 0.1"},
+      {:syslog, github: "smpallen99/syslog"},
+      {:distillery, "~> 1.4"},
+      {:gen_state_machine_helpers, "~> 0.1.0"},
+      {:conform, "~> 2.2"},
+      {:earmark, "~> 1.2"},
+      {:elixir_make, "~> 0.4.0"},
+      {:exjsx, "~> 4.0"},
+      {:neotoma, "~> 1.7"},
+      {:postgrex, "~> 0.13.3"},
+      {:sbroker, "~> 1.0"},
+      {:ucx_license_manager,
+        git: "git@bitbucket.org:emetrotel/ucx_license_manager.git", env: Mix.env}
 
     ] ++ plugin_deps()
   end

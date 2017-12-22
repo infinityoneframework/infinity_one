@@ -87,10 +87,10 @@ defmodule UccChat.ChatDat do
 
   def favorite_room?(%__MODULE__{} = chatd, channel_id) do
     with room_types <- chatd.rooms,
-         stared when not is_nil(stared) <-
-            Enum.find(room_types, &(&1[:type] == :stared)),
+         starred when not is_nil(starred) <-
+            Enum.find(room_types, &(&1[:type] == :starred)),
          room when not is_nil(room) <-
-            Enum.find(stared, &(&1[:channel_id] == channel_id)) do
+            Enum.find(starred, &(&1[:channel_id] == channel_id)) do
       true
     else
       _ -> false

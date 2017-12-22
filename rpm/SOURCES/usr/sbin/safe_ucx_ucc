@@ -1,0 +1,135 @@
+#!/bin/sh
+# Copyright (C) E-MetroTel, 2015 - 2018.  All Rights Reserved 
+# This software contains material which is proprietary and confidential
+# to E-MetroTel and is made available solely pursuant to the terms of 
+# a written license agreement with E-MetroTel.
+
+
+PROG_NAME=ucx_ucc
+INSTALL_DIR=/var/www/$PROG_NAME
+PROG=$INSTALL_DIR/bin/$PROG_NAME
+ENV_VARS=RELEASE_CONFIG_FILE=/etc/asterisk/ucx_ucx_ucc.conf
+
+ucx_ucc_SBIN_DIR=/usr/sbin
+ucx_ucc_PID_FILE=/var/run/${PROG_NAME}.pid
+PRIORITY=-20
+SLEEPSECS=4
+
+message() {
+   # echo "$1" >&2
+   logger -t safe_ucx_ucc[$$] "$1"
+}
+
+result=`${PROG} ping`
+if [ "$result" = "pong" ]; then 
+	  message "$PROG_NAME is already running. $0 will exit now"
+	  exit 1
+fi
+
+run_ucx_ucc()
+{
+    attempts=0                 # restart attempt counter
+    max_attempts=5             # number of attempts permitted in time frame
+    SECONDS=0                  # restart the script timer
+    reset_attempts_seconds=60  # Time frame to measuring restart attempts
+
+    message "Starting $PROG_NAME"
+
+    while :; do
+
+        ###################################################
+        # Check if existing ucx_ucc running and kill it 
+
+        res=`ps aux | grep ucx_ucc.sh | grep -v "grep ucx_ucc.sh"`
+        EXITST=$?
+
+        if [ "$EXITST" -eq "0" ]; then
+           pid=`ps aux | grep ucx_ucc.sh | grep -v "grep ucx_ucc.sh" | awk '{print $2}'`
+           message "$PROG_NAME Killing running ucx_ucc.sh process pid $pid"
+           kill -9 "$pid"
+        fi
+
+        ###################################################
+        # Check if we time window has expired and reset 
+        # counters if so
+
+        if [ "$((SECONDS))" -gt "$((reset_attempts_seconds))" ]; then
+  	        message "$PROG_NAME Resetting attempt counter."
+            SECONDS=0
+            attempts=2
+        fi
+
+        ###################################################
+        # Check if we have exceeded our max restart attempts
+        # and stop the script if so
+
+        if [ "$((attempts))" -eq "$((max_attempts))" ]; then
+            message "Exiting $PROG_NAME after $((attempts)) restart attempts"
+            exit 99
+        fi
+
+        ###################################################
+        # Check the cookie and remove it if not the correct
+        # permissions
+
+        if [ -f /var/lib/asterisk/.erlang.cookie ]; then 
+            ls -l /var/lib/asterisk/.erlang.cookie | grep "\-r--------"
+            if [ "$?" -ne "0" ]; then
+                message "Found .erlang.cookie with incorrect permissions. Removing it!"
+                /bin/rm /var/lib/asterisk/.erlang.cookie
+            fi
+        fi
+
+        ###################################################
+        # Start the service
+
+        RES=`sudo -H -u asterisk $ENV_VARS bash -c "$PROG foreground"`
+        EXITSTATUS=$?
+
+        # log the return value for troubleshooting purposes
+        message "$PROG_NAME returned: $RES"
+
+        ###################################################
+        # Service quit. Check exit status and restart if 
+        # not 0.
+
+        message "$PROG_NAME ended with exit status $EXITSTATUS"
+
+        if test "x$EXITSTATUS" = "x0" ; then
+            message "$PROG_NAME shutdown normally."
+            exit 0
+        fi
+
+        message "Automatically restarting $PROG_NAME attempt $((attempts))"
+
+        ###################################################
+        # update the restart counter and wait before looping
+
+        attempts=$((attempts + 1))
+        sleep $SLEEPSECS
+    done
+}
+
+get_ssl_cert_file()
+{
+    res=`grep  "^[ ]*[^#]" /etc/httpd/conf.d/ssl.conf | grep $1`
+    if [ $? -ne 0 ]; then
+        return
+    fi
+    cert_file=`echo $res  | awk '{print $2}'`
+    stat -c "%A" $cert_file | grep "......r.." > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        # echo "Changing permissions for $cert_file"
+        chmod a+r $cert_file > /dev/null 2>&1
+    fi
+}
+check_ssl_cert_permissions()
+{
+    get_ssl_cert_file "SSLCertificateFile"
+    get_ssl_cert_file "SSLCertificateKey"
+    get_ssl_cert_file "SSLCACertificateFile"
+}
+
+check_ssl_cert_permissions
+run_ucx_ucc &
+

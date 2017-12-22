@@ -1,8 +1,8 @@
-defmodule UccChat.Repo.Migrations.CreateStaredMessage do
+defmodule UccChat.Repo.Migrations.CreateStarredMessage do
   use Ecto.Migration
 
   def change do
-    create table(:stared_messages, primary_key: false) do
+    create table(:starred_messages, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :user_id, references(:users, on_delete: :nilify_all, type: :binary_id)
       add :message_id, references(:messages, on_delete: :delete_all, type: :binary_id)
@@ -11,9 +11,9 @@ defmodule UccChat.Repo.Migrations.CreateStaredMessage do
       timestamps(type: :utc_datetime)
       # timestamps()
     end
-    create index(:stared_messages, [:user_id])
-    create index(:stared_messages, [:message_id])
-    create index(:stared_messages, [:channel_id])
+    create index(:starred_messages, [:user_id])
+    create index(:starred_messages, [:message_id])
+    create index(:starred_messages, [:channel_id])
 
   end
 end

@@ -52,11 +52,32 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
 config :ucx_ucc, :ucc_tracer_modules, :all
 config :ucx_ucc, :ucc_tracer_level, :debug
 
-config :logger, :console,
+# Do not include metadata nor timestamps in development logs
+#config :logger, :console,
+# level: :info,
+# # level: :error,
+# format: "\n$time [$level]$levelpad$metadata$message\n",
+# metadata: [:module, :function, :line]
+
+config :logger, [
   level: :info,
-  # level: :error,
-  format: "\n$time [$level]$levelpad$metadata$message\n",
-  metadata: [:module, :function, :line]
+  backends: [Logger.Backends.Syslog, :console],
+  console: [level: :warn, format: "[$level] $metadata$message\n",
+    metadata: [:module, :function]
+  ],
+
+  # the following section controls logging to syslog
+  syslog: [
+    appid: "ucx_ucc", host: '127.0.0.1', facility: :local5,
+
+    # syslog already prints timestamp, so no $date and $time needed
+    # format: "$date $time [$level] $metadata$message\n",
+    format: "[$level] $metadata$message\n",
+    # to enable category, module, function, and line numbers, use the following:
+    # metadata: [:catgy, :module, :function, :line]
+    metadata: [:module, :function]
+  ]
+]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

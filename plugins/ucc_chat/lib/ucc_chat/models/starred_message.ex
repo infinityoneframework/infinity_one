@@ -1,5 +1,5 @@
-defmodule UccChat.StaredMessage do
-  use UccModel, schema: UccChat.Schema.StaredMessage
+defmodule UccChat.StarredMessage do
+  use UccModel, schema: UccChat.Schema.StarredMessage
 
   def count(user_id, message_id, channel_id) do
     @schema

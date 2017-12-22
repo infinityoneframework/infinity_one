@@ -1,0 +1,127 @@
+#!/bin/bash
+# Copyright (C) E-MetroTel, 2015 - 2018. All Rights Reserved 
+# This software contains material which is proprietary and confidential
+# to E-MetroTel and is made available solely pursuant to the terms of 
+# a written license agreement with E-MetroTel.
+
+#
+# chkconfig: 345 95 5
+# description: The extest service script
+# process name: ucx_ucc
+#
+# Author: Auto Generated
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+PROG_NAME=ucx_ucc
+INSTALL_DIR=/var/www/$PROG_NAME
+UCX_UCC_SBIN=/usr/sbin
+PROG=$INSTALL_DIR/bin/$PROG_NAME
+PROG_LOCK_FILE=/var/lock/subsys
+RETVAL=0
+SAFE_UCX_UCC=$UCX_UCC_SBIN/safe_ucx_ucc
+ENV_VARS=RELEASE_CONFIG_FILE=/etc/asterisk/ucx_ucc.conf
+
+txtgrn=$(tput setaf 2)
+txtred=$(tput setaf 1)
+txtrst=$(tput sgr0)
+
+if [ -f /etc/sysconfig/$PROG_NAME ] ; then
+  . /etc/sysconfig/$PROG_NAME
+fi
+
+[ -f $PROG ] || exit 0
+
+message() {
+    if [ $RETVAL -eq 0 ]; then
+        printf "%-45s[${txtgrn}  OK  ${txtrst}]\n" "$1"
+    else
+        printf "%-45s[${txtred}FAILED${txtrst}]\n" "$1"
+    fi
+}
+run_silent() {
+    sudo -H -u asterisk $ENV_VARS bash -c "$PROG $1 > /dev/null 2>&1"
+}
+run() {
+    sudo -H -u asterisk $ENV_VARS bash -c "$PROG $1"
+}
+start() {
+        ucx_ucc_pid=`pidofproc $SAFE_UCX_UCC`
+        if [ -n "${ucx_ucc_pid}" ]; then
+           RETVAL=1
+           message $"$PROG_NAME: is already running."
+           return $RETVAL
+        fi
+
+        $SAFE_UCX_UCC > /dev/null 2>&1
+        RETVAL=$?
+        message $"Starting $PROG_NAME: "
+        if [ $RETVAL = 0 ]; then
+            touch $PROG_LOCK_FILE/$PROG_NAME
+        fi
+        return $RETVAL
+}
+stop() {
+        ucx_ucc_pid=`pidofproc $SAFE_UCX_UCC`
+        if [ -n "${ucx_ucc_pid}" ]; then
+            /bin/kill $ucx_ucc_pid
+        fi
+        run_silent stop
+        RETVAL=$?
+        message "Stopping $PROG_NAME: "
+        rm -f $PROG_LOCK_FILE/$PROG_NAME
+        sleep 1
+        beam_pid=$(/bin/ps aux | /bin/grep '[b]eam.smp -Bd' | /bin/awk '{print $2}')
+        if [ -z "${beam_pid}" ]; then
+          epmd_pid=$(/bin/ps aux | /bin/grep '[e]pmd -daemon' | /bin/awk '{print $2}')
+          if [ -n "${epmd_pid}" ]; then
+            /bin/kill $epmd_pid > /dev/null 2>&1
+          fi
+        fi
+        return $RETVAL
+}
+restart() {
+        run_silent restart
+        RETVAL=$?
+        message $"Restarting $PROG_NAME: "
+        return $RETVAL
+}
+status() {
+      sudo -H -u asterisk bash -c "$PROG ping | grep 'pong'" > /dev/null 2>&1
+      RETVAL=$?
+      echo -n "Status: $PROG_NAME is "
+      if [ $RETVAL -eq 0 ]; then
+        echo "running ..."
+      else
+        echo "stopped"
+      fi
+      return $RETVAL
+} 
+
+case "$1" in
+        start)
+                start
+                ;;
+        stop)
+                stop
+                ;;
+        status)
+                status
+                ;;
+        restart)
+                restart
+                ;;
+        remote_console)
+                run remote_console
+                ;;
+        console)
+                run console
+                ;;
+        *)
+                echo $"Usage: $0 {start|stop|status|restart|console|remote_console}"
+                exit 1
+                ;;
+esac
+exit $RETVAL
