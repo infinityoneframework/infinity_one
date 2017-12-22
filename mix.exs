@@ -23,7 +23,7 @@ defmodule UcxUcc.Mixfile do
     [mod: {UcxUcc.Application, []},
      extra_applications: extra_applications(Mix.env)]
   end
-  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
+  defp extra_applications(:prod), do: [:logger, :syslog, :runtime_tools, :coherence]
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
@@ -103,6 +103,7 @@ defmodule UcxUcc.Mixfile do
       {:floki, "~> 0.0", override: true},
       {:phoenix_markdown, "~> 0.1"},
       {:distillery, "~> 1.4"},
+      {:syslog, github: "smpallen99/syslog"},
 
     ] ++ plugin_deps()
   end

@@ -10,7 +10,7 @@
 
 // const notifications = [
 //   {event: "update:pinned", title: "Pinned Messages"},
-//   {event: "update:stared", title: "Stared Messages"}
+//   {event: "update:starred", title: "Starred Messages"}
 // ]
 
 // const default_settings = {
@@ -35,7 +35,7 @@
 //   "Notifications": { args: {templ: "notifications.html"}},
 //   "Files List": {args: {templ: "files_list.html"}},
 //   "Mentions": { args: {templ: "mentions.html"} },
-//   "Stared Messages": { args: {templ: "stared_messages.html"}},
+//   "Starred Messages": { args: {templ: "starred_messages.html"}},
 //   "Knowledge Base": {hidden: true},
 //   "Pinned Messages": {args: {templ: "pinned_messages.html"}},
 //   "Past Chats": {hidden: true},

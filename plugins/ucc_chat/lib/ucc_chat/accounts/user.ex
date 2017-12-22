@@ -1,7 +1,7 @@
 defmodule UccChat.Accounts.User do
   use Unbrella.Plugin.Schema, UcxUcc.Accounts.User
 
-  alias UccChat.Schema.{Message, Subscription, Channel, StaredMessage}
+  alias UccChat.Schema.{Message, Subscription, Channel, StarredMessage}
 
   Code.ensure_compiled(Subscription)
   Code.ensure_compiled(Channel)
@@ -18,7 +18,7 @@ defmodule UccChat.Accounts.User do
     # has_many :channels, through: [:subscriptions, :channel], on_delete: :nilify_all
     many_to_many :channels, Channel, join_through: Subscription
     has_many :messages, Message, on_delete: :nilify_all
-    has_many :stared_messages, StaredMessage, on_delete: :nilify_all
+    has_many :starred_messages, StarredMessage, on_delete: :nilify_all
     has_many :owns, Channel, foreign_key: :user_id, on_delete: :nilify_all
   end
 

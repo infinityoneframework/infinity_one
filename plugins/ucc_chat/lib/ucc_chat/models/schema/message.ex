@@ -4,7 +4,7 @@ defmodule UccChat.Schema.Message do
   import Ecto.Changeset
 
   alias UcxUcc.Accounts.User
-  alias UccChat.Schema.{Channel, Reaction, Attachment, StaredMessage}
+  alias UccChat.Schema.{Channel, Reaction, Attachment, StarredMessage}
 
   schema "messages" do
     field :body, :string
@@ -18,7 +18,7 @@ defmodule UccChat.Schema.Message do
     belongs_to :channel, Channel
     belongs_to :edited_by, User, foreign_key: :edited_id
 
-    has_many :stars, StaredMessage, on_delete: :delete_all
+    has_many :stars, StarredMessage, on_delete: :delete_all
     has_many :attachments, Attachment, on_delete: :delete_all
     has_many :reactions, Reaction, on_delete: :delete_all
 

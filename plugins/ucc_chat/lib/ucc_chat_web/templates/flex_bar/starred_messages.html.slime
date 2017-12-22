@@ -1,13 +1,13 @@
 .content
   = render "flex_close_button.html"
-  .list-view.stared-messages-list
+  .list-view.starred-messages-list
     .title
-      h2= ~g(Stared Messages)
+      h2= ~g(Starred Messages)
     = if @stars == [] do
-      h2= ~g(No started messages)
+      h2= ~g(No starred messages)
   .ul.list.clearfix(rebel-channel="room")
     = for star <- @stars do
-      li(id="#{star[:id]}" class="#{get_li_class(star, :starned)}" data-username="#{star[:username]}" data-date="#{star[:date]}" data-timestamp="#{star[:timestamp]}")
+      li(id="#{star[:id]}" class="#{get_li_class(star, :starred)}" data-username="#{star[:username]}" data-date="#{star[:date]}" data-timestamp="#{star[:timestamp]}")
         button.thumb.user-card-message(data-username="#{star[:username]}" tabindex="1")
           .avatar
             .avatar-image(style="background-image:url(#{avatar_url(star[:username])});")

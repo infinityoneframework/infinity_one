@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   alias UcxUcc.{Accounts, Repo, Permissions}
   alias UccChat.{ChannelService, RobotService, MessageService}
-  alias UccChat.{Channel, Message, Attachment, StaredMessage, PinnedMessage}
+  alias UccChat.{Channel, Message, Attachment, StarredMessage, PinnedMessage}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChat.MessageService, as: Service
   # alias __MODULE__.Client
@@ -227,19 +227,19 @@ defmodule UccChatWeb.RoomChannel.Message do
   def message_action(socket, Utils.dataset("id", "star-message") = sender, client) do
     assigns = socket.assigns
     message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
-    _star = StaredMessage.create! %{message_id: message_id,
+    _star = StarredMessage.create! %{message_id: message_id,
       user_id: assigns.user_id, channel_id: assigns.channel_id}
     close_cog socket, sender, client
-    client.broadcast! socket, "update:stared", %{}
+    client.broadcast! socket, "update:starred", %{}
   end
 
   def message_action(socket, Utils.dataset("id", "unstar-message") = sender, client) do
     assigns = socket.assigns
     message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
-    StaredMessage.delete! StaredMessage.get_by(user_id: assigns.user_id,
+    StarredMessage.delete! StarredMessage.get_by(user_id: assigns.user_id,
       message_id: message_id, channel_id: assigns.channel_id)
     close_cog socket, sender, client
-    client.broadcast! socket, "update:stared", %{}
+    client.broadcast! socket, "update:starred", %{}
   end
 
   def message_action(socket, Utils.dataset("id", "pin-message") = sender, client) do
