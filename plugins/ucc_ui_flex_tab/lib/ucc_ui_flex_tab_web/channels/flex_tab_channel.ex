@@ -12,6 +12,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
   alias UcxUcc.TabBar
   alias TabBar.Ftab
+  alias UccUiFlexTabWeb.TabBarView
 
   @type socket :: Phoenix.Socket.t
   @type sender :: Map.t
@@ -119,6 +120,11 @@ defmodule UccUiFlexTab.FlexTabChannel do
     exec_js!(socket, "ucxchat.channel_id")
   end
 
+  def refresh_tab_bar(socket, groups \\ ~w(channel)) do
+    update socket, :replaceWith,
+      set: Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: groups),
+      on: "#flex-tabs .flex-tab-bar"
+  end
   # def room_update(_event, _payload, _socket) do
 
   # end

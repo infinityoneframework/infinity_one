@@ -21,6 +21,7 @@ defmodule UcxUcc.Accounts.User do
     field :tag_line, :string
     field :uri, :string
     field :active, :boolean
+    field :webrtc_enabled, :boolean, default: false
 
     has_many :user_roles, UcxUcc.Accounts.UserRole
     has_many :roles, through: [:user_roles, :role]
@@ -33,7 +34,7 @@ defmodule UcxUcc.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @all_params ~w(name email username tz_offset alias tag_line uri active avatar_url)a
+  @all_params ~w(name email username tz_offset alias tag_line uri active avatar_url webrtc_enabled)a
   @required  ~w(name email username)a
 
   def changeset(model, params \\ %{}) do
@@ -50,6 +51,7 @@ defmodule UcxUcc.Accounts.User do
     |> cast(params, @all_params ++ coherence_fields())
     |> validate_required(@required)
     |> cast_assoc(:phone_numbers)
+    |> cast_assoc(:account)
     |> validate_exclusion(:username, ["all", "here"])
     |> validate_format(:username, ~r/^[\.a-zA-Z0-9-_]+$/)
     |> validate_format(:email, ~r/@/)

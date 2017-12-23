@@ -51,6 +51,7 @@ defmodule UcxUccWeb.Coherence.RegistrationController do
   @spec create(conn, params) :: conn
   def create(conn, %{"registration" => registration_params} = params) do
     user_schema = Config.user_schema
+    registration_params = Map.put(registration_params, "account", %{})
     :registration
     |> Controller.changeset(user_schema, user_schema.__struct__, registration_params)
     |> Schemas.create
@@ -60,6 +61,7 @@ defmodule UcxUccWeb.Coherence.RegistrationController do
         |> send_confirmation(user, user_schema)
         |> redirect_or_login(user, params, Config.allow_unconfirmed_access_for)
       {:error, changeset} ->
+        Logger.warn "changeset: #{inspect changeset}"
         render(conn, "new.html", changeset: changeset)
     end
   end

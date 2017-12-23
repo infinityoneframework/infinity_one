@@ -33,7 +33,10 @@
               = text_input fp, :number, type: :tel, pattern: "\\d{2,11}"
             .input-line
               = label fp, :label, ~g(Label)
-              = select fp, :label_id, labels
+              div
+                div.select-arrow
+                  i.icon-down-open.secondary-font-color
+                = select fp, :label_id, labels
             .input-line
               button.button.danger#remove-phone-number(rebel-click="delete_phone_number" data-number-id="#{fp.data.id}" title="#{~g(Delete)}")
                 i.icon-trash

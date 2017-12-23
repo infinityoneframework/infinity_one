@@ -85,6 +85,19 @@ defmodule UcxUcc.TabBar do
     |> Enum.sort(& &1.order < &2.order)
   end
 
+  def update_button(key, field, value) do
+    button = get_button(key)
+    add_button Map.put(button, field, value)
+  end
+
+  def show_button(key) do
+    update_button key, :display, true
+  end
+
+  def hide_button(key) do
+    update_button key, :display, false
+  end
+
   @doc """
   Add a ftab from the ftab store
 

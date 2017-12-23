@@ -16,6 +16,8 @@ section.page-container.page-home.page-static
               .input-line
                 label(for="language")= ~g"Language"
                 div
+                  div.select-arrow
+                    i.icon-down-open.secondary-font-color
                   = select f, :language, get_languages(), class: "language required"
           .section
             h1= ~g"Messages"
@@ -72,11 +74,15 @@ section.page-container.page-home.page-static
               .input-line.double-col#viewMode
                 label= ~g"View mode"
                 div
+                  div.select-arrow
+                    i.icon-down-open.secondary-font-color
                   = select f, :view_mode, [{~g"Normal", 1}, {~g"Cozy", 2}, {~g"Compact", 3}]
                   .info= ~g"This changes the amount of space messages take up on the screen."
               .input-line.double-col#emailNotificationMode
                 label= ~g"Email Notification Mode"
                 div
+                  div.select-arrow
+                    i.icon-down-open.secondary-font-color
                   = select f, :email_notification_model, Disabled: "disabled", "Every Mention/DM": "all"
                   .info= ~g"You need to verify your email address to get notifications"
           = unless defer do
@@ -94,10 +100,14 @@ section.page-container.page-home.page-static
               .input-line.double-col
                 label= ~g"New Room Notification"
                 div
+                  div.select-arrow
+                    i.icon-down-open.secondary-font-color
                   = select f, :new_room_notification, get_room_notification_sounds(), class: "audio"
               .input-line.double-col
                 label= ~g"New Message Notification"
                 div
+                  div.select-arrow
+                    i.icon-down-open.secondary-font-color
                   = select f, :new_message_notification, get_message_notification_sounds(), class: "audio"
         .submit
           button.button.primary.save

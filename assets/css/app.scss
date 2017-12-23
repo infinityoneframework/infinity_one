@@ -288,4 +288,13 @@ a.phone-number:hover {
     }
   }
 }
+.content.account {
+  form li.boolean {
+    .input.checkbox.toggle {
+      input:checked+label::before {
+        background-color: #a6d256;
+      }
+    }
+  }
+}
 
