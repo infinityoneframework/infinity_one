@@ -38,5 +38,5 @@ javascript:
   let myPanel = $('.page-container')
   window.flash_error = '<%= flash_error %>'
   $(document).ready(function() {
-    UccChat.utils.remove_page_loading();
+    UccUtils.remove_page_loading();
   });

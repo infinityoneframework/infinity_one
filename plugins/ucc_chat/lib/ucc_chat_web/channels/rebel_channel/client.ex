@@ -211,7 +211,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   def get_caret_position_js(selector) do
     """
     var elem = document.querySelector('#{selector}');
-    UccChat.utils.getCaretPosition(elem);
+    UccUtils.getCaretPosition(elem);
     """ |> strip_nl
   end
 
@@ -229,7 +229,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   def set_caret_position_js(selector, start, finish) do
     """
     var elem = document.querySelector('#{selector}');
-    UccChat.utils.setCaretPosition(elem, #{start}, #{finish});
+    UccUtils.setCaretPosition(elem, #{start}, #{finish});
     """ |> strip_nl
   end
 
