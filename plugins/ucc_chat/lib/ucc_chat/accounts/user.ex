@@ -31,5 +31,6 @@ defmodule UccChat.Accounts.User do
     changeset
     |> cast(params, @fields)
     |> validate_required([])
+    |> cast_assoc(:subscriptions)
   end
 end

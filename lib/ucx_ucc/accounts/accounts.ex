@@ -119,9 +119,32 @@ defmodule UcxUcc.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
+    {account_key, subs_key} =
+      case Map.keys(attrs) do
+        [k | _] when is_atom(k) ->
+          {:account, :subscriptions}
+        _ ->
+          {"account", "subscriptions"}
+      end
+    subs =
+      true
+      |> UccChat.Channel.list_by_default()
+      |> Enum.map(& %{channel_id: &1.id})
+    attrs =
+      attrs
+      |> Map.put(subs_key, subs)
+      |> put_account(account_key)
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
+  end
+
+  defp put_account(attrs, key) do
+    if attrs[key] do
+      attrs
+    else
+      Map.put attrs, key, %{}
+    end
   end
 
   @doc """
@@ -321,7 +344,7 @@ defmodule UcxUcc.Accounts do
     end
   end
 
-  def delete_users_role(%{} = user, role_name, scope) do
+  def delete_users_role(%{} = user, role_name, scope \\ nil) do
     with role when not is_nil(role) <- get_role_by_name(role_name),
          user_role when not is_nil(user_role) <- get_by_user_role(user.id, role.id, scope),
          {:ok, _} <- delete_user_role(user_role) do
@@ -798,6 +821,35 @@ defmodule UcxUcc.Accounts do
   """
   def change_phone_number_label(%PhoneNumberLabel{} = phone_number_label) do
     PhoneNumberLabel.changeset(phone_number_label, %{})
+  end
+
+  # TODO: Replace this hack with the broadcast stuff
+  alias UccChat.{Subscription, Channel}
+  alias UccChat.Schema.Subscription, as: SubscriptionSchema
+  alias UccChat.Schema.Channel, as: ChannelSchema
+
+  def deactivate_user(user) do
+    (from s in SubscriptionSchema,
+      join: c in ChannelSchema, on: s.channel_id == c.id,
+      where: c.type == 2 and s.user_id == ^(user.id),
+      select: c)
+    |> Repo.all
+    |> Enum.each(fn channel ->
+      Channel.update(channel, %{active: false})
+    end)
+    user
+  end
+
+  def activate_user(user) do
+    (from s in SubscriptionSchema,
+      join: c in ChannelSchema, on: s.channel_id == c.id,
+      where: c.type == 2 and s.user_id == ^(user.id),
+      select: c)
+    |> Repo.all
+    |> Enum.each(fn channel ->
+      Channel.update(channel, %{active: true})
+    end)
+    user
   end
 
   defp to_map(%{} = attrs), do: attrs

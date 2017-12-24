@@ -44,7 +44,7 @@ defmodule UccChat.Schema.Subscription do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @all_fields)
-    |> validate_required(@fields)
+    # |> validate_required(@fields)
     |> unique_constraint(:user_id, name: :subscriptions_user_id_channel_id_index)
   end
 

@@ -14,6 +14,7 @@ defmodule UcxUccWeb.Coherence.RegistrationController do
 
   alias Coherence.Messages
   alias UcxUcc.Coherence.Schemas
+  alias UcxUcc.Accounts
 
   require Logger
 
@@ -51,11 +52,11 @@ defmodule UcxUccWeb.Coherence.RegistrationController do
   @spec create(conn, params) :: conn
   def create(conn, %{"registration" => registration_params} = params) do
     user_schema = Config.user_schema
-    registration_params = Map.put(registration_params, "account", %{})
-    :registration
-    |> Controller.changeset(user_schema, user_schema.__struct__, registration_params)
-    |> Schemas.create
-    |> case do
+    # registration_params = Map.put(registration_params, "account", %{})
+    # :registration
+    # |> Controller.changeset(user_schema, user_schema.__struct__, registration_params)
+    # |> Schemas.create
+     case Accounts.create_user registration_params do
       {:ok, user} ->
         conn
         |> send_confirmation(user, user_schema)

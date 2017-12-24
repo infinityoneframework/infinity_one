@@ -5,6 +5,7 @@ defmodule UccAdminWeb.FlexBar.Tab.InviteUsers do
   alias UcxUcc.TabBar
   alias TabBar.Tab
   alias UccAdminWeb.FlexBarView
+  alias UccAdmin.AdminService
   # alias UcxUcc.TabBar.Ftab
 
   def add_buttons do
@@ -19,6 +20,11 @@ defmodule UccAdminWeb.FlexBar.Tab.InviteUsers do
       10)
   end
 
+    # html =
+    #   "admin_invite_users.html"
+    #   |> FlexBarView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
+    #      invite_emails: [], error_emails: [], pending_invitations: get_pending_invitations())
+    #   |> safe_to_string
   def args(socket, {user_id, _channel_id, _, _}, _) do
     user = Helpers.get_user! user_id
     {[
@@ -26,8 +32,13 @@ defmodule UccAdminWeb.FlexBar.Tab.InviteUsers do
       channel_id: nil,
       user_info: %{admin: true},
       error_emails: [],
-      pending_invitations: [],
+      pending_invitations: AdminService.get_pending_invitations(),
       invite_emails: []], socket}
+  end
+
+  def invite_users(socket, sender) do
+    Logger.warn inspect(sender)
+    socket
   end
 
 end

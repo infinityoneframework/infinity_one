@@ -17,6 +17,7 @@ defmodule UcxUccWeb.Coherence.InvitationController do
 
   alias Coherence.{Config, Messages}
   alias UcxUcc.Coherence.Schemas
+  alias UcxUcc.Accounts
 
   require Logger
 
@@ -121,10 +122,7 @@ defmodule UcxUccWeb.Coherence.InvitationController do
         |> put_flash(:error, Messages.backend().invalid_invitation())
         |> redirect(to: logged_out_url(conn))
       invite ->
-        :invitation
-        |> Controller.changeset(user_schema, user_schema.__struct__, params["user"])
-        |> Schemas.create
-        |> case do
+        case Accounts.create_user params["user"] do
           {:ok, user} ->
             Schemas.delete invite
             conn

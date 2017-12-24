@@ -150,7 +150,7 @@ u1 = create_user.("admin", "admin@emetrotel.com", "emetr0tel", true)
 
 IO.puts "Creating Channels"
 
-ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id})
+ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id, default: true})
 
 IO.puts "Creating Subscriptions"
 

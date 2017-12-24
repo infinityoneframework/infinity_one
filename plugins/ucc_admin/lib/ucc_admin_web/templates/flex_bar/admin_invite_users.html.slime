@@ -3,7 +3,7 @@
   .user-view.invite-users
     = if has_permission? @user, "view-user-administration" do
       .about.clearfix
-        form.edit-form(data-flex-id="admin_invite_users" rebel-change="flex_form_save")
+        form.edit-form(data-id="admin_invite_users" rebel-change="flex_call" data-fun="invite_users")
           h3= ~g(Send invitation email)
           .input-line
             label(for="inviteEmails")= ~g(You can send multiple email invitations at once.)

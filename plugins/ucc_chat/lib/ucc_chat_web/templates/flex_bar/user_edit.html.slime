@@ -5,14 +5,22 @@
   p.secondary-font-color= ~g(You are not authorized to view this page)
 - else
   .about.clearfix
-    - form_opts = [class: "edit-form user", autocomplete: :off, "data-username": user.username]
-    = form_for @changeset, "#", form_opts, fn f ->
-      input(type="hidden" name="flex-id" value="admin_user_info")
-      input(type="hidden" name="user[id]" value="#{user.id}")
+    = form_for @changeset, "#", [id: "user-form", class: "edit-form user"], fn f ->
       = if user do
         h3= user.name
       - else
         h3= ~g(Add User)
+      ul.list.clearfix(style="margin-bottom: -20px; margin-top: 20px;")
+        li.boolean
+          label
+            span(style="margin-right: 20px")= ~g(Enable WebRTC)
+            .input.checkbox.toggle(rebel-click="toggle_webrtc_enabled" data-id="user_webrtc_enabled" style="display: inline-block; top: 8px;")
+              = UccChatWeb.FlexBarView.toggle_tag f, "user", %{name: :webrtc_enabled}, "rebel-change": "toggle_webrtc_enabled_change"
+              label(for="")
+    - form_opts = [class: "edit-form user", autocomplete: :off, "data-username": user.username]
+    = form_for @changeset, "#", form_opts, fn f ->
+      input(type="hidden" name="flex-id" value="admin_user_info")
+      input(type="hidden" name="user[id]" value="#{user.id}")
       .input-line
         = label f, :name, ~g(Name)
         = text_input f, :name, autocomplete: :off

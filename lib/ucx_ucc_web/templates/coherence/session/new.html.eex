@@ -20,6 +20,11 @@
       <%= error %>
     </div>
   <% end %>
+  <%= if notice = flash["info"] do %>
+    <div class="alert alert-success" role="alert">
+      <%= notice %>
+    </div>
+  <% end %>
 <% end %>
 <%= form_for @conn, session_path(@conn, :create), [id: "login-card", as: :session, class: "content-background-color color-primary-font-color"], fn f  -> %>
   <input type="hidden" name="tz-offset" id="tz-offset">

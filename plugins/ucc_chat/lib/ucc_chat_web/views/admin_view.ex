@@ -10,26 +10,34 @@ defmodule UccChatWeb.AdminView do
 
   def render_user_action_button(user, "admin") do
     if Accounts.has_role? user, "admin" do
-      render "user_action_buttons.html", opts: %{type: :danger, action: "remove-admin", icon: :shield, label: ~g(REMOVE ADMIN)}
+      render "user_action_buttons.html", opts: %{
+        fun: "change-admin", user: user, type: :danger, action: "remove-admin", icon: :shield, label: ~g(REMOVE ADMIN)
+      }
     else
-      render "user_action_buttons.html", opts: %{type: :secondary, action: "make-admin", icon: :shield, label: ~g(MAKE ADMIN)}
+      render "user_action_buttons.html", opts: %{
+        fun: "change-admin", user: user, type: :secondary, action: "make-admin", icon: :shield, label: ~g(MAKE ADMIN)
+      }
     end
   end
 
   def render_user_action_button(user, "activate") do
     if user.active do
-      render "user_action_buttons.html", opts: %{type: :danger, action: "deactivate", icon: :block, label: ~g(DEACTIVATE)}
+      render "user_action_buttons.html", opts: %{
+        fun: "change-active", user: user, type: :danger, action: "deactivate", icon: :block, label: ~g(DEACTIVATE)
+      }
     else
-      render "user_action_buttons.html", opts: %{type: :secondary, action: "activate", icon: "ok-circled", label: ~g(ACTIVATE)}
+      render "user_action_buttons.html", opts: %{
+        fun: "change-active", user: user, type: :secondary, action: "activate", icon: "ok-circled", label: ~g(ACTIVATE)
+      }
     end
   end
 
-  def render_user_action_button(_user, "edit") do
-    render "user_action_buttons.html", opts: %{type: :primary, action: "edit-user", icon: :edit, label: ~g(EDIT)}
+  def render_user_action_button(user, "edit") do
+    render "user_action_buttons.html", opts: %{user: user, type: :primary, action: "edit-user", icon: :edit, label: ~g(EDIT)}
   end
 
-  def render_user_action_button(_user, "delete") do
-    render "user_action_buttons.html", opts: %{type: :danger, action: "delete", icon: :trash, label: ~g(DELETE)}
+  def render_user_action_button(user, "delete") do
+    render "user_action_buttons.html", opts: %{user: user, type: :danger, action: "delete", icon: :trash, label: ~g(DELETE)}
   end
 
   def admin_type_label(%{type: 0}), do: ~g(Channel)

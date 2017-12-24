@@ -36,9 +36,14 @@
     border-color: #e60000;
   }
 }
-#login-card .alert-danger {
+.alert-danger {
   color: red;
   border-color: red;
+}
+.alert-success {
+  color: #155724;
+  border-color: #c3f6cb;
+  background-color: #d4edda;
 }
 .back-to-login {
   padding-top: 8px;
@@ -288,7 +293,8 @@ a.phone-number:hover {
     }
   }
 }
-.content.account {
+.content.account,
+.about {
   form li.boolean {
     .input.checkbox.toggle {
       input:checked+label::before {
@@ -296,5 +302,10 @@ a.phone-number:hover {
       }
     }
   }
+}
+.about form li.boolean {
+  color: #444;
+  font-size: 14px;
+  font-weight: 400;
 }
 

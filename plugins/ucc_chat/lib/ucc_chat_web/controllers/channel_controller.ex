@@ -29,28 +29,33 @@ defmodule UccChatWeb.ChannelController do
 
   def index(conn, _params) do
     user = Coherence.current_user(conn)
-    channel = if user.open_id do
-      Logger.debug "index load open id"
-      case Channel.get(user.open_id) do
-        nil ->
-          Channel.list() |> hd
-        channel ->
+    case Coherence.current_user(conn) do
+      nil ->
+        UcxUccWeb.Coherence.SessionController.delete(conn, %{})
+      user ->
+        channel = if user.open_id do
+          Logger.debug "index load open id"
+          case Channel.get(user.open_id) do
+            nil ->
+              Channel.list() |> hd
+            channel ->
+              channel
+          end
+        else
+          Logger.debug "index load no open id"
+          channel =
+            ChannelSchema
+            |> Ecto.Query.first
+            |> Repo.one
+
+          user
+          |> User.changeset(%{open_id: channel.id})
+          |> Repo.update!
           channel
-      end
-    else
-      Logger.debug "index load no open id"
-      channel =
-        ChannelSchema
-        |> Ecto.Query.first
-        |> Repo.one
+        end
 
-      user
-      |> User.changeset(%{open_id: channel.id})
-      |> Repo.update!
-      channel
+        show(conn, channel)
     end
-
-    show(conn, channel)
   end
 
   def show(conn, %ChannelSchema{} = channel) do
@@ -90,16 +95,15 @@ defmodule UccChatWeb.ChannelController do
   end
 
   def direct(conn, %{"name" => name}) do
-    with user when not is_nil(user) <-
-         UccChat.ServiceHelpers.get_user_by_name(name),
-         user_id <- Coherence.current_user(conn) |> Map.get(:id),
+    with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(name),
+         user_id <- Coherence.current_user(conn) |> IO.inspect(label: "curr user") |> Map.get(:id),
          false <- user.id == user_id do
 
       case get_direct(user_id, name) do
         nil ->
           # create the direct and redirect
-          ChannelService.add_direct(name, user_id, nil)
-          direct = get_direct(user_id, name)
+          ChannelService.add_direct(name, user_id, nil) |> IO.inspect(label: "direct")
+          direct = get_direct(user_id, name) |> IO.inspect(label: "direct 1")
           show(conn, direct.channel)
         direct ->
           show(conn, direct.channel)

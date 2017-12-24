@@ -178,7 +178,7 @@ defmodule UccChatWeb.FlexBar.Form do
   end
 
   defp notify_cancel(socket, tab, sender) do
-    if function_exported? tab.module, :notify, 3 do
+    if function_exported? tab.module, :notify_cancel, 3 do
       apply tab.module, :notify_cancel, [socket, tab, sender]
     end
   end

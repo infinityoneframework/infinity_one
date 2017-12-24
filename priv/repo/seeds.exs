@@ -158,7 +158,7 @@ users =
 
 IO.puts "Creating Channels"
 
-ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id})
+ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id, default: true})
 ch2 = ChannelService.insert_channel!(%{name: "support", user_id: u2.id})
 
 channels =

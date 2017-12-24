@@ -1,4 +1,18 @@
 <br \>
+<style>
+  body {
+    /*background: linear-gradient(to top, #6c6c6c 0%, #aaaaaa 100%);*/
+    background-color: #666;
+  }
+  .alert { width: 520px; margin: auto;}
+  .alert.alert-danger {
+    width: 520px;
+    margin: auto;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+  }
+</style>
 
 <%= form_for @changeset, invitation_path(@conn, :create_user), fn f  -> %>
 

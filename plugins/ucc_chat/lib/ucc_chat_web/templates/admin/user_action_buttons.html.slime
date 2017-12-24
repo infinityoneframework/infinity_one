@@ -1,5 +1,7 @@
 - opts = @opts
-button.button.button-block(class="#{opts[:type]} #{opts[:action]}")
+- fun = opts[:action] |> to_string |> String.replace("-", "_")
+- user_id = opts.user.id
+button.button.button-block(data-user-id="#{user_id}" class="#{opts[:type]} #{opts[:action]} #{opts[:fun]}" rebel-click="flex_call" data-id="admin_user_info" data-fun="#{fun}")
   span
     i(class="icon-#{opts[:icon]}")
     = opts[:label]

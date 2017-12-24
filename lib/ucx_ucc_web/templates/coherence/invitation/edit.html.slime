@@ -1,0 +1,74 @@
+br
+css:
+  body {
+    /*background: linear-gradient(to top, #6c6c6c 0%, #aaaaaa 100%);*/
+    background-color: #666;
+  }
+  .alert { width: 520px; margin: auto;}
+  .alert.alert-danger {
+    width: 520px;
+    margin: auto;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+  }
+
+= if @changeset.action do
+  .alert.alert-danger
+    p= dgettext "coherence", "Oops, something went wrong! Please check the errors below."
+    p= inspect @changeset.errors
+
+= form_for @changeset, invitation_path(@conn, :create_user), [id: "login-card", class: "content-background-color color-primary-font-color"], fn f  ->
+
+  input(type="hidden" name="token" value="#{@token}")
+
+  .fields
+    .input-line
+      = required_label f, dgettext("coherence", "Name")
+      div
+        = text_input f, :name, required: "", dir: "auto"
+        = error_tag f, :name
+
+    - login_field = Coherence.Config.login_field |> IO.inspect(label: "login_field")
+    = unless login_field == :email do
+      .input-line
+        = required_label f, login_field
+        div
+          = text_input f, login_field, required: "", dir: "auto"
+          = error_tag f, login_field
+
+    .input-line
+      = required_label f, dgettext("coherence", "Email")
+      div
+        = text_input f, :email, required: "", dir: "auto"
+        = error_tag f, :email
+
+    .input-line
+      = required_label f, dgettext("coherence", "Password")
+      div
+        = password_input f, :password, required: "", dir: "auto"
+        = error_tag f, :password
+
+    .input-line
+      = required_label f, dgettext("coherence", "Password Confirmation")
+      div
+        = password_input f, :password_confirmation, required: "", dir: "auto"
+        = error_tag f, :password_confirmation
+  .submit
+    button.button.primary.login
+      span= dgettext("coherence", "Create")
+  div
+    button.cancel.register(type="button")= dgettext("coherence", "Cancel")
+
+.login-terms
+  .powered-by
+    = ~g(Powered by)
+    a.color-tertiry-font-color(href="http://emetrotel.com")
+      = ~g(E-MetroTel's UCx)
+
+javascript:
+  $(document).ready(function() {
+    $('body').on('click', 'button.cancel', function(e) {
+      window.location = "#{Coherence.Config.logged_out_url("/")}";
+    });
+  });

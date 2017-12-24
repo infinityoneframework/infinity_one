@@ -54,6 +54,12 @@ defmodule UccChatWeb.Client do
     Rebel.Query.insert socket, html, append: selector
   end
 
+  def replace_with(socket, selector, html) do
+    html = Poison.encode!(html)
+    exec_js(socket, ~s/$('#{selector}').replaceWith(#{html})/)
+    set_event_handlers(socket, selector)
+  end
+
   def html(socket, selector, html) do
     Rebel.Query.update socket, :html, set: html, on: selector
   end

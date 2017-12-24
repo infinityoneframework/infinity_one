@@ -6,19 +6,19 @@ defmodule UccChatWeb.PageController do
   alias Coherence.Controller
   alias UcxUcc.Repo
   alias UcxUcc.Agents.User
+  alias UccChat.ServiceHelpers, as: Helpers
   # alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
 
   def index(conn, _params) do
-    user =
-      conn
-      |> Coherence.current_user
-      |> Repo.preload([:user])
-
-    channel = UccChat.ChannelSchema |> Ecto.Query.first |> Repo.one
-    Logger.info "user: #{inspect user}"
-    render conn, "index.html", user: user, channel: channel
+    case Helpers.get_user(Coherence.current_user(conn) |> Map.get(:id)) do
+      nil ->
+        UcxUccWeb.Coherence.SessionController.delete(conn, %{})
+      user ->
+        channel = UccChat.ChannelSchema |> Ecto.Query.first |> Repo.one
+        render conn, "index.html", user: user, channel: channel
+    end
   end
 
   def switch_user(conn, %{"user" => username}) do

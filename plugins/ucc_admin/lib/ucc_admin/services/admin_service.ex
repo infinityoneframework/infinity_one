@@ -16,6 +16,7 @@ defmodule UccAdmin.AdminService do
   alias UccWebrtc.Settings.Webrtc
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChatWeb.AdminView, as: ChatAdminView
+  alias UccAdminWeb.FlexBarView
 
   def handle_in("save:general", params, socket) do
     params =
@@ -174,7 +175,7 @@ defmodule UccAdmin.AdminService do
     current_user = Helpers.get_user!(assigns.user_id)
     html =
       "admin_invite_users.html"
-      |> AdminView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
+      |> FlexBarView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
          invite_emails: [], error_emails: [], pending_invitations: get_pending_invitations())
       |> safe_to_string
 
@@ -191,14 +192,14 @@ defmodule UccAdmin.AdminService do
       {:ok, emails} ->
         html =
           "admin_invite_users.html"
-          |> AdminView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
+          |> FlexBarView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
              invite_emails: emails, error_emails: [], pending_invitations: get_pending_invitations())
           |> safe_to_string
         {:reply, {:ok, %{html: html, title: "Invite Users", success: ~g(Invitations sent successfully.)}}, socket}
       %{errors: errors, ok: emails} ->
         html =
           "admin_invite_users.html"
-          |> AdminView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
+          |> FlexBarView.render(user: current_user, channel_id: nil, user_info: %{admin: true},
              invite_emails: emails, error_emails: errors, pending_invitations: get_pending_invitations())
           |> safe_to_string
         {:reply, {:ok, %{html: html, title: "Invite Users", warning: ~g(Some of the Invitations were not send.)}}, socket}
@@ -485,8 +486,8 @@ defmodule UccAdmin.AdminService do
     end
   end
 
-  defp get_pending_invitations do
-    Coherence.Invitation
+  def get_pending_invitations do
+    UcxUcc.Coherence.Invitation
     |> Repo.all
   end
 
