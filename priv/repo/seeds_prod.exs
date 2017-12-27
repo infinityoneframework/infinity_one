@@ -4,12 +4,10 @@ alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
 alias UcxPresence.Extension
-alias Mscs.Client
 
 Message.delete_all
 Subscription.delete_all
 Channel.delete_all
-Mscs.Apb.delete_all
 
 Repo.delete_all PhoneNumberLabel
 Repo.delete_all PhoneNumber
@@ -145,8 +143,8 @@ random_string = fn len ->
   |> to_string
 end
 # _u0 = create_user.("Bot", "bot@emetrotel.com", "rtene31-#4%@zck93yurstrst", :bot)
-_u0 = create_user.("Bot", "bot@emetrotel.com", random_string.(32), :bot)
-u1 = create_user.("admin", "admin@emetrotel.com", "emetr0tel", true)
+_u0 = create_user.("Bot", "bot@example.com", random_string.(32), :bot)
+u1 = create_user.("admin", "admin@example.com", "password", true)
 
 IO.puts "Creating Channels"
 
@@ -168,17 +166,6 @@ Message.create!(%{channel_id: ch1.id, user_id: u1.id, body: message})
 IO.puts "Creating Settings"
 
 UccSettings.init_all()
-
-start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
-
-IO.puts "Setting mac addresses"
-
-Client.list
-|> Enum.with_index
-|> Enum.each(fn {user, inx} ->
-  mac = start_mac + inx + 1
-  Client.update(user, %{mac: mac})
-end)
 
 IO.puts "Setting phone numbers"
 

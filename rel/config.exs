@@ -52,10 +52,8 @@ release :ucx_ucc do
     :coherence,
     :earmark,
     :exjsx,
-    :gen_state_machine_helpers,
     :neotoma,
     :sbroker,
-    :ucx_license_manager,
     :elixir_make
   ]
   set commands: [
