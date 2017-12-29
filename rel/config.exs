@@ -52,6 +52,8 @@ release :ucx_ucc do
     :coherence,
     :earmark,
     :exjsx,
+    :gen_state_machine_helpers,
+    :ucx_license_manager,
     :neotoma,
     :sbroker,
     :elixir_make
