@@ -1,7 +1,10 @@
 defmodule UcxUcc do
 
   @env Mix.env()
+  @version UcxUcc.Mixfile.project[:version]
+
   def env, do: @env
+  def version, do: @version
 
   defmacro __using__(_) do
     quote do
