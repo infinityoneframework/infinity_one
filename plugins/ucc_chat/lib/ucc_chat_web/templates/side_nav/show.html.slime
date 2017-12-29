@@ -22,3 +22,4 @@ aside.side-nav.primary-background-color.color-tertiary-font-color(role="navigati
     span.arrow.bottom
   footer.footer
     = render "footer.html"
+    span.version= ~g(Version: ) <> UcxUcc.version()
