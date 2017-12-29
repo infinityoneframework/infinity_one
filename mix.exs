@@ -104,6 +104,7 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_markdown, "~> 0.1"},
       {:distillery, "~> 1.4"},
       {:syslog, github: "smpallen99/syslog"},
+      {:conform, "~> 2.5"}
 
     ] ++ plugin_deps()
   end
