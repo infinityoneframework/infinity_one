@@ -50,6 +50,8 @@ config :logger, [
 
 ]
 
+config :conform, verbosity: :quiet
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
