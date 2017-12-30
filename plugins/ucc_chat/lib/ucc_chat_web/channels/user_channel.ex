@@ -29,7 +29,7 @@ defmodule UccChatWeb.UserChannel do
   import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
-  alias UcxUcc.{Repo, Accounts}
+  alias UcxUcc.{Repo, Accounts, Hooks}
   # alias UcxUcc.TabBar.Ftab
   alias Accounts.{Account, User}
   alias UccAdmin.AdminService
@@ -487,7 +487,7 @@ defmodule UccChatWeb.UserChannel do
     trace ev, params
 
     user = Accounts.get_user(socket.assigns.user_id,
-      preload: [:account, :roles, user_roles: :role, phone_numbers: :label, extensions: :extension])
+      preload: Hooks.user_preload([:account, :roles, user_roles: :role, phone_numbers: :label]))
 
     user_cs = User.changeset(user, %{})
     account_cs = Account.changeset(user.account, %{})
@@ -503,7 +503,7 @@ defmodule UccChatWeb.UserChannel do
     trace ev, params
 
     user = Accounts.get_user(socket.assigns.user_id,
-      preload: [:account, :roles, user_roles: :role, phone_numbers: :label, extensions: :extension])
+      preload: Hooks.user_preload([:account, :roles, user_roles: :role, phone_numbers: :label]))
 
     labels = Enum.map Accounts.list_phone_number_labels, & {String.to_atom(&1.name), &1.id}
 
