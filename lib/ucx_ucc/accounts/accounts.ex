@@ -824,7 +824,7 @@ defmodule UcxUcc.Accounts do
   end
 
   # TODO: Replace this hack with the broadcast stuff
-  alias UccChat.{Subscription, Channel}
+  alias UccChat.{Channel}
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
   alias UccChat.Schema.Channel, as: ChannelSchema
 
