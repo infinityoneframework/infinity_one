@@ -11,8 +11,8 @@ section.page-container.page-home.page-static
           li.boolean
             label
               span(style="margin-right: 20px")= ~g(Enable WebRTC)
-              .input.checkbox.toggle(rebel-click="toggle_webrtc_enabled" data-id="user_webrtc_enabled" style="display: inline-block; top: 8px;")
-                = UccChatWeb.FlexBarView.toggle_tag f, "user", %{name: :webrtc_enabled}, "rebel-change": "toggle_webrtc_enabled_change"
+              .input.checkbox.toggle(rebel-click="delegate" data-module="MscsWeb.UserChannel" data-fun="toggle_webrtc_enabled" data-id="user_webrtc_enabled" style="display: inline-block; top: 8px;")
+                = UccChatWeb.FlexBarView.toggle_tag f, "user", %{name: :webrtc_enabled}, "rebel-change": "delegate", "data-module": "MscsWeb.UserChannel", "data-fun": "toggle_webrtc_enabled_change"
                 label(for="")
     = form_for @phone_number_changeset, "#", [id: "account-phone-form"], fn f ->
       .rocket-form
