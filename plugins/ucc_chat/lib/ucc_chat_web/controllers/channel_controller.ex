@@ -28,7 +28,6 @@ defmodule UccChatWeb.ChannelController do
   end
 
   def index(conn, _params) do
-    user = Coherence.current_user(conn)
     case Coherence.current_user(conn) do
       nil ->
         UcxUccWeb.Coherence.SessionController.delete(conn, %{})

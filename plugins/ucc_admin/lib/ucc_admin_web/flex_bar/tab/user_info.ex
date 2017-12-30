@@ -4,7 +4,6 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   import UccChat.ServiceHelpers, only: [safe_to_string: 1]
 
-  alias UccChat.{Channel, Direct}
   alias UcxUcc.{Accounts, TabBar.Tab}
   alias UccChatWeb.Client
   alias UccChatWeb.AdminView
@@ -31,7 +30,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
       ])
   end
 
-  def args(socket, {user_id, channel_id, _, sender}, _) do
+  def args(socket, {user_id, _channel_id, _, sender}, _) do
     form = sender["form"]
     current_user = Helpers.get_user! user_id
     user =
@@ -67,8 +66,8 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
     ]
   end
 
-  def notify_cancel(socket, _tab, _sender) do
-    Client.send_js socket, ~s/$('.flex-nav li.active .admin-link').click()/
+  def notify_cancel(socket, _tab, _sender, client \\ UccChatWeb.Client) do
+    client.send_js socket, click_users_link_js()
     socket
   end
 
@@ -201,11 +200,6 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
     socket
   end
 
-  def notify_cancel(socket, _tab, _sender, client \\ UccChatWeb.Client) do
-    client.send_js socket, click_users_link_js()
-    socket
-  end
-
   defp click_users_link_js, do: """
     var link = $('.flex-nav li.active a.admin-link[data-id="admin_users"]');
     if (link) {
@@ -213,9 +207,9 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
     }
     """
 
-  defp set_active_js(sender), do: """
-   $('.flex-tab-main-content tr').removeClass('active');
-   $('#{this(sender)}').addClass('active');
-    """ |> String.replace("\n", "")
+  # defp set_active_js(sender), do: """
+  #  $('.flex-tab-main-content tr').removeClass('active');
+  #  $('#{this(sender)}').addClass('active');
+  #   """ |> String.replace("\n", "")
 
 end

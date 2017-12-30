@@ -29,7 +29,7 @@ defmodule UccChatWeb.UserChannel do
   import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
-  alias UcxUcc.{Repo, Accounts}
+  alias UcxUcc.{Repo, Accounts, Hooks}
   # alias UcxUcc.TabBar.Ftab
   alias Accounts.{Account, User}
   alias UccAdmin.AdminService
@@ -487,7 +487,7 @@ defmodule UccChatWeb.UserChannel do
     trace ev, params
 
     user = Accounts.get_user(socket.assigns.user_id,
-      preload: [:account, :roles, user_roles: :role, phone_numbers: :label, extensions: :extension])
+      preload: Hooks.user_preload([:account, :roles, user_roles: :role, phone_numbers: :label]))
 
     user_cs = User.changeset(user, %{})
     account_cs = Account.changeset(user.account, %{})
@@ -503,7 +503,7 @@ defmodule UccChatWeb.UserChannel do
     trace ev, params
 
     user = Accounts.get_user(socket.assigns.user_id,
-      preload: [:account, :roles, user_roles: :role, phone_numbers: :label, extensions: :extension])
+      preload: Hooks.user_preload([:account, :roles, user_roles: :role, phone_numbers: :label]))
 
     labels = Enum.map Accounts.list_phone_number_labels, & {String.to_atom(&1.name), &1.id}
 
@@ -1259,50 +1259,50 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  def toggle_webrtc_enabled(socket, sender) do
-    user = Accounts.get_user socket.assigns.user_id
-    form = sender["form"]
-    id = "#" <> sender["dataset"]["id"]
+  # def toggle_webrtc_enabled(socket, sender) do
+  #   user = Accounts.get_user socket.assigns.user_id
+  #   # form = sender["form"]
+  #   id = "#" <> sender["dataset"]["id"]
 
-    start_loading_animation(socket, id)
+  #   start_loading_animation(socket, id)
 
-    val = !Rebel.Query.select(socket, prop: "checked", from: id)
+  #   val = !Rebel.Query.select(socket, prop: "checked", from: id)
 
-    with {:ok, user} <- Accounts.update_user(user, %{webrtc_enabled: val}),
-         client <- Mscs.Client.get(user.id),
-         true <- is_nil(client.mac) and val,
-         {:ok, client} <- Mscs.Client.add_mac_address!(client) do
-      handle_webrtc_enabled_success(socket, val, id)
-    else
-      false ->
-        handle_webrtc_enabled_success(socket, val, id)
-      {:error, _} ->
-        Client.toastr! socket, :error, ~g(Problem updating WebRTC mode)
-    end
-    |> stop_loading_animation()
-  end
+  #   with {:ok, user} <- Accounts.update_user(user, %{webrtc_enabled: val}),
+  #        client <- Mscs.Client.get(user.id),
+  #        true <- is_nil(client.mac) and val,
+  #        {:ok, _client} <- Mscs.Client.add_mac_address!(client) do
+  #     handle_webrtc_enabled_success(socket, val, id)
+  #   else
+  #     false ->
+  #       handle_webrtc_enabled_success(socket, val, id)
+  #     {:error, _} ->
+  #       Client.toastr! socket, :error, ~g(Problem updating WebRTC mode)
+  #   end
+  #   |> stop_loading_animation()
+  # end
 
-  # TODO: Don't think we need this
-  def toggle_webrtc_enabled_change(socket, sender) do
-    Logger.warn inspect(sender)
-    socket
-  end
+  # # TODO: Don't think we need this
+  # def toggle_webrtc_enabled_change(socket, sender) do
+  #   Logger.warn inspect(sender)
+  #   socket
+  # end
 
-  defp handle_webrtc_enabled_success(socket, val, id) do
-    Rebel.Query.update socket, prop: "checked", set: val, on: id
-    msg =
-      if val do
-        # UcxUcc.TabBar.show_button("mscs")
-        ~g(WebRTC Enabled!)
-      else
-        # UcxUcc.TabBar.hide_button("mscs")
-        ~g(WebRTC Disabled!)
-      end
+  # defp handle_webrtc_enabled_success(socket, val, id) do
+  #   Rebel.Query.update socket, prop: "checked", set: val, on: id
+  #   msg =
+  #     if val do
+  #       # UcxUcc.TabBar.show_button("mscs")
+  #       ~g(WebRTC Enabled!)
+  #     else
+  #       # UcxUcc.TabBar.hide_button("mscs")
+  #       ~g(WebRTC Disabled!)
+  #     end
 
-    socket
-    |> UccUiFlexTab.FlexTabChannel.refresh_tab_bar
-    |> Client.toastr!(:success, msg)
-  end
+  #   socket
+  #   |> UccUiFlexTab.FlexTabChannel.refresh_tab_bar
+  #   |> Client.toastr!(:success, msg)
+  # end
 
   def close_phone_cog(socket, sender, client \\ UccChatWeb.Client) do
     # Logger.warn "close_phone_cog sender: #{inspect sender}"

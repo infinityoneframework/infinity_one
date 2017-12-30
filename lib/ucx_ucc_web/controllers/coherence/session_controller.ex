@@ -80,9 +80,9 @@ defmodule UcxUccWeb.Coherence.SessionController do
     login = params["session"][login_field_str]
 
     tz_offset =
-      case Integer.parse(params["tz-offset"] || "") do
-        :error -> 0
-        {num, _} -> num
+      case Regex.run ~r/^-?\d+$/, String.trim(params["tz-offset"]) do
+        [str] -> String.to_integer(str)
+        _     -> 0
       end
 
     new_bindings = [{login_field, login}, remember: rememberable_enabled?()]
