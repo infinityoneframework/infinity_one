@@ -476,14 +476,14 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "ucx_ucc.Elixir.UcxUcc.Repo.database"
     ],
-    "ucx_ucc.Elixir.UcxUcc.Repo.test": [
-      commented: false,
-      datatype: [list: :binary],
-      default: ["test", "99"],
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUcc.Repo.test here.",
-      hidden: false,
-      to: "ucx_ucc.Elixir.UcxUcc.Repo.test"
-    ],
+    # "ucx_ucc.Elixir.UcxUcc.Repo.test": [
+    #   commented: false,
+    #   datatype: [list: :binary],
+    #   default: ["test", "99"],
+    #   doc: "Provide documentation for ucx_ucc.Elixir.UcxUcc.Repo.test here.",
+    #   hidden: false,
+    #   to: "ucx_ucc.Elixir.UcxUcc.Repo.test"
+    # ],
     "ucx_ucc.Elixir.UcxUcc.Repo.pool_size": [
       commented: false,
       datatype: :integer,
@@ -494,13 +494,13 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     ]
   ],
   transforms: [
-    "ucx_ucc.Elixir.UcxUcc.Repo.test": fn conf ->
-      case Conform.Conf.get(conf, "ucx_ucc.Elixir.UcxUcc.Repo.test") |> IO.inspect(label: "test") do
-        [{_, [atom, int]}] ->
-          {String.to_atom(atom), String.to_integer(int)}
-        _ -> {:test, 20}
-      end
-    end,
+    # "ucx_ucc.Elixir.UcxUcc.Repo.test": fn conf ->
+    #   case Conform.Conf.get(conf, "ucx_ucc.Elixir.UcxUcc.Repo.test") |> IO.inspect(label: "test") do
+    #     [{_, [atom, int]}] ->
+    #       {String.to_atom(atom), String.to_integer(int)}
+    #     _ -> {:test, 20}
+    #   end
+    # end,
     "ex_ami.servers.asterisk.connection": fn conf ->
       {ip, port} =
         case Conform.Conf.get(conf, "ex_ami.servers.asterisk.connection") do
