@@ -23,7 +23,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",
-  version: Application.spec(:ucx_ucc, :vsn)
+  version: Application.spec(:ucx_ucc, :vsn),
+  check_origin: false
 
 # Do not print debug messages in production
 #config :logger, level: :info
