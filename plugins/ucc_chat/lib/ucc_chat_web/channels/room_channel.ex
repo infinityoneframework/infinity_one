@@ -307,8 +307,10 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-  def handle_out("broadcast:message", %{message: _message}, socket) do
-    Logger.error "TBD: Implement this"
+  def handle_out("broadcast:message", %{message: message}, socket) do
+    message = Message.preload_schema message, [:attachments, :user, :reactions]
+    {_, html} = WebMessage.render_message message
+    WebMessage.broadcast_message(socket, message.id, message.user_id, html)
     {:noreply, socket}
   end
 
