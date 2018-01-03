@@ -26,8 +26,15 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
   version: Application.spec(:ucx_ucc, :vsn),
   check_origin: false
 
+# uncomment the following lines if you would like to use a symlink
+# for production releases. Change the second path in the tuple to
+# point to an existing  directory on your server somewhere.
+# config :ucx_ucc,
+#   release_simlink_uploads: {"uploads", "/var/lib/ucx_ucc/uploads"}
 config :ucx_ucc,
   release_simlink_uploads: {"uploads", "/var/lib/ucx_ucc/uploads"}
+
+
 # Do not print debug messages in production
 #config :logger, level: :info
 
