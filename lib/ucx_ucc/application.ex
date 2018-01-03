@@ -46,10 +46,8 @@ defmodule UcxUcc.Application do
   def setup_uploads_link do
     case Application.get_env :ucx_ucc, :release_simlink_uploads do
       {link, target} ->
-        link_path =
-          :ucx_ucc
-          |> Application.app_dir()
-          |> Path.join(~w(priv static #{link}))
+        app_dir = Application.app_dir(:ucx_ucc)
+        link_path = Path.join([app_dir | ~w(priv static #{link})])
 
         unless File.exists?(link_path) do
           File.ln_s(target, link_path)
