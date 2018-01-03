@@ -65,6 +65,7 @@ release :ucx_ucc do
     "drop_database": "rel/commands/drop_database.sh"
   ]
   plugin UcxUcc.MigrationsPlugin
+  # plugin UcxUcc.SymlinkUploadsPlugin
   plugin Conform.ReleasePlugin
 end
 

@@ -26,6 +26,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
   version: Application.spec(:ucx_ucc, :vsn),
   check_origin: false
 
+config :ucx_ucc,
+  release_simlink_uploads: {"uploads", "/var/lib/ucx_ucc/uploads"}
 # Do not print debug messages in production
 #config :logger, level: :info
 
