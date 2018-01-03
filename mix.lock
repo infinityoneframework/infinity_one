@@ -84,7 +84,7 @@
   "timex": {:hex, :timex, "3.1.24", "d198ae9783ac807721cca0c5535384ebdf99da4976be8cefb9665a9262a1e9e3", [:mix], [{:combine, "~> 0.7", [hex: :combine, repo: "hexpm", optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, repo: "hexpm", optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, repo: "hexpm", optional: false]}], "hexpm"},
   "timex_ecto": {:hex, :timex_ecto, "3.2.1", "461140751026e1ca03298fab628f78ab189e78784175f5e301eefa034ee530aa", [:mix], [{:ecto, "~> 2.2", [hex: :ecto, repo: "hexpm", optional: false]}, {:timex, "~> 3.1", [hex: :timex, repo: "hexpm", optional: false]}], "hexpm"},
   "tzdata": {:hex, :tzdata, "0.5.12", "1c17b68692c6ba5b6ab15db3d64cc8baa0f182043d5ae9d4b6d35d70af76f67b", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, repo: "hexpm", optional: false]}], "hexpm"},
-  "ucc_rpm": {:git, "git@bitbucket.org:emetrotel/ucc_rpm.git", "4ccd0ecced97a73d6c21b9211a086330e06b5c00", []},
+  "ucc_rpm": {:git, "git@bitbucket.org:emetrotel/ucc_rpm.git", "b004342eb253797d87b52a00a8090d91a2703120", []},
   "ucx_alarm_manager": {:git, "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", "155c31090bb627ee80bdc36e5e5a9b8b3d38bfd1", []},
   "ucx_license_manager": {:git, "git@bitbucket.org:emetrotel/ucx_license_manager.git", "f84e0a09a28f5e4788b347529349a9c6238b47a7", []},
   "ucx_unit": {:git, "git@bitbucket.org:emetrotel/ucx_unit.git", "5c576c64248637e0094fa5ce369c776ae060d59e", []},
