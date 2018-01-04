@@ -138,6 +138,7 @@ class FileUpload {
         fd.append('file_name', document.getElementById('file-name').value)
         fd.append('description', document.getElementById('file-description').value)
         fd.append('channel_id', ucxchat.channel_id)
+        fd.append('room', ucxchat.room)
         fd.append('user_id', ucxchat.user_id)
         let status = new UploadStatusBar(file.name, 10000);
         this.sendFileToServer(fd, status)

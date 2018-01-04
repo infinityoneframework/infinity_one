@@ -1,39 +1,37 @@
 defmodule UccChat.AttachmentService do
   use UccChat.Shared, :service
 
-  alias UccChat.{Attachment, Message}
-  alias UccChatWeb.RoomChannel
-  alias Ecto.Multi
+  alias UccChat.{Attachment}
 
   require Logger
 
-  def insert_attachment(params) do
-    message_params = %{channel_id: params["channel_id"], body: "", sequential: false, user_id: params["user_id"]}
-    params = Map.delete params, "user_id"
-    multi =
-      Multi.new
-      |> Multi.insert(:message, Message.change(message_params))
-      |> Multi.run(:attachment, &do_insert_attachment(&1, params))
+  # def insert_attachment(params) do
+  #   message_params = %{channel_id: params["channel_id"], body: "", sequential: false, user_id: params["user_id"]}
+  #   params = Map.delete params, "user_id"
+  #   multi =
+  #     Multi.new
+  #     |> Multi.insert(:message, Message.change(message_params))
+  #     |> Multi.run(:attachment, &do_insert_attachment(&1, params))
 
-    case Repo.transaction(multi) do
-      {:ok, %{message: message}} = ok ->
-        RoomChannel.broadcast_message(message)
-        ok
-      error ->
-        error
-    end
-  end
+  #   case Repo.transaction(multi) do
+  #     {:ok, %{message: message}} = ok ->
+  #       RoomChannel.broadcast_message(message)
+  #       ok
+  #     error ->
+  #       error
+  #   end
+  # end
 
-  defp do_insert_attachment(%{message: %{id: id} = message}, params) do
-    params
-    |> Map.put("message_id", id)
-    |> Attachment.create()
-    |> case do
-      {:ok, attachment} ->
-        {:ok, %{attachment: attachment, message: message}}
-      error -> error
-    end
-  end
+  # defp do_insert_attachment(%{message: %{id: id} = message}, params) do
+  #   params
+  #   |> Map.put("message_id", id)
+  #   |> Attachment.create()
+  #   |> case do
+  #     {:ok, attachment} ->
+  #       {:ok, %{attachment: attachment, message: message}}
+  #     error -> error
+  #   end
+  # end
 
   def delete_attachment(%UccChat.Schema.Attachment{} = attachment) do
     case Attachment.delete attachment do

@@ -15,13 +15,25 @@ defmodule UccChatWeb.RoomChannel.Message do
   alias UccChatWeb.RoomChannel.MessageCog
 
   alias UccChatWeb.{MessageView, Client}
+  alias UccChatWeb.RoomChannel.Attachment, as: WebAttachment
 
   require UccChat.ChatConstants, as: CC
 
   @preloads [:user, :edited_by, :attachments, :reactions]
 
+  def create_attachment(params, socket, client \\ Client) do
+    Logger.debug "params: #{inspect params}"
+    do_create("", params["channel_id"], params["user_id"], params, socket,
+      client, &handle_new_attachment_message/4)
+  end
+
   def create(body, channel_id, user_id, socket, client \\ Client) do
-    Logger.info "message create body: #{inspect body}"
+    Logger.debug "body: #{inspect body}"
+    do_create(body, channel_id, user_id, %{}, socket,
+      client, &handle_new_message/4)
+  end
+
+  defp do_create(body, channel_id, user_id, params, socket, client, handler) do
     user = Accounts.get_user user_id
     channel = Channel.get!(channel_id)
     msg_params = if Channel.direct?(channel), do: %{type: "d"}, else: %{}
@@ -53,12 +65,14 @@ defmodule UccChatWeb.RoomChannel.Message do
           ~g(You are not authorized to create a message)
 
       true ->
-        handle_new_message socket, body,
-          [channel: channel,
+        handler.(socket, body, [
+          channel: channel,
           user: user,
-          msg_params: msg_params], client
-
+          msg_params: msg_params,
+          params: params
+        ], client)
     end
+
     Service.stop_typing(socket, user_id, channel_id)
     socket
   end
@@ -92,7 +106,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   defp handle_new_message(socket, message_body, opts, client) do
-    Logger.debug "handle_new_message #{inspect message_body}"
+    Logger.debug "message_body: #{inspect message_body}"
     user = opts[:user]
     channel = opts[:channel]
     channel_id = channel.id
@@ -112,6 +126,41 @@ defmodule UccChatWeb.RoomChannel.Message do
     message
     |> render_message
     |> client.broadcast_message(socket)
+  end
+
+  defp handle_new_attachment_message(socket, message_body, opts, client) do
+    Logger.debug "message_body: #{inspect message_body}"
+    user = opts[:user]
+    channel = opts[:channel]
+    params = opts[:params]
+    channel_id = channel.id
+
+    case WebAttachment.create user.id, channel_id, params do
+      {:ok, message} ->
+        message = Message.preload_schema(message, [:user, :attachments, :reactions])
+        robot_body = "Attachment: #{params["file_name"]}, Type: #{params["type"]}, " <>
+          ~s(Description: "#{params["description"]}")
+
+        RobotService.new_message robot_body, channel, user
+
+        Service.update_direct_notices(channel, message)
+
+        broadcast_message(socket, message.id, user.id, "", [])
+
+        client.toastr! socket, :success,
+          ~g(Attachment posted successfully.)
+
+        message
+        |> render_message
+        |> client.broadcast_message(socket)
+
+      error ->
+        client.toastr! socket, :error,
+          ~g(There was a problem creating that attachment.)
+        Logger.error "error: " <> inspect(error)
+    end
+
+    socket
   end
 
   def create_system_message(channel_id, body) do
@@ -311,6 +360,12 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
+  @doc """
+  This is the entry point for a new message being posted.
+
+  Fetches the message from the client textarea control, and calls the `create/5`
+  API.
+  """
   def new_message(socket, _sender, client \\ Client) do
     assigns = socket.assigns
 

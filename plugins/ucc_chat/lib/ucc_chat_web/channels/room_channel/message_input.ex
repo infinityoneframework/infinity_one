@@ -11,7 +11,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]
-    # Logger.warn "message_keydown: #{inspect key}"
     unless key in @ignore_keys do
       handle_keydown(socket, sender, key)
     end
@@ -61,7 +60,6 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp trace_data(context) do
-    # Logger.warn "message_keydown: " <> inspect(context)
     context
   end
 
