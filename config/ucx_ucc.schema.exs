@@ -56,23 +56,23 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: false,
-      doc: "Provide documentation for coherence.require_current_password here.",
-      hidden: false,
+      doc: "Not sure this will work for the admin panel. Do not enable.",
+      hidden: true,
       to: "coherence.require_current_password"
     ],
     "coherence.logged_out_url": [
       commented: false,
       datatype: :binary,
       default: "/",
-      doc: "Provide documentation for coherence.logged_out_url here.",
-      hidden: false,
+      doc: "Change the redirect URL when the page is accessed from a non logged in user.",
+      hidden: true,
       to: "coherence.logged_out_url"
     ],
     "coherence.email_from_name": [
       commented: false,
       datatype: :binary,
       default: "Need to set this",
-      doc: "Provide documentation for coherence.email_from_name here.",
+      doc: "Enter the from name for the mailer.",
       hidden: false,
       to: "coherence.email_from_name",
       env_var: "COH_NAME",
@@ -81,11 +81,13 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Need to set this",
-      doc: "Provide documentation for coherence.email_from_email here.",
+      doc: "Enter the from email address for the mailer.",
       hidden: false,
       to: "coherence.email_from_email",
       env_var: "COH_EMAIL"
     ],
+    # The following is commented out since I don't think Coherence will
+    # work correctly if this is changed.
     # "coherence.opts": [
     #   commented: false,
     #   datatype: [
@@ -102,15 +104,15 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     #     :confirmable,
     #     :registerable
     #   ],
-    #   doc: "Provide documentation for coherence.opts here.",
-    #   hidden: false,
+    #   doc: "Change the authentication options.",
+    #   hidden: true,
     #   to: "coherence.opts"
     # ],
     "coherence.Elixir.UcxUccWeb.Coherence.Mailer.adapter": [
       commented: false,
       datatype: :atom,
       default: Swoosh.Adapters.Sendgrid,
-      doc: "Provide documentation for coherence.Elixir.UcxUccWeb.Coherence.Mailer.adapter here.",
+      doc: "The email adapter.",
       hidden: true,
       to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.adapter"
     ],
@@ -118,7 +120,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "Need to set this",
-      doc: "Provide documentation for coherence.Elixir.UcxUccWeb.Coherence.Mailer.api_key here.",
+      doc: "The email adapter API key.",
       hidden: false,
       to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.api_key",
       env_var: "SENDGRID_API_KEY"
@@ -132,7 +134,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         :exjsx,
         :postgrex
       ],
-      doc: "Provide documentation for distillery.no_warn_missing here.",
+      doc: "",
       hidden: true,
       to: "distillery.no_warn_missing"
     ],
@@ -148,7 +150,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: true,
-      doc: "Provide documentation for auto_linker.opts.phone here.",
+      doc: "Auto link phone numbers in messages.",
       hidden: false,
       to: "auto_linker.opts.phone"
     ],
@@ -172,7 +174,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :integer,
       default: 87241261056,
-      doc: "Provide documentation for unbrella.plugins.mscs.base_mac_address here.",
+      doc: "The starting mac address for UCx phone mac addresses.",
       hidden: false,
       to: "unbrella.plugins.mscs.base_mac_address"
     ],
@@ -180,7 +182,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :integer,
       default: 18000,
-      doc: "Provide documentation for unbrella.plugins.mscs.unistim_port_base here.",
+      doc: "The starting UNISTIM port number.",
       hidden: false,
       to: "unbrella.plugins.mscs.unistim_port_base"
     ],
@@ -188,7 +190,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "127.0.0.1",
-      doc: "Provide documentation for unbrella.plugins.mscs.cs_ip here.",
+      doc: "The IP address of the UCx. Change this to connect to a remote UCx.",
       hidden: false,
       to: "unbrella.plugins.mscs.cs_ip"
     ],
@@ -196,7 +198,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :integer,
       default: 7000,
-      doc: "Provide documentation for unbrella.plugins.mscs.ucxport here.",
+      doc: "The UCx UNISTIM port number. Change this if you are running on a non default port number.",
       hidden: false,
       to: "unbrella.plugins.mscs.ucxport"
     ],
@@ -204,7 +206,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :integer,
       default: 150,
-      doc: "Provide documentation for unbrella.plugins.ucc_chat.page_size here.",
+      doc: "The number of chat messages loaded on a page refresh.",
       hidden: false,
       to: "unbrella.plugins.ucc_chat.page_size"
     ],
@@ -212,7 +214,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: true,
-      doc: "Provide documentation for unbrella.plugins.ucc_chat.defer here.",
+      doc: "Some UI features are not yet implemented. Enabling this flag displays the UI for these features.",
       hidden: true,
       to: "unbrella.plugins.ucc_chat.defer"
     ],
@@ -236,7 +238,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: true,
-      doc: "Provide documentation for unbrella.plugins.ucc_dialer.enabled here.",
+      doc: "Enables the click-to-call dialer features.",
       hidden: false,
       to: "unbrella.plugins.ucc_dialer.enabled"
     ],
@@ -244,7 +246,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "1, NXXNXXXXXX",
-      doc: "Provide documentation for unbrella.plugins.ucc_dialer.dial_translation here.",
+      doc: "Phone number translation rules. Default adds 1 to the beginning of 10 digit numbers.",
       hidden: false,
       to: "unbrella.plugins.ucc_dialer.dial_translation"
     ],
@@ -252,7 +254,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: true,
-      doc: "Provide documentation for unbrella.plugins.ucx_presence.enabled here.",
+      doc: "Enable UCx presence feature.",
       hidden: false,
       to: "unbrella.plugins.ucx_presence.enabled"
     ],
@@ -260,7 +262,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: true,
-      doc: "Provide documentation for ex_ami.logging here.",
+      doc: "Enable AMI logging.",
       hidden: false,
       to: "ex_ami.logging"
     ],
@@ -270,7 +272,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       # datatype: {:atom, [list: [atom: :binary, atom: :integer]]},
       default: [{"127.0.0.1", "5038"}],
       # default: {Elixir.ExAmi.TcpConnection, [host: "127.0.0.1", port: 5038]},
-      doc: "Provide documentation for ex_ami.servers.asterisk.connection here.",
+      doc: "IP and port number for the asterisk AMI connection.",
       hidden: false,
       to: "ex_ami.servers.asterisk.connection",
     ],
@@ -278,7 +280,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "ucx_ucc",
-      doc: "Provide documentation for ex_ami.servers.asterisk.username here.",
+      doc: "Asterisk AMI username.",
       hidden: false,
       to: "ex_ami.servers.asterisk.username"
     ],
@@ -286,7 +288,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "emetr0tel",
-      doc: "Provide documentation for ex_ami.servers.asterisk.secret here.",
+      doc: "Arterisk AMI secret.",
       hidden: false,
       to: "ex_ami.servers.asterisk.secret"
     ],
@@ -294,7 +296,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: true,
-      doc: "Provide documentation for ex_ami.servers.asterisk.logging here.",
+      doc: "AMI library AMI servers logging.",
       hidden: false,
       to: "ex_ami.servers.asterisk.logging"
     ],
@@ -302,7 +304,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: :info,
-      doc: "Provide documentation for logger.level here.",
+      doc: "Global application logging level.",
       hidden: false,
       to: "logger.level"
     ],
@@ -315,7 +317,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         Logger.Backends.Syslog,
         :console
       ],
-      doc: "Provide documentation for logger.backends here.",
+      doc: "Logger back ends.",
       hidden: false,
       to: "logger.backends"
     ],
@@ -323,7 +325,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: :warn,
-      doc: "Provide documentation for logger.console.level here.",
+      doc: "Logger console back end level.",
       hidden: false,
       to: "logger.console.level"
     ],
@@ -333,7 +335,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       default: """
       [$level] $metadata$message
       """,
-      doc: "Provide documentation for logger.console.format here.",
+      doc: "The console logging format.",
       hidden: false,
       to: "logger.console.format"
     ],
@@ -346,7 +348,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         :module,
         :function
       ],
-      doc: "Provide documentation for logger.console.metadata here.",
+      doc: "The console logging metadata.",
       hidden: false,
       to: "logger.console.metadata"
     ],
@@ -354,7 +356,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "ucx_ucc",
-      doc: "Provide documentation for logger.syslog.appid here.",
+      doc: "The syslog logging app id.",
       hidden: false,
       to: "logger.syslog.appid"
     ],
@@ -362,7 +364,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :charlist,
       default: '127.0.0.1',
-      doc: "Provide documentation for logger.syslog.host here.",
+      doc: "The syslog host IP address.",
       hidden: false,
       to: "logger.syslog.host"
     ],
@@ -370,7 +372,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :atom,
       default: :local5,
-      doc: "Provide documentation for logger.syslog.facility here.",
+      doc: "The syslog facility name.",
       hidden: false,
       to: "logger.syslog.facility"
     ],
@@ -380,7 +382,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       default: """
       [$level] $metadata$message
       """,
-      doc: "Provide documentation for logger.syslog.format here.",
+      doc: "The syslog logger message format.",
       hidden: false,
       to: "logger.syslog.format"
     ],
@@ -393,7 +395,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         :module,
         :function
       ],
-      doc: "Provide documentation for logger.syslog.metadata here.",
+      doc: "The syslog logger message metadata",
       hidden: false,
       to: "logger.syslog.metadata"
     ],
@@ -401,7 +403,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :binary,
       default: "localhost",
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUccWeb.Endpoint.url.host here.",
+      doc: "The endpoint host name.",
       hidden: false,
       to: "ucx_ucc.Elixir.UcxUccWeb.Endpoint.url.host"
     ],
@@ -409,7 +411,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :integer,
       default: 4021,
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUccWeb.Endpoint.url.port here.",
+      doc: "The main port number.",
       hidden: false,
       to: "ucx_ucc.Elixir.UcxUccWeb.Endpoint.url.port"
     ],
@@ -417,7 +419,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       commented: false,
       datatype: :integer,
       default: 4021,
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.port here.",
+      doc: "The main https port number.",
       hidden: false,
       to: "ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.port"
     ],
@@ -477,31 +479,16 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "ucx_ucc.Elixir.UcxUcc.Repo.database"
     ],
-    # "ucx_ucc.Elixir.UcxUcc.Repo.test": [
-    #   commented: false,
-    #   datatype: [list: :binary],
-    #   default: ["test", "99"],
-    #   doc: "Provide documentation for ucx_ucc.Elixir.UcxUcc.Repo.test here.",
-    #   hidden: false,
-    #   to: "ucx_ucc.Elixir.UcxUcc.Repo.test"
-    # ],
     "ucx_ucc.Elixir.UcxUcc.Repo.pool_size": [
       commented: false,
       datatype: :integer,
       default: 15,
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUcc.Repo.pool_size here.",
+      doc: "The database pool size.",
       hidden: false,
       to: "ucx_ucc.Elixir.UcxUcc.Repo.pool_size"
     ]
   ],
   transforms: [
-    # "ucx_ucc.Elixir.UcxUcc.Repo.test": fn conf ->
-    #   case Conform.Conf.get(conf, "ucx_ucc.Elixir.UcxUcc.Repo.test") |> IO.inspect(label: "test") do
-    #     [{_, [atom, int]}] ->
-    #       {String.to_atom(atom), String.to_integer(int)}
-    #     _ -> {:test, 20}
-    #   end
-    # end,
     "ex_ami.servers.asterisk.connection": fn conf ->
       {ip, port} =
         case Conform.Conf.get(conf, "ex_ami.servers.asterisk.connection") do
