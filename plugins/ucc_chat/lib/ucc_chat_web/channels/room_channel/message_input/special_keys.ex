@@ -22,10 +22,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
 
     case Buffer.match_all_patterns context.state.head do
       nil ->
-        Logger.info "got nil"
+        Logger.debug "got nil"
         MessageInput.close_popup(context)
       {pattern, key} ->
-        Logger.info "pattern: #{inspect {pattern, key}}"
+        Logger.debug "pattern: #{inspect {pattern, key}}"
         MessageInput.dispatch_handle_in(key, pattern, context)
     end
   end
@@ -40,11 +40,15 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
 
   def handle_in(context, @cr) do
     # Logger.info "cr event: #{inspect context.sender["event"]}"
+    # The following is a little tricky. SlashCommands.Commands.run returns
+    # true if further processing is required. When false, its indicating
+    # that the cr key should be ignored.
     if SlashCommands.Commands.run(context.state.buffer, context.sender, context.socket) do
       unless context.sender["event"]["shiftKey"] do
         if editing?(context.sender) do
           Message.edit_message(context.socket, context.sender, context.client)
         else
+          # this is the case for a new message to be posted
           Message.new_message(context.socket, context.sender, context.client)
         end
         MessageService.stop_typing context.socket

@@ -27,7 +27,8 @@ defmodule UccChatWeb.RoomChannel do
     # "update:set_remove_owner",
     "broadcast:message",
     "broadcast:message:update",
-    "message:new"
+    "message:new",
+    "message:new:attachment"
   ]
 
   alias UccChat.{
@@ -79,6 +80,7 @@ defmodule UccChatWeb.RoomChannel do
   end
 
   def broadcast_message(message) do
+    Logger.debug "message: #{inspect message}"
     channel = Channel.get message.channel_id
     Endpoint.broadcast! CC.chan_room <> channel.name, "broadcast:message",
       %{message: message}
@@ -95,6 +97,10 @@ defmodule UccChatWeb.RoomChannel do
       %{message: message, channel: channel}
     # need to get channel_id from message
     # raise "TBD: Implement this"
+  end
+
+  def new_attachment(room, params) do
+    Endpoint.broadcast! CC.chan_room <> room, "message:new:attachment", params
   end
 
   def user_join(nil), do: Logger.warn "join for nil username"
@@ -168,6 +174,15 @@ defmodule UccChatWeb.RoomChannel do
   # Outgoing message handlers
 
   def handle_out("message:new", _, socket) do
+    Logger.debug "message:new"
+    {:noreply, socket}
+  end
+
+  def handle_out("message:new:attachment", payload, socket) do
+    if payload["user_id"] == socket.assigns.user_id do
+      Logger.debug "matched user"
+      WebMessage.create_attachment(payload, socket)
+    end
     {:noreply, socket}
   end
 
@@ -302,7 +317,7 @@ defmodule UccChatWeb.RoomChannel do
   # end
 
   def handle_out("update:remove_user", %{username: username, js: js}, socket) do
-    Logger.warn "......... username: #{username}"
+    Logger.debug "username: #{username}"
     exec_js socket, js
     {:noreply, socket}
   end
@@ -310,6 +325,7 @@ defmodule UccChatWeb.RoomChannel do
   def handle_out("broadcast:message", %{message: message}, socket) do
     message = Message.preload_schema message, [:attachments, :user, :reactions]
     {_, html} = WebMessage.render_message message
+    # Logger.warn "html: #{html}"
     WebMessage.broadcast_message(socket, message.id, message.user_id, html)
     {:noreply, socket}
   end

@@ -2,13 +2,13 @@ defmodule UccChatWeb.AttachmentController do
   use UccChatWeb, :controller
 
   # alias UccChat.{Channel, User, Direct, ChannelService}
-  alias UccChat.{AttachmentService}
+  alias UccChatWeb.RoomChannel.Attachment
 
   require Logger
 
   def create(conn, params) do
     # Logger.warn "attachment params: #{inspect params}"
-    case AttachmentService.insert_attachment params do
+    case Attachment.insert_attachment params do
       {:ok, _attachment, _message} ->
         render conn, "success.json", %{}
       {:error, _changeset} ->
