@@ -312,6 +312,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         list: :atom
       ],
       default: [
+        Logger.Backends.Syslog,
         :console
       ],
       doc: "Provide documentation for logger.backends here.",
