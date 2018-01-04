@@ -23,11 +23,11 @@ defmodule UccChat.File do
     {:ffmpeg, fn(input, output) ->
       "-i #{input} -f image2 -ss 00:00:01.00 -vframes 1 -vf scale=-1:200 #{output}" end, :jpg}
   end
-  def transform(:poster, {_, %{type: "image" <> _}} = params) do
+  def transform(:poster, {_, %{type: "image" <> _}} = _params) do
     # IO.inspect params, label: "transform other1: " <> inspect(params)
     {:convert, "-strip -resize @80000 -format png", :png}
   end
-  def transform(:poster, params) do
+  def transform(:poster, _params) do
     # IO.inspect params, label: "transform other2: " <> inspect(params)
     {:convert, "-strip -resize @80000 -format png", :png}
   end
@@ -60,7 +60,7 @@ defmodule UccChat.File do
   def storage_dir(scope) do
     path = "priv/static/uploads/#{scope.message_id}"
     if UcxUcc.env == :prod do
-      Path.join(Application.app_dir(:ucc_chat), path)
+      Path.join(Application.app_dir(:ucx_ucc), path)
     else
       path
     end
