@@ -60,6 +60,7 @@ defmodule UccChatWeb.SystemChannel do
   #   {:noreply, socket}
   # end
   def handle_in(ev = "state:blur", params, socket) do
+    # Logger.warn "blur"
     trace ev, params
     # TODO: move this blur timer to a configuration item
     ref = Process.send_after self(), :blur_timeout, @blur_timer
@@ -67,6 +68,7 @@ defmodule UccChatWeb.SystemChannel do
   end
   def handle_in(ev = "state:focus", params, socket) do
     trace ev, params
+    # Logger.warn "focus"
     # TODO: move this blur timer to a configuration item
     socket =
       case socket.assigns[:blur_ref] do
@@ -134,5 +136,11 @@ defmodule UccChatWeb.SystemChannel do
       _ ->
         nil
     end
+  end
+
+  def terminate(_, socket) do
+    assigns = socket.assigns
+    Presence.update socket, assigns.user_id,
+      %{status: "offline", username: assigns.username}
   end
 end
