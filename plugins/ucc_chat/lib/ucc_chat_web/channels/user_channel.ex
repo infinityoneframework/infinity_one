@@ -990,6 +990,9 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  defp clear_unreads(%{assigns: %{channel_id: ""}} = socket) do
+    socket
+  end
   defp clear_unreads(%{assigns: %{channel_id: channel_id}} = socket) do
     # Logger.warn "clear_unreads/1: channel_id: #{inspect channel_id}, " <>
     #   "socket.assigns.user_id: #{inspect socket.assigns.user_id}"
