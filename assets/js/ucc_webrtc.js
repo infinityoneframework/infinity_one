@@ -209,6 +209,9 @@ require('./device_manager');
           callbacks[i]();
         }
         WebRTC.yourConnection.close();
+        WebRTC.stream.getTracks().forEach(function (track) {
+          track.stop();
+        });
         if (WebRTC.callType == 'video') {
           WebRTC.connectedUser = null;
           WebRTC.remoteVideo.src = null;
