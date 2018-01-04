@@ -26,5 +26,12 @@ require('./ucc_webrtc');
 require('./tone_generator');
 require('./device_manager');
 require('./chat_tooltip');
+require('./mscs/mscs');
+// import configured plugin js
+// var plugins = window.ucx_ucc_plugins;
+
+// for(var i = 0; i < plugins.length; ++i) {
+//   require('./' + plugins[i] + '/' + plugins[i]);
+// }
 
 window.moment = require('moment');

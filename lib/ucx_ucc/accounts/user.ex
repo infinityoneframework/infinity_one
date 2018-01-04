@@ -22,6 +22,10 @@ defmodule UcxUcc.Accounts.User do
     field :uri, :string
     field :active, :boolean
 
+    # TODO: This should be moved to one of the commercial plugins
+    field :webrtc_enabled, :boolean, default: false
+
+
     has_many :user_roles, UcxUcc.Accounts.UserRole
     has_many :roles, through: [:user_roles, :role]
     has_many :phone_numbers, UcxUcc.Accounts.PhoneNumber, on_replace: :delete
@@ -33,7 +37,7 @@ defmodule UcxUcc.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @all_params ~w(name email username tz_offset alias tag_line uri active avatar_url)a
+  @all_params ~w(name email username tz_offset alias tag_line uri active avatar_url webrtc_enabled)a
   @required  ~w(name email username)a
 
   def changeset(model, params \\ %{}) do

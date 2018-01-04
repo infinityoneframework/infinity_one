@@ -4,12 +4,14 @@ alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
 alias UccChat.{ChannelService, Subscription, Message, Channel}
 alias UcxPresence.Extension
-# alias Mscs.{Client, Apb}
+alias Mscs.Client
 
 # Extension.delete_all
 Message.delete_all
 Subscription.delete_all
 Channel.delete_all
+Mscs.Apb.delete_all
+
 
 Repo.delete_all PhoneNumberLabel
 Repo.delete_all PhoneNumber
@@ -259,11 +261,55 @@ IO.puts "Creating Settings"
 
 UccSettings.init_all()
 
+start_mac = Application.get_env :mscs, :base_mac_address, 0x144ffc0000
+
+IO.puts "Setting mac addresses"
+
+Client.list |> Enum.with_index |> Enum.each(fn {user, inx} ->
+  mac = start_mac + inx + 1
+  Client.update(user, %{mac: mac})
+end)
+
+
 IO.puts "Setting phone numbers"
 
-[_work, _home, _mobile] =
+[work, _home, _mobile] =
   ~w(Work Home Mobile)
   |> Enum.map(fn label ->
       Accounts.create_phone_number_label! %{name: label}
   end)
+
+add_phone_number =
+  fn {{numbers, labels}, user} ->
+    phonelist =
+      numbers
+      |> Enum.zip(labels)
+      |> Enum.map(fn {number, label} ->
+        default = if label.name == "Work", do: true, else: false
+        %{user_id: user.id, number: number, default: default, label_id: label.id }
+      end)
+    Accounts.update_user!(user, %{phone_numbers: phonelist})
+  end
+
+add_extension =
+  fn user ->
+    user = Repo.preload(user, [:phone_numbers])
+    Extension.create! %{default: true, user_id: user.id, extension_id: hd(user.phone_numbers) |> Map.get(:id)}
+  end
+
+# [
+#   2000: u2, 2001: u3, 2002: Enum.at(users, 0),
+#   2002: Enum.at(users, 1), 2003: Enum.at(users, 2),
+#   2004: Enum.at(users, 3)
+# ]
+
+users =
+  2000..2009
+  |> Enum.map(& {[to_string(&1)], [work]})
+  |> Enum.zip([u2, u3] ++ users)
+  |> Enum.map(& add_phone_number.(&1))
+
+IO.puts "Adding extensions"
+
+Enum.map users, &add_extension.(&1)
 

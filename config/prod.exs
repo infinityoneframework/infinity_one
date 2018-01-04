@@ -23,7 +23,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",
-  version: Application.spec(:ucx_ucc, :vsn)
+  version: Application.spec(:ucx_ucc, :vsn),
+  check_origin: false
 
 # uncomment the following lines if you would like to use a symlink
 # for production releases. Change the second path in the tuple to
@@ -37,11 +38,26 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
 
 config :logger, [
   level: :info,
-  backends: [:console],
+  backends: [:console, :syslog],
   console: [level: :warn, format: "[$level] $metadata$message\n",
     metadata: [:module, :function]
   ],
+
+  # the following section controls logging to syslog
+  syslog: [
+    appid: "ucx_ucc", host: '127.0.0.1', facility: :local5,
+
+    # syslog already prints timestamp, so no $date and $time needed
+    # format: "$date $time [$level] $metadata$message\n",
+    format: "[$level] $metadata$message\n",
+    # to enable category, module, function, and line numbers, use the following:
+    # metadata: [:catgy, :module, :function, :line]
+    metadata: [:module, :function]
+  ]
+
 ]
+
+config :conform, verbosity: :quiet
 
 # ## SSL Support
 #

@@ -27,6 +27,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
   def args(socket, {user_id, channel_id, _, _}, opts) do
     current_user = Helpers.get_user!(user_id)
+    channel_id = socket.assigns.channel_id
     channel = Channel.get!(channel_id, preload: [users: [:roles, user_roles: :role]])
 
     {user, user_mode} =
@@ -75,7 +76,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
   def open(socket, {user_id, channel_id, tab, sender}, %{"view" => "user"} = args) do
     username = args["username"]
-
+    channel_id = socket.assigns.channel_id
     {args, socket} = user_args(socket, user_id, channel_id, username)
 
     html =
