@@ -8,7 +8,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
   alias UccChatWeb.Client
   alias UccChatWeb.AdminView
 
-  alias UcxUcc.{TabBar, Hooks}
+  alias UcxUcc.{TabBar, Hooks, UccPubSub}
   alias UccAdminWeb.FlexBarView
 
   @roles_preload [:roles, user_roles: :role]
@@ -190,13 +190,17 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   def notify_update_success(socket, tab, sender, _opts, client \\ UccChatWeb.Client)
 
+  def notify_update_success(socket, %{id: "admin_user_info"}, _sender, %{resource_params: params} = opts, client) do
+    UccPubSub.broadcast "phone_number", "admin", opts
+    client.send_js socket, click_users_link_js()
+    socket
+  end
   def notify_update_success(socket, %{id: "admin_user_info"}, _sender, _opts, client) do
     client.send_js socket, click_users_link_js()
     socket
   end
 
   def notify_update_success(socket, _tab, _sender, _opts, _) do
-    # Logger.info "tab: #{inspect tab}, sender: #{inspect sender}"
     socket
   end
 

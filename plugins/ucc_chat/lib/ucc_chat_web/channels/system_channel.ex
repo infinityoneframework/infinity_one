@@ -37,6 +37,8 @@ defmodule UccChatWeb.SystemChannel do
   def leave(pid, user_id) do
     UcxUccWeb.Presence.untrack(pid, CC.chan_system(), user_id)
     UccChat.PresenceAgent.unload(user_id)
+    UccPubSub.broadcast("user:" <> user_id, "user:leave")
+    # Logger.warn ".......... leaving " <> inspect(user_id)
   end
 
   def handle_out(ev = "presence_diff", params, socket) do
