@@ -75,6 +75,21 @@ require('./device_manager');
       this.localName = localName;
       this.localUsername = localUsername;
       this.create_channel();
+      var contraints_video_hs = {
+        video: {
+          optional: [{sourceId: UcxUcc.DeviceManager.get_device("video_input_id")}]
+        },
+        audio: {
+          optional: [{sourceId: UcxUcc.DeviceManager.get_device("headset_input_id")}]
+        }
+      };
+
+      if (this.debug) { console.log('getUserMedia for video & headset'); }
+      navigator.getUserMedia(contraints_video_hs, function (myStream) {
+        //  myStream; // No action
+      }, function(error) {
+        console.error('video_hs:', error);
+      });
     },
     setRemoteName: function(name) {
       console.log('setRemoteName')

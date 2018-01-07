@@ -1198,7 +1198,6 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def video_stop(socket, sender) do
-
     trace "video_stop", sender
     exec_js(socket, "window.WebRTC.hangup()")
     execute(socket, :click, on: ".tab-button.active")

@@ -77,7 +77,6 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   def open(socket, {user_id, _channel_id, tab, sender}, %{"view" => "user"} = args) do
     username = args["username"]
     channel_id = socket.assigns.channel_id
-
     {args, socket} = user_args(socket, user_id, channel_id, username)
 
     html =
