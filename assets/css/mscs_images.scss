@@ -151,19 +151,121 @@
     &.phone-i-idle {
       background-image: url('../images/mscs/prgm-phone-i-idle-gray.png');
     }
+    &.phone-u-idle {
+      background-image: url('../images/mscs/prgm-phone-u-idle-gray.png');
+    }
     &.feature-active {
       background-image: url('../images/mscs/prgm-feature-active-gray.png');
+    }
+    &.feature-inactive {
+      background-image: url('../images/mscs/prgm-feature-inactive-gray.png');
     }
     &.phone-i-active {
       background-image: url('../images/mscs/prgm-phone-i-active-gray.png');
     }
+    &.phone-u-active {
+      background-image: url('../images/mscs/prgm-phone-u-active-gray.png');
+    }
     &.phone-i-hold {
       background-image: url('../images/mscs/prgm-phone-i-hold-gray.png');
+      background-size: 30px;
+    }
+    &.phone-u-hold {
+      background-image: url('../images/mscs/prgm-phone-u-hold-gray.png');
       background-size: 30px;
     }
     &.phone-i-ring-flash {
       background-image: url('../images/mscs/phone-i-ring-flash.gif');
       background-size: 17px;
     }
+    &.phone-u-ring-flash {
+      background-image: url('../images/mscs/phone-u-ring-flash.gif');
+      background-size: 17px;
+    }
+    &.voice-mail{
+      background-image: url('../images/mscs/prgm-voicemail-ico.png');
+    }
+    &.auto-dial{
+      background-image: url('../images/mscs/prgm-autodial-ico.png');
+    }
+    &.vm-no{
+      background-image: url('../images/mscs/prgm-vm-number-ico.png');
+    }
+    &.redial{
+      background-image: url('../images/mscs/prgm-redial-ico.png');
+    }
+    &.transto-vm{
+      background-image: url('../images/mscs/prgm-transtovm-ico.png');
+    }
+    &.i-group-listen{
+      background-image: url('../images/mscs/prgm-i-group-listen.png');
+    }
+    &.u-group-listen{
+      background-image: url('../images/mscs/prgm-u-group-listen.png');
+    }
+    &.i-hold-ringing{
+      background-image: url('../images/mscs/prgm-i-hold-ringing.png');
+    }
+    &.u-hold-ringing{
+      background-image: url('../images/mscs/prgm-u-hold-ringing.png');
+    }
+    &.active-audio{
+      background-image: url('../images/mscs/prgm-active-audio.png');
+    }
+    &.hold-audio{
+      background-image: url('../images/mscs/prgm-hold-audio.png');
+    }
+    &.home{
+      background-image: url('../images/mscs/prgm-home.png');
+    }
+    &.business{
+      background-image: url('../images/mscs/prgm-business.png');
+    }
+    &.extension-number{
+      background-image: url('../images/mscs/prgm-extension-number.png');
+    }
+    &.pager{
+      background-image: url('../images/mscs/prgm-pager.png');
+    }
+    &.voice{
+      background-image: url('../images/mscs/prgm-voice.png');
+    }
+    &.fax{
+      background-image: url('../images/mscs/prgm-fax.png');
+    }
+    &.email{
+      background-image: url('../images/mscs/prgm-email.png');
+    }
+    &.wireless{
+      background-image: url('../images/mscs/prgm-wireless.png');
+    }
+    &.internet-address{
+      background-image: url('../images/mscs/prgm-internet-address.png');
+    }
+    &.set-to-set-command{
+      background-image: url('../images/mscs/prgm-set-to-set-command.png');
+    }
+    &.secured{
+      background-image: url('../images/mscs/prgm-secured.png');
+    }
+    &.trash-can{
+      background-image: url('../images/mscs/prgm-trash-can.png');
+    }
+    &.inbox{
+      background-image: url('../images/mscs/prgm-inbox.png');
+    }
+    &.outbox{
+      background-image: url('../images/mscs/prgm-outbox.png');
+    }
+    &.misc{
+      background-image: url('../images/mscs/prgm-misc.png');
+    }
+    &.blank{
+      background-image: url('../images/mscs/prgm-blank.png');
+    }
+
+.prgm-keys{
+  margin-top:18px;
+}
   }
 }
