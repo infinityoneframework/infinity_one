@@ -73,6 +73,18 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
   }
 }
 
+@keyframes alerting {
+  0%  {color: black; transform: scale(1,1); }
+  50% {color: red; transform: scale(1.5, 1.5); }
+  100% {color: black; transform: scale(1,1); }
+}
+
+.icon-alerting:before {
+  animation-name: alerting;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
 .mscs-container {
 
   margin-right: auto;

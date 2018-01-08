@@ -48,6 +48,7 @@ defmodule UccChatWeb.UserChannel do
   alias UccWebrtcWeb.WebrtcChannel
   alias UccChatWeb.RebelChannel.Client
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
+  alias UcxUcc.UccPubSub
 
   require UccChat.ChatConstants, as: CC
 
@@ -432,7 +433,16 @@ defmodule UccChatWeb.UserChannel do
           |> Map.put("extension", %{user_id: socket.assigns.user_id, default: true})
           |> Accounts.create_phone_number
           |> case do
-            {:ok, _phone_number} ->
+            {:ok, phone_number} ->
+              if phone_number.primary do
+                UccPubSub.broadcast "phone_number", "create", %{
+                  number: phone_number.number,
+                  user_id: socket.assigns.user_id,
+                  username: socket.assigns.username
+                }
+              end
+              # Logger.warn inspect(socket.assigns)
+
               {:ok, %{success: ~g"Phone Number created successfully"}}
             {:error, cs} ->
               Logger.error "cs.errors: #{inspect cs.errors}"
@@ -443,7 +453,15 @@ defmodule UccChatWeb.UserChannel do
           |> Accounts.get_phone_number!
           |> Accounts.update_phone_number(phone_number_params)
           |> case do
-            {:ok, _phone_number} ->
+            {:ok, phone_number} ->
+              if phone_number.primary do
+                UccPubSub.broadcast "phone_number", "update", %{
+                  number: phone_number.number,
+                  user_id: socket.assigns.user_id,
+                  username: socket.assigns.username
+                }
+              end
+              # Logger.warn inspect(socket.assigns)
               {:ok, %{success: ~g"Phone Number updated successfully"}}
             {:error, cs} ->
               Logger.error "cs.errors: #{inspect cs.errors}"
@@ -455,7 +473,6 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def handle_in("account:phone:delete", params, socket) do
-    # Logger.warn "#{ev} params: #{inspect params}"
 
     user_id = socket.assigns.user_id
     phone_number =
@@ -470,6 +487,14 @@ defmodule UccChatWeb.UserChannel do
         ^user_id ->
           case Accounts.delete_phone_number(phone_number) do
             {:ok, _} ->
+              if phone_number.primary do
+                UccPubSub.broadcast "phone_number", "delete", %{
+                  number: phone_number.number,
+                  user_id: socket.assigns.user_id,
+                  username: socket.assigns.username
+                }
+              end
+
               {:ok, %{success: ~g"Phone Number deleted successfully."}}
             {:error, _} ->
               {:ok, %{error: ~g"There was a problem deleting the phone number!"}}
@@ -766,7 +791,6 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
-    # Logger.warn "message:new, " <> room <> ", " <>  inspect(payload)
 
     trace event, ""  #socket.assigns
 
@@ -777,10 +801,9 @@ defmodule UccChatWeb.UserChannel do
       # Logger.debug "in the room ... #{assigns.user_id}, room: #{inspect room}"
       if channel.id != assigns.channel_id or assigns.user_state == "idle" do
         if channel.type == 2 do
-          # Logger.warn "private channel ..."
           msg =
             if payload[:body] do
-              %{body: payload[:body], username: assigns.username}
+              %{body: payload[:body], username: assigns.username, message: payload[:message]}
             else
               nil
             end
@@ -899,6 +922,8 @@ defmodule UccChatWeb.UserChannel do
         "#{inspect socket.assigns.room}, opens: #{inspect opens}"
     end
 
+    # Logger.warn "update_direct_message: " <> inspect(payload)
+
     %{channel_id: channel_id, msg: msg} = payload
     channel = Channel.get!(channel_id)
 
@@ -910,6 +935,7 @@ defmodule UccChatWeb.UserChannel do
          count <- ChannelService.get_unread(channel_id, user_id) do
       push(socket, "room:mention", %{room: channel.name, unread: count})
 
+      # Logger.warn "msg: " <> inspect(msg)
       if msg do
         user = Helpers.get_user(user_id)
         handle_notifications socket, user, channel,
@@ -945,8 +971,9 @@ defmodule UccChatWeb.UserChannel do
   ###############
   # Helpers
 
-  defp handle_notifications(socket, user, channel, payload, client \\ UccChatWeb.Client) do
-    message = payload.mention.message
+  defp handle_notifications(socket, user, channel, payload, client \\ UccChatWeb.Client)
+  defp handle_notifications(socket, user, channel, payload, client) do
+    message = if mention = payload[:mention], do: mention.message, else: payload[:message]
     payload = case UccChat.Settings.get_new_message_sound(user, channel.id) do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
@@ -963,6 +990,7 @@ defmodule UccChatWeb.UserChannel do
     end
 
     if sound = payload[:sound] do
+      # Logger.warn "sound: " <> inspect(sound)
       client.notify_audio(socket, sound)
     end
 
@@ -990,6 +1018,9 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  defp clear_unreads(%{assigns: %{channel_id: ""}} = socket) do
+    socket
+  end
   defp clear_unreads(%{assigns: %{channel_id: channel_id}} = socket) do
     # Logger.warn "clear_unreads/1: channel_id: #{inspect channel_id}, " <>
     #   "socket.assigns.user_id: #{inspect socket.assigns.user_id}"
@@ -1234,7 +1265,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def mousedown(socket, sender) do
-    Logger.debug "mousedown sender: #{inspect sender}"
+    # Logger.debug "mousedown sender: #{inspect sender}"
     socket
   end
 
