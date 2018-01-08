@@ -106,7 +106,6 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   defp handle_new_message(socket, message_body, opts, client) do
-    Logger.debug "message_body: #{inspect message_body}"
     user = opts[:user]
     channel = opts[:channel]
     channel_id = channel.id
@@ -118,10 +117,9 @@ defmodule UccChatWeb.RoomChannel.Message do
     message = create_message(body, user.id, channel_id, opts[:msg_params])
 
     Service.create_mentions(mentions, message.id, message.channel_id, body)
-
     Service.update_direct_notices(channel, message)
 
-    broadcast_message(socket, message.id, user.id, "", [])
+    broadcast_message(socket, message.id, user.id, message, [])
 
     message
     |> render_message
@@ -145,7 +143,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
         Service.update_direct_notices(channel, message)
 
-        broadcast_message(socket, message.id, user.id, "", [])
+        broadcast_message(socket, message.id, user.id, message.body, [])
 
         client.toastr! socket, :success,
           ~g(Attachment posted successfully.)
@@ -315,7 +313,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def message_action(socket, sender, client) do
     action = sender["dataset"]["id"]
-    Logger.info "message action: #{action}, sender: #{inspect sender}"
+    Logger.debug "message action: #{action}, sender: #{inspect sender}"
     close_cog socket, sender, client
   end
 
@@ -329,7 +327,6 @@ defmodule UccChatWeb.RoomChannel.Message do
         [att | _] -> att.description
       end
       |> Poison.encode!
-      |> IO.inspect(label: "body")
     client.send_js socket, set_editing_js(message_id, body)
   end
 
@@ -442,7 +439,6 @@ defmodule UccChatWeb.RoomChannel.Message do
     channel_id
     |> Channel.get
     |> broadcast_bot_message(user_id, body)
-
   end
 
   def broadcast_system_message(%{} = channel, user_id, body) do
@@ -483,10 +479,19 @@ defmodule UccChatWeb.RoomChannel.Message do
       create_broadcast_message(id, user_id, html, opts)
   end
 
-  defp create_broadcast_message(id, user_id, html, opts \\ []) do
+  defp create_broadcast_message(id, user_id, message, opts \\ [])
+  defp create_broadcast_message(id, user_id, %{body: body} = message, opts) do
+    Enum.into opts, %{
+      body: body,
+      id: id,
+      user_id: user_id,
+      message: message
+    }
+  end
+  defp create_broadcast_message(id, user_id, html, opts) do
     Enum.into opts,
       %{
-        html: html,
+        body: html,
         id: id,
         user_id: user_id
       }
