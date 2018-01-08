@@ -757,6 +757,8 @@ defmodule UccChatWeb.UserChannel do
     # TODO: add Hooks for this
     # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     subscribe_callback "user:all", "callback", :user_all_event
+    # TODO: Add hooks for this
+    subscribe_callback "user:" <> user_id, "presence:change", {UcxPresenceWeb.Channel.Presence, :presence_change}
     {:noreply, socket}
   end
 
@@ -1060,6 +1062,32 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
+  def drop_notify_click(socket, sender) do
+    # Logger.info "sender: " <> inspect(sender)
+    dataset = sender["dataset"]
+    id = dataset["id"]
+    channel = dataset["channel"]
+    # Logger.info inspect({id, channel})
+    if id == "answer_call" && channel do
+      # Logger.info "answering #{dataset["channel"]}"
+      UcxPresence.Server.answer_call dataset["channel"]
+    end
+    socket
+  end
+  def drop_notify_cancel(socket, sender) do
+    exec_js socket, """
+      var elem = $('#{this(sender)}').closest('.notice');
+      elem.animate({
+        height: "0px",
+        'font-size': "0px"
+      }, 500, function() {
+        elem.delete();
+      });
+      """ |> String.replace("\n", " ")
+
+    socket
+  end
+
   # TOOD: this needs to be moved like the video stuff
   def start_audio_call(socket, sender) do
     current_user_id = socket.assigns.user_id
@@ -1264,7 +1292,7 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
-  def mousedown(socket, sender) do
+  def mousedown(socket, _sender) do
     # Logger.debug "mousedown sender: #{inspect sender}"
     socket
   end
