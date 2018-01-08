@@ -18,6 +18,7 @@ defmodule UccChatWeb.UserChannel do
     "webrtc:incoming_video_call",
     "webrtc:confirmed_video_call",
     "webrtc:declined_video_call",
+    "webrtc:leave",
     "get",
   ]
 
@@ -141,6 +142,13 @@ defmodule UccChatWeb.UserChannel do
     #   showCancelButton: true
     #   confirmButtonText: "Yes"
     #   cancelButtonText: "No"
+
+   def handle_out("webrtc:leave" = ev, payload, socket) do
+     trace ev, payload
+     exec_js socket, ~s/$('.webrtc-video button.stop-call').click()/
+     {:noreply, socket}
+   end
+
   def handle_out("webrtc:" <> event, payload, socket) do
     apply WebrtcChannel, String.to_atom(event), [payload, socket]
   end
