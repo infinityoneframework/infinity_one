@@ -791,7 +791,6 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
-    # Logger.warn "message:new, " <> room <> ", " <>  inspect(payload)
 
     trace event, ""  #socket.assigns
 
@@ -802,10 +801,9 @@ defmodule UccChatWeb.UserChannel do
       # Logger.debug "in the room ... #{assigns.user_id}, room: #{inspect room}"
       if channel.id != assigns.channel_id or assigns.user_state == "idle" do
         if channel.type == 2 do
-          # Logger.warn "private channel ..."
           msg =
             if payload[:body] do
-              %{body: payload[:body], username: assigns.username}
+              %{body: payload[:body], username: assigns.username, message: payload[:message]}
             else
               nil
             end
@@ -924,6 +922,8 @@ defmodule UccChatWeb.UserChannel do
         "#{inspect socket.assigns.room}, opens: #{inspect opens}"
     end
 
+    # Logger.warn "update_direct_message: " <> inspect(payload)
+
     %{channel_id: channel_id, msg: msg} = payload
     channel = Channel.get!(channel_id)
 
@@ -935,6 +935,7 @@ defmodule UccChatWeb.UserChannel do
          count <- ChannelService.get_unread(channel_id, user_id) do
       push(socket, "room:mention", %{room: channel.name, unread: count})
 
+      # Logger.warn "msg: " <> inspect(msg)
       if msg do
         user = Helpers.get_user(user_id)
         handle_notifications socket, user, channel,
@@ -970,8 +971,9 @@ defmodule UccChatWeb.UserChannel do
   ###############
   # Helpers
 
-  defp handle_notifications(socket, user, channel, payload, client \\ UccChatWeb.Client) do
-    message = payload.mention.message
+  defp handle_notifications(socket, user, channel, payload, client \\ UccChatWeb.Client)
+  defp handle_notifications(socket, user, channel, payload, client) do
+    message = if mention = payload[:mention], do: mention.message, else: payload[:message]
     payload = case UccChat.Settings.get_new_message_sound(user, channel.id) do
       nil -> payload
       sound -> Map.put(payload, :sound, sound)
@@ -988,6 +990,7 @@ defmodule UccChatWeb.UserChannel do
     end
 
     if sound = payload[:sound] do
+      # Logger.warn "sound: " <> inspect(sound)
       client.notify_audio(socket, sound)
     end
 
@@ -1262,7 +1265,7 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def mousedown(socket, sender) do
-    Logger.debug "mousedown sender: #{inspect sender}"
+    # Logger.debug "mousedown sender: #{inspect sender}"
     socket
   end
 
