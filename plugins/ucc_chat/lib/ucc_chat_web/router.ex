@@ -20,10 +20,6 @@ defmodule UccChatWeb.Router do
     plug Coherence.Authentication.Session, protected: true
   end
 
-  pipeline :avatar do
-    plug :accepts, ~w(json html)
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -38,11 +34,6 @@ defmodule UccChatWeb.Router do
 
     get "/logout", Coherence.SessionController, :delete
     coherence_routes :protected
-  end
-
-  scope "/", UccChatWeb do
-    pipe_through :avatar
-    get "/avatar/:username", AvatarController, :show
   end
 
   scope "/", UccChatWeb do
