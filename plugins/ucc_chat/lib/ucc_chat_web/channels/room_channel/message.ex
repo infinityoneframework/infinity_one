@@ -105,18 +105,18 @@ defmodule UccChatWeb.RoomChannel.Message do
     MessageService.stop_typing(socket, user_id, channel_id)
   end
 
-  defp handle_new_message(socket, message_body, opts, client) do
+  defp handle_new_message(socket, body, opts, client) do
     user = opts[:user]
     channel = opts[:channel]
     channel_id = channel.id
 
-    {body, mentions} = Service.encode_mentions(message_body, channel_id)
+    {mention_body, mentions} = Service.encode_mentions(body, channel_id)
 
     RobotService.new_message body, channel, user
 
     message = create_message(body, user.id, channel_id, opts[:msg_params])
 
-    Service.create_mentions(mentions, message.id, message.channel_id, body)
+    Service.create_mentions(mentions, message.id, message.channel_id, mention_body)
     Service.update_direct_notices(channel, message)
 
     broadcast_message(socket, message.id, user.id, message, [])
