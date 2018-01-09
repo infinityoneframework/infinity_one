@@ -119,7 +119,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     "coherence.Elixir.UcxUccWeb.Coherence.Mailer.cmd_path": [
       commented: false,
       datatype: :binary,
-      default: "/user/sbin/sendmail",
+      default: "/usr/sbin/sendmail",
       doc: "The path to the sendmail executable.",
       hidden: false,
       to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.cmd_path"
@@ -134,7 +134,7 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     ],
     "coherence.Elixir.UcxUccWeb.Coherence.Mailer.qmail": [
       commented: false,
-      datatype: :binary,
+      datatype: :atom,
       default: false,
       doc: "Enable qmail",
       hidden: false,
