@@ -2,7 +2,7 @@ defmodule UccChatWeb.Client do
   use UccChatWeb.RoomChannel.Constants
 
   import UcxUccWeb.Utils
-  import Rebel.{Query, Core}, warn: false
+  import Rebel.{Core}, warn: false
 
   alias Rebel.Element
   alias UccChatWeb.RebelChannel.Client, as: RebelClient
@@ -73,7 +73,7 @@ defmodule UccChatWeb.Client do
   end
 
   def close_popup(socket) do
-    update socket, :html, set: "", on: ".message-popup-results"
+    Rebel.Query.update socket, :html, set: "", on: ".message-popup-results"
   end
 
   def get_message_box_value(socket) do
@@ -95,7 +95,7 @@ defmodule UccChatWeb.Client do
     do: set_message_box_focus_js() <> ~s(elem.value = "";)
 
   def render_popup_results(html, socket) do
-    update socket, :html, set: html, on: ".message-popup-results"
+    Rebel.Query.update socket, :html, set: html, on: ".message-popup-results"
   end
 
   def get_selected_item(socket) do
@@ -143,7 +143,7 @@ defmodule UccChatWeb.Client do
   end
 
   def delete_message!(message_id, socket) do
-    delete! socket, "li.message#" <> message_id
+    Rebel.Query.delete! socket, "li.message#" <> message_id
   end
 
   def desktop_notify(socket, name, body, message, duration) do
@@ -177,4 +177,5 @@ defmodule UccChatWeb.Client do
   defdelegate insert_html(socket, selector, position, html), to: Rebel.Element
   defdelegate toastr!(socket, which, message), to: UccChatWeb.RebelChannel.Client
   defdelegate toastr(socket, which, message), to: UccChatWeb.RebelChannel.Client
+  defdelegate delete(socket, which), to: Rebel.Query
 end

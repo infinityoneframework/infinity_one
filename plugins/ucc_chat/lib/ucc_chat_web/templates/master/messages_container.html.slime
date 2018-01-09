@@ -1,5 +1,6 @@
 section.messages-container.flex-tab-main-content(class="#{get_admin_class(@chatd.user)}" id="#{get_window_id(@chatd.channel)}" aria-label="Channel")
   = unless embedded_version() do
+    .drop-notices
     header.fixed-title.content-background-color.border-component-color
       = render "burger.html"
       h2

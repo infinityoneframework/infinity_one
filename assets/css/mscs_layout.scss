@@ -79,6 +79,29 @@ $container-width: $main-phone-width + $pk-button-width + $pk-strip-margin-left +
   100% {color: black; transform: scale(1,1); }
 }
 
+// @keyframes mscs_open {
+//   0% {transform: translateX(0); }
+//   100% {transform: translateX(500px); }
+// }
+// @keyframes mscs_close {
+//   0% {transform: translateX(500px); }
+//   100% {transform: translateX(0); }
+// }
+
+// section.flex-tab-mscs {
+//   width: 0px !important;
+// }
+// section.flex-tab-mscs.open {
+//   animation-name: mscs_open;
+//   animation-duration: 1s;
+//   animation-iteration-count: 1;
+// }
+// section.flex-tab-mscs.close {
+//   animation-name: mscs_close;
+//   animation-duration: 1s;
+//   animation-iteration-count: 1;
+// }
+
 .icon-alerting:before {
   animation-name: alerting;
   animation-duration: 1s;

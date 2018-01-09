@@ -15,6 +15,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   import Rebel.Query
 
   require Logger
+  require UccChat.ChatConstants, as: CC
 
   @device_fields [
     :handsfree_input_id,
@@ -100,6 +101,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     push socket, ev, payload
     unless payload[:dest] do
       do_broadcast socket, socket.assigns.state["otherName"], "leave", %{dest: true}
+      UcxUccWeb.Endpoint.broadcast CC.chan_user <> socket.assigns.state["otherName"], "webrtc:leave", %{}
     end
     {:noreply, socket}
   end

@@ -3,7 +3,7 @@ defmodule UcxUcc.Mixfile do
 
   def project do
     [app: :ucx_ucc,
-     version: "1.0.0-alhpa4",
+     version: "1.0.0-alhpa5",
      elixir: "~> 1.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -104,7 +104,8 @@ defmodule UcxUcc.Mixfile do
       {:phoenix_markdown, "~> 0.1"},
       {:distillery, "~> 1.4"},
       {:syslog, github: "smpallen99/syslog"},
-      {:conform, "~> 2.5"}
+      {:conform, "~> 2.5"},
+      {:gen_smtp, "~> 0.12.0"}
 
     ] ++ plugin_deps()
   end
