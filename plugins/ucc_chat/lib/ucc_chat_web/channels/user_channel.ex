@@ -1262,7 +1262,7 @@ defmodule UccChatWeb.UserChannel do
     status = sender["dataset"]["status"] || ""
     # Logger.error "handle status #{status}"
     UccPubSub.broadcast "status:" <> user_id, "set:" <> status, sender["dataset"]
-    socket
+    execute socket, :click, on: ".account-box.active"
   end
 
   def phone_call(socket, sender) do
