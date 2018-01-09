@@ -111,19 +111,34 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
     "coherence.Elixir.UcxUccWeb.Coherence.Mailer.adapter": [
       commented: false,
       datatype: :atom,
-      default: Swoosh.Adapters.Sendgrid,
+      default: Swoosh.Adapters.Sendmail,
       doc: "The email adapter.",
-      hidden: true,
+      hidden: false,
       to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.adapter"
     ],
-    "coherence.Elixir.UcxUccWeb.Coherence.Mailer.api_key": [
+    "coherence.Elixir.UcxUccWeb.Coherence.Mailer.cmd_path": [
       commented: false,
       datatype: :binary,
-      default: "Need to set this",
-      doc: "The email adapter API key.",
+      default: "/user/sbin/sendmail",
+      doc: "The path to the sendmail executable.",
       hidden: false,
-      to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.api_key",
-      env_var: "SENDGRID_API_KEY"
+      to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.cmd_path"
+    ],
+    "coherence.Elixir.UcxUccWeb.Coherence.Mailer.cmd_args": [
+      commented: false,
+      datatype: :binary,
+      default: "-N delay,failure,success",
+      doc: "The sendmail argements",
+      hidden: false,
+      to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.cmd_args"
+    ],
+    "coherence.Elixir.UcxUccWeb.Coherence.Mailer.qmail": [
+      commented: false,
+      datatype: :binary,
+      default: false,
+      doc: "Enable qmail",
+      hidden: false,
+      to: "coherence.Elixir.UcxUccWeb.Coherence.Mailer.qmail"
     ],
     "distillery.no_warn_missing": [
       commented: false,
