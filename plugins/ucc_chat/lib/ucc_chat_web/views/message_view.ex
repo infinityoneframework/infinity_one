@@ -280,8 +280,13 @@ defmodule UccChatWeb.MessageView do
   def get_popup_data(_), do: false
 
   def format_message_body(message) do
-    # Logger.warn "type: #{inspect message.type}, system: #{inspect message.system}, body: #{inspect message.body}"
-    body = AutoLinker.link message.body || "", exclude_pattern: "```"
+    # Logger.warn "t   body =
+    body =
+      (message.body || "")
+      |> Phoenix.HTML.html_escape
+      |> Phoenix.HTML.safe_to_string
+      |> AutoLinker.link(exclude_pattern: "```")
+
     quoted? = String.contains?(body, "```")
     body
     |> EmojiOne.shortname_to_image(single_class: "big")
