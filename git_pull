@@ -1,6 +1,6 @@
 #!/bin/sh
 echo 'ucx_ucc'
-git pull
+git pull origin emetrotel
 
 cd plugins/mscs
 echo ''
