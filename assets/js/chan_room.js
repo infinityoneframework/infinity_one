@@ -141,6 +141,10 @@ function start_room_channel(ucc_chat, socket) {
   console.log('....going to update_mentions')
   ucc_chat.roomManager.updateMentionsMarksOfRoom()
 
+  $('.messages-box .message').find('pre code').each(function(i, block) {
+    hljs.highlightBlock(block)
+  });
+
   if (window.Rebel) {
     window.Rebel.set_event_handlers('#flex-tabs')
   }

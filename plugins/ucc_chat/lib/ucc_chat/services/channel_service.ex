@@ -477,10 +477,8 @@ defmodule UccChat.ChannelService do
     #   "messages_header.html"
     #   |> UccChat.View.MasterView.render(chatd: chatd)
     #   |> Helpers.safe_to_string
-    html =
-      "messages_container.html"
-      |> UccChatWeb.MasterView.render(chatd: chatd)
-      |> Helpers.safe_to_string
+    html = Phoenix.View.render_to_string(UccChatWeb.MasterView,
+      "messages_container.html", chatd: chatd)
 
     side_nav_html = SideNavService.render_rooms_list(channel.id, user_id )
 
