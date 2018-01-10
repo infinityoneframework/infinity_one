@@ -106,7 +106,7 @@ $(document).ready(function() {
 function start_loading_animation(elem) {
   console.log('start_loading_animation', elem)
   UccUtils.page_loading()
-  elem.next().after(utils.loading_animation())
+  elem.next().after(UccUtils.loading_animation())
 }
 
 function stop_loading_animation(elem) {
