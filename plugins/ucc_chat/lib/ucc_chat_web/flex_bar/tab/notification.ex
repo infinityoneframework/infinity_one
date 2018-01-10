@@ -3,7 +3,7 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
 
   alias UccChat.Notification
   alias UccChat.AccountService
-  alias UcxUcc.TabBar.Tab
+  alias UcxUcc.{Accounts, TabBar.Tab}
 
   def add_buttons do
     TabBar.add_button Tab.new(
@@ -14,7 +14,11 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
       "icon-bell-alt",
       View,
       "notifications.html",
-      50)
+      50,
+      [
+        model: UccChat.Notification,
+        prefix: "notification"
+      ])
   end
 
   def args(socket, {user_id, channel_id, _, _}, params) do
@@ -42,7 +46,12 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
   end
 
   def play(socket, _sender) do
-    play_sound socket, socket.assigns.notification.settings.audio
+    assigns = Rebel.get_assigns(socket)
+    sound =
+      socket.assigns.user_id
+      |> Accounts.get_user(preload: [:account])
+      |> UccChat.Settings.get_new_message_sound(socket.assigns.channel_id)
+    play_sound socket, sound
   end
 
   def change_audio(socket, sender) do
