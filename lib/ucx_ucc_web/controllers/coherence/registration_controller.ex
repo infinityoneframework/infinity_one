@@ -58,6 +58,7 @@ defmodule UcxUccWeb.Coherence.RegistrationController do
     # |> Schemas.create
      case Accounts.create_user registration_params do
       {:ok, user} ->
+        UcxUcc.Accounts.add_role_to_user(user, "user")
         conn
         |> send_confirmation(user, user_schema)
         |> redirect_or_login(user, params, Config.allow_unconfirmed_access_for)
