@@ -176,7 +176,8 @@ defmodule UccChatWeb.MessageView do
       |> Enum.into(settings)
 
     if Application.get_env :ucx_chat, :defer, true do
-      [:katex_syntax?, :show_mark_down?, :show_markdown_code?, :show_markdown?]
+      [:show_mark_down?, :show_markdown_code?, :show_markdown?]
+      # [:katex_syntax?, :show_mark_down?, :show_markdown_code?, :show_markdown?]
       # [:katex_syntax?, :show_mark_down?, :show_markdown_code?, :show_markdown?]
     else
       [:katex_syntax?,
@@ -258,6 +259,7 @@ defmodule UccChatWeb.MessageView do
     end
   end
 
+
   defp hidden_br do
     content_tag :span, class: "hidden-br" do
       tag :br
@@ -282,29 +284,65 @@ defmodule UccChatWeb.MessageView do
   def format_message_body(message) do
     # Logger.warn "t   body =
     body =
-      (message.body || "")
-      |> Phoenix.HTML.html_escape
-      |> Phoenix.HTML.safe_to_string
-      |> AutoLinker.link(exclude_pattern: "```")
+      if message.system do
+        message.body
+      else
+        (message.body || "")
+        |> Phoenix.HTML.html_escape
+        |> Phoenix.HTML.safe_to_string
+        |> AutoLinker.link(exclude_pattern: "```")
+      end
 
     quoted? = String.contains?(body, "```")
     body
+    |> encode_mentions
+    |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
     |> message_formats
-    # |> String.replace("&lt;", "<")
-    # |> String.replace("&gt;", ">")
     |> format_newlines(quoted?, message.system)
     |> UccChatWeb.SharedView.format_quoted_code(quoted?, message.system)
     |> raw
   end
 
+  def encode_mentions(body) do
+    Regex.replace ~r/(^|\s)@([\w]+)/, body,
+      ~s'\\1<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
+      ~s' data-fun="flex_user_open" class="mention-link" data-username="\\2">@\\2</a>'
+  end
+
+  def encode_room_links(body) do
+    Regex.replace ~r/(^|\s)#([\w]+)/, body, ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
+  end
+
   def message_formats(body) do
-    body
     # TODO: Fix this. Don't convert content inside html tags
     #       Probably should write an elixir parser
-    # |> String.replace(~r/_(.+?)_/, "<i>\\1</i>")
-    # |> String.replace(~r/\*(.+?)\*/, "<strong>\\1</strong>")
-    # |> String.replace(~r/\~(.+?)\~/, "<strike>\\1</strike>")
+    body
+    |> italic_formats()
+    |> bold_formats()
+    |> strike_formats()
+  end
+
+  defp italic_formats(body) do
+    if body =~ ~r/\<.*?_.*?_.*?\>/ do
+      body
+    else
+      String.replace(body, ~r/_(.+?)_/, "<i>\\1</i>")
+    end
+  end
+  defp bold_formats(body) do
+    if body =~ ~r/\<.*?\*.*?\*.*?\>/ do
+      body
+    else
+      String.replace(body, ~r/\*(.+?)\*/, "<strong>\\1</strong>")
+    end
+  end
+  defp strike_formats(body) do
+    if body =~ ~r/\<.*?~.*?~.*?\>/ do
+      body
+    else
+      String.replace(body, ~r/\~(.+?)\~/, "<strike>\\1</strike>")
+    end
   end
 
   defp format_newlines(string, true, _), do: string

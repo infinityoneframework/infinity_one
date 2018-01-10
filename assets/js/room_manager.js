@@ -72,6 +72,10 @@ class RoomManager {
     $('.room-link').removeClass("active")
     $('.messages-container').replaceWith(resp.html)
 
+    if (resp.flex_html) {
+      $('#flex-tabs .flex-tab-bar').replaceWith(resp.flex_html);
+    }
+
     let last_read = resp.messages_info.last_read
     if (last_read && last_read != "") {
       setTimeout(() => {

@@ -258,8 +258,10 @@ defmodule UccChat.MessageService do
       spawn fn ->
         case MessageAgent.get_preview url do
           nil ->
+
             html =
               MessageAgent.put_preview url, create_link_preview(url, message_id)
+
             broadcast_link_preview(html, room, message_id)
           html ->
             spawn fn ->

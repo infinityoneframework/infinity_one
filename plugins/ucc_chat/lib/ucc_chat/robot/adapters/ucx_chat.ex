@@ -12,6 +12,8 @@ defmodule UccChat.Robot.Adapters.UccChat do
     {:ok, %{conn: conn, opts: opts, robot: robot}}
   end
 
+  def status(pid), do: GenServer.call(pid, :status)
+
   @doc false
   def handle_cast({:send, msg}, %{conn: conn} = state) do
     Kernel.send(conn, {:reply, msg})
@@ -29,6 +31,11 @@ defmodule UccChat.Robot.Adapters.UccChat do
   def handle_cast({:emote, msg}, %{conn: conn} = state) do
     Kernel.send(conn, {:reply, msg})
     {:noreply, state}
+  end
+
+  @doc false
+  def handle_call(:status, _from, state) do
+    {:reply, state, state}
   end
 
   @doc false
