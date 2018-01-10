@@ -1,4 +1,4 @@
-// import * as cc from './chat_channel'
+import * as cc from './chat_channel'
 // import * as main from './main'
 // import * as fbar_form from './flex_bar_form'
 // import * as utils from './utils'
@@ -158,33 +158,34 @@
 //   //   update_showing_count()
 //   //   return false
 //   // })
-//   // .on('click', '.uploaded-files-list .file-delete', e => {
-//   //   let id = $(e.currentTarget).parent().data('id')
-//   //   sweetAlert({
-//   //     title: gettext.are_you_sure,
-//   //     text: gettext.you_will_not_be_able_to_recover_this_message,
-//   //     type: "warning",
-//   //     showCancelButton: true,
-//   //     confirmButtonColor: "#DD6B55",
-//   //     confirmButtonText: gettext.yes_delete_it,
-//   //     closeOnConfirm: false
-//   //   },
-//   //   function(){
-//   //     cc.delete_("/attachment/" + id)
-//   //       .receive("ok", resp => {
-//   //         swal({
-//   //           title: gettext.deleted,
-//   //           text: gettext.your_entry_has_been_deleted,
-//   //           type: 'success',
-//   //           timer: 1500,
-//   //           showConfirmButton: false,
-//   //         })
-//   //       })
-//   //       .receive("error", resp => {
-//   //         toastr.error(resp.error)
-//   //       })
-//   //   });
-//   // })
+$('body')
+  .on('click', '.uploaded-files-list .file-delete', e => {
+    let id = $(e.currentTarget).parent().data('id')
+    sweetAlert({
+      title: gettext.are_you_sure,
+      text: gettext.you_will_not_be_able_to_recover_this_message,
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: gettext.yes_delete_it,
+      closeOnConfirm: false
+    },
+    function(){
+      cc.delete_("/attachment/" + id)
+        .receive("ok", resp => {
+          swal({
+            title: gettext.deleted,
+            text: gettext.your_entry_has_been_deleted,
+            type: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          })
+        })
+        .receive("error", resp => {
+          toastr.error(resp.error)
+        })
+    });
+  });
 
 //   // userchan.on('flex:open', msg => {
 //   //   console.log('receive flex:open', msg)
