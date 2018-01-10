@@ -419,8 +419,8 @@ defmodule UccChatWeb.RoomChannel.Message do
     """
   end
 
+  def broadcast_bot_message(channel, user_id, body)
   def broadcast_bot_message(%{} = channel, _user_id, body) do
-    Logger.debug "broadcast_bot_message body: #{inspect body}"
     bot_id = Helpers.get_bot_id()
     message = create_message(String.replace(body, "\n", "<br>"), bot_id,
       channel.id,
@@ -429,8 +429,7 @@ defmodule UccChatWeb.RoomChannel.Message do
         sequential: false,
       })
 
-    html = render_message message
-    resp = create_broadcast_message(message.id, channel.name, html)
+    resp = create_broadcast_message(message.id, channel.name, message)
     UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
       "message:new", resp
   end
@@ -443,8 +442,8 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def broadcast_system_message(%{} = channel, user_id, body) do
     message = create_system_message(channel.id, user_id, body)
-    {_, html} = render_message message
-    resp = create_broadcast_message(message.id, channel.name, html)
+    # {_, html} = render_message message
+    resp = create_broadcast_message(message.id, channel.name, message)
     UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
       "message:new", resp
   end

@@ -18,6 +18,8 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
     GenServer.start(__MODULE__, {self(), name, user}, name: @name)
   end
 
+  def status(), do: GenServer.call(@name, :status)
+
 
   def init({owner, name, user}) do
     GenServer.cast(self(), :after_init)
@@ -26,6 +28,10 @@ defmodule UccChat.Robot.Adapters.UccChat.Connection do
 
   def handle_cast(:after_init, state) do
     {:noreply, state}
+  end
+
+  def handle_call(:status, _from, state) do
+    {:reply, state, state}
   end
 
   def handle_info({:reply, %{text: text, room: room, user: %{id: user_id, name: _name}}}, %{} = state) do

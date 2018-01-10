@@ -284,10 +284,14 @@ defmodule UccChatWeb.MessageView do
   def format_message_body(message) do
     # Logger.warn "t   body =
     body =
-      (message.body || "")
-      |> Phoenix.HTML.html_escape
-      |> Phoenix.HTML.safe_to_string
-      |> AutoLinker.link(exclude_pattern: "```")
+      if message.system do
+        message.body
+      else
+        (message.body || "")
+        |> Phoenix.HTML.html_escape
+        |> Phoenix.HTML.safe_to_string
+        |> AutoLinker.link(exclude_pattern: "```")
+      end
 
     quoted? = String.contains?(body, "```")
     body
