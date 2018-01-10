@@ -44,7 +44,7 @@ defmodule UccChat.SlashCommands do
     %{command: "shrug", args: ~g"your message (optional)", description: ~g"Displays ¯\_(ツ)_/¯ after your message"},
     %{command: "unmute", args: "@username", description: ~g"Unmute someone in the room"},
     %{command: "unhide", args: "#channel", description: ~g"Unhide a hidden channel"},
-    %{command: "call", args: "phone number", description: ~g"Call a phone number"}
+    %{command: "call", args: "phone number | @username", description: ~g"Call a phone number or a user"}
   ]
 
   @command_map @command_data |> Enum.reduce(%{}, fn %{command: command} = map, acc -> Map.put(acc, command, map) end)
