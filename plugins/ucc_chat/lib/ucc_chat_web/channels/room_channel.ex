@@ -41,6 +41,7 @@ defmodule UccChatWeb.RoomChannel do
   alias UcxUccWeb.Endpoint
   alias UccChatWeb.RoomChannel.KeyStore
   alias UccChatWeb.RoomChannel.Message, as: WebMessage
+  alias UccChatWeb.Client, as: WebClient
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
@@ -86,8 +87,8 @@ defmodule UccChatWeb.RoomChannel do
       %{message: message}
   end
 
-  def broadcast_bot_message(_room, _user_id, _body) do
-    raise "TBD: Implement this"
+  def broadcast_bot_message(room, user_id, body) do
+    WebMessage.broadcast_bot_message room, user_id, body
   end
 
   def broadcast_updated_message(message, _opts) do
@@ -173,8 +174,14 @@ defmodule UccChatWeb.RoomChannel do
   ##########
   # Outgoing message handlers
 
-  def handle_out("message:new", _, socket) do
-    Logger.debug "message:new"
+  def handle_out("message:new", %{message: %{system: true} = message}, socket) do
+    message
+    |> WebMessage.render_message
+    |> WebClient.broadcast_message(socket)
+    {:noreply, socket}
+  end
+
+  def handle_out("message:new", _payload, socket) do
     {:noreply, socket}
   end
 
