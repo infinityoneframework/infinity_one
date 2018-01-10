@@ -18,9 +18,9 @@ defmodule UccChat.SideNavService do
 
   def render_more_channels(user_id) do
     # user = Helpers.get_user! user_id, preload: [:roles, user_roles: :role]
-    user = Helpers.get_user! user_id
+    user = Accounts.get_user! user_id, preload: [:roles, user_roles: :role]
 
-    channels = ChannelService.get_side_nav_rooms user
+    channels = ChannelService.get_side_nav_rooms(user)
 
     render_to_string UccChatWeb.SideNavView, "list_combined_flex.html",
       channels: channels, current_user: user
