@@ -27,6 +27,8 @@ defmodule UccChat.ChannelService do
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
   alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
+  alias UccUiFlexTabWeb.TabBarView
+
   require UccChat.ChatConstants, as: CC
   require Logger
   require IEx
@@ -447,7 +449,7 @@ defmodule UccChat.ChannelService do
     end
 
     channel = Channel.get_by! name: room, preload: [:subscriptions]
-    # old_channel = Helpers.get_by! Channel, :name, old_room, preload: [:subscriptions]
+    old_channel = Channel.get_by! name: old_room
 
     # {subscribed, hidden} = Channel.subscription_status(channel, user.id)
 
@@ -480,7 +482,7 @@ defmodule UccChat.ChannelService do
     html = Phoenix.View.render_to_string(UccChatWeb.MasterView,
       "messages_container.html", chatd: chatd)
 
-    side_nav_html = SideNavService.render_rooms_list(channel.id, user_id )
+    side_nav_html = SideNavService.render_rooms_list(channel.id, user_id)
 
     %{
       display_name: display_name,
@@ -494,6 +496,17 @@ defmodule UccChat.ChannelService do
       side_nav_html: side_nav_html,
       room_route: Channel.room_route(channel)
     }
+    |> set_flex_html(channel.type, old_channel.type)
+  end
+
+  defp set_flex_html(map, type, type) do
+    map
+  end
+  defp set_flex_html(map, 2, _) do
+    Map.put map, :flex_html, Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: ["direct", "mscs"])
+  end
+  defp set_flex_html(map, _, _) do
+    Map.put map, :flex_html, Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: ["channel", "mcss"])
   end
 
   def toggle_favorite(user_id, channel_id) do
