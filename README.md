@@ -7,7 +7,9 @@
 
 > <center><b>NOTE</b></center>
 >
-> This project is work in progress. It is not ready for demo yet. If you would like to demo a working version, please visit [Chat Demo](https://chat.spallen.com)
+> This is an E-MetroTel dev branch that has some minor tweaks for their
+> commercial plugins. It fill not work without the commercial plugins and
+> should not be used by the open source community.
 >
 
 UcxUcc is a simple but powerful team collaboration suite of applications designed to improve communications, information sharing and productivity for the businesses small and large.
@@ -49,13 +51,14 @@ And the bast part is that the data is safe with encrypted connections between yo
 * Code syntax highlighting
 * Profile editing and admin pages
 * Very configurable
+* Markdown support in messages
 * and more ...
 ## Feature Roadmap
 
 * Replace the Rock.Chat UI with a new original design
 * Peer to peer Video
 * Peer to peer Audio
-* Presence adapters for on-the-phone presence with Asterisk PBX
+* Presence adapters for on-the-phone presence with Asterisk PBX (commercial plugin)
 * Mobile clients and Push notifications
 * Email and SMS notifications
 * OTR Conversations
@@ -138,7 +141,7 @@ We appreciate any contribution to UcxUcc. Check our [CODE_OF_CONDUCT.md](CODE_OF
 The UI for this version of the project is taken (with some modifications) directly from [Rocket.Chat](https://rocket.chat/).
 ## License
 
-`UcxUcc` is Copyright (c) 2017 E-MetroTel
+`UcxUcc` is Copyright (c) 2017-2018 E-MetroTel
 
 The source code is released under the MIT License.
 
