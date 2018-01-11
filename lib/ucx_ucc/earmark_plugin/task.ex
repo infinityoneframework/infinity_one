@@ -12,10 +12,10 @@ defmodule UcxUcc.EarmarkPlugin.Task do
   end
 
   defp render_line({"[ ] " <> line, _}) do
-    "<i class='icon-check-empty'></i> #{line}"
+    "<i class='icon-check-empty'></i> #{Earmark.as_html!(line, %Earmark.Options{gfm: true})}"
   end
   defp render_line({"[x] " <> line, _}) do
-    "<i class='icon-check'></i> #{line}"
+    "<i class='icon-check'></i> #{Earmark.as_html!(line, %Earmark.Options{gfm: true})}"
   end
   defp render_line({line, lnb}), do: {:error, lnb, line}
 

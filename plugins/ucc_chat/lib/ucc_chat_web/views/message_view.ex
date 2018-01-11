@@ -283,9 +283,47 @@ defmodule UccChatWeb.MessageView do
 
   def md_key, do: Application.get_env(:ucx_ucc, :markdown_key, "!md")
 
+  @doc """
+  Get the configured options for processing the message body.
+
+  Returns a keyword list of the options.
+
+  * md_key - The message tag to mark a block as markdown formatted text
+  * message_replacement_patterns - A compiled version of Regex translations
+  """
+  def message_opts do
+    [md_key: md_key(), message_replacement_patterns: compile_message_replacement_patterns()]
+  end
+
+  defp compile_message_replacement_patterns do
+    :ucx_ucc
+    |> Application.get_env(:message_replacement_patterns, [])
+    |> Enum.reduce([], fn {re, sub}, acc ->
+      case Regex.compile re do
+        {:ok, re} -> [{re, sub} | acc]
+        _         -> acc
+      end
+    end)
+  end
+
+  @doc """
+  Format the message body.
+
+  Processes the message body for:
+
+  * html escaping
+  * encoding mention links
+  * encoding room links
+  * converting emoji short cuts to images
+  * running configurable Regex replacement patterns
+  * Converting newlines to <br/>
+  * Adding markup to quoted code
+  * Processing built-in markup like ~strike~ formatting
+  """
   def format_message_body(message, opts \\ []) do
     body = message.body || ""
     md_key = Keyword.get(opts, :md_key, md_key())
+    message_replacement_patterns = opts[:message_replacement_patterns] || compile_message_replacement_patterns()
 
     markdown? = md_key && String.contains?(body, md_key)
     quoted? = String.contains?(body, "```") && !markdown?
@@ -302,11 +340,20 @@ defmodule UccChatWeb.MessageView do
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
     |> message_formats(markdown?)
+    |> run_message_replacement_patterns(message_replacement_patterns)
     |> run_markdown(markdown?, md_key)
     |> format_newlines(quoted? || markdown?, message.system)
     |> UccChatWeb.SharedView.format_quoted_code(quoted? && !markdown?, message.system)
     |> raw
   end
+
+  def run_message_replacement_patterns(body, [_ | _] = patterns) do
+    Enum.reduce(patterns, body, fn {re, sub}, body ->
+      Regex.replace(re, body, sub)
+    end)
+  end
+
+  def run_message_replacement_patterns(body, _), do: body
 
   defp autolink(body, false) do
     AutoLinker.link(body, exclude_patterns: ["```"])
@@ -337,8 +384,6 @@ defmodule UccChatWeb.MessageView do
   end
 
   def message_formats(body, false) do
-    # TODO: Fix this. Don't convert content inside html tags
-    #       Probably should write an elixir parser
     body
     |> italic_formats()
     |> bold_formats()
