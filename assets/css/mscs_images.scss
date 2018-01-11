@@ -83,6 +83,10 @@
         background-image: url('../images/mscs/dialpad-ico.png');
         background-position: 50% 35% !important;
       }
+      &.image.voice-message {
+        background-image: url('../images/mscs/message-ico.png');
+        background-position-y: 40% !important;
+      }
 
     }
   } // .key-strip
@@ -100,9 +104,6 @@
       }
       &.services {
         background-image: url('../images/mscs/web-services-ico.png');
-      }
-      &.voice-message {
-        background-image: url('../images/mscs/message-ico.png');
       }
       &.portal {
         background-image: url('../images/mscs/copy-ico.png');
