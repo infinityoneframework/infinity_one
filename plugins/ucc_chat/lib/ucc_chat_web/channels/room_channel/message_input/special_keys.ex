@@ -25,7 +25,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
         Logger.debug "got nil"
         MessageInput.close_popup(context)
       {pattern, key} ->
-        Logger.debug "pattern: #{inspect {pattern, key}}"
+        Logger.debug fn -> "pattern: #{inspect {pattern, key}}" end
         MessageInput.dispatch_handle_in(key, pattern, context)
     end
   end

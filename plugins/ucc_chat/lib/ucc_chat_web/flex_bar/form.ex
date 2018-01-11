@@ -97,7 +97,7 @@ defmodule UccChatWeb.FlexBar.Form do
     start_loading_animation(socket, id)
 
     val = !select(socket, prop: "checked", from: id)
-    Logger.debug "id: " <> inspect(id) <> ", val: " <> inspect(val)
+    Logger.debug fn -> "id: " <> inspect(id) <> ", val: " <> inspect(val) end
     update socket, prop: "checked", set: val, on: id
 
     tab = TabBar.get_button(form["flex-id"])

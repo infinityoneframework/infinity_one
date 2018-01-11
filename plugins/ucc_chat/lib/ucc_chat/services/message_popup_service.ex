@@ -14,7 +14,7 @@ defmodule UccChat.MessagePopupService do
   require Logger
 
   def handle_in("get:users" <> _mod, msg) do
-    Logger.debug "get:users, msg: #{inspect msg}"
+    Logger.debug fn -> "get:users, msg: #{inspect msg}" end
     pattern = msg["pattern"] |> to_string
     users =
       msg["channel_id"]
@@ -49,7 +49,7 @@ defmodule UccChat.MessagePopupService do
   end
 
   def handle_in("get:channels" <> _mod, msg) do
-    Logger.debug "get:channels, msg: #{inspect msg}"
+    Logger.debug fn -> "get:channels, msg: #{inspect msg}" end
     pattern = msg["pattern"] |> to_string
     channels = get_channels_by_pattern(msg["channel_id"], msg["user_id"],
       "%" <> pattern <> "%")
@@ -74,7 +74,7 @@ defmodule UccChat.MessagePopupService do
   end
 
   def handle_in("get:slashcommands" <> _mod, msg) do
-    Logger.debug "get:slashcommands, msg: #{inspect msg}"
+    Logger.debug fn -> "get:slashcommands, msg: #{inspect msg}" end
     pattern = msg["pattern"] |> to_string
 
     if commands = SlashCommands.commands(pattern) do
@@ -93,8 +93,7 @@ defmodule UccChat.MessagePopupService do
 
   def handle_in(ev = "get:emojis", msg) do
     pattern = msg["pattern"] |> to_string
-    Logger.debug "#{ev}, pattern: #{pattern} msg: #{inspect msg}"
-
+    Logger.debug fn -> "#{ev}, pattern: #{pattern} msg: #{inspect msg}" end
 
     case Emoji.commands(pattern) do
       [] ->

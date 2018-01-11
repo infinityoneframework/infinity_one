@@ -22,13 +22,13 @@ defmodule UccChatWeb.RoomChannel.Message do
   @preloads [:user, :edited_by, :attachments, :reactions]
 
   def create_attachment(params, socket, client \\ Client) do
-    Logger.debug "params: #{inspect params}"
+    Logger.debug fn -> "params: #{inspect params}" end
     do_create("", params["channel_id"], params["user_id"], params, socket,
       client, &handle_new_attachment_message/4)
   end
 
   def create(body, channel_id, user_id, socket, client \\ Client) do
-    Logger.debug "body: #{inspect body}"
+    Logger.debug fn -> "body: #{inspect body}" end
     do_create(body, channel_id, user_id, %{}, socket,
       client, &handle_new_message/4)
   end
@@ -314,7 +314,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def message_action(socket, sender, client) do
     action = sender["dataset"]["id"]
-    Logger.debug "message action: #{action}, sender: #{inspect sender}"
+    Logger.debug fn -> "message action: #{action}, sender: #{inspect sender}" end
     close_cog socket, sender, client
   end
 

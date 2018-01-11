@@ -466,7 +466,7 @@ defmodule UccAdmin.AdminService do
           _ -> true
         end)
         |> case do
-          {[], list} = results ->
+          {[], list} ->
             {:ok, get_emails(list)}
           {errors, oks} ->
             %{errors: get_emails(errors) |> Enum.join("\n"), ok: get_emails(oks)}

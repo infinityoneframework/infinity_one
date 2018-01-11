@@ -147,7 +147,8 @@ defmodule UccChatWeb.SlashCommandChannelController do
   end
 
   def handle_channel_command(socket, command, args, user_id, channel_id) do
-    Logger.debug ".......... #{inspect command}"
+    Logger.debug fn -> inspect(command) end
+
     with name <- String.trim(args),
          name <- String.replace(name, ~r/^#/, ""),
          true <- String.match?(name, ~r/[a-z0-9\.\-_]/i) do
@@ -169,11 +170,11 @@ defmodule UccChatWeb.SlashCommandChannelController do
             ", name: #{inspect name}"
           {:reply, {:ok, %{}}, socket}
         {:ok, res} ->
-          Logger.debug "res: #{inspect res}, command: #{inspect command}, " <>
-            "name: #{inspect name}"
+          Logger.debug fn -> "res: #{inspect res}, command: #{inspect command}, " <>
+            "name: #{inspect name}" end
           resp = notify_room_update(socket, command, target_channel,
             {:ok, Helpers.response_message(channel_id, res)})
-          Logger.debug "resp: #{inspect resp}"
+          Logger.debug fn -> "resp: #{inspect resp}" end
           {:reply, resp, socket}
         {:error, :no_permission}
           {:reply, {:ok, %{}}, socket}
@@ -213,8 +214,10 @@ defmodule UccChatWeb.SlashCommandChannelController do
 
   defp notify_room_update(socket, command, target, response)
     when command in ~w(archive unarchive)a do
-    Logger.debug "command: #{inspect command}, channel_id: " <>
-      "#{inspect target.id}, response: #{inspect response}"
+
+    Logger.debug fn -> "command: #{inspect command}, channel_id: " <>
+      "#{inspect target.id}, response: #{inspect response}" end
+
     socket.endpoint.broadcast! CC.chan_room <> target.name, "room:state_change",
       %{change: "#{command}", channel_id: target.id}
     socket.endpoint.broadcast! CC.chan_room <> target.name,
