@@ -86,8 +86,22 @@ defmodule UccChatWeb.RoomChannel.Message do
     message = Message.get(message_id, preload: @preloads)
     case message.attachments do
       [] ->
-        {body, _mentions} = Service.encode_mentions(body, channel_id)
-        Message.update(message, %{body: body, edited_id: user.id})
+        {mention_body, mentions} = Service.encode_mentions(body, channel_id)
+
+        # TODO: Do we want to pass to the robots again? I can think of
+        #       arguments on both sides of this decision. For now, we
+        #       won't.
+
+        case Message.update(message, %{body: body, edited_id: user.id}) do
+          {:ok, message} ->
+            channel = Channel.get channel_id
+            Service.update_mentions(mentions, message.id, message.channel_id, mention_body)
+            Service.update_direct_notices(channel, message)
+            {:ok, message}
+          {:error, changeset} ->
+            Logger.error inspect(changeset)
+        end
+
       [att|_] ->
         update_attachment_description(att, message, value, user)
     end
@@ -112,6 +126,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
     {mention_body, mentions} = Service.encode_mentions(body, channel_id)
 
+    # TODO: This should be moved to a UccPubSub broadcast.
     RobotService.new_message body, channel, user
 
     message = create_message(body, user.id, channel_id, opts[:msg_params])

@@ -4,6 +4,8 @@
 
 ### Enhancements
 
+* [UCX-3442] Adding mention while editing message now adds the mention to the DB
+
 ### Bug Fixes
 
 ### Backward incompatible changes

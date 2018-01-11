@@ -10,6 +10,7 @@ defmodule UccChat.MessageService do
   }
   alias UccChatWeb.{MessageView, UserChannel}
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UcxUcc.Accounts
   # alias UccChat.Schema.Message, as: MessageSchema
 
   require UccChat.ChatConstants, as: CC
@@ -417,6 +418,26 @@ defmodule UccChat.MessageService do
       String.replace body, ~r/(^|\s|\.|\!|:|,|\?)@#{name}[\.\!\?\,\:\s]*/,
         name_link
     {body, [{user.id, name}|acc]}
+  end
+
+  def update_mentions([], _, _, _), do: :ok
+  def update_mentions([], _, _, _), do: :ok
+  def update_mentions([mention|mentions], message_id, channel_id, body) do
+    update_mention(mention, message_id, channel_id, body)
+    update_mentions(mentions, message_id, channel_id, body)
+  end
+
+  def update_mention({nil, _}, _, _, _), do: nil
+  def update_mention({mention, name}, message_id, channel_id, body) do
+    IO.inspect {mention, name}, label: "{mention, name}"
+    case Accounts.get_by_user(username: name)  do
+      nil -> :error
+      user ->
+        case Mention.list_by(message_id: message_id, user_id: user.id) do
+          [] -> create_mention({mention, name}, message_id, channel_id, body)
+          _list -> :ok
+        end
+    end
   end
 
   def create_mentions([], _, _, _), do: :ok
