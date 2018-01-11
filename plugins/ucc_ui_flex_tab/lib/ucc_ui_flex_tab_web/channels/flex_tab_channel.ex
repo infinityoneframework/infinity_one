@@ -29,7 +29,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
   """
   @spec flex_tab_click(socket, sender) :: socket
   def flex_tab_click(socket, sender) do
-    Logger.debug "sender: #{inspect sender}"
+    Logger.debug fn -> "sender: #{inspect sender}" end
     channel_id = get_channel_id(socket)
     user_id = socket.assigns.user_id
     Rebel.put_assigns socket, :channel_id, channel_id
@@ -47,7 +47,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
   @spec flex_tab_open(socket, sender) :: socket
   def flex_tab_open(socket, sender) do
-    Logger.debug "sender: #{inspect sender}"
+    Logger.debug fn -> "sender: #{inspect sender}" end
     channel_id = get_channel_id(socket)
     user_id = socket.assigns.user_id
     Rebel.put_assigns socket, :channel_id, channel_id
