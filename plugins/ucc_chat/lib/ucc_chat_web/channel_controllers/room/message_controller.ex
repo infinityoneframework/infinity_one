@@ -87,13 +87,15 @@ defmodule UccChatWeb.MessageChannelController do
 
     previews = MessageService.message_previews(user.id, list)
 
+    message_opts = UccChatWeb.MessageView.message_opts()
+
     messages_html =
       list
       |> Enum.map(fn message ->
         previews = List.keyfind(previews, message.id, 0, {nil, []}) |> elem(1)
         "message.html"
         |> UccChatWeb.MessageView.render(user: user, message: message,
-          previews: previews)
+          previews: previews, message_opts: message_opts)
         |> Helpers.safe_to_string
       end)
       |> to_string
@@ -120,6 +122,7 @@ defmodule UccChatWeb.MessageChannelController do
       |> Repo.all
 
     previews = MessageService.message_previews(user.id, list)
+    message_opts = UccChatWeb.MessageView.message_opts()
 
     messages_html =
       list
@@ -128,7 +131,7 @@ defmodule UccChatWeb.MessageChannelController do
 
         "message.html"
         |> UccChatWeb.MessageView.render(user: user, message: message,
-          previews: previews)
+          previews: previews, message_opts: message_opts)
         |> Helpers.safe_to_string
       end)
       |> to_string
@@ -148,6 +151,7 @@ defmodule UccChatWeb.MessageChannelController do
     list = Message.get_surrounding_messages(channel_id, timestamp, user)
 
     previews = MessageService.message_previews(user.id, list)
+    message_opts = UccChatWeb.MessageView.message_opts()
 
     messages_html =
       list
@@ -156,7 +160,7 @@ defmodule UccChatWeb.MessageChannelController do
 
         "message.html"
         |> UccChatWeb.MessageView.render(user: user, message: message,
-          previews: previews)
+          previews: previews, message_opts: message_opts)
         |> Helpers.safe_to_string
       end)
       |> to_string
@@ -174,13 +178,14 @@ defmodule UccChatWeb.MessageChannelController do
     list = Message.get_messages(channel_id, user)
 
     previews = MessageService.message_previews(user.id, list)
+    message_opts = UccChatWeb.MessageView.message_opts()
 
     messages_html =
       list
       |> Enum.map(fn message ->
         "message.html"
         |> UccChatWeb.MessageView.render(user: user, message: message,
-          previews: previews)
+          previews: previews, message_opts: message_opts)
         |> Helpers.safe_to_string
       end)
       |> to_string

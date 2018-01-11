@@ -20,9 +20,10 @@ div(class="wrapper #{has_more_next(:has_more_next)} #{hide_username(@chatd.user)
       - else
         li.start.color-info-font-color
           = ~g(Start of conversation)
+    - message_opts = UccChatWeb.MessageView.message_opts()
     = for message <- @chatd.messages do
       - previews = List.keyfind(@chatd.previews, message.id, 0, {nil, []}) |> elem(1)
-      = render UccChatWeb.MessageView, "message.html", user: @chatd.user, message: message, previews: previews
+      = render UccChatWeb.MessageView, "message.html", user: @chatd.user, message: message, previews: previews, message_opts: message_opts
     = if has_more_next() do
       li.load-more
         - if is_loading() do

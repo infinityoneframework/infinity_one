@@ -46,7 +46,6 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
   end
 
   def play(socket, _sender) do
-    assigns = Rebel.get_assigns(socket)
     sound =
       socket.assigns.user_id
       |> Accounts.get_user(preload: [:account])

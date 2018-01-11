@@ -579,8 +579,11 @@ aside.side-nav {
   }
 
   .mention-link {
+    &:not(.mention-link-me) {color: $primary-action-color !important; }
+
     &.mention-link-me {
       color: $primary-action-contrast;
+      background-color: $primary-action-color !important;
     }
 
     &.mention-link-all {
