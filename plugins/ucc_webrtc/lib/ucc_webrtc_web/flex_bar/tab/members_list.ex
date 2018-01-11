@@ -42,8 +42,8 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   def open(socket, {current_user_id, channel_id, tab, sender}, args) do
     Logger.debug fn -> "open assigns: #{inspect socket.assigns}" end
     user_id = args["user_id"]
-    Logger.debug fn -> "stuff: #{inspect %{current_user_id: current_user_id, " <>
-      "user_id: user_id, assigns_user_id: socket.assigns.user_id}}" end
+    Logger.debug fn ->
+      "stuff: #{inspect %{current_user_id: current_user_id, user_id: user_id, assigns_user_id: socket.assigns.user_id}}" end
     {view_args, socket} = MembersList.video_args(socket,
       current_user_id, channel_id, user_id)
     Logger.debug fn -> "args: #{inspect view_args}" end
