@@ -36,8 +36,7 @@ defmodule UccAdminWeb.FlexBar.Tab.InviteUsers do
       invite_emails: []], socket}
   end
 
-  def invite_users(socket, sender) do
-    Logger.warn inspect(sender)
+  def invite_users(socket, _sender) do
     socket
   end
 
