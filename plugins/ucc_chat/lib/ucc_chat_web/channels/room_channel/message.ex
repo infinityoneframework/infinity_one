@@ -435,6 +435,10 @@ defmodule UccChatWeb.RoomChannel.Message do
     """
   end
 
+  @doc """
+  Handle the request from the bot server to broadcast a response.
+
+  """
   def broadcast_bot_message(channel, user_id, body)
   def broadcast_bot_message(%{} = channel, _user_id, body) do
     bot_id = Helpers.get_bot_id()
@@ -445,9 +449,8 @@ defmodule UccChatWeb.RoomChannel.Message do
         sequential: false,
       })
 
-    resp = create_broadcast_message(message.id, channel.name, message)
     UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-      "message:new", resp
+      "message:push", %{rendered: render_message(message)}
   end
 
   def broadcast_bot_message(channel_id, user_id, body) do

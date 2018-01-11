@@ -28,6 +28,7 @@ defmodule UccChatWeb.RoomChannel do
     "broadcast:message",
     "broadcast:message:update",
     "message:new",
+    "message:push",
     "message:new:attachment"
   ]
 
@@ -173,6 +174,11 @@ defmodule UccChatWeb.RoomChannel do
 
   ##########
   # Outgoing message handlers
+
+  def handle_out("message:push", %{rendered: rendered}, socket) do
+    WebClient.push_message(rendered, socket)
+    {:noreply, socket}
+  end
 
   def handle_out("message:new", %{message: %{system: true} = message}, socket) do
     message
