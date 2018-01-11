@@ -5,6 +5,7 @@
 ### Enhancements
 
 * [UCX-3442] Adding mention while editing message now adds the mention to the DB
+* [UCX-3639] Fixed display order of mentions in the flex panel
 
 ### Bug Fixes
 
