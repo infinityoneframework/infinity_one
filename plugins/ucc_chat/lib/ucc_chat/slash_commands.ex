@@ -54,7 +54,6 @@ defmodule UccChat.SlashCommands do
   def commands(pattern, count \\ @default_count) do
     pattern
     |> find(count)
-    |> IO.inspect(label: "find result")
     |> Enum.reduce([], fn
       cmd, [] -> [format_command(@command_map[cmd], " selected")]
       cmd, acc -> [format_command(@command_map[cmd])|acc]
@@ -101,10 +100,13 @@ defmodule UccChat.SlashCommands do
     end
   end
 
-  def special_text(message) do
+
+  def special_text(message) when is_binary(message) do
     case @special_text[message] do
       nil   -> "/" <> message
       value -> value
     end
   end
+
+  def special_text(_), do: nil
 end

@@ -52,6 +52,16 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
   extends: [],
   import: [],
   mappings: [
+    "ucx_ucc.message_replacement_patterns": [
+      commented: true,
+      datatype: [
+        list: :binary
+      ],
+      default: [],
+      doc: "Message body replacement Regex and replacement string pairs",
+      hidden: false,
+      to: "ucx_ucc.message_replacement_patterns"
+    ],
     "coherence.require_current_password": [
       commented: false,
       datatype: :atom,
@@ -514,7 +524,16 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
         end
 
       {Elixir.ExAmi.TcpConnection, [host: ip, port: port]}
+    end,
+  "ucx_ucc.message_replacement_patterns": fn conf ->
+    Enum.reduce Conform.Conf.get(conf, "ucx_ucc.message_replacement_patterns"), [], fn
+      {_, []}, acc -> acc
+      {_, list}, acc ->
+        list
+        |> Enum.chunk_every(2, 2, :discard)
+        |> Enum.map(fn [a, b] -> {a, b} end)
     end
+  end
   ],
   validators: []
 ]

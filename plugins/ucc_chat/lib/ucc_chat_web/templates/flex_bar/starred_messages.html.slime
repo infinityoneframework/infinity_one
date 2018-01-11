@@ -6,6 +6,7 @@
     = if @stars == [] do
       h2= ~g(No starred messages)
   .ul.list.clearfix(rebel-channel="room")
+    - message_opts = UccChatWeb.MessageView.message_opts()
     = for star <- @stars do
       li(id="#{star[:id]}" class="#{get_li_class(star, :starred)}" data-username="#{star[:username]}" data-date="#{star[:date]}" data-timestamp="#{star[:timestamp]}")
         button.thumb.user-card-message(data-username="#{star[:username]}" tabindex="1")
@@ -18,6 +19,6 @@
           .message-cog-container(class="#{UccChatWeb.MessageView.hide_cog(star[:message])}" rebel-click="flex_message_cog_click")
             i.icon-cog.message-cog(aria-label="#{~g(Actions)}")
         .body.color-primary-font-color(dir="auto")
-          = UccChatWeb.MessageView.format_message_body(star[:message])
+          = UccChatWeb.MessageView.format_message_body(star[:message], message_opts)
         ul.actionLinks.hidden
         ul.reactions.hidden

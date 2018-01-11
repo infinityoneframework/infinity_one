@@ -28,7 +28,7 @@ defmodule UccChatWeb.ChannelRouter do
 
   def match(:delete, socket, ["attachment", id], params) do
     params = Map.put(params, "id", id)
-    apply(Web.MessageChannelController, :delete_attachment,
+    apply(MessageChannelController, :delete_attachment,
       [socket, params])
   end
   def match(:delete, socket, ["room", "has_unread"], params) do

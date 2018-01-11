@@ -211,9 +211,10 @@ defmodule UccChatWeb.RoomChannel.Message do
   def render_message(message) do
     user_id = message.user_id
     user = Accounts.get_user user_id
+    message_opts = UccChatWeb.MessageView.message_opts()
 
     {message, render_to_string(MessageView, "message.html", message: message,
-      user: user, previews: [])}
+      user: user, previews: [], message_opts: message_opts)}
   end
 
   def push_private_message(socket, channel_id, body, client \\ Client) do

@@ -85,17 +85,19 @@ defmodule UccChat.ChannelService do
 
   def set_subscription_state(channel, user_id, state)
     when state in [true, false] do
+    attrs = if state == true, do: %{open: true, hidden: false}, else: %{open: state}
     case Subscription.get_by channel_id: channel, user_id: user_id do
       nil -> nil
-      sub -> Subscription.update(sub, %{open: state})
+      sub -> Subscription.update(sub, attrs)
     end
   end
 
   def set_subscription_state_room(name, user_id, state)
     when state in [true, false] do
+    attrs = if state == true, do: %{open: true, hidden: false}, else: %{open: state}
     case Subscription.get_by_room(name, user_id) do
       nil -> nil
-      sub -> Subscription.update(sub, %{open: state})
+      sub -> Subscription.update(sub, attrs)
     end
   end
 

@@ -49,7 +49,11 @@ defmodule UccChat.AvatarService do
   end
 
   def avatar_url(username) do
-    "/avatar/#{get_initials(username)}.svg"
+    initials =
+      username
+      |> get_initials()
+      |> String.downcase()
+    "/avatar/" <> initials <> ".svg"
   end
 
   # Can be run from iex to generate a list of files.

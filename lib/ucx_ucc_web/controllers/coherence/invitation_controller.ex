@@ -124,6 +124,7 @@ defmodule UcxUccWeb.Coherence.InvitationController do
       invite ->
         case Accounts.create_user params["user"] do
           {:ok, user} ->
+            Accounts.add_role_to_user user, "user"
             Schemas.delete invite
             conn
             |> send_confirmation(user, user_schema)

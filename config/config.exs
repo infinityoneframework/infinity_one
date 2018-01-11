@@ -26,6 +26,18 @@ config :ucx_ucc, :generators,
   migration: true,
   binary_id: true
   # sample_binary_id: "11111111-1111-1111-1111-111111111111"
+
+# The example below replaces [UCX-123] with
+# [UCX-123](https://emetrotel.atlassian.net/browse/UCX-123) before
+# passing the translated text to the markdown processor
+# Additional patterns can be added with the corresponding first and
+# third arguments to Regex.replace/3.
+#   The first element is the string version of the regex
+#   The second element is the replacement string using captures
+# config :ucx_ucc, :message_replacement_patterns, [
+#   {~S"\[(UCX-\d+)\]([^\(]|$|\n)", "[\\1](https://emetrotel.atlassian.net/browse/\\1)\\2"}
+# ]
+
 config :ucx_ucc, :settings_modules, [
   UcxUcc.Settings.General,
   UccChat.Settings.ChatGeneral,

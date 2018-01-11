@@ -281,27 +281,96 @@ defmodule UccChatWeb.MessageView do
   def get_popup_data(%{data: data}), do: data
   def get_popup_data(_), do: false
 
-  def format_message_body(message) do
-    # Logger.warn "t   body =
-    body =
-      if message.system do
-        message.body
-      else
-        (message.body || "")
-        |> Phoenix.HTML.html_escape
-        |> Phoenix.HTML.safe_to_string
-        |> AutoLinker.link(exclude_pattern: "```")
-      end
+  def md_key, do: Application.get_env(:ucx_ucc, :markdown_key, "!md")
 
-    quoted? = String.contains?(body, "```")
-    body
+  @doc """
+  Get the configured options for processing the message body.
+
+  Returns a keyword list of the options.
+
+  * md_key - The message tag to mark a block as markdown formatted text
+  * message_replacement_patterns - A compiled version of Regex translations
+  """
+  def message_opts do
+    [md_key: md_key(), message_replacement_patterns: compile_message_replacement_patterns()]
+  end
+
+  defp compile_message_replacement_patterns do
+    :ucx_ucc
+    |> Application.get_env(:message_replacement_patterns, [])
+    |> Enum.reduce([], fn {re, sub}, acc ->
+      case Regex.compile re do
+        {:ok, re} -> [{re, sub} | acc]
+        _         -> acc
+      end
+    end)
+  end
+
+  @doc """
+  Format the message body.
+
+  Processes the message body for:
+
+  * html escaping
+  * encoding mention links
+  * encoding room links
+  * converting emoji short cuts to images
+  * running configurable Regex replacement patterns
+  * Converting newlines to <br/>
+  * Adding markup to quoted code
+  * Processing built-in markup like ~strike~ formatting
+  """
+  def format_message_body(message, opts \\ []) do
+    body = message.body || ""
+    md_key = Keyword.get(opts, :md_key, md_key())
+    message_replacement_patterns = opts[:message_replacement_patterns] || compile_message_replacement_patterns()
+
+    markdown? = md_key && String.contains?(body, md_key)
+    quoted? = String.contains?(body, "```") && !markdown?
+
+    if message.system || markdown? do
+      body
+    else
+      body
+      |> Phoenix.HTML.html_escape
+      |> Phoenix.HTML.safe_to_string
+      |> autolink(markdown?)
+    end
     |> encode_mentions
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
-    |> message_formats
-    |> format_newlines(quoted?, message.system)
-    |> UccChatWeb.SharedView.format_quoted_code(quoted?, message.system)
+    |> message_formats(markdown?)
+    |> run_message_replacement_patterns(message_replacement_patterns)
+    |> run_markdown(markdown?, md_key)
+    |> format_newlines(quoted? || markdown?, message.system)
+    |> UccChatWeb.SharedView.format_quoted_code(quoted? && !markdown?, message.system)
     |> raw
+  end
+
+  def run_message_replacement_patterns(body, [_ | _] = patterns) do
+    Enum.reduce(patterns, body, fn {re, sub}, body ->
+      Regex.replace(re, body, sub)
+    end)
+  end
+
+  def run_message_replacement_patterns(body, _), do: body
+
+  defp autolink(body, false) do
+    AutoLinker.link(body, exclude_patterns: ["```"])
+  end
+  defp autolink(body, _), do: body
+
+  def run_markdown(body, false, _), do: body
+  def run_markdown(body, true, md_key) do
+    case String.split(body, md_key) do
+      [first, markdown | rest] ->
+        markdown = String.trim_leading(markdown, "\n")
+        first <> ~s|<div class="markdown-body">| <>
+          Earmark.as_html!(markdown, %Earmark.Options{gfm: true, plugins: %{"" => UcxUcc.EarmarkPlugin.Task}})
+          <> "</div>" <> String.trim_leading(Enum.join(rest, ""))
+      _ ->
+        body
+    end
   end
 
   def encode_mentions(body) do
@@ -314,14 +383,13 @@ defmodule UccChatWeb.MessageView do
     Regex.replace ~r/(^|\s)#([\w]+)/, body, ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
   end
 
-  def message_formats(body) do
-    # TODO: Fix this. Don't convert content inside html tags
-    #       Probably should write an elixir parser
+  def message_formats(body, false) do
     body
     |> italic_formats()
     |> bold_formats()
     |> strike_formats()
   end
+  def message_formats(body, _), do: body
 
   defp italic_formats(body) do
     if body =~ ~r/\<.*?_.*?_.*?\>/ do
