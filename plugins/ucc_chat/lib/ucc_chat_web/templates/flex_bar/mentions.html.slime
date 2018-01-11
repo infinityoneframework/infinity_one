@@ -6,6 +6,7 @@
     = if @mentions == [] do
       h2 No mentions found
   .ul.mentioned-messages-list.list.clearfix(rebel-channel="room")
+    - md_key = UccChatWeb.MessageView.md_key()
     = for mention <- @mentions do
       - user = Map.get mention[:message], :user
       li(id="#{mention[:id]}" class="#{get_li_class(mention, :mention)}" data-username="#{user.username}" data-date="#{mention[:date]}" data-timestamp="#{mention[:timestamp]}")
@@ -22,6 +23,6 @@
           .message-cog-container(class="#{UccChatWeb.MessageView.hide_cog(mention[:message])}" rebel-click="flex_message_cog_click")
             i.icon-cog.message-cog(aria-label="Actions")
         .body.color-primary-font-color(dir="auto")
-          = UccChatWeb.MessageView.format_message_body(mention[:message])
+          = UccChatWeb.MessageView.format_message_body(mention[:message], md_key: md_key)
         ul.actionLinks.hidden
         ul.reactions.hidden
