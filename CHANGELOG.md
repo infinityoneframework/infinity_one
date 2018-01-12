@@ -10,6 +10,7 @@
 * [UCX-3632] Fixed audio file uploads
 * [UCX-3649] Fixed backspace in empty message box shows send button
 * [UCX-3649] Enter key to send message does not insert a \n in the message
+* [UCX-3647] Close tool-tip when user removes reaction
 
 ## 0.2.0 (2018-01-12)
 
