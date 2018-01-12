@@ -9,6 +9,7 @@
 * [UCX-3638] Fixed issue with Bot responses displayed multiple times
 * [UCX-3640] Fixed Bot avatar on page reload
 * [UCX-3635] Fixed user able to delete their own message
+* [UCX-3642] Added a unique constraint and validation on starred_messages
 
 ### Bug Fixes
 
