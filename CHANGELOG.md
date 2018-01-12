@@ -10,6 +10,7 @@
 * [UCX-3640] Fixed Bot avatar on page reload
 * [UCX-3635] Fixed user able to delete their own message
 * [UCX-3642] Added a unique constraint and validation on starred_messages
+* [UCX-3643] Added a unique constraint and validation on pinned_messages
 
 ### Bug Fixes
 
