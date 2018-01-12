@@ -12,6 +12,7 @@
 * [UCX-3642] Added a unique constraint and validation on starred_messages
 * [UCX-3643] Added a unique constraint and validation on pinned_messages
 * [UCX-3627] Up arrow edit only selects messages from the main window and check for nil
+* [UCX-3628] Only allow message edit if text area is empty
 
 ### Bug Fixes
 

@@ -76,7 +76,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   end
 
   def handle_in(context, @up_arrow) do
-    Message.open_edit context.socket
+    # only open message for editing if the text area is blank.
+    if context.sender["text_len"] == 0 do
+      Message.open_edit context.socket
+    end
   end
 
   def handle_in(context, _key), do: context
