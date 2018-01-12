@@ -11,6 +11,7 @@
 * [UCX-3635] Fixed user able to delete their own message
 * [UCX-3642] Added a unique constraint and validation on starred_messages
 * [UCX-3643] Added a unique constraint and validation on pinned_messages
+* [UCX-3627] Up arrow edit only selects messages from the main window and check for nil
 
 ### Bug Fixes
 

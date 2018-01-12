@@ -333,7 +333,11 @@ defmodule UccChatWeb.RoomChannel.Message do
     close_cog socket, sender, client
   end
 
-  def start_editing(socket, message_id, client \\ Client) do
+  def start_editing(socket, message_id, client \\ Client)
+  def start_editing(socket, nil, client) do
+    client.toastr socket, :warning, ~g(There are no messages to edit)
+  end
+  def start_editing(socket, message_id, client) do
     Rebel.put_assigns socket, :edit_message_id, message_id
     Logger.info "editing #{message_id}"
     message = Message.get message_id, preload: [:attachments]
@@ -347,7 +351,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   def open_edit(socket, client \\ Client) do
-    message_id = client.send_js! socket, "$('li.message.own').last().attr('id')"
+    message_id = client.send_js! socket, "$('.messages-box li.message.own').last().attr('id')"
     start_editing socket, message_id, client
   end
 
