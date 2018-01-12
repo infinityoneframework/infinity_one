@@ -4,7 +4,7 @@
     = if @chatd.user.username do
       .thumb(data-status="#{@chatd.status}")
         .avatar
-          .avatar-image(style="background-image: url(#{avatar_url(@chatd.user.username)});")
+          .avatar-image(style="background-image: url(#{avatar_url @chatd.user});")
       .data
         h4
           - id = @chatd.user.id

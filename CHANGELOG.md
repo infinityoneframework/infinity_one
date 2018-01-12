@@ -13,6 +13,7 @@
 * [UCX-3643] Added a unique constraint and validation on pinned_messages
 * [UCX-3627] Up arrow edit only selects messages from the main window and check for nil
 * [UCX-3628] Only allow message edit if text area is empty
+* [UCX-3644] Fixed incorrect avatar in account box
 
 ### Bug Fixes
 
