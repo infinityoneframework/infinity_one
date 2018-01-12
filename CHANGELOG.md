@@ -20,3 +20,10 @@
 * [UCX-3645] Message send button now works
 
 ### Backward incompatible changes
+
+
+## 0.2.1 (2018-01-xx)
+
+### Enhancements
+
+* [UCX-3652] Updated the italics markup regex so it does not match with _ in html tags

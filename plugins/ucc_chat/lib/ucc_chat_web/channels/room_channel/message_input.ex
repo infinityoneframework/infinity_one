@@ -17,7 +17,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     socket
   end
 
-  def message_send(socket, sender, client \\ Client) do
+  def message_send(socket, _sender, client \\ Client) do
     if client.editing_message?(socket) do
       Message.edit_message(socket, client)
     else

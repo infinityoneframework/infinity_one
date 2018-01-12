@@ -421,7 +421,6 @@ defmodule UccChat.MessageService do
   end
 
   def update_mentions([], _, _, _), do: :ok
-  def update_mentions([], _, _, _), do: :ok
   def update_mentions([mention|mentions], message_id, channel_id, body) do
     update_mention(mention, message_id, channel_id, body)
     update_mentions(mentions, message_id, channel_id, body)

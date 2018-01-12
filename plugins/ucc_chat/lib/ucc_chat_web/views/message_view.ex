@@ -395,21 +395,21 @@ defmodule UccChatWeb.MessageView do
     if body =~ ~r/\<.*?_.*?_.*?\>/ do
       body
     else
-      String.replace(body, ~r/_(.+?)_/, "<i>\\1</i>")
+      String.replace(body, ~r/_([^\<\>]+?)_/, "<i>\\1</i>")
     end
   end
   defp bold_formats(body) do
     if body =~ ~r/\<.*?\*.*?\*.*?\>/ do
       body
     else
-      String.replace(body, ~r/\*(.+?)\*/, "<strong>\\1</strong>")
+      String.replace(body, ~r/\*([^\<\>]+?)\*/, "<strong>\\1</strong>")
     end
   end
   defp strike_formats(body) do
     if body =~ ~r/\<.*?~.*?~.*?\>/ do
       body
     else
-      String.replace(body, ~r/\~(.+?)\~/, "<strike>\\1</strike>")
+      String.replace(body, ~r/\~([^\<\>]+?)\~/, "<strike>\\1</strike>")
     end
   end
 
