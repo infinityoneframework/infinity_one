@@ -380,39 +380,52 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
+  # @doc """
+  # Helper function
+  # """
+  # def new_or_edit_message(socket, _editing? = true, client \\ Client),
+  #   do: edit_message(socket, client)
+
+  # def new_or_edit_message(socket, _editing?, client \\ Client),
+  #   do: new_message(socket, client)
+
   @doc """
   This is the entry point for a new message being posted.
 
   Fetches the message from the client textarea control, and calls the `create/5`
   API.
   """
-  def new_message(socket, _sender, client \\ Client) do
+  def new_message(socket, client \\ Client) do
     assigns = socket.assigns
 
-    message =
+    body =
       socket
       |> client.get_message_box_value
       |> String.trim_trailing
 
-    if message != "" do
-      create(message, assigns.channel_id, assigns.user_id, socket)
+    if body != "" do
+      create(body, assigns.channel_id, assigns.user_id, socket)
     end
 
     client.clear_message_box(socket)
     socket
   end
 
-  def edit_message(%{assigns: assigns} = socket, sender, client \\ Client) do
+  def edit_message(%{assigns: assigns} = socket, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
-    value = sender["value"]
-    # Logger.info "edit_message.... sender: #{inspect sender}"
-    # Logger.info "edit_message.... value: #{inspect value}, message_id: #{message_id}"
-    update(value, assigns.channel_id, assigns.user_id, message_id, socket, client)
+
+    body =
+      socket
+      |> client.get_message_box_value
+      |> String.trim_trailing
+
+    update(body, assigns.channel_id, assigns.user_id, message_id, socket, client)
+
     client.clear_message_box(socket)
     client.send_js socket, clear_editing_js(message_id)
   end
 
-  def cancel_edit(socket, _sender, client \\ Client) do
+  def cancel_edit(socket, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
     client.clear_message_box(socket)
     client.send_js socket, clear_editing_js(message_id)

@@ -1,8 +1,12 @@
 # UcxUcc Changelog
 
-## 0.2.0 (2018-01-xx)
+## 0.2.0 (2018-01-12)
 
 ### Enhancements
+
+* [UCX-3628] Only allow message edit if text area is empty
+
+### Bug Fixes
 
 * [UCX-3442] Adding mention while editing message now adds the mention to the DB
 * [UCX-3639] Fixed display order of mentions in the flex panel
@@ -12,9 +16,7 @@
 * [UCX-3642] Added a unique constraint and validation on starred_messages
 * [UCX-3643] Added a unique constraint and validation on pinned_messages
 * [UCX-3627] Up arrow edit only selects messages from the main window and check for nil
-* [UCX-3628] Only allow message edit if text area is empty
 * [UCX-3644] Fixed incorrect avatar in account box
-
-### Bug Fixes
+* [UCX-3645] Message send button now works
 
 ### Backward incompatible changes

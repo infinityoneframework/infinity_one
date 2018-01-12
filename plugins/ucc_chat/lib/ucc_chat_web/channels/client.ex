@@ -76,6 +76,15 @@ defmodule UccChatWeb.Client do
     update socket, :html, set: "", on: ".message-popup-results"
   end
 
+  def has_class?(socket, selector, class) do
+    exec_js! socket,
+      "document.querySelector('#{selector}').classList.contains('#{class}')"
+  end
+
+  def editing_message?(socket) do
+    has_class?(socket, @message_box, "editing")
+  end
+
   def get_message_box_value(socket) do
     exec_js! socket, "document.querySelector('#{@message_box}').value;"
   end
@@ -89,6 +98,7 @@ defmodule UccChatWeb.Client do
 
   def clear_message_box(socket) do
     exec_js socket, clear_message_box_js()
+    set_inputbox_buttons socket, false
   end
 
   def clear_message_box_js,
@@ -145,6 +155,22 @@ defmodule UccChatWeb.Client do
 
   def delete_message!(message_id, socket) do
     delete! socket, "li.message#" <> message_id
+  end
+
+  def set_inputbox_buttons(socket, mode) when mode in [true, :active] do
+    exec_js socket, """
+      $('.message-buttons').hide();
+      $('.message-buttons.send-button').show();
+      $('#{@message_box}').addClass('dirty');
+      """
+  end
+
+  def set_inputbox_buttons(socket, mode) when mode in [false, nil, :empty] do
+    exec_js socket, """
+      $('.message-buttons').show();
+      $('.message-buttons.send-button').hide();
+      $('#{@message_box}').removeClass('dirty');
+      """
   end
 
   def desktop_notify(socket, name, body, message, duration) do
