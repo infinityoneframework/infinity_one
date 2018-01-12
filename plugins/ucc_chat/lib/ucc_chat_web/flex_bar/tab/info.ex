@@ -51,7 +51,7 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     trace "assigns", socket.assigns
 
     params = %{channel_id: opts.resource.id, field: socket.assigns.toggle_field}
-    Logger.debug "params: " <> inspect(params)
+    Logger.debug fn -> "params: " <> inspect(params) end
     broadcast socket, "room:update", params
   end
 

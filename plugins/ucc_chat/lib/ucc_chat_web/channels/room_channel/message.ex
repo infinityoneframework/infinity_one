@@ -22,13 +22,13 @@ defmodule UccChatWeb.RoomChannel.Message do
   @preloads [:user, :edited_by, :attachments, :reactions]
 
   def create_attachment(params, socket, client \\ Client) do
-    Logger.debug "params: #{inspect params}"
+    Logger.debug fn -> "params: #{inspect params}" end
     do_create("", params["channel_id"], params["user_id"], params, socket,
       client, &handle_new_attachment_message/4)
   end
 
   def create(body, channel_id, user_id, socket, client \\ Client) do
-    Logger.debug "body: #{inspect body}"
+    Logger.debug fn -> "body: #{inspect body}" end
     do_create(body, channel_id, user_id, %{}, socket,
       client, &handle_new_message/4)
   end
@@ -86,8 +86,22 @@ defmodule UccChatWeb.RoomChannel.Message do
     message = Message.get(message_id, preload: @preloads)
     case message.attachments do
       [] ->
-        {body, _mentions} = Service.encode_mentions(body, channel_id)
-        Message.update(message, %{body: body, edited_id: user.id})
+        {mention_body, mentions} = Service.encode_mentions(body, channel_id)
+
+        # TODO: Do we want to pass to the robots again? I can think of
+        #       arguments on both sides of this decision. For now, we
+        #       won't.
+
+        case Message.update(message, %{body: body, edited_id: user.id}) do
+          {:ok, message} ->
+            channel = Channel.get channel_id
+            Service.update_mentions(mentions, message.id, message.channel_id, mention_body)
+            Service.update_direct_notices(channel, message)
+            {:ok, message}
+          {:error, changeset} ->
+            Logger.error inspect(changeset)
+        end
+
       [att|_] ->
         update_attachment_description(att, message, value, user)
     end
@@ -112,6 +126,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
     {mention_body, mentions} = Service.encode_mentions(body, channel_id)
 
+    # TODO: This should be moved to a UccPubSub broadcast.
     RobotService.new_message body, channel, user
 
     message = create_message(body, user.id, channel_id, opts[:msg_params])
@@ -314,11 +329,15 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def message_action(socket, sender, client) do
     action = sender["dataset"]["id"]
-    Logger.debug "message action: #{action}, sender: #{inspect sender}"
+    Logger.debug fn -> "message action: #{action}, sender: #{inspect sender}" end
     close_cog socket, sender, client
   end
 
-  def start_editing(socket, message_id, client \\ Client) do
+  def start_editing(socket, message_id, client \\ Client)
+  def start_editing(socket, nil, client) do
+    client.toastr socket, :warning, ~g(There are no messages to edit)
+  end
+  def start_editing(socket, message_id, client) do
     Rebel.put_assigns socket, :edit_message_id, message_id
     Logger.info "editing #{message_id}"
     message = Message.get message_id, preload: [:attachments]
@@ -332,7 +351,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   def open_edit(socket, client \\ Client) do
-    message_id = client.send_js! socket, "$('li.message.own').last().attr('id')"
+    message_id = client.send_js! socket, "$('.messages-box li.message.own').last().attr('id')"
     start_editing socket, message_id, client
   end
 
@@ -342,9 +361,12 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def delete(%{assigns: assigns} = socket, message_id, client \\ Client) do
     user = Accounts.get_user assigns.user_id, preload: [:account, :roles, user_roles: :role]
-    if user.id == message_id ||
-      Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
+    message = Message.get message_id
+    if UccSettings.allow_message_deleting && (user.id == message.user_id ||
+      Permissions.has_permission?(user, "delete-message", assigns.channel_id)) do
+
       message = Message.get message_id, preload: [:attachments]
+
       case MessageService.delete_message message do
         {:ok, _} ->
           client.delete_message! message_id, socket
@@ -358,39 +380,52 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
+  # @doc """
+  # Helper function
+  # """
+  # def new_or_edit_message(socket, _editing? = true, client \\ Client),
+  #   do: edit_message(socket, client)
+
+  # def new_or_edit_message(socket, _editing?, client \\ Client),
+  #   do: new_message(socket, client)
+
   @doc """
   This is the entry point for a new message being posted.
 
   Fetches the message from the client textarea control, and calls the `create/5`
   API.
   """
-  def new_message(socket, _sender, client \\ Client) do
+  def new_message(socket, client \\ Client) do
     assigns = socket.assigns
 
-    message =
+    body =
       socket
       |> client.get_message_box_value
       |> String.trim_trailing
 
-    if message != "" do
-      create(message, assigns.channel_id, assigns.user_id, socket)
+    if body != "" do
+      create(body, assigns.channel_id, assigns.user_id, socket)
     end
 
     client.clear_message_box(socket)
     socket
   end
 
-  def edit_message(%{assigns: assigns} = socket, sender, client \\ Client) do
+  def edit_message(%{assigns: assigns} = socket, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
-    value = sender["value"]
-    # Logger.info "edit_message.... sender: #{inspect sender}"
-    # Logger.info "edit_message.... value: #{inspect value}, message_id: #{message_id}"
-    update(value, assigns.channel_id, assigns.user_id, message_id, socket, client)
+
+    body =
+      socket
+      |> client.get_message_box_value
+      |> String.trim_trailing
+
+    update(body, assigns.channel_id, assigns.user_id, message_id, socket, client)
+
     client.clear_message_box(socket)
     client.send_js socket, clear_editing_js(message_id)
   end
 
-  def cancel_edit(socket, _sender, client \\ Client) do
+  def cancel_edit(socket, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
     client.clear_message_box(socket)
     client.send_js socket, clear_editing_js(message_id)
@@ -420,6 +455,10 @@ defmodule UccChatWeb.RoomChannel.Message do
     """
   end
 
+  @doc """
+  Handle the request from the bot server to broadcast a response.
+
+  """
   def broadcast_bot_message(channel, user_id, body)
   def broadcast_bot_message(%{} = channel, _user_id, body) do
     bot_id = Helpers.get_bot_id()
@@ -430,9 +469,8 @@ defmodule UccChatWeb.RoomChannel.Message do
         sequential: false,
       })
 
-    resp = create_broadcast_message(message.id, channel.name, message)
     UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-      "message:new", resp
+      "message:push", %{rendered: render_message(message)}
   end
 
   def broadcast_bot_message(channel_id, user_id, body) do

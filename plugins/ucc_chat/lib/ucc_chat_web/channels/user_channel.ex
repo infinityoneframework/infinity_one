@@ -68,7 +68,6 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def join_room(user_id, room) do
-    # Logger.debug ("...join_room user_id: #{inspect user_id}")
     Endpoint.broadcast!(CC.chan_user() <> "#{user_id}", "room:join",
       %{room: room, user_id: user_id})
   end
@@ -1059,8 +1058,8 @@ defmodule UccChatWeb.UserChannel do
   defp update_has_unread(%{id: channel_id, name: room},
     %{assigns: assigns} = socket) do
     has_unread = ChannelService.get_has_unread(channel_id, assigns.user_id)
-    Logger.debug "has_unread: #{inspect has_unread}, channel_id: " <>
-      "#{inspect channel_id}, assigns: #{inspect assigns}"
+    Logger.debug fn -> "has_unread: #{inspect has_unread}, channel_id: " <>
+      "#{inspect channel_id}, assigns: #{inspect assigns}" end
     unless has_unread do
       ChannelService.set_has_unread(channel_id, assigns.user_id, true)
 
@@ -1100,7 +1099,7 @@ defmodule UccChatWeb.UserChannel do
   def start_audio_call(socket, sender) do
     current_user_id = socket.assigns.user_id
     user_id = sender["dataset"]["id"]
-    Logger.debug "start audio curr_id: #{current_user_id}, user_id: #{user_id}"
+    Logger.debug fn -> "start audio curr_id: #{current_user_id}, user_id: #{user_id}" end
     socket
   end
 
@@ -1184,7 +1183,8 @@ defmodule UccChatWeb.UserChannel do
   end
 
   defp do_room_update(socket, field, _user_id, _channel_id) do
-    Logger.warn "field: #{inspect field}, assigns: #{inspect socket.assigns}"
+    Logger.warn fn -> "Default case. Should not be called. field: " <>
+      "#{inspect field}, assigns: #{inspect socket.assigns}" end
     socket
   end
 
@@ -1192,7 +1192,7 @@ defmodule UccChatWeb.UserChannel do
     [channel_id: channel_id]
     |> Subscription.list_by
     |> Enum.each(fn %{user_id: user_id} ->
-      Logger.debug "broadcast update room room-visibility to user_id: #{inspect user_id}"
+      Logger.debug fn -> "broadcast update room room-visibility to user_id: #{inspect user_id}" end
       socket.endpoint.broadcast CC.chan_user <> user_id, "update:room-visibility",
         %{visible: visible?, room_name: room_name, user_id: user_id, channel_id: channel_id}
     end)

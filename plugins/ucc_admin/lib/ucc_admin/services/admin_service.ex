@@ -451,7 +451,6 @@ defmodule UccAdmin.AdminService do
   end
 
   def send_invitation_emails(_current_user, emails) do
-    Logger.warn "emails: #{inspect emails}"
     Enum.reject(emails, fn email ->
       email
       |> String.trim
@@ -467,8 +466,7 @@ defmodule UccAdmin.AdminService do
           _ -> true
         end)
         |> case do
-          {[], list} = results ->
-            Logger.warn "results: #{inspect results}"
+          {[], list} ->
             {:ok, get_emails(list)}
           {errors, oks} ->
             %{errors: get_emails(errors) |> Enum.join("\n"), ok: get_emails(oks)}

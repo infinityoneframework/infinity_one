@@ -119,9 +119,9 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     trace ev, msg
     _ = ev
     _ = msg
-    Logger.debug "Sending offer to #{name}"
-    String.split(offer["sdp"], "\r\n")
-    |> Enum.each(&(Logger.debug &1))
+    # Logger.debug "Sending offer to #{name}"
+    # String.split(offer["sdp"], "\r\n")
+    # |> Enum.each(&(Logger.debug &1))
     # Logger.debug "offer #{name} #{inspect offer}"
     case socket.assigns[:state] do
       nil -> socket
@@ -161,7 +161,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     trace ev, msg
     _ = ev
     _ = msg
-    Logger.debug "Disconnecting from  #{name}"
+    Logger.debug fn -> "Disconnecting from  #{name}" end
     case socket.assigns[:state] do
       nil -> socket
       data ->
@@ -178,7 +178,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     trace ev, msg
     _ = ev
     _ = msg
-    Logger.debug "Sending candidate to #{name}: #{inspect candidate}"
+    Logger.debug fn ->  "Sending candidate to #{name}: #{inspect candidate}" end
     socket =
       socket
       |> do_broadcast(name, "candidate", %{candidate: msg["candidate"]})
@@ -191,7 +191,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     _ = ev
     _ = msg
     type = msg["type"]
-    Logger.debug "name: #{nm}, unknown type: #{type}, msg: #{inspect msg}"
+    Logger.debug fn -> "name: #{nm}, unknown type: #{type}, msg: #{inspect msg}" end
     socket = do_broadcast socket, nm, "error", %{type: "error", message: "Unrecognized command: " <> type}
     {:noreply, socket}
   end
@@ -222,7 +222,6 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
       [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
       confirm: fn result ->
-        Logger.debug "sweet confirmed! #{inspect result}"
         open_my_video_tab(socket, payload)
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:confirmed_video_call",
           %{user_id: socket.assigns.user_id}
@@ -230,7 +229,6 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       cancel: fn result ->
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:declined_video_call",
           %{user_id: socket.assigns.user_id}
-        Logger.debug "sweet canceled! result: #{inspect result}"
       end
 
     {:noreply, socket}

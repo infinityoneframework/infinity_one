@@ -28,6 +28,7 @@ defmodule UccChatWeb.RoomChannel do
     "broadcast:message",
     "broadcast:message:update",
     "message:new",
+    "message:push",
     "message:new:attachment"
   ]
 
@@ -81,7 +82,7 @@ defmodule UccChatWeb.RoomChannel do
   end
 
   def broadcast_message(message) do
-    Logger.debug "message: #{inspect message}"
+    Logger.debug fn -> "message: #{inspect message}" end
     channel = Channel.get message.channel_id
     Endpoint.broadcast! CC.chan_room <> channel.name, "broadcast:message",
       %{message: message}
@@ -112,7 +113,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def user_leave(nil), do: Logger.warn "leave for nil username"
   def user_leave(username, room) do
-    Logger.debug "user_leave username: #{inspect username}, room: #{inspect room}"
+    Logger.debug fn -> "user_leave username: #{inspect username}, room: #{inspect room}" end
     Endpoint.broadcast CC.chan_room <> room, "user:leave", %{username: username}
   end
 
@@ -120,7 +121,7 @@ defmodule UccChatWeb.RoomChannel do
   # Socket stuff
 
   def join(ev = CC.chan_room <> "lobby", msg, socket) do
-    Logger.debug "user joined lobby msg: #{inspect msg}, socket: #{inspect socket}"
+    Logger.debug fn -> "user joined lobby msg: #{inspect msg}, socket: #{inspect socket}" end
     super ev, msg, socket
   end
 
@@ -174,6 +175,11 @@ defmodule UccChatWeb.RoomChannel do
   ##########
   # Outgoing message handlers
 
+  def handle_out("message:push", %{rendered: rendered}, socket) do
+    WebClient.push_message(rendered, socket)
+    {:noreply, socket}
+  end
+
   def handle_out("message:new", %{message: %{system: true} = message}, socket) do
     message
     |> WebMessage.render_message
@@ -187,7 +193,6 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_out("message:new:attachment", payload, socket) do
     if payload["user_id"] == socket.assigns.user_id do
-      Logger.debug "matched user"
       WebMessage.create_attachment(payload, socket)
     end
     {:noreply, socket}
@@ -324,7 +329,7 @@ defmodule UccChatWeb.RoomChannel do
   # end
 
   def handle_out("update:remove_user", %{username: username, js: js}, socket) do
-    Logger.debug "username: #{username}"
+    Logger.debug fn -> "username: #{inspect username}" end
     exec_js socket, js
     {:noreply, socket}
   end
@@ -342,9 +347,8 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-# [[{{"bc47810a-29a3-4cd5-893b-13a5a2ebdd31", #PID<0.4000.0>}, %{keys: ""}}]]
   def terminate(_reason, %{assigns: assigns}) do
-    Logger.debug "terminate: " <> inspect({assigns[:user_id], assigns[:self]})
+    Logger.debug fn -> "terminate: " <> inspect({assigns[:user_id], assigns[:self]}) end
     KeyStore.delete {assigns[:user_id], assigns[:self]}
     :ok
   end
@@ -445,6 +449,7 @@ defmodule UccChatWeb.RoomChannel do
 
   defdelegate message_keydown(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate click_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
+  defdelegate message_send(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate emoji_show(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_filter(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput

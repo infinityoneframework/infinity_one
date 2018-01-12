@@ -65,8 +65,8 @@ defmodule UccChatWeb.UserSocket do
   def id(socket), do: "users_socket:#{socket.assigns.user_id}"
 
   def push_message_box(socket, channel_id, user_id) do
-    Logger.debug "push_message_box #{channel_id}, #{user_id}, " <>
-      "socket.assigns: #{inspect socket.assigns}"
+    Logger.debug fn -> "push_message_box #{channel_id}, #{user_id}, " <>
+      "socket.assigns: #{inspect socket.assigns}" end
 
     update socket, :html,
       set: MessageService.render_message_box(channel_id, user_id),

@@ -28,7 +28,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
     """ |> String.replace("\n", "")
 
   def args(socket, {user_id, _channel_id, _, sender}, _params) do
-    Logger.debug "sender: " <> inspect(sender)
+    Logger.debug fn -> "sender: " <> inspect(sender) end
     current_user = Helpers.get_user! user_id
     dataset = sender["dataset"]
     channel = if channel_id = dataset["name"], do: Channel.get(channel_id)

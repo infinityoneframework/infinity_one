@@ -175,6 +175,8 @@ defmodule UccChatWeb.SharedView do
     Subscription.subscribed?(channel_id, user_id)
   end
 
+  def avatar_url(%{avatar_url: nil, username: username}), do: avatar_url(username)
+  def avatar_url(%{avatar_url: avatar_url}), do: avatar_url
   def avatar_url(username) do
     UccChat.AvatarService.avatar_url username
   end
@@ -200,7 +202,7 @@ defmodule UccChatWeb.SharedView do
   end
 
   def account_box_header(user) do
-    Hooks.account_box_header [], user
+    Hooks.account_box_header([], user)
   end
 
   def nav_option_buttons do
