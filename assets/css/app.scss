@@ -317,3 +317,47 @@ footer.footer span.version {
   font-size: 10px;
 }
 
+section.page-container.page-home {
+  .content {
+    .avatar-full {
+      height: 125px;
+      width: 125px;
+      padding: 5px;
+      display: inline-block;
+      img {
+        height: 100%;
+      }
+    }
+    .avatar-initials {
+      display: inline-block;
+      cursor: pointer;
+    }
+    div.file {
+      display: inline-block;
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      bottom: 5px;
+
+      // height: 30px;
+      // width: 30px;
+      i {
+        // height: 100%;
+        font-size: 22px;
+        vertical-align: bottom;
+        cursor: pointer;
+      }
+      input {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        border: none;
+        cursor: pointer;
+      }
+    }
+  }
+}
+

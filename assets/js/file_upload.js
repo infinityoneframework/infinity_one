@@ -163,6 +163,16 @@ class FileUpload {
 
   register_events() {
     $('body').on('change', '.message-form input[type=file]', function(event) {
+      console.log('file change')
+      let e = event.originalEvent || event
+      let files = e.target.files
+      if (!files || files.length == 0) {
+        files = e.dataTransfer.files || []
+      }
+      UccChat.fileUpload.handleFileUpload(files)
+    })
+    .on('change', '#account-profile-form input[type=file]', function(event) {
+      console.log('file change2 ')
       let e = event.originalEvent || event
       let files = e.target.files
       if (!files || files.length == 0) {

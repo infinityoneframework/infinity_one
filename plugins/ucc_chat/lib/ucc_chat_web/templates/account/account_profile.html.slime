@@ -4,9 +4,24 @@ section.page-container.page-home.page-static
     h2
       span.room-title= ~g"Profile"
   .content
+    - user = @user
     = form_for @user_changeset, "#", [id: "account-profile-form"], fn f ->
       .rocket-form
         fieldset
+          .input-line
+            label(for="avatar")= ~g"Avatar"
+            .avatar-full
+              = if url = user.avatar_url do
+                img src="#{url}"
+              - else
+                img src="#{avatar_url(user.username)}"
+            .avatar-initials
+              img src="#{avatar_url(user.username)}"
+            div.file style="position: relative;"
+              i.icon-upload
+              input(accept="" type="file")
+
+
           .input-line
             label(for="realname")= ~g"Name"
             div
