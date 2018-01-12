@@ -28,6 +28,7 @@ defmodule UccChatWeb.RoomChannel do
     "broadcast:message",
     "broadcast:message:update",
     "message:new",
+    "message:push",
     "message:new:attachment"
   ]
 
@@ -173,6 +174,11 @@ defmodule UccChatWeb.RoomChannel do
 
   ##########
   # Outgoing message handlers
+
+  def handle_out("message:push", %{rendered: rendered}, socket) do
+    WebClient.push_message(rendered, socket)
+    {:noreply, socket}
+  end
 
   def handle_out("message:new", %{message: %{system: true} = message}, socket) do
     message
@@ -443,6 +449,7 @@ defmodule UccChatWeb.RoomChannel do
 
   defdelegate message_keydown(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate click_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
+  defdelegate message_send(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate emoji_show(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_filter(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput

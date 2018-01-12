@@ -21,5 +21,6 @@ defmodule UccChat.Schema.StarredMessage do
     struct
     |> cast(params, @fields)
     |> validate_required(@fields)
+    |> unique_constraint(:user_id, name: :starred_messages_user_id_channel_id_message_id)
   end
 end

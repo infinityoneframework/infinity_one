@@ -5,7 +5,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   # alias UccChatWeb.RoomChannel.KeyStore
   alias UccChatWeb.RoomChannel.MessageInput.{SpecialKeys, Buffer}
   # alias UccChatWeb.RoomChannel.Message
-  alias UccChatWeb.RoomChannel.MessageInput.Buffer
+  alias UccChatWeb.RoomChannel.Message
   alias UccChatWeb.Client
   alias UccChat.MessageService
 
@@ -14,6 +14,16 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     unless key in @ignore_keys do
       handle_keydown(socket, sender, key)
     end
+    socket
+  end
+
+  def message_send(socket, sender, client \\ Client) do
+    if client.editing_message?(socket) do
+      Message.edit_message(socket, client)
+    else
+      Message.new_message(socket, client)
+    end
+    MessageService.stop_typing socket
     socket
   end
 
@@ -43,6 +53,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     }
     |> Buffer.add_buffer_state(sender, key)
     |> set_app(sender)
+    |> set_message_box_buttions(client)
     |> logit1
   end
 
@@ -60,6 +71,19 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp trace_data(context) do
+    context
+  end
+
+  defp set_message_box_buttions(context, client) do
+    socket = context.socket
+    sender = context.sender
+    if sender["class"] =~ "dirty" do
+      if sender["text_len"] == 1 and client.get_message_box_value(socket) == "" do
+        client.set_inputbox_buttons(socket, false)
+      end
+    else
+      client.set_inputbox_buttons(socket, true)
+    end
     context
   end
 

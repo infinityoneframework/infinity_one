@@ -3,7 +3,7 @@ li.user-image.user-card-room(class="status-#{user.status}" data-status-name="#{u
   = user_list_item_hook user
   button(data-username="#{user.username}" tabindex="0" title="#{user.username}" data-fun="flex_user_open" rebel-click="flex_call" data-id="members-list")
     .avatar
-      .avatar-image(style="background-image:url(#{avatar_url(user.username)});")
+      .avatar-image(style="background-image:url(#{avatar_url(user)});")
     p= user.username
     = if user_muted? user, @channel_id do
       i.icon-mute(title="User Muted")
