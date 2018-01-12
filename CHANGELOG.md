@@ -30,3 +30,4 @@
 
 * [UCX-3652] Updated the italics markup regex so it does not match with _ in html tags
 * [UCX-3632] Fixed audio file uploads
+* [UCX-3649] Fixed backspace in empty message box shows send button
