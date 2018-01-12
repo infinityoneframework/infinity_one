@@ -357,9 +357,12 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def delete(%{assigns: assigns} = socket, message_id, client \\ Client) do
     user = Accounts.get_user assigns.user_id, preload: [:account, :roles, user_roles: :role]
-    if user.id == message_id ||
-      Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
+    message = Message.get message_id
+    if UccSettings.allow_message_deleting && (user.id == message.user_id ||
+      Permissions.has_permission?(user, "delete-message", assigns.channel_id)) do
+
       message = Message.get message_id, preload: [:attachments]
+
       case MessageService.delete_message message do
         {:ok, _} ->
           client.delete_message! message_id, socket
