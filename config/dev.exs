@@ -40,7 +40,7 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
 config :ucx_ucc, UcxUccWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      # ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
       ~r{lib/ucx_ucc/web/templates/.*(eex|slim|slime)$},

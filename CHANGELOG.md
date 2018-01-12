@@ -26,4 +26,7 @@
 
 ### Enhancements
 
+### Bug Fixes
+
 * [UCX-3652] Updated the italics markup regex so it does not match with _ in html tags
+* [UCX-3632] Fixed audio file uploads
