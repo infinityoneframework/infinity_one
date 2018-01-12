@@ -18,10 +18,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def message_send(socket, _sender, client \\ Client) do
+    body = socket |> client.get_message_box_value |> String.trim_trailing
     if client.editing_message?(socket) do
-      Message.edit_message(socket, client)
+      Message.edit_message(socket, body, client)
     else
-      Message.new_message(socket, client)
+      Message.new_message(socket, body, client)
     end
     MessageService.stop_typing socket
     socket

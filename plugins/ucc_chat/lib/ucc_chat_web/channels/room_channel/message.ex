@@ -395,13 +395,8 @@ defmodule UccChatWeb.RoomChannel.Message do
   Fetches the message from the client textarea control, and calls the `create/5`
   API.
   """
-  def new_message(socket, client \\ Client) do
+  def new_message(socket, body, client \\ Client) do
     assigns = socket.assigns
-
-    body =
-      socket
-      |> client.get_message_box_value
-      |> String.trim_trailing
 
     if body != "" do
       create(body, assigns.channel_id, assigns.user_id, socket)
@@ -411,13 +406,8 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
-  def edit_message(%{assigns: assigns} = socket, client \\ Client) do
+  def edit_message(%{assigns: assigns} = socket, body, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
-
-    body =
-      socket
-      |> client.get_message_box_value
-      |> String.trim_trailing
 
     update(body, assigns.channel_id, assigns.user_id, message_id, socket, client)
 
