@@ -52,6 +52,7 @@ And the bast part is that the data is safe with encrypted connections between yo
 * Profile editing and admin pages
 * Very configurable
 * Markdown support in messages
+* Configurable message parsing (Regex.replace/3 list)
 * and more ...
 ## Feature Roadmap
 
