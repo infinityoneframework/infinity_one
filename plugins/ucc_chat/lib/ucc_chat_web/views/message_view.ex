@@ -392,24 +392,24 @@ defmodule UccChatWeb.MessageView do
   def message_formats(body, _), do: body
 
   defp italic_formats(body) do
-    if body =~ ~r/\<.*?_.*?_.*?\>/ do
+    if body =~ ~r/(\<.*?_.*?_.*?\>)|`|!md/ do
       body
     else
-      String.replace(body, ~r/_(.+?)_/, "<i>\\1</i>")
+      String.replace(body, ~r/_([^\<\>]+?)_/, "<i>\\1</i>")
     end
   end
   defp bold_formats(body) do
-    if body =~ ~r/\<.*?\*.*?\*.*?\>/ do
+    if body =~ ~r/\<.*?\*.*?\*.*?\>|`|!md/ do
       body
     else
-      String.replace(body, ~r/\*(.+?)\*/, "<strong>\\1</strong>")
+      String.replace(body, ~r/\*([^\<\>]+?)\*/, "<strong>\\1</strong>")
     end
   end
   defp strike_formats(body) do
-    if body =~ ~r/\<.*?~.*?~.*?\>/ do
+    if body =~ ~r/\<.*?~.*?~.*?\>|`|!md/ do
       body
     else
-      String.replace(body, ~r/\~(.+?)\~/, "<strike>\\1</strike>")
+      String.replace(body, ~r/\~([^\<\>]+?)\~/, "<strike>\\1</strike>")
     end
   end
 

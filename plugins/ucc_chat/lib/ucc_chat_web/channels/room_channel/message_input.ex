@@ -17,11 +17,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     socket
   end
 
-  def message_send(socket, sender, client \\ Client) do
+  def message_send(socket, _sender, client \\ Client) do
+    body = socket |> client.get_message_box_value |> String.trim_trailing
     if client.editing_message?(socket) do
-      Message.edit_message(socket, client)
+      Message.edit_message(socket, body, client)
     else
-      Message.new_message(socket, client)
+      Message.new_message(socket, body, client)
     end
     MessageService.stop_typing socket
     socket
@@ -53,7 +54,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     }
     |> Buffer.add_buffer_state(sender, key)
     |> set_app(sender)
-    |> set_message_box_buttions(client)
+    |> set_message_box_buttions(key, client)
     |> logit1
   end
 
@@ -74,15 +75,18 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     context
   end
 
-  defp set_message_box_buttions(context, client) do
+  defp set_message_box_buttions(context, key, client) do
     socket = context.socket
     sender = context.sender
-    if sender["class"] =~ "dirty" do
-      if sender["text_len"] == 1 and client.get_message_box_value(socket) == "" do
+    len = sender["text_len"]
+    dirty = sender["class"] =~ "dirty"
+    cond do
+      dirty and (len == 0 or (len == 1 and client.get_message_box_value(socket) == "")) ->
         client.set_inputbox_buttons(socket, false)
-      end
-    else
-      client.set_inputbox_buttons(socket, true)
+      not dirty and not (key == @bs and len == 0) ->
+        client.set_inputbox_buttons(socket, true)
+      true ->
+        nil
     end
     context
   end

@@ -23,7 +23,7 @@ defmodule UccChat.Schema.Attachment do
     struct
     |> cast(params, [:channel_id, :message_id, :file_name, :description,
       :type, :size])
-    |> cast_attachments(params, [:file])
+    |> cast_attachments(params, [:file], allow_paths: true)
     |> validate_required([:file, :channel_id, :message_id])
   end
 
