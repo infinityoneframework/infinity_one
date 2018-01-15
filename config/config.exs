@@ -34,9 +34,9 @@ config :ucx_ucc, :generators,
 # third arguments to Regex.replace/3.
 #   The first element is the string version of the regex
 #   The second element is the replacement string using captures
-# config :ucx_ucc, :message_replacement_patterns, [
-#   {~S"\[(UCX-\d+)\]([^\(]|$|\n)", "[\\1](https://emetrotel.atlassian.net/browse/\\1)\\2"}
-# ]
+config :ucx_ucc, :message_replacement_patterns, [
+  {~S"\[(UCX-\d+)\]([^\(]|$|\n)", "<a href='https://emetrotel.atlassian.net/browse/\\1' target='_blank'>[\\1]</a>\\2"}
+]
 
 config :ucx_ucc, :settings_modules, [
   UcxUcc.Settings.General,

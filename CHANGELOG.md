@@ -4,6 +4,11 @@
 
 ### Enhancements
 
+* [UCX-3592] Added support for a full 120 WebRTC client programmable keys
+* [UCX-3655] Added a new WebRTC client compact theme supporting 15 keys per strip
+* [UCX-3656] Implemented the WebRTC client Settings page
+* [UCX-3657] WIP: Prototype of replacing WebRTC client icons
+
 ### Bug Fixes
 
 * [UCX-3652] Updated the italics markup regex so it does not match with _ in html tags
@@ -11,6 +16,7 @@
 * [UCX-3649] Fixed backspace in empty message box shows send button
 * [UCX-3649] Enter key to send message does not insert a \n in the message
 * [UCX-3647] Close tool-tip when user removes reaction
+* [UCX-3648] Cleaned up the markdown styles for bullet and numbered lists
 
 ## 1.0.0-alpha8 (2018-01-12)
 
@@ -34,4 +40,3 @@
 * [UCX-3645] Message send button now works
 
 ### Backward incompatible changes
-

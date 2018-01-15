@@ -14,6 +14,7 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
     link(href="/favicon1.ico" rel="shortcut icon" type="image/x-icon")
     link(href="/favicon1.ico" rel="icon" type="image/x-icon")
     link(rel="stylesheet" href='#{static_path(@conn, "/fonts/fontello/css/fontello.css")}')
+    link(href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet")
     link(rel="stylesheet" href='#{static_path(@conn, "/css/app.css")}')
     link(rel="stylesheet" href='#{static_path(@conn, "/css/channel_settings.css")}')
     link(rel="stylesheet" href='#{static_path(@conn, "/css/toastr.css")}')
@@ -31,7 +32,7 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
       a(data-audio="[#{id}]" href="#" onClick="$('audio##{id}')[0].play()" style="display:none;")
 
     script(src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous")
-    style body { background-color: #04436A; }
+    style body { background-color: #f3f2f2; }
 
   javascript:
     window.UccChat = { }
