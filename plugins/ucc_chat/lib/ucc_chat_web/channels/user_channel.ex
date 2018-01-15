@@ -30,7 +30,7 @@ defmodule UccChatWeb.UserChannel do
   import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
-  alias UcxUcc.{Repo, Accounts, Hooks}
+  alias UcxUcc.{Repo, Accounts, Hooks, TabBar}
   # alias UcxUcc.TabBar.Ftab
   alias Accounts.{Account, User}
   alias UccAdmin.AdminService
@@ -372,6 +372,26 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("side_nav:close" = ev, params, socket) do
     trace ev, params
+    assigns = socket.assigns
+
+    UccUiFlexTab.FlexTabChannel.flex_close socket, %{}
+
+    assigns.user_id
+    |> UcxUcc.TabBar.get_ftabs
+    |> Enum.find(fn {tab_name, _} -> String.starts_with?(tab_name, "admin_") end)
+    |> case do
+        {tab_name, _} ->
+          Logger.warn "found open admin tab: " <> tab_name
+          module =
+            "admin_user_info"
+            |> TabBar.get_button
+            |> Map.get(:module)
+
+          module.close socket, %{}
+          TabBar.close_ftab assigns.user_id, assigns.channel_id
+        _ ->
+          :ok
+    end
 
     {:noreply, socket}
   end

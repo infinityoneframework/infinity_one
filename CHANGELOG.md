@@ -1,6 +1,14 @@
 # UcxUcc Changelog
 
-## 0.2.1 (2018-01-xx)
+## 0.2.2 (2018-01-16)
+
+### Bug Fixes
+
+* [UCX-3566] Closing Admin section now closes Admin panels
+
+
+
+## 0.2.1 (2018-01-15)
 
 ### Enhancements
 
