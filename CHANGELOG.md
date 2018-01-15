@@ -6,6 +6,7 @@
 
 * [UCX-3566] Closing Admin section now closes Admin panels
 * [UCX-3670] Allow Bots in public channels only
+* [UCX-3672] Add ability to collect and report healh stats
 
 ## 0.2.1 (2018-01-15)
 
