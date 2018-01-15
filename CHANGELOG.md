@@ -2,10 +2,14 @@
 
 ## 1.0.0-alpha10 (2018-01-15)
 
-### Enhancements
-
 ### Bug Fixes
 
+* [UCX-3566] Closing Admin section now closes Admin panels
+
+### Enhancements
+
+* [UCX-3670] Allow Bots in public channels only
+* [UCX-3672] Add ability to collect and report healh stats
 
 ## 1.0.0-alpha9 (2018-01-14)
 

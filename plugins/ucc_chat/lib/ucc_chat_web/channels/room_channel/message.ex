@@ -127,7 +127,12 @@ defmodule UccChatWeb.RoomChannel.Message do
     {mention_body, mentions} = Service.encode_mentions(body, channel_id)
 
     # TODO: This should be moved to a UccPubSub broadcast.
-    RobotService.new_message body, channel, user
+    # This should be configurable, but for how we will only allow bot
+    # processing for public channels
+
+    if channel.type == 0 do
+      RobotService.new_message body, channel, user
+    end
 
     message = create_message(body, user.id, channel_id, opts[:msg_params])
 
