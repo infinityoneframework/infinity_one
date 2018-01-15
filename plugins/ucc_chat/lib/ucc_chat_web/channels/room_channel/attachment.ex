@@ -7,7 +7,6 @@ defmodule UccChatWeb.RoomChannel.Attachment do
   require Logger
 
   def insert_attachment(params) do
-
     # TODO: I don't like this approach since it sends so all channels for the
     #       room. We should be doing this through a rebel update or the
     #       user's channel.

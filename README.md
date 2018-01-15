@@ -14,11 +14,12 @@
 
 UcxUcc is a simple but powerful team collaboration suite of applications designed to improve communications, information sharing and productivity for the businesses small and large.
 
-Checkout the [Live Demo](http://chat.spallen.com). Click on the [Register a new account](http://chat.spallen.com/registrations/new) link on the sign in page to create an account.
+Checkout an older version's [Live Demo](http://chat.spallen.com). Click on the [Register a new account](http://chat.spallen.com/registrations/new) link on the sign in page to create an account. This is actually the live demo of the [ucx_chat](https://github.com/smpallen99/ucx_chat) project. [ucx_ucc](https://github.com/smpallen99/ucx_ucc) is based on a significantly different architecture that allows for adding custom plug-ins without extending the base project.
 
 ![Screen Shoot](priv/images/screen_shot_1.png)
 
 This innovative suite of tools enhances business productivity with:
+
 * An enterprise class telephone that is available anywhere your employees have an Internet connection
 * Share important messaging conversations that would normally be hidden in point to point conversations with tools like SMS and Skype.
 * Choose the most effect method of communications a glance at their on-line or on the phone presence.
@@ -52,7 +53,9 @@ And the bast part is that the data is safe with encrypted connections between yo
 * Profile editing and admin pages
 * Very configurable
 * Markdown support in messages
+* Configurable message parsing (Regex.replace/3 list)
 * and more ...
+
 ## Feature Roadmap
 
 * Replace the Rock.Chat UI with a new original design
@@ -118,19 +121,22 @@ yum install ffmpeg ffmpeg-devel -y
 yum install -y ImageMagick ImageMagick-devel
 ```
 
-### Running Migrations on Dev
+### Running Migrations
 
-```
-iex> Ecto.Migrator.run UcxUcc.Repo, Path.join([Application.app_dir(:ucx_ucc) | ~w(priv repo migrations)]), :up, all: true
+Don't uses the standard `mix ecto.migrate` since it will not pickup the migrations from the plugins. Instead, run the followind command.
+
+```bash
+mix unbrella.migrate
 ```
 
-### Updating Config When there are new entires
+However, you can still run the following commands since they are aliased to use `mix unbrella.migrate`.
 
-```elixir
-alias UcxUcc.{Repo, Config.FileUpload, Config}
-config = Repo.all(Config) |> hd
-Config.changeset(config, %{file_upload: %FileUpload{} |> Map.from_struct}) |> Repo.update
+```bash
+mix ecto.setup
+mix ecto.setup
+mix test
 ```
+
 ## Contributing
 
 We appreciate any contribution to UcxUcc. Check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [CONTRIBUTING.md](CONTRIBUTING.md) guides for more information. We usually keep a list of features and bugs [in the issue tracker][1].

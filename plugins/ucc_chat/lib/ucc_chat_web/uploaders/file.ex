@@ -16,7 +16,8 @@ defmodule UccChat.File do
 
   # Whitelist file extensions:
   def validate({file, _}) do
-    ~w(.jpg .jpeg .gif .png .txt .text .doc .pdf .wav .mp3 .mp4 .mov .m4a .xls) |> Enum.member?(Path.extname(file.file_name))
+    ~w(.jpg .jpeg .gif .png .txt .text .doc .pdf .wav .mp3 .mp4 .mov .m4a .xls)
+    |> Enum.member?(Path.extname(file.file_name))
   end
 
   def transform(:poster, {_, %{type: "video" <> _}}) do
@@ -28,9 +29,10 @@ defmodule UccChat.File do
     {:convert, "-strip -resize @80000 -format png", :png}
   end
   def transform(:poster, _params) do
-    # IO.inspect params, label: "transform other2: " <> inspect(params)
-    {:convert, "-strip -resize @80000 -format png", :png}
+    :noaction
+    # {:convert, "-strip -resize @80000 -format png", :png}
   end
+
 
   def filename(:poster, _params) do
     :poster
