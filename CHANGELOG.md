@@ -5,8 +5,7 @@
 ### Bug Fixes
 
 * [UCX-3566] Closing Admin section now closes Admin panels
-
-
+* [UCX-3670] Allow Bots in public channels only
 
 ## 0.2.1 (2018-01-15)
 
