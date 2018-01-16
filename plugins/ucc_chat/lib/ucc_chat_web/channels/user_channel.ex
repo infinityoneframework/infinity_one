@@ -1102,7 +1102,7 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
   def drop_notify_cancel(socket, sender) do
-    exec_js socket, """
+    broadcast_js socket, """
       var elem = $('#{this(sender)}').closest('.notice');
       elem.animate({
         height: "0px",
