@@ -67,7 +67,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
   end
 
   def notify_cancel(socket, _tab, _sender, client \\ UccChatWeb.Client) do
-    client.send_js socket, click_users_link_js()
+    client.broadcast_js socket, click_users_link_js()
     socket
   end
 
@@ -174,7 +174,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
   end
 
   def delete(socket, sender) do
-    Logger.warn inspect(sender)
+    Logger.info inspect(sender)
     Client.toastr! socket, :warning, ~s(Not yet implemented)
     # TODO: Need to implement a conformation dialog
     # current_user = Accounts.get_user socket.assigns.user_id, preload: @roles_preload
@@ -192,7 +192,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   def notify_update_success(socket, %{id: "admin_user_info"}, _sender, %{resource_params: _params} = opts, client) do
     UccPubSub.broadcast "phone_number", "admin", opts
-    client.send_js socket, click_users_link_js()
+    client.broadcast_js socket, click_users_link_js()
     socket
   end
   def notify_update_success(socket, %{id: "admin_user_info"}, _sender, _opts, client) do

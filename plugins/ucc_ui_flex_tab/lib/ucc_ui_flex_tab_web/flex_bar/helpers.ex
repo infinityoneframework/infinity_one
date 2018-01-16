@@ -95,7 +95,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
             socket
             |> update(:html, set: html, on: "section.flex-tab-main")
-            |> exec_js(js)
+            |> broadcast_js(js)
 
             socket
         end
@@ -151,7 +151,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       """
       @spec close(socket, map) :: socket
       def close(socket, _sender) do
-        exec_js(socket, """
+        broadcast_js(socket, """
           $('section.flex-tab').parent().removeClass('opened')
           $('.tab-button.active').removeClass('active')
           """)
@@ -223,8 +223,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
   """
   @spec exec_update_fun(socket, map, String.t) :: socket
   def exec_update_fun(socket, sender, name) do
-    js = ~s/$('#{this(sender)}')[0].dataset['fun'] = '#{name}'/
-    exec_js socket, js
+    broadcast_js socket, ~s/$('#{this(sender)}')[0].dataset['fun'] = '#{name}'/
     socket
   end
 

@@ -90,7 +90,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
     socket
     |> super({user_id, channel_id, tab, sender}, nil)
-    |> exec_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
+    |> broadcast_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
 
     socket
   end
@@ -127,7 +127,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   end
 
   defp exec_update_showing_count(socket) do
-    exec_js(socket,
+    broadcast_js(socket,
       "$('.showing-cnt').text($('.list-view ul.lines li').length)")
     socket
   end
