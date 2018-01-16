@@ -30,7 +30,7 @@ defmodule UccChatWeb.UserChannel do
   import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
-  alias UcxUcc.{Repo, Accounts, Hooks}
+  alias UcxUcc.{Repo, Accounts, Hooks, TabBar}
   # alias UcxUcc.TabBar.Ftab
   alias Accounts.{Account, User}
   alias UccAdmin.AdminService
@@ -57,7 +57,7 @@ defmodule UccChatWeb.UserChannel do
   onload :page_loaded
 
   def on_connect(socket) do
-    exec_js socket, "window.UccChat.run()"
+    broadcast_js socket, "window.UccChat.run()"
 
     WebrtcChannel.on_connect(socket)
   end
@@ -144,7 +144,7 @@ defmodule UccChatWeb.UserChannel do
 
    def handle_out("webrtc:leave" = ev, payload, socket) do
      trace ev, payload
-     exec_js socket, ~s/$('.webrtc-video button.stop-call').click()/
+     broadcast_js socket, ~s/$('.webrtc-video button.stop-call').click()/
      {:noreply, socket}
    end
 
@@ -302,15 +302,15 @@ defmodule UccChatWeb.UserChannel do
   def handle_in("notification:click", params, socket) do
     message = Message.get params["message_id"]
     if params["channel_id"] == socket.assigns.channel_id do
-      exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+      broadcast_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
     else
       room = params["channel_name"]
-      exec_js socket, ~s/$('aside.side-nav a.open-room[data-room="#{room}"]').click()/
+      broadcast_js socket, ~s/$('aside.side-nav a.open-room[data-room="#{room}"]').click()/
 
       # TODO: This is a hack. We should have a notification when the room is loaded and then run the JS below.
       spawn fn ->
         Process.sleep 3500
-        exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+        broadcast_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
       end
     end
 
@@ -371,6 +371,26 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("side_nav:close" = ev, params, socket) do
     trace ev, params
+    assigns = socket.assigns
+
+    UccUiFlexTab.FlexTabChannel.flex_close socket, %{}
+
+    assigns.user_id
+    |> UcxUcc.TabBar.get_ftabs
+    |> Enum.find(fn {tab_name, _} -> String.starts_with?(tab_name, "admin_") end)
+    |> case do
+        {tab_name, _} ->
+          Logger.warn "found open admin tab: " <> tab_name
+          module =
+            "admin_user_info"
+            |> TabBar.get_button
+            |> Map.get(:module)
+
+          module.close socket, %{}
+          TabBar.close_ftab assigns.user_id, assigns.channel_id
+        _ ->
+          :ok
+    end
 
     {:noreply, socket}
   end
@@ -583,7 +603,7 @@ defmodule UccChatWeb.UserChannel do
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
-    exec_js socket, "Rebel.set_event_handlers('.main-content')"
+    broadcast_js socket, "Rebel.set_event_handlers('.main-content')"
     {:noreply, socket}
   end
 
@@ -1047,7 +1067,7 @@ defmodule UccChatWeb.UserChannel do
     # Logger.warn "room: #{inspect room}, assigns: #{inspect assigns}"
     ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, false)
 
-    exec_js socket, """
+    broadcast_js socket, """
       $('link-room-#{room}').removeClass('has-unread')
         .removeClass('has-alert');
       """ |> String.replace("\n", "")
@@ -1063,7 +1083,7 @@ defmodule UccChatWeb.UserChannel do
     unless has_unread do
       ChannelService.set_has_unread(channel_id, assigns.user_id, true)
 
-      exec_js socket,
+      broadcast_js socket,
         "$('.link-room-#{room}').addClass('has-unread').addClass('has-alert');"
       push socket, "update:alerts", %{}
     end
@@ -1082,7 +1102,7 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
   def drop_notify_cancel(socket, sender) do
-    exec_js socket, """
+    broadcast_js socket, """
       var elem = $('#{this(sender)}').closest('.notice');
       elem.animate({
         height: "0px",
@@ -1238,7 +1258,7 @@ defmodule UccChatWeb.UserChannel do
 
   def video_stop(socket, sender) do
     trace "video_stop", sender
-    exec_js(socket, "window.WebRTC.hangup()")
+    broadcast_js(socket, "window.WebRTC.hangup()")
     execute(socket, :click, on: ".tab-button.active")
   end
 

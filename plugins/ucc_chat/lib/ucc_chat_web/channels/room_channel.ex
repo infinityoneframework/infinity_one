@@ -330,7 +330,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_out("update:remove_user", %{username: username, js: js}, socket) do
     Logger.debug fn -> "username: #{inspect username}" end
-    exec_js socket, js
+    broadcast_js socket, js
     {:noreply, socket}
   end
 

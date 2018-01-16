@@ -58,7 +58,7 @@ defmodule UccChatWeb.FlexBar.Tab.Notification do
   end
 
   def play_sound(socket, sound) do
-    exec_js socket, "document.getElementById('#{sound}').play()"
+    broadcast_js socket, "document.getElementById('#{sound}').play()"
     socket
   end
 end

@@ -185,8 +185,8 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     |> check_and_close(Map.put(context, :app, module))
   end
 
-  def send_js(context, js) do
-    context.client.send_js context.socket, js
+  def broadcast_js(context, js) do
+    context.client.broadcast_js context.socket, js
     context
   end
 

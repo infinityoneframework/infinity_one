@@ -28,7 +28,7 @@ defmodule UccAdmin.Page do
         socket
         |> update(:html, set: html, on: ".main-content")
         |> update(:html, set: admin_flex, on: ".flex-nav section")
-        |> exec_js(active_link_js(page))
+        |> broadcast_js(active_link_js(page))
         socket
       end
 
