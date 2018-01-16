@@ -11,7 +11,9 @@ config :logger, level: :error
 config :logger, :console,
   level: :error,
   # level: :error,
-  format: "\n$time [$level]$levelpad$metadata$message\n",
+  format: {UcxUcc.Logger.Formatter, :console},
+  # level: :error,
+  compile: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]
 
 if File.exists? "config/test.secret.exs" do

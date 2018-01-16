@@ -1,5 +1,16 @@
 # UcxUcc Changelog
 
+## 1.0.0-alpha11 (2018-01-16)
+
+### Bug Fixes
+
+* [UCX-2605] Fix client initialization after reset
+
+### Enhancements
+
+* [UCX-3672] Using a different syslog package now with better resolution
+* [UCX-3681] Improved the logger format, reducing noise
+
 ## 1.0.0-alpha10 (2018-01-15)
 
 ### Bug Fixes
