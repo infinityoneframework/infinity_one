@@ -22,7 +22,7 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
       # |> Poison.encode!
 
     client.append(socket, ~s([id="#{message_id}"] .message-cog-container), html)
-    client.send_js socket, """
+    client.broadcast_js socket, """
       Rebel.set_event_handlers('[id="#{message_id}"]');
       $('##{message_id} .message-dropdown').click(function(e) {
         e.stopPropagation();
@@ -41,7 +41,7 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
       |> client.render_to_string("flex_cog.html", [])
 
     client.append(socket, ~s([id="#{message_id}"] .message-cog-container), html)
-    client.send_js socket, """
+    client.broadcast_js socket, """
       Rebel.set_event_handlers('[id="#{message_id}"]');
       $('##{message_id} .message-dropdown').click(function(e) {
         e.stopPropagation();
@@ -53,7 +53,7 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
 
   def jump_to_message(socket, sender, client \\ Client) do
     id = sender["rebel_id"] |> IO.inspect(label: "rebel_id")
-    client.send_js socket, """
+    client.broadcast_js socket, """
       var ts = $('[rebel-id="#{id}"]').closest('li.message').data('timestamp');
       var target = $('.messages-box li[data-timestamp="' + ts + '"]');
       if (target.offset()) {
@@ -69,12 +69,12 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
   end
 
   def close_cog(socket, sender, client \\ Client) do
-    client.send_js socket, ~s/$('#{Rebel.Core.this(sender)}').closest('.message-dropdown').remove()/
+    client.broadcast_js socket, ~s/$('#{Rebel.Core.this(sender)}').closest('.message-dropdown').remove()/
     socket
   end
 
   def message_box_focus(socket, client \\ Client) do
-    client.send_js socket, ~s/UccChat.roomManager.message_box_focus();/
+    client.broadcast_js socket, ~s/UccChat.roomManager.message_box_focus();/
     socket
   end
 end

@@ -50,7 +50,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     # Logger.error "on_connect: assigns: #{inspect socket.assigns}"
     case get_client_device socket do
       nil ->
-        exec_js socket, "window.UccChat.devices = {};" <> ice_servers_js()
+        broadcast_js socket, "window.UccChat.devices = {};" <> ice_servers_js()
         socket
       device ->
         str =
@@ -59,7 +59,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
           end)
           |> Enum.join(", ")
 
-        exec_js socket, "window.UcxUcc.devices = {" <> str <> "};" <> ice_servers_js()
+        broadcast_js socket, "window.UcxUcc.devices = {" <> str <> "};" <> ice_servers_js()
 
         # TODO: First attempt at notifing mscs that devices are ready, but
         # can't find common key to broadcast on.
@@ -120,8 +120,10 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     _ = ev
     _ = msg
     # Logger.debug "Sending offer to #{name}"
-    # String.split(offer["sdp"], "\r\n")
-    # |> Enum.each(&(Logger.debug &1))
+    offer["sdp"]
+    |> String.split("\r\n")
+    |> Enum.each(&(Logger.debug &1))
+
     # Logger.debug "offer #{name} #{inspect offer}"
     case socket.assigns[:state] do
       nil -> socket
@@ -141,7 +143,8 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     _ = msg
     Logger.debug "Sending answer to #{name}"
     # Logger.debug "answer #{name} #{inspect answer}"
-    String.split(answer["sdp"], "\r\n")
+    answer["sdp"]
+    |> String.split("\r\n")
     |> Enum.each(&(Logger.debug &1))
 
     socket =
@@ -252,7 +255,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   def confirmed_video_call(payload, socket) do
     trace "confirmed_video_call payload", payload
     trace "confirmed_video_call assign", socket.assigns
-    exec_js socket, "window.WebRTC.call('#{payload.user_id}');"
+    broadcast_js socket, "window.WebRTC.call('#{payload.user_id}');"
     open_remote_video_item socket, payload.user_id
     {:noreply, socket}
   end
@@ -264,13 +267,12 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     html = Phoenix.View.render_to_string VideoView, "remote_video_item.html",
       item: %{connected: true, username: user.username}
 
-    socket
-    |> insert(html, append: ".videos")
+    insert(socket, html, append: ".videos")
 
     spawn fn ->
       Process.sleep 3000
       js = ~s{$('.videos .video-item[data-username="#{user.username}"] video')[0].srcObject = window.WebRTC.remoteVideo.srcObject}
-      exec_js socket, js
+      broadcast_js socket, js
     end
     socket
   end
@@ -328,7 +330,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       end)
       |> Enum.join(", ")
 
-    exec_js socket, "window.UcxUcc.DeviceManager.devices = {" <> str <> "}"
+    broadcast_js socket, "window.UcxUcc.DeviceManager.devices = {" <> str <> "}"
     socket
   end
 

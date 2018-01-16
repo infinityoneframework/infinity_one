@@ -159,7 +159,9 @@ defmodule UccChatWeb.RoomChannel.Message do
         robot_body = "Attachment: #{params["file_name"]}, Type: #{params["type"]}, " <>
           ~s(Description: "#{params["description"]}")
 
-        RobotService.new_message robot_body, channel, user
+        if channel.type == 0 do
+          RobotService.new_message robot_body, channel, user
+        end
 
         Service.update_direct_notices(channel, message)
 
@@ -352,7 +354,7 @@ defmodule UccChatWeb.RoomChannel.Message do
         [att | _] -> att.description
       end
       |> Poison.encode!
-    client.send_js socket, set_editing_js(message_id, body)
+    client.broadcast_js socket, set_editing_js(message_id, body)
   end
 
   def open_edit(socket, client \\ Client) do
@@ -417,13 +419,13 @@ defmodule UccChatWeb.RoomChannel.Message do
     update(body, assigns.channel_id, assigns.user_id, message_id, socket, client)
 
     client.clear_message_box(socket)
-    client.send_js socket, clear_editing_js(message_id)
+    client.broadcast_js socket, clear_editing_js(message_id)
   end
 
   def cancel_edit(socket, client \\ Client) do
     message_id = Rebel.get_assigns socket, :edit_message_id
     client.clear_message_box(socket)
-    client.send_js socket, clear_editing_js(message_id)
+    client.broadcast_js socket, clear_editing_js(message_id)
   end
 
   defp close_cog(socket, sender, client) do

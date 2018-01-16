@@ -11,6 +11,7 @@
 * [UCX-3670] Allow Bots in public channels only
 * [UCX-3672] Add ability to collect and report healh stats
 * [UCX-3671] Enable msec resolution timestamps in syslog
+* [UCX-3667] Improve response time by replacing exec_js with broadcast_js
 
 ## 1.0.0-alpha9 (2018-01-14)
 

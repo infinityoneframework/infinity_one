@@ -43,7 +43,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   def start_loading_animation(socket, elem) do
     socket
     |> page_loading
-    |> exec_js("$('#{elem}').next().after('#{ClientView.loading_animation}')")
+    |> broadcast_js("$('#{elem}').next().after('#{ClientView.loading_animation}')")
     socket
   end
 
@@ -113,7 +113,7 @@ defmodule UccChatWeb.RebelChannel.Client do
 
   def toastr(socket, which, message) do
     message = Poison.encode! message
-    exec_js socket, ~s{window.toastr.#{which}(#{message});}
+    broadcast_js socket, ~s{window.toastr.#{which}(#{message});}
   end
 
   def broadcast_room_icon(socket, room_name, icon_name) do
@@ -121,7 +121,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def set_room_icon(socket, room_name, icon_name) do
-    do_exec_js socket, update_room_icon_js(room_name, icon_name)
+    do_broadcast_js socket, update_room_icon_js(room_name, icon_name)
   end
 
   def update_room_icon_js(room_name, icon_name) do
@@ -158,8 +158,8 @@ defmodule UccChatWeb.RebelChannel.Client do
   def broadcast_message_box(socket, channel_id, user_id) do
     html = MessageService.render_message_box(channel_id, user_id)
     html_str = Poison.encode! html
-    do_exec_js socket, "console.log('user_id', '#{user_id}');"
-    do_exec_js socket, "console.log('html', '#{html_str}');"
+    do_broadcast_js socket, "console.log('user_id', '#{user_id}');"
+    do_broadcast_js socket, "console.log('html', '#{html_str}');"
 
     update! socket, :html,
       set: html,
@@ -186,7 +186,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def scroll_bottom(socket, selector) do
-    exec_js socket, scroll_bottom_js(selector)
+    broadcast_js socket, scroll_bottom_js(selector)
     socket
   end
 
@@ -216,7 +216,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def set_caret_position(socket, selector, start, finish) do
-    exec_js socket, set_caret_position_js(selector, start, finish)
+    broadcast_js socket, set_caret_position_js(selector, start, finish)
   end
 
   def set_caret_position!(socket, selector, start, finish) do
@@ -234,7 +234,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def more_channels(socket, html) do
-    exec_js socket, more_channels_js(html)
+    broadcast_js socket, more_channels_js(html)
   end
 
   def more_channels_js(html) do

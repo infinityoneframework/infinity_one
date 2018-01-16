@@ -29,7 +29,7 @@ defmodule UccChatWeb.RoomChannel.Reaction do
     end
     # MessageService.broadcast_updated_message message, reaction: true
     UccChatWeb.RoomChannel.broadcast_updated_message message, reaction: true
-    client.send_js socket, """
+    client.broadcast_js socket, """
       chat_emoji.close_picker();
       document.querySelector('#{@message_box}').focus();
       """

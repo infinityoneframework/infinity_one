@@ -100,9 +100,10 @@ defmodule UccChatWeb.ChannelController do
 
       case get_direct(user_id, name) do
         nil ->
+          IO.inspect {user_id, name}
           # create the direct and redirect
-          ChannelService.add_direct(name, user_id, nil) |> IO.inspect(label: "direct")
-          direct = get_direct(user_id, name) |> IO.inspect(label: "direct 1")
+          ChannelService.add_direct(name, user_id, nil) #  |> IO.inspect(label: "direct")
+          direct = get_direct(user_id, name) #|> IO.inspect(label: "direct 1")
           show(conn, direct.channel)
         direct ->
           show(conn, direct.channel)
@@ -112,9 +113,10 @@ defmodule UccChatWeb.ChannelController do
     end
   end
 
-  defp get_direct(user_id, name) do
+  def get_direct(user_id, name) do
     (from d in DirectSchema,
-      where: d.user_id == ^user_id and like(d.users, ^"%#{name}%"),
+      # where: d.user_id == ^user_id and like(d.users, ^"#{name}__%") or like(d.users, ^"%__#{name}")),
+      where: d.user_id == ^user_id and d.users == ^name,
       preload: [:channel])
     |> Repo.one
   end

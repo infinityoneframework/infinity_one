@@ -36,7 +36,8 @@ defmodule UccAdminWeb.FlexBar.Tab.InviteUsers do
       invite_emails: []], socket}
   end
 
-  def invite_users(socket, _sender) do
+  def invite_users(socket, sender) do
+    Logger.info "TBD: not implemented: " <> inspect(sender)
     socket
   end
 
