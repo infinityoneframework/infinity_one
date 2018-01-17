@@ -19,13 +19,6 @@ defmodule UcxUcc.Application do
 
     setup_uploads_link()
 
-    children =
-      Unbrella.application_children()
-      |> Enum.map(fn {mod, fun, args} ->
-        apply mod, fun, args
-      end)
-      |> List.flatten
-
     # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository
@@ -35,7 +28,17 @@ defmodule UcxUcc.Application do
       supervisor(UcxUccWeb.Presence, []),
       worker(UcxUcc.Permissions, []),
       worker(UcxUcc.UccPubSub, []),
-    ] ++ children
+    ]
+
+    children =
+      Unbrella.application_children()
+      |> Enum.reduce_while(children, fn {mod, fun, args}, acc ->
+        result = apply mod, fun, args
+        case apply mod, fun, args do
+          list when is_list(list) -> {:cont, acc ++ list}
+          halt -> halt
+        end
+      end)
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
