@@ -107,7 +107,10 @@ defmodule UcxUcc.Mixfile do
       {:conform, "~> 2.5"},
       {:ex_syslogger, path: "../ex_syslogger"},
       # {:ex_syslogger, github: "smpallen99/ex_syslogger"},
-      {:gen_smtp, "~> 0.12.0"}
+      {:gen_smtp, "~> 0.12.0"},
+      # {:ex_syslogger, github: "smpallen99/ex_syslogger"},
+      {:gen_smtp, "~> 0.12.0"},
+      {:exprof, "~> 0.2.0"}
 
     ] ++ plugin_deps()
   end
