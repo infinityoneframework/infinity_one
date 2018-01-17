@@ -33,7 +33,6 @@ defmodule UcxUcc.Application do
     children =
       Unbrella.application_children()
       |> Enum.reduce_while(children, fn {mod, fun, args}, acc ->
-        result = apply mod, fun, args
         case apply mod, fun, args do
           list when is_list(list) -> {:cont, acc ++ list}
           halt -> halt
