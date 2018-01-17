@@ -103,6 +103,11 @@ defmodule UcxUcc.Mixfile do
       {:floki, "~> 0.0", override: true},
       {:phoenix_markdown, "~> 0.1"},
       {:distillery, "~> 1.4"},
+      # {:syslog, github: "smpallen99/syslog"},
+      {:conform, "~> 2.5"},
+      {:ex_syslogger, github: "smpallen99/ex_syslogger"},
+      {:gen_smtp, "~> 0.12.0"},
+      {:exprof, "~> 0.2.0"}
 
     ] ++ plugin_deps()
   end
