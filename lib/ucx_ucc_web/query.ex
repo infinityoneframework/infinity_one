@@ -1,12 +1,9 @@
 defmodule UcxUccWeb.Query do
-  import Rebel.Core
 
   @broadcast             &Rebel.Core.broadcast_js/2
   @no_broadcast          &Rebel.Core.async_js/2
   @html_modifiers        ~r/html|append|before|after|insertAfter|insertBefore|htmlPrefilter|prepend|replaceWith|wrap/i
 
-  # update(socket, :class, set: "label ext-" <>  number, on: on)
-  # update socket, :text, set: raw(payload.text), on: on
   def update(socket, item, opts) do
     do_update(socket, item, to_map(opts), @no_broadcast)
   end
@@ -32,7 +29,7 @@ defmodule UcxUccWeb.Query do
     do_update(socket, item, to_map(opts), @no_broadcast)
   end
 
-  def insert(socket, item, opts) do
+  def insert!(socket, item, opts) do
     do_update(socket, item, to_map(opts), @broadcast)
   end
 
@@ -53,21 +50,27 @@ defmodule UcxUccWeb.Query do
   end
 
   defp build_js(selector, {method, attr}, value) do
-    "$('#{selector}').#{method}('#{attr}','#{escape_value(value)}');"
+    "$('#{selector}').#{method}('#{attr}',#{escape_value(value)});"
   end
 
+  defp build_js(selector, method, value) when method in ~w(html replaceWith) do
+    "$('#{selector}').#{method}(#{escape_value(value)});"
+  end
   defp build_js(selector, method, value) do
-    "$('#{selector}').#{method}('#{escape_value(value)}');"
+    "$('#{selector}').#{method}('#{value}');"
   end
 
   defp to_map(opts), do: Enum.into(opts, %{})
 
   defp jquery_method(:update, :class), do: {"attr", "class"}
   defp jquery_method(:update, :text), do: "text"
+  defp jquery_method(:update, :html), do: "html"
   defp jquery_method(:update, {:class, :toggle}), do: "toggleClass"
+  defp jquery_method(:update, :replaceWith), do: "replaceWith"
 
   defp jquery_method(:insert, :class), do: "addClass"
   defp jquery_method(:insert, :text), do: "text"
+  defp jquery_method(:insert, :html), do: "text"
 
   defp jquery_method(:delete, :class), do: "removeClass"
 
@@ -81,9 +84,8 @@ defmodule UcxUccWeb.Query do
   end
 
   defp escape_value(value) when is_boolean(value),  do: "#{inspect(value)}"
-  defp escape_value(value) when is_nil(value),      do: ""
-  defp escape_value(value) when is_binary(value),   do: value
-  defp escape_value(value),                         do: "#{Rebel.Core.encode_js(value)}"
-  # defp escape_value(value) when is_nil(value),      do: "\"\""
-  # defp escape_value(value),                         do: "#{Rebel.Core.encode_js(value)}"
+  defp escape_value(value) when is_nil(value),      do: ~s("")
+  defp escape_value(value)                         do
+    "#{Rebel.Core.encode_js(value)}"
+  end
 end

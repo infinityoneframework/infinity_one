@@ -15,7 +15,7 @@ defmodule UccChatWeb.RebelChannel.Macros do
     quote bind_quoted: [name: name, name_js: name_js, content: block] do
 
       def unquote(name)(socket) do
-        do_broadcast_js socket, apply(__MODULE__, unquote(name_js), [])
+        async_js socket, apply(__MODULE__, unquote(name_js), [])
         socket
       end
 

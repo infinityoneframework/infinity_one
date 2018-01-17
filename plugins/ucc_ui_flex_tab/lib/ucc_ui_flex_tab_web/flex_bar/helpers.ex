@@ -40,6 +40,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
   import Rebel.Query
   alias UcxUcc.TabBar
+  alias UcxUccWeb.Query
 
   require Logger
 
@@ -94,8 +95,8 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
             ] |> Enum.join(";")
 
             socket
-            |> update(:html, set: html, on: "section.flex-tab-main")
-            |> broadcast_js(js)
+            |> Query.update(:html, set: html, on: "section.flex-tab-main")
+            |> async_js(js)
 
             socket
         end
@@ -118,10 +119,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
             html = Phoenix.View.render_to_string(tab.view, templ, args)
 
-            socket
-            |> update(:html, set: html, on: "section.flex-tab-main")
-
-            socket
+            Query.update(socket, :html, set: html, on: "section.flex-tab-main")
         end
       end
 
@@ -151,7 +149,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       """
       @spec close(socket, map) :: socket
       def close(socket, _sender) do
-        broadcast_js(socket, """
+        async_js(socket, """
           $('section.flex-tab').parent().removeClass('opened')
           $('.tab-button.active').removeClass('active')
           """)
