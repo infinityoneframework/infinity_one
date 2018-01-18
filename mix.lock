@@ -22,7 +22,7 @@
   "elixir_make": {:hex, :elixir_make, "0.4.0", "992f38fabe705bb45821a728f20914c554b276838433349d4f2341f7a687cddf", [:mix], [], "hexpm"},
   "erlagi": {:git, "https://github.com/smpallen99/erlagi.git", "59ff096dfdb2acaf8a713bf6bdeaa3021d267b3f", []},
   "esqlite": {:hex, :esqlite, "0.2.3", "1a8b60877fdd3d50a8a84b342db04032c0231cc27ecff4ddd0d934485d4c0cd5", [:rebar3], [], "hexpm"},
-  "ex_ami": {:git, "https://github.com/smpallen99/ex_ami.git", "b609e359a5fbfd73ad3cfdb8fd60c0067a1726ae", []},
+  "ex_ami": {:git, "https://github.com/smpallen99/ex_ami.git", "c6deda31ad88ee8b24af3ea83a165e792001cc03", []},
   "ex_data": {:git, "git@bitbucket.org:emetrotel/ex_data.git", "5ba58d1a388f59a98f58d7b8054bfedbe6bf2b5d", []},
   "ex_syslogger": {:git, "https://github.com/smpallen99/ex_syslogger.git", "05b7dfea4c618702ec9bd3b218cf81ff8151f5a2", []},
   "exactor": {:hex, :exactor, "2.2.3", "a6972f43bb6160afeb73e1d8ab45ba604cd0ac8b5244c557093f6e92ce582786", [:mix], [], "hexpm"},
