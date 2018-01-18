@@ -39,24 +39,27 @@ config :ucx_ucc,
 #config :logger, level: :info
 
 config :logger, [
-  level: :info,
-  backends: [:console, :syslog],
-  console: [level: :warn, format: "[$level] $metadata$message\n",
-    metadata: [:module, :function]
+  backends: [:console, {ExSyslogger, :syslog}],
+  console: [
+    level: :warn,
+    format: {UcxUcc.Logger.Formatter, :console},
+    compile: "[$level] $metadata$message\n",
+    metadata: [:module, :function, :line]
   ],
 
   # the following section controls logging to syslog
   syslog: [
-    appid: "ucx_ucc", host: '127.0.0.1', facility: :local5,
+    level: :info,
+    ident: "ucx_ucc",
+    facility: :local5,
+    formatter: UcxUcc.Logger.Formatter,
 
     # syslog already prints timestamp, so no $date and $time needed
     # format: "$date $time [$level] $metadata$message\n",
     format: "[$level] $metadata$message\n",
-    # to enable category, module, function, and line numbers, use the following:
-    # metadata: [:catgy, :module, :function, :line]
-    metadata: [:module, :function]
+    metadata: [:module, :function, :line],
+    option: :pid
   ]
-
 ]
 
 config :conform, verbosity: :quiet

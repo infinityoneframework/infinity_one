@@ -7,6 +7,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   alias UccChatWeb.ClientView
   alias UccChat.{MessageService, SideNavService}
   alias UcxUcc.Accounts
+  alias UcxUccWeb.Query
 
   require Logger
 
@@ -43,7 +44,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   def start_loading_animation(socket, elem) do
     socket
     |> page_loading
-    |> broadcast_js("$('#{elem}').next().after('#{ClientView.loading_animation}')")
+    |> async_js("$('#{elem}').next().after('#{ClientView.loading_animation}')")
     socket
   end
 
@@ -55,7 +56,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def set_ucxchat_room(socket, room, display_name, _route \\ "channels") do
-    broadcast_js(socket, "window.UccChat.ucxchat.room = '#{room}'; " <>
+    async_js(socket, "window.UccChat.ucxchat.room = '#{room}'; " <>
       "window.UccChat.ucxchat.display_name = '#{display_name}'")
     |> case do
       {:ok, _} ->
@@ -72,7 +73,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def push_history(socket) do
-    broadcast_js(socket, "history.replaceState(history.state, " <>
+    async_js(socket, "history.replaceState(history.state, " <>
       "window.UccChat.ucxchat.display_name, '/' + ucxchat.room_route " <>
       "+ '/' + window.UccChat.ucxchat.display_name)")
     |> case do
@@ -90,7 +91,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def replace_history(socket) do
-    broadcast_js(socket, "history.replaceState(history.state, " <>
+    async_js(socket, "history.replaceState(history.state, " <>
       "ucxchat.display_name, '/' + ucxchat.room_route + '/' + " <>
       "ucxchat.display_name)")
     |> case do
@@ -102,18 +103,14 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def toastr!(socket, which, message) do
-    case toastr socket, which, message do
-      {:ok, _} ->
-        socket
-      {:error, error} ->
-        Logger.error "toastr failed with error: #{inspect error}"
-        socket
-    end
+    Logger.info "toastr! has been been deprecated! Please use toastr/3 instead."
+    toastr socket, which, message
+    socket
   end
 
   def toastr(socket, which, message) do
     message = Poison.encode! message
-    broadcast_js socket, ~s{window.toastr.#{which}(#{message});}
+    async_js socket, ~s{window.toastr.#{which}(#{message});}
   end
 
   def broadcast_room_icon(socket, room_name, icon_name) do
@@ -150,16 +147,16 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def push_message_box(socket, channel_id, user_id) do
-    update socket, :html,
+    Query.update socket, :html,
       set: MessageService.render_message_box(channel_id, user_id),
       on: ".room-container footer.footer"
   end
 
   def broadcast_message_box(socket, channel_id, user_id) do
     html = MessageService.render_message_box(channel_id, user_id)
-    html_str = Poison.encode! html
-    do_broadcast_js socket, "console.log('user_id', '#{user_id}');"
-    do_broadcast_js socket, "console.log('html', '#{html_str}');"
+    # html_str = Poison.encode! html
+    # do_broadcast_js socket, "console.log('user_id', '#{user_id}');"
+    # do_broadcast_js socket, "console.log('html', '#{html_str}');"
 
     update! socket, :html,
       set: html,
@@ -173,20 +170,20 @@ defmodule UccChatWeb.RebelChannel.Client do
     Logger.info "username: " <> user.username
     Logger.info html
 
-    update socket, :html,
+    Query.update socket, :html,
       set: html,
       # set: SideNavService.render_rooms_list(channel_id, user_id),
       on: "aside.side-nav .rooms-list"
   end
 
   def update_main_content_html(socket, view, template, bindings) do
-    update socket, :html,
+    Query.update socket, :html,
       set: render_to_string(view, template, bindings),
       on: ".main-content"
   end
 
   def scroll_bottom(socket, selector) do
-    broadcast_js socket, scroll_bottom_js(selector)
+    async_js socket, scroll_bottom_js(selector)
     socket
   end
 
@@ -216,7 +213,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def set_caret_position(socket, selector, start, finish) do
-    broadcast_js socket, set_caret_position_js(selector, start, finish)
+    async_js socket, set_caret_position_js(selector, start, finish)
   end
 
   def set_caret_position!(socket, selector, start, finish) do
@@ -234,7 +231,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def more_channels(socket, html) do
-    broadcast_js socket, more_channels_js(html)
+    async_js socket, more_channels_js(html)
   end
 
   def more_channels_js(html) do

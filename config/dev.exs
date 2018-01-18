@@ -54,8 +54,9 @@ config :ucx_ucc, :ucc_tracer_level, :debug
 
 config :logger, :console,
   level: :info,
+  format: {UcxUcc.Logger.Formatter, :console},
   # level: :error,
-  format: "\n$time [$level]$levelpad$metadata$message\n",
+  compile: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]
 
 # Set a higher stacktrace during development. Avoid configuring such

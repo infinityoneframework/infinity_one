@@ -8,6 +8,7 @@ defmodule UccAdmin.Page do
 
       alias UccAdminWeb.AdminChannel
       alias UccChatWeb.RebelChannel.SideNav
+      alias UcxUccWeb.Query
 
       require Logger
 
@@ -26,9 +27,9 @@ defmodule UccAdmin.Page do
         html = Phoenix.View.render_to_string page.view, page.template, bindings
         admin_flex = AdminChannel.render_to_string("admin_flex.html", user: user)
         socket
-        |> update(:html, set: html, on: ".main-content")
-        |> update(:html, set: admin_flex, on: ".flex-nav section")
-        |> broadcast_js(active_link_js(page))
+        |> Query.update(:html, set: html, on: ".main-content")
+        |> Query.update(:html, set: admin_flex, on: ".flex-nav section")
+        |> async_js(active_link_js(page))
         socket
       end
 

@@ -21,8 +21,6 @@ defmodule UccAdminWeb.AdminChannel do
 
   def admin_link(id, socket, sender) do
     page = UccAdmin.get_page id
-    # Logger.debug "page: #{inspect page}"
-    # Logger.warn "sender: #{inspect sender}"
     {:noreply, apply(page.module, :open, [socket, sender, page])}
   end
 

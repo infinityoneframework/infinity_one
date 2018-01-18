@@ -50,6 +50,7 @@ defmodule UccChatWeb.UserChannel do
   alias UccChatWeb.RebelChannel.Client
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
   alias UcxUcc.UccPubSub
+  alias UcxUccWeb.Query
 
   require UccChat.ChatConstants, as: CC
 
@@ -784,8 +785,11 @@ defmodule UccChatWeb.UserChannel do
     # TODO: add Hooks for this
     # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     subscribe_callback "user:all", "callback", :user_all_event
+
     # TODO: Add hooks for this
     subscribe_callback "user:" <> user_id, "presence:change", {UcxPresenceWeb.Channel.Presence, :presence_change}
+    subscribe_callback "user:all", "status_message:update", :status_message_update
+
     {:noreply, socket}
   end
 
@@ -1114,6 +1118,108 @@ defmodule UccChatWeb.UserChannel do
 
     socket
   end
+
+  #################################
+  # Status Messages Implementation
+  #
+
+  def change_status_message(socket, sender) do
+    Logger.debug fn -> inspect(sender) end
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    account = user.account
+
+    case sender["value"] do
+      "__new__" ->
+        account
+        |> push_status_message_select(socket)
+        |> show_status_message_input()
+        |> async_js(~s/$('.status-message-input input').focus();/)
+
+      "__clear__" ->
+        case UcxUcc.Accounts.update_account(account, %{status_message: ""}) do
+          {:ok, account} ->
+            Client.toastr(socket, :success, ~g(Your status message as been cleared))
+            account
+          {:error, _} ->
+            Client.toastr socket, :error, ~g(Problem updating clearing your status message)
+            account
+        end
+        |> push_status_message_select(socket)
+        |> Rebel.Query.execute(:click, on: ".account-box.active")
+        |> broadcast_status_message(user.username, "")
+
+      "" ->
+        if sender["event"]["type"] == "click" do
+          async_js socket, "$('.status-message-input input').change();"
+        else
+          socket
+          |> Rebel.Query.execute(:click, on: ".account-box.active")
+          |> show_status_message_select()
+        end
+
+      message  ->
+        message = String.trim(message)
+        user = Accounts.get_user socket.assigns.user_id, preload: [:account]
+        case UccChat.Accounts.update_status_message(user.account, message) do
+          {:ok, account} ->
+            account
+            |> push_status_message_select(socket)
+            |> Client.toastr(:success, ~g(Your status message was updated))
+            |> broadcast_status_message(user.username, message)
+          {:error, _} ->
+            Client.toastr socket, :error, ~g(Problem updating your status message)
+        end
+        socket
+        |> Rebel.Query.execute(:click, on: ".account-box.active")
+        |> show_status_message_select()
+    end
+
+    socket
+  end
+
+  def cancel_status_message(socket, sender) do
+    Logger.debug fn -> inspect(sender) end
+    async_js socket, "$('.status-message-input').hide(); $('.status-message-select').show();"
+    socket
+  end
+
+  defp push_status_message_select(account, socket) do
+    html =
+      Phoenix.View.render_to_string(UccChatWeb.SideNavView,
+        "account_box_status_select.html", account: account)
+    Query.update(socket, :replaceWith, set: html, on: ".status-message-select")
+  end
+
+  defp show_status_message_select(socket) do
+    async_js(socket, "$('.status-message-select').show(); $('.status-message-input').hide();")
+    socket
+  end
+
+  defp show_status_message_input(socket) do
+    async_js(socket, "$('.status-message-select').hide(); $('.status-message-input').show();")
+    socket
+  end
+
+  defp broadcast_status_message(socket, username, message) do
+    UccPubSub.broadcast "user:all", "status_message:update", %{username: username, message: message}
+    socket
+  end
+
+  @doc """
+  The user callback used to update status messages.
+
+  This is a UccPubSub Callback.
+
+  Note: This is run for all users in the system. It does not check to see if a user is
+        subscribed or not. It should really to that.
+
+  TBD: Implement a filter to only push out if the user is subscribed to this person.
+  """
+  def status_message_update("status_message:update", %{username: username, message: message}, socket) do
+    Query.update socket, :text, set: message, on: ~s(.status-message[data-username="#{username}"])
+  end
+
+  # End of States messages implementation
 
   # TOOD: this needs to be moved like the video stuff
   def start_audio_call(socket, sender) do

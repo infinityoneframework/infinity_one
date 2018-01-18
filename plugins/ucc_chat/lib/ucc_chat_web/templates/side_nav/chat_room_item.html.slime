@@ -7,6 +7,8 @@ li(class="room-link #{chat_room_item_li_class(@room)}")
 
     span(class="name #{@room[:archived]}")
       = @room[:display_name]
+      = if message = user_status_message(@room) do
+        span.status-message.color-primary-action-color(data-username="#{@room[:display_name]}")= message
 
     span.opt
       i.icon-eye-off.hide-room(title="Hide room" aria-label="Hide room")

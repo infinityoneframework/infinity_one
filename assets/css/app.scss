@@ -355,3 +355,112 @@ footer.footer span.version {
   }
 }
 
+.room-link {
+  .status-message {
+    font-size: x-small;
+    vertical-align: top;
+    padding-left: 8px;
+    text-overflow: ellipsis;
+  }
+  &.active .status-message {
+    color: white;
+    font-weight: bold;
+  }
+}
+
+nav.options {
+  .status-message-box {
+    padding-left: 14px;
+    padding-right: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #888;
+    margin-top: 10px;
+    position: relative;
+
+    .select-arrow {
+      right: 12px;
+      i {
+        color: rgba(255,255,255,0.3);
+      }
+    }
+    option[value="__clear__"] { color: red; }
+    option[value="__new__"] { color: green; }
+
+    &:before {
+      content: 'Status Message';
+      position: absolute;
+      right: 12px;
+      top: -20px;
+      color: rgba(255,255,255,0.3);
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border-width: 1px;
+      background-color: rgba(255,255,255,0.1);
+      &:focus {
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+    .status-message-input {
+      .buttons {
+        position: absolute;
+        border-radius: 0 4px 4px 0;
+        top: 2px;
+        right: 14px;
+        .button {
+          padding: 0px;
+          display: inline-block;
+          background-color: #6c6c6c;
+          width: 22px;
+          height: 31px;
+          border-width: 0;
+          &.save {
+            border-radius: 0 5px 5px 0;
+          }
+        }
+      }
+    }
+  }
+}
+.account-box .options {
+  button,
+  a {
+    padding: 12px 12px;
+  }
+}
+
+.account-box {
+  .status-message {
+    display: block;
+    font-size: x-small;
+    color: #a6d256;
+  }
+}
+.room-topic.status-message {
+  color: #5a7920;
+}
+nav.options {
+  button.phone-status.idle,
+  button.status.online {
+    &:before {
+      position: absolute;
+      right: 12px;
+      top: 5px;
+      color: rgba(255,255,255,0.3);
+    }
+  }
+  button.status.online {
+    &:before {
+      content: 'Chat Status';
+    }
+  }
+  button.phone-status.idle {
+    &:before {
+      content: 'Phone Status';
+    }
+  }
+}
+
+

@@ -333,19 +333,6 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: false,
       to: "logger.level"
     ],
-    "logger.backends": [
-      commented: false,
-      datatype: [
-        list: :atom
-      ],
-      default: [
-        Logger.Backends.Syslog,
-        :console
-      ],
-      doc: "Logger back ends.",
-      hidden: false,
-      to: "logger.backends"
-    ],
     "logger.console.level": [
       commented: false,
       datatype: :atom,
@@ -354,16 +341,6 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: false,
       to: "logger.console.level"
     ],
-    "logger.console.format": [
-      commented: false,
-      datatype: :binary,
-      default: """
-      [$level] $metadata$message
-      """,
-      doc: "The console logging format.",
-      hidden: false,
-      to: "logger.console.format"
-    ],
     "logger.console.metadata": [
       commented: false,
       datatype: [
@@ -371,45 +348,12 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       ],
       default: [
         :module,
-        :function
+        :function,
+        :line
       ],
       doc: "The console logging metadata.",
       hidden: false,
       to: "logger.console.metadata"
-    ],
-    "logger.syslog.appid": [
-      commented: false,
-      datatype: :binary,
-      default: "ucx_ucc",
-      doc: "The syslog logging app id.",
-      hidden: false,
-      to: "logger.syslog.appid"
-    ],
-    "logger.syslog.host": [
-      commented: false,
-      datatype: :charlist,
-      default: '127.0.0.1',
-      doc: "The syslog host IP address.",
-      hidden: false,
-      to: "logger.syslog.host"
-    ],
-    "logger.syslog.facility": [
-      commented: false,
-      datatype: :atom,
-      default: :local5,
-      doc: "The syslog facility name.",
-      hidden: false,
-      to: "logger.syslog.facility"
-    ],
-    "logger.syslog.format": [
-      commented: false,
-      datatype: :binary,
-      default: """
-      [$level] $metadata$message
-      """,
-      doc: "The syslog logger message format.",
-      hidden: false,
-      to: "logger.syslog.format"
     ],
     "logger.syslog.metadata": [
       commented: false,
@@ -418,7 +362,8 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       ],
       default: [
         :module,
-        :function
+        :function,
+        :line
       ],
       doc: "The syslog logger message metadata",
       hidden: false,
@@ -525,15 +470,15 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
 
       {Elixir.ExAmi.TcpConnection, [host: ip, port: port]}
     end,
-  "ucx_ucc.message_replacement_patterns": fn conf ->
-    Enum.reduce Conform.Conf.get(conf, "ucx_ucc.message_replacement_patterns"), [], fn
-      {_, []}, acc -> acc
-      {_, list}, acc ->
-        list
-        |> Enum.chunk_every(2, 2, :discard)
-        |> Enum.map(fn [a, b] -> {a, b} end)
+    "ucx_ucc.message_replacement_patterns": fn conf ->
+      Enum.reduce Conform.Conf.get(conf, "ucx_ucc.message_replacement_patterns"), [], fn
+        {_, []}, acc -> acc
+        {_, list}, acc ->
+          list
+          |> Enum.chunk_every(2, 2, :discard)
+          |> Enum.map(fn [a, b] -> {a, b} end)
+      end
     end
-  end
   ],
   validators: []
 ]

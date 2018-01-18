@@ -142,4 +142,14 @@ defmodule UccChatWeb.MasterView do
     UccChat.settings = chat_settings;
     """
   end
+
+  def status_message(chatd, name) do
+    chatd.room_map
+    |> Map.values
+    |> Enum.find(& &1.display_name == name)
+    |> case do
+      %{status_message: message} -> message
+      _ -> ""
+    end
+  end
 end

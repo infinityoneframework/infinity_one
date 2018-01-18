@@ -192,11 +192,11 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   def notify_update_success(socket, %{id: "admin_user_info"}, _sender, %{resource_params: _params} = opts, client) do
     UccPubSub.broadcast "phone_number", "admin", opts
-    client.broadcast_js socket, click_users_link_js()
+    client.async_js socket, click_users_link_js()
     socket
   end
   def notify_update_success(socket, %{id: "admin_user_info"}, _sender, _opts, client) do
-    client.send_js socket, click_users_link_js()
+    client.async_js socket, click_users_link_js()
     socket
   end
 
