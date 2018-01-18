@@ -2,6 +2,7 @@ defmodule UccChatWeb.SideNavView do
   use UccChatWeb, :view
 
   alias UcxUcc.Hooks
+  alias UcxUcc.Accounts.Account
 
   require Logger
   # import UccChat.AvatarService, only: [avatar_url: 1]
@@ -48,5 +49,22 @@ defmodule UccChatWeb.SideNavView do
     Hooks.nav_room_item_icons [], room
   end
 
+  def user_status_message(%Account{status_message: ""}), do: nil
+  def user_status_message(%Account{status_message: message}), do: message
+
+  def user_status_message(room) do
+    if room.channel_type == 2 and room.user.account.status_message do
+      room.user.account.status_message
+    end
+  end
+
+  def status_message_list(account) do
+    list =
+      account
+      |> UccChat.Accounts.get_status_message_history
+      |> Enum.map(& {&1, &1})
+
+    [{"➖" <> ~g" (No Message)", "__clear__"}, {"➕" <> ~g" (Enter new Message)", "__new__"} | list]
+  end
 end
 

@@ -106,6 +106,10 @@ defmodule UcxUcc.Accounts do
     end
   end
 
+  def get_by_username(username, opts \\ []) do
+    get_by_user [{:username, username} | opts]
+  end
+
   @doc """
   Creates a user.
 

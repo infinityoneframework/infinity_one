@@ -243,6 +243,11 @@ class SideNav {
       this.channel_link_click($(e.currentTarget))
       return false
     })
+    .on('click', '.status-message-box', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    })
     // $('button.status').on('click', function(e) {
     //   console.log('clicked status change', $(this).data('status'))
     // })

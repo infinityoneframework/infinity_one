@@ -4,18 +4,8 @@
 
 ### Bug Fixes
 
-* [UCX-2605] Fix client initialization after reset
-
-### Enhancements
-
-* [UCX-3672] Using a different syslog package now with better resolution
-* [UCX-3681] Improved the logger format, reducing noise
-
-## 1.0.0-alpha10 (2018-01-15)
-
-### Bug Fixes
-
 * [UCX-3566] Closing Admin section now closes Admin panels
+* [UCX-2605] Fix client initialization after reset
 
 ### Enhancements
 
@@ -23,6 +13,9 @@
 * [UCX-3672] Add ability to collect and report healh stats
 * [UCX-3671] Enable msec resolution timestamps in syslog
 * [UCX-3667] Improve response time by replacing exec_js with broadcast_js
+* [UCX-3672] Using a different syslog package now with better resolution
+* [UCX-3681] Improved the logger format, reducing noise
+* [UCX-3679] Added status messages
 
 ## 1.0.0-alpha9 (2018-01-14)
 
