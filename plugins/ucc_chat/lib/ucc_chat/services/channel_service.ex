@@ -302,16 +302,20 @@ defmodule UccChat.ChannelService do
   end
 
   defp channel_room(cc, id, _channel, channel_id) do
-    chan = cc.channel
+    chan = cc.channel |> IO.inspect(label: "channel")
     open = chan.id == channel_id
     type = get_chan_type(cc.type, chan.type)
     {display_name, user_status, user} =
       get_channel_display_name(type, chan, id)
     unread = if cc.unread == 0, do: false, else: cc.unread
     # cc = unhide_current_channel(cc, channel_id)
+    status_message =
+      if chan.type == 2 and user.account.status_message != "",
+        do: user.account.status_message, else: nil
 
     %{
       open: open,
+      status_message: status_message,
       has_unread: cc.has_unread,
       unread: unread,
       alert: cc.alert,

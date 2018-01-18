@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 0.2.2 (2018-01-16)
+## 0.2.2 (2018-01-18)
 
 ### Bug Fixes
 
@@ -11,6 +11,7 @@
 * [UCX-3670] Allow Bots in public channels only
 * [UCX-3672] Add ability to collect and report healh stats
 * [UCX-3667] Improve response time by replacing exec_js with broadcast_js
+* [UCX-3679] Added status messages
 
 ## 0.2.1 (2018-01-15)
 

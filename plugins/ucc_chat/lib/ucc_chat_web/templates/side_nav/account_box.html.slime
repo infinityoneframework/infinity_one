@@ -7,12 +7,24 @@
           .avatar-image(style="background-image: url(#{avatar_url @chatd.user});")
       .data
         h4
-          - id = @chatd.user.id
           = get_user_name(@chatd.user)
-          = if Application.get_env :ucx_chat, :debug do
-            span.debug-info= "(#{id})"
+          span.status-message data-username="#{@chatd.user.username}"
+            = if message = user_status_message(@chatd.user.account) do
+              = message
+            - else
+              | &nbsp;
   nav.options.primary-background-color.animated-hidden
     .wrapper(rebel-channel="user")
+      .status-message-box
+        = render "account_box_status_select.html", account: @chatd.user.account
+        .status-message-input style="display: none;"
+          input rebel-change="change_status_message" placeholder="#{~g(Type message)}"
+          .buttons.primary-background-color
+            button.button.cancel.primary-background-color rebel-click="cancel_status_message"
+              i.icon-cancel
+            button.button.save.primary-background-color rebel-click="change_status_message"
+              .icon-ok.success-color
+
       button.status.online(data-status="online" rebel-click="click_status")
         span= ~g(Online)
       button.status.away(data-status="away" rebel-click="click_status")
