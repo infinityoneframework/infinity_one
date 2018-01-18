@@ -244,13 +244,11 @@ class SideNav {
       return false
     })
     .on('click', '.status-message-box', e => {
+      // $('#account_status_message').children().first().attr('disabled', 'disabled')
       e.preventDefault();
       e.stopPropagation();
       return false;
     })
-    // $('button.status').on('click', function(e) {
-    //   console.log('clicked status change', $(this).data('status'))
-    // })
   }
   static show_account_box_menu() {
     if (debug) { console.log('show_account_box_menu'); }

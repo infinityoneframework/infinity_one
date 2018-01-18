@@ -370,15 +370,29 @@ footer.footer span.version {
 
 nav.options {
   .status-message-box {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 14px;
+    padding-right: 12px;
     padding-bottom: 10px;
     border-bottom: 1px solid #888;
+    margin-top: 10px;
     position: relative;
 
+    .select-arrow {
+      right: 12px;
+      i {
+        color: rgba(255,255,255,0.3);
+      }
+    }
     option[value="__clear__"] { color: red; }
     option[value="__new__"] { color: green; }
 
+    &:before {
+      content: 'Status Message';
+      position: absolute;
+      right: 12px;
+      top: -20px;
+      color: rgba(255,255,255,0.3);
+    }
     input {
       width: 100%;
       padding: 8px;
@@ -394,7 +408,7 @@ nav.options {
         position: absolute;
         border-radius: 0 4px 4px 0;
         top: 2px;
-        right: 21px;
+        right: 14px;
         .button {
           padding: 0px;
           display: inline-block;
@@ -410,6 +424,13 @@ nav.options {
     }
   }
 }
+.account-box .options {
+  button,
+  a {
+    padding: 12px 12px;
+  }
+}
+
 .account-box {
   .status-message {
     display: block;
@@ -420,4 +441,26 @@ nav.options {
 .room-topic.status-message {
   color: #5a7920;
 }
+nav.options {
+  button.phone-status.idle,
+  button.status.online {
+    &:before {
+      position: absolute;
+      right: 12px;
+      top: 5px;
+      color: rgba(255,255,255,0.3);
+    }
+  }
+  button.status.online {
+    &:before {
+      content: 'Chat Status';
+    }
+  }
+  button.phone-status.idle {
+    &:before {
+      content: 'Phone Status';
+    }
+  }
+}
+
 
