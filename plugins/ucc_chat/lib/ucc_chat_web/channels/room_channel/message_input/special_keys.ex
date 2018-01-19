@@ -65,12 +65,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
 
   def handle_in(%{app: _} = context, @dn_arrow) do
     # Logger.info "down arrow"
-    MessageInput.broadcast_js context, "UccUtils.downArrow()"
+    MessageInput.async_js context, "UccUtils.downArrow()"
   end
 
   def handle_in(%{app: _, open?: true} = context, @up_arrow) do
     # Logger.info "up arrow"
-    MessageInput.broadcast_js context, "UccUtils.upArrow()"
+    MessageInput.async_js context, "UccUtils.upArrow()"
   end
 
   def handle_in(context, @up_arrow) do

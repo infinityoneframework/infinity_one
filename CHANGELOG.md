@@ -6,6 +6,7 @@
 
 * [UCX-3566] Closing Admin section now closes Admin panels
 * Fixed issues with new status message not showing up in select box until page reload
+* [UCX-3699] Fixed editing message shows up in other user's input box
 
 ### Enhancements
 
