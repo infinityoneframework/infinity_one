@@ -9,6 +9,7 @@
 * [UCX-3699] Fixed editing message shows up in other user's input box
 * [UCX-3703] Fix incorrect message box after making room public
 * [UCX-3661] Fix broken auto grow message input box and make it shrink correctly
+* [UCX-3686] Fix mention linking for usernames with .
 
 ### Enhancements
 
