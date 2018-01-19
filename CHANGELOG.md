@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 * [UCX-3566] Closing Admin section now closes Admin panels
+* Fixed issues with new status message not showing up in select box until page reload
 
 ### Enhancements
 
