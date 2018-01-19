@@ -1,5 +1,16 @@
 # UcxUcc Changelog
 
+## 1.0.0-alpha12 (2018-01-xx)
+
+### Bug Fixes
+
+* [UCX-3664] Fixed incoming call notification bar
+  * Redesign Phone presence server for Asterisk 13
+  * Fixed the call notification alert so it clears correctly
+  * Fixed the answer button on the notification bar
+
+### Enhancements
+
 ## 1.0.0-alpha11 (2018-01-16)
 
 ### Bug Fixes

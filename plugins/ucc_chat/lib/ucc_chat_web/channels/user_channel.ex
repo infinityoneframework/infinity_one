@@ -787,7 +787,7 @@ defmodule UccChatWeb.UserChannel do
     subscribe_callback "user:all", "callback", :user_all_event
 
     # TODO: Add hooks for this
-    subscribe_callback "user:" <> user_id, "presence:change", {UcxPresenceWeb.Channel.Presence, :presence_change}
+    subscribe_callback "user:" <> user_id, "call_state:change", {UcxPresenceWeb.Channel.Presence, :call_state_change}
     subscribe_callback "user:all", "status_message:update", :status_message_update
 
     {:noreply, socket}
@@ -1094,25 +1094,19 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def drop_notify_click(socket, sender) do
-    # Logger.info "sender: " <> inspect(sender)
-    dataset = sender["dataset"]
-    id = dataset["id"]
-    channel = dataset["channel"]
-    # Logger.info inspect({id, channel})
-    if id == "answer_call" && channel do
-      # Logger.info "answering #{dataset["channel"]}"
-      UcxPresence.Server.answer_call dataset["channel"]
-    end
+    UccPubSub.broadcast "drop_notify", "click", sender
     socket
   end
   def drop_notify_cancel(socket, sender) do
+    UccPubSub.broadcast "drop_notify", "cancel", sender
+
     broadcast_js socket, """
       var elem = $('#{this(sender)}').closest('.notice');
       elem.animate({
         height: "0px",
         'font-size': "0px"
       }, 500, function() {
-        elem.delete();
+        elem.remove();
       });
       """ |> String.replace("\n", " ")
 

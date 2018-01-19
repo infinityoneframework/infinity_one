@@ -107,7 +107,8 @@ defmodule UcxUcc.Mixfile do
       {:ex_syslogger, github: "smpallen99/ex_syslogger"},
       # {:ex_syslogger, github: "smpallen99/ex_syslogger"},
       {:gen_smtp, "~> 0.12.0"},
-      {:exprof, "~> 0.2.0"}
+      {:exprof, "~> 0.2.0"},
+      # {:jira_bot, path: "../jira_bot"}
 
     ] ++ plugin_deps()
   end
