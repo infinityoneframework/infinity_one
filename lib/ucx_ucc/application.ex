@@ -6,6 +6,8 @@ defmodule UcxUcc.Application do
   def start(type, args) do
     import Supervisor.Spec
 
+    UcxUcc.CertManager.set_endpoint_certs! :ucx_ucc, UcxUccWeb.Endpoint
+
     # allow plugin access by it name
     # i.e. Application.get_env(:ucc_ucx, :router)
 
