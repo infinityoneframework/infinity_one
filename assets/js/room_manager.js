@@ -482,6 +482,7 @@ class RoomManager {
         } else {
           this.render_room(resp)
           this.bind_history_manager_scroll_event()
+          $('textarea.input-message').autogrow();
         }
         if (callback) { callback() }
         if (debug) { console.log('open_room after callback', this) }

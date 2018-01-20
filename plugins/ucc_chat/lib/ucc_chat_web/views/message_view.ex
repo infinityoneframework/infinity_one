@@ -374,7 +374,7 @@ defmodule UccChatWeb.MessageView do
   end
 
   def encode_mentions(body) do
-    Regex.replace ~r/(^|\s)@([\w]+)/, body,
+    Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body,
       ~s'\\1<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
       ~s' data-fun="flex_user_open" class="mention-link" data-username="\\2">@\\2</a>'
   end

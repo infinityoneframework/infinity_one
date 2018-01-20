@@ -147,20 +147,19 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def push_message_box(socket, channel_id, user_id) do
-    Query.update socket, :html,
-      set: MessageService.render_message_box(channel_id, user_id),
-      on: ".room-container footer.footer"
+    socket
+    |> Query.update(:html, set: MessageService.render_message_box(channel_id, user_id), on: ".room-container footer.footer")
+    |> async_js("$('textarea.input-message').focus().autogrow();")
+    socket
   end
 
   def broadcast_message_box(socket, channel_id, user_id) do
     html = MessageService.render_message_box(channel_id, user_id)
-    # html_str = Poison.encode! html
-    # do_broadcast_js socket, "console.log('user_id', '#{user_id}');"
-    # do_broadcast_js socket, "console.log('html', '#{html_str}');"
 
-    update! socket, :html,
-      set: html,
-      on: ".room-container footer.footer"
+    socket
+    |> update!(:html, set: html, on: ".room-container footer.footer")
+    |> broadcast_js("$('textarea.input-message').autogrow();")
+    socket
   end
 
   def push_rooms_list_update(socket, channel_id, user_id) do

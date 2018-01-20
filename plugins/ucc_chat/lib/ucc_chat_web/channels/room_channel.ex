@@ -218,9 +218,8 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-
   def handle_out("update:message_box", _payload, socket) do
-    Client.broadcast_message_box socket, socket.assigns.channel_id,
+    Client.push_message_box socket, socket.assigns.channel_id,
       socket.assigns.user_id
     {:noreply, socket}
   end

@@ -302,7 +302,7 @@ defmodule UccChat.ChannelService do
   end
 
   defp channel_room(cc, id, _channel, channel_id) do
-    chan = cc.channel |> IO.inspect(label: "channel")
+    chan = cc.channel
     open = chan.id == channel_id
     type = get_chan_type(cc.type, chan.type)
     {display_name, user_status, user} =

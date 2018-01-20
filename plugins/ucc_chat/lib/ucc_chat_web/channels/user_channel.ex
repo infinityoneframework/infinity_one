@@ -1123,8 +1123,7 @@ defmodule UccChatWeb.UserChannel do
         if sender["event"]["type"] == "click" do
           async_js socket, "$('.status-message-input input').change();"
         else
-          account
-          |> push_status_message_select(socket)
+          socket
           |> Rebel.Query.execute(:click, on: ".account-box.active")
           |> show_status_message_select()
         end
@@ -1133,8 +1132,9 @@ defmodule UccChatWeb.UserChannel do
         message = String.trim(message)
         user = Accounts.get_user socket.assigns.user_id, preload: [:account]
         case UccChat.Accounts.update_status_message(user.account, message) do
-          {:ok, _} ->
-            socket
+          {:ok, account} ->
+            account
+            |> push_status_message_select(socket)
             |> Client.toastr(:success, ~g(Your status message was updated))
             |> broadcast_status_message(user.username, message)
           {:error, _} ->

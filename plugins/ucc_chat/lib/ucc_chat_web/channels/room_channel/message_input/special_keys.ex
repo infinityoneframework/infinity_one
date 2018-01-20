@@ -5,6 +5,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
   alias MessageInput.SlashCommands
   alias UccChat.MessageService
+  alias UccChatWeb.Client
 
   use UccChatWeb.RoomChannel.Constants
   require Logger
@@ -65,12 +66,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
 
   def handle_in(%{app: _} = context, @dn_arrow) do
     # Logger.info "down arrow"
-    MessageInput.broadcast_js context, "UccUtils.downArrow()"
+    Client.async_js context.socket, "UccUtils.downArrow()"
   end
 
   def handle_in(%{app: _, open?: true} = context, @up_arrow) do
     # Logger.info "up arrow"
-    MessageInput.broadcast_js context, "UccUtils.upArrow()"
+    Client.async_js context.socket, "UccUtils.upArrow()"
   end
 
   def handle_in(context, @up_arrow) do
