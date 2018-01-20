@@ -19,6 +19,8 @@
 
 ### Enhancements
 
+* [UCX-3708] Made the WebRTC client compact theme the default
+
 ## 1.0.0-alpha11 (2018-01-16)
 
 ### Bug Fixes
