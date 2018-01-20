@@ -1,6 +1,6 @@
 %{"arc": {:hex, :arc, "0.8.0", "bb7cf8ea50f30f9c2bb357270c074def42a7ec6a3b4605be731cc5faf8fde6fd", [:mix], [{:ex_aws, "~> 1.1", [hex: :ex_aws, repo: "hexpm", optional: true]}, {:httpoison, "~> 0.11", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 2.2 or ~> 3.1", [hex: :poison, repo: "hexpm", optional: true]}, {:sweet_xml, "~> 0.6", [hex: :sweet_xml, repo: "hexpm", optional: true]}], "hexpm"},
   "arc_ecto": {:hex, :arc_ecto, "0.7.0", "428ed7ea4ed0be8996d8fc6e9f651d3e26fe9c9063f26cbf6731c865369845d3", [:mix], [{:arc, "~> 0.8.0", [hex: :arc, repo: "hexpm", optional: false]}, {:ecto, "~> 2.0", [hex: :ecto, repo: "hexpm", optional: false]}], "hexpm"},
-  "auto_linker": {:git, "https://github.com/smpallen99/auto_linker.git", "10cf319731366ca34e8b1a913c948efb38a6f876", []},
+  "auto_linker": {:hex, :auto_linker, "0.2.1", "ef48a91e40cb4a70a8fe5dae5462aa140f5c83b81287467c7b99fe68ef443831", [:mix], [], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "calliope": {:hex, :calliope, "0.4.1", "8b7034343d247199bcf267a6e07ea296dc99ac1e90413c197114c8df0fa0b436", [:mix], [], "hexpm"},
   "certifi": {:hex, :certifi, "2.0.0", "a0c0e475107135f76b8c1d5bc7efb33cd3815cb3cf3dea7aefdd174dabead064", [:rebar3], [], "hexpm"},

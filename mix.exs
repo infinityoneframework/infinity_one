@@ -70,8 +70,8 @@ defmodule UcxUcc.Mixfile do
       # {:coherence, path: "../coherence3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.7.0"},
-      # {:auto_linker, "~> 0.2"},
-      {:auto_linker, github: "smpallen99/auto_linker"},
+      {:auto_linker, "~> 0.2"},
+      # {:auto_linker, github: "smpallen99/auto_linker"},
       # {:auto_linker, path: "../auto_linker"},
       {:link_preview, "~> 1.0.0"},
       {:cowboy, "~> 1.0"},
@@ -107,7 +107,8 @@ defmodule UcxUcc.Mixfile do
       {:ex_syslogger, github: "smpallen99/ex_syslogger"},
       # {:ex_syslogger, github: "smpallen99/ex_syslogger"},
       {:gen_smtp, "~> 0.12.0"},
-      {:exprof, "~> 0.2.0"}
+      {:exprof, "~> 0.2.0"},
+      # {:jira_bot, path: "../jira_bot"}
 
     ] ++ plugin_deps()
   end

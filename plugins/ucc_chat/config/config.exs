@@ -37,6 +37,7 @@ config :ucx_ucc, UccChat.Robot, [
     {HedwigSimpleResponders.Fishpun, []},
     {HedwigSimpleResponders.Slime, []},
     {HedwigSimpleResponders.Slogan, []},
+    # {JiraBot, []}
   ]
 ]
 
