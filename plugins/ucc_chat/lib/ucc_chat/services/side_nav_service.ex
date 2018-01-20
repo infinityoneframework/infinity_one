@@ -7,6 +7,15 @@ defmodule UccChat.SideNavService do
   alias UccChat.Schema.Direct, as: DirectSchema
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
 
+  def render_rooms_list_seach(match, user_id, opts \\ [], channel_id \\ nil) do
+    user = Helpers.get_user! user_id
+    channel = if channel_id, do: Channel.get(channel_id), else: nil
+
+    chatd = ChatDat.new_search(user, match, channel, opts)
+
+    render_to_string UccChatWeb.SideNavView, "rooms_list.html", chatd: chatd
+  end
+
   def render_rooms_list(channel_id, user_id) do
     user = Helpers.get_user! user_id
     channel = if channel_id, do: Channel.get(channel_id), else: nil

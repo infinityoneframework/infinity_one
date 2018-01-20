@@ -383,3 +383,23 @@ nav.options {
   color: #5a7920;
 }
 
+.side-nav .rooms-list {
+  &.search {
+    h3,
+    .empty,
+    .more {
+      display: none;
+    }
+    .opt {
+      display: none;
+    }
+    li.room-link.active {
+      background-color: inherit !important;
+    }
+    .search-empty {
+      padding-top: 15px;
+      padding-left: 5px;
+      font-weight: bold;
+    }
+  }
+}

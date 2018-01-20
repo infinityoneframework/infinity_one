@@ -18,6 +18,7 @@
 * [UCX-3672] Add ability to collect and report healh stats
 * [UCX-3667] Improve response time by replacing exec_js with broadcast_js
 * [UCX-3679] Added status messages
+* Implement SideNav Channel Search
 
 ## 0.2.1 (2018-01-15)
 

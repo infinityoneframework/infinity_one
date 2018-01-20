@@ -8,7 +8,7 @@ defmodule UccChat.ChatDat do
   defstruct user: nil, room_types: [], settings: %{}, rooms: [],
             channel: nil, messages: nil, room_map: %{}, active_room: %{},
             status: "offline", room_route: "channels", messages_info: %{},
-            previews: []
+            previews: [], search_empty: false
 
   def new(user, channel, messages \\ [])
   def new(%User{roles: %Ecto.Association.NotLoaded{}} = user,
@@ -42,6 +42,8 @@ defmodule UccChat.ChatDat do
     }
   end
 
+  def new(%User{} = user, nil, _), do: new(user)
+
   def new(%User{} = user, channel_id, messages) do
     channel = Channel.get(channel_id)
     new(user, channel, messages)
@@ -65,6 +67,33 @@ defmodule UccChat.ChatDat do
       active_room: 0,
       room_route: "home"
     }
+  end
+
+  def new_search(user, match, channel_id, opts \\ [])
+  def new_search(%{} = user, match, channel_id, opts) do
+    %{room_types: room_types, rooms: rooms, room_map: room_map,
+      active_room: _ar, search_empty: empty} =
+        UccChat.ChannelService.get_side_nav_search(user, match, channel_id, opts)
+
+    status = UccChat.PresenceAgent.get user.id
+    %__MODULE__{
+      status: status,
+      user: user,
+      room_types: room_types,
+      rooms: rooms,
+      room_map: room_map,
+      channel: nil,
+      messages: [],
+      active_room: 0,
+      room_route: "home",
+      search_empty: empty,
+    }
+  end
+
+  def new_search(user_id, match, channel_id, opts) do
+    user_id
+    |> Accounts.get_user
+    |> new_search(match, channel_id, opts)
   end
 
   def get_messages_info(chatd) do

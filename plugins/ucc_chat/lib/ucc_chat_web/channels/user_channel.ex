@@ -1497,6 +1497,9 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+  defdelegate side_nav_search_click(socket, sender), to: __MODULE__.SideNav.Search, as: :search_click
+  defdelegate side_nav_search_keydown(socket, sender), to: __MODULE__.SideNav.Search, as: :search_keydown
+  defdelegate side_nav_search_blur(socket, sender), to: __MODULE__.SideNav.Search, as: :search_blur
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer
