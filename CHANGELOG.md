@@ -5,6 +5,8 @@
 ### Bug Fixes
 
 * [UCX-3566] Closing Admin section now closes Admin panels
+* [UCX-3654] Ucc: Headset configuration failure causes speech path issue on Ucx Ucc phone client
+
 
 ### Enhancements
 
