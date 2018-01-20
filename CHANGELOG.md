@@ -8,6 +8,14 @@
   * Redesign Phone presence server for Asterisk 13
   * Fixed the call notification alert so it clears correctly
   * Fixed the answer button on the notification bar
+* [UCX-3654] Ucc: Headset configuration failure causes speech path issue on Ucx Ucc phone client
+* Fixed issues with new status message not showing up in select box until page reload
+* [UCX-3699] Fixed editing message shows up in other user's input box
+* [UCX-3703] Fix incorrect message box after making room public
+* [UCX-3661] Fix broken auto grow message input box and make it shrink correctly
+* [UCX-3686] Fix mention linking for usernames with .
+* [UCX-3707] Fixed auto linking phone number errors
+* [UCX-3607] Fixed the blue flashing led
 
 ### Enhancements
 

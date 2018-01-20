@@ -97,8 +97,10 @@ defmodule UccChatWeb.Client do
     do: "var elem = document.querySelector('#{@message_box}'); elem.focus();"
 
   def clear_message_box(socket) do
-    async_js socket, clear_message_box_js()
-    set_inputbox_buttons socket, false
+    assigns = socket.assigns
+    socket
+    |> UccChatWeb.RebelChannel.Client.push_message_box(assigns.channel_id, assigns.user_id)
+    |> set_inputbox_buttons(false)
   end
 
   def clear_message_box_js,

@@ -95,12 +95,11 @@ defmodule UccChatWeb.ChannelController do
 
   def direct(conn, %{"name" => name}) do
     with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(name),
-         user_id <- Coherence.current_user(conn) |>  Map.get(:id),
+         user_id <- Coherence.current_user(conn) |> Map.get(:id),
          false <- user.id == user_id do
 
       case get_direct(user_id, name) do
         nil ->
-          IO.inspect {user_id, name}
           # create the direct and redirect
           ChannelService.add_direct(name, user_id, nil) #  |> IO.inspect(label: "direct")
           direct = get_direct(user_id, name) #|> IO.inspect(label: "direct 1")

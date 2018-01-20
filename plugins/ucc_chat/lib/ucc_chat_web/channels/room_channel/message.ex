@@ -346,7 +346,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
   def start_editing(socket, message_id, client) do
     Rebel.put_assigns socket, :edit_message_id, message_id
-    Logger.info "editing #{message_id}"
+    Logger.debug fn ->  "editing #{message_id}" end
     message = Message.get message_id, preload: [:attachments]
     body =
       case message.attachments do
@@ -354,7 +354,7 @@ defmodule UccChatWeb.RoomChannel.Message do
         [att | _] -> att.description
       end
       |> Poison.encode!
-    client.broadcast_js socket, set_editing_js(message_id, body)
+    client.async_js socket, set_editing_js(message_id, body)
   end
 
   def open_edit(socket, client \\ Client) do
