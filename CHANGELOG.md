@@ -20,6 +20,7 @@
 * [UCX-3679] Added status messages
 * Implement SideNav Channel Search
 * Implement SideNav More Channels Filters
+* Implement SideNav Create channel
 
 ## 0.2.1 (2018-01-15)
 

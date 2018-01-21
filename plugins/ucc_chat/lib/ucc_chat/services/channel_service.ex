@@ -1206,7 +1206,6 @@ defmodule UccChat.ChannelService do
   def invite_user(user, channel_id, current_user_id \\ [], opts \\ [])
   def invite_user(%User{} = user, channel_id, current_user_id, opts)
     when is_binary(current_user_id) do
-    user.id
     invite_user(user.id, channel_id, opts)
   end
 

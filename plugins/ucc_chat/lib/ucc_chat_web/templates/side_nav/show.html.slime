@@ -15,7 +15,7 @@ aside.side-nav.primary-background-color.color-tertiary-font-color(role="navigati
     .unread-rooms.background-primary-action-color.color-primary-action-contrast.bottom-unread-rooms.hidden
       = ~g(More unreads)
       i.icon-down-big
-    .flex-nav.primary-background-color.animated-hidden
+    .flex-nav.create-channel.primary-background-color.animated-hidden
       section
         = render "create_combined_flex.html"
         / = #render @side_nav[:flex_template], conn: @conn, flex_data: @side_nav[:flex_data]

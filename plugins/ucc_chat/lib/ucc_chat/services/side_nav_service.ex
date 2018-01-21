@@ -35,6 +35,12 @@ defmodule UccChat.SideNavService do
   end
 
   def render_more_users(user_id) do
+    {user, users} = get_more_users(user_id)
+    render_to_string UccChatWeb.SideNavView, "list_users_flex.html",
+      UcxUcc.Hooks.render_users_bindings([users: users, current_user: user])
+  end
+
+  def get_more_users(user_id) do
     user = Helpers.get_user! user_id
     preload = UcxUcc.Hooks.user_preload [:roles, user_roles: :role]
     users =
@@ -58,9 +64,7 @@ defmodule UccChat.SideNavService do
           struct(user, subscription_hidden: sub.hidden,
             status: UccChat.PresenceAgent.get(user.id))
       end)
-
-    render_to_string UccChatWeb.SideNavView, "list_users_flex.html",
-      UcxUcc.Hooks.render_users_bindings([users: users, current_user: user])
+    {user, users}
   end
 
 end
