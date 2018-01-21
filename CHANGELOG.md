@@ -19,6 +19,7 @@
 * [UCX-3667] Improve response time by replacing exec_js with broadcast_js
 * [UCX-3679] Added status messages
 * Implement SideNav Channel Search
+* Implement SideNav More Channels Filters
 
 ## 0.2.1 (2018-01-15)
 

@@ -253,6 +253,23 @@ defmodule UccChat.ChannelService do
   ##################
   #
 
+  def get_side_nav_rooms_search(%User{} = user, pattern, opts \\ []) do
+    pattern =
+      if opts[:fuzzy] do
+        pattern
+        |> String.to_charlist
+        |> Enum.intersperse("%")
+        |> to_string
+      else
+        pattern
+      end
+
+    user.id
+    |> Channel.get_channels_by_pattern("%" <> pattern <> "%", 1000)
+    |> order_by([c], [asc: c.name])
+    |> Repo.all
+  end
+
   def get_side_nav_rooms(%User{} = user) do
     user
     |> Channel.get_all_channels

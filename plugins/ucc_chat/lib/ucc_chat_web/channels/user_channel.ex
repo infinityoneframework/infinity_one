@@ -1500,6 +1500,8 @@ defmodule UccChatWeb.UserChannel do
   defdelegate side_nav_search_click(socket, sender), to: __MODULE__.SideNav.Search, as: :search_click
   defdelegate side_nav_search_keydown(socket, sender), to: __MODULE__.SideNav.Search, as: :search_keydown
   defdelegate side_nav_search_blur(socket, sender), to: __MODULE__.SideNav.Search, as: :search_blur
+  defdelegate side_nav_channels_select(socket, sender), to: __MODULE__.SideNav.Channels, as: :channels_select
+  defdelegate side_nav_channels_search(socket, sender), to: __MODULE__.SideNav.Channels, as: :channels_search
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer

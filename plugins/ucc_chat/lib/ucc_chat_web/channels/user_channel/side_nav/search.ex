@@ -21,7 +21,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Search do
   end
 
   def search_blur(socket, sender) do
-    assigns = socket.assigns |> IO.inspect(label: "assigns")
+    assigns = socket.assigns
     channel_id = if assigns.channel_id == "", do: nil, else: assigns.channel_id
 
     spawn fn ->
