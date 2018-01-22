@@ -16,10 +16,12 @@
 * [UCX-3686] Fix mention linking for usernames with .
 * [UCX-3707] Fixed auto linking phone number errors
 * [UCX-3607] Fixed the blue flashing led
+* [UCX-3696] Remove the shift toggle aux pad shortcut on the compact theme
 
 ### Enhancements
 
 * [UCX-3708] Made the WebRTC client compact theme the default
+* Added Mac Address display on phone settings page
 
 ## 1.0.0-alpha11 (2018-01-16)
 
