@@ -228,7 +228,7 @@ defmodule UccChat.Channel do
   end
 
   def archive(%ChannelSchema{archived: true} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     changeset =
       channel
       |> changeset(get_user!(user_id), %{archived: true})
@@ -237,7 +237,7 @@ defmodule UccChat.Channel do
   end
 
   def archive(%ChannelSchema{id: id} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     channel
     |> changeset(get_user!(user_id), %{archived: true})
     |> update
@@ -252,7 +252,7 @@ defmodule UccChat.Channel do
   end
 
   def unarchive(%ChannelSchema{archived: false} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     changeset =
       channel
       |> changeset(get_user!(user_id), %{archived: false})
@@ -261,7 +261,7 @@ defmodule UccChat.Channel do
   end
 
   def unarchive(%ChannelSchema{id: id} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     channel
     |> changeset(get_user!(user_id), %{archived: false})
     |> update

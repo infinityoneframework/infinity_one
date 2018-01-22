@@ -1,0 +1,15 @@
+.content
+  = render "flex_close_button.html"
+  .list-view.search-messages-list
+    .title
+      h2= ~g(Search Messages)
+      p
+        = ~g(You can search using RegExp. e.g.)
+        code.code-colors.inline= "/^#{~g(text)}/"
+    .control
+      form.search-form role="form"
+        .input-line.search
+          input#message-search.search.content-background-color type="text" placeholder="#{~g(Search Messages)}" autocomplete="off" rebel-keydown="flex_call" data-id="search" data-fun="search_input"
+          i.icon-search.secondary-font-color
+  ul.list.clearfix(rebel-channel="room")
+

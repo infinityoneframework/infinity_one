@@ -988,6 +988,18 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+  # A generic timer handler that was introduced for the message search
+  # feature. The message is provide with a module, function, arity tuple
+  # as means of a callback.
+  def handle_info({:forward_timeout, {m, f, a}}, socket) do
+    case apply(m, f, [socket | a]) do
+      tuple when is_tuple(tuple) ->
+        tuple
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
   def handle_info(payload, socket) do
     Logger.warn "default handle info payload: #{inspect payload}"
     {:noreply, socket}

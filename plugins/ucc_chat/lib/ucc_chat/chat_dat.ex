@@ -1,6 +1,6 @@
 defmodule UccChat.ChatDat do
   alias UccChat.{Channel, MessageService}
-  alias UcxUcc.{Repo, Hooks, Accounts.User}
+  alias UcxUcc.{Repo, Hooks, Accounts, Accounts.User}
   alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger

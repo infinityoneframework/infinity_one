@@ -4,7 +4,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   import UcxUccWeb.Gettext
 
   alias UcxUccWeb.Query
-  alias UccChat.{SideNavService, Channel, ChannelService}
+  alias UccChat.{Channel, ChannelService}
   alias UccChatWeb.{SideNavView, RebelChannel.Client}
   alias UcxUcc.Accounts
 
@@ -13,7 +13,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   def channels_select(socket, sender, client \\ Client) do
     sender
     |> get_filter_options()
-    |> render_channels(socket.assigns.user_id, socket)
+    |> render_channels(socket.assigns.user_id, socket, client)
   end
 
   def channels_search(socket, sender, client \\ Client) do
@@ -21,10 +21,10 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
     sender
     |> get_filter_options()
     |> Map.put(:search, "%" <> match <> "%")
-    |> render_channels(socket.assigns.user_id, socket)
+    |> render_channels(socket.assigns.user_id, socket, client)
   end
 
-  defp render_channels(options, user_id, socket) do
+  defp render_channels(options, user_id, socket, _client) do
     user = Accounts.get_user user_id, preload: [:roles, user_roles: :role]
     channels = Channel.get_channels_search(user_id, options.search , options) # |> IO.inspect(label: "channels")
     html = Phoenix.View.render_to_string UccChatWeb.SideNavView,
@@ -32,7 +32,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
     Query.update(socket, :html, set: html, on: "ul.channel_list")
   end
 
-  defp get_filter_options(%{"form" => form} = sender) do
+  defp get_filter_options(%{"form" => form}) do
     %{search: "%" <> form["channel-search"] <> "%"}
     |> channel_type_opt(form)
     |> show_opt(form)
@@ -52,11 +52,11 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   defp sort_opt(opts, %{"sort-channels" => "msgs" }), do: Map.put(opts, :order_by, :msgs)
   defp sort_opt(opts, _), do: opts
 
-  def create_channel(socket, sender) do
+  def create_channel(socket, _sender) do
     Query.delete(socket, class: "animated-hidden", on: ".flex-nav.create-channel")
   end
 
-  def create_channel_search_members(socket, %{"event" => %{"key" => key}} = sender)
+  def create_channel_search_members(socket, %{"event" => %{"key" => key}})
     when key in ~w(Tab Enter) do
 
     socket
@@ -125,7 +125,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
         Client.toastr(socket, :error, format_error(message))
       {:error, _, changeset, _} ->
         Client.toastr(socket, :error, format_error(changeset))
-      channel = %{} ->
+      _channel = %{} ->
         Client.toastr(socket, :error, ~g(That channel name already exists!))
       other ->
         Logger.error "other: " <> inspect(other)
@@ -158,7 +158,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
     socket
   end
 
-  def create_channel_cancel(socket, sender) do
+  def create_channel_cancel(socket, _sender) do
     close_create_channel(socket)
   end
 
@@ -182,7 +182,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   end
 
   defp select_member(nil, socket) do
-    Client.toastr(socket, ~g(Something went wrong!))
+    Client.toastr(socket, :error, ~g(Something went wrong!))
     socket
   end
 

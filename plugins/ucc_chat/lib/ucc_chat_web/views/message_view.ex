@@ -69,7 +69,7 @@ defmodule UccChatWeb.MessageView do
     Helpers.format_date_time tz_offset(dt, user)
   end
 
-  defp tz_offset(dt, user) do
+  def tz_offset(dt, user) do
     Timex.shift(dt, hours: user.tz_offset || 0)
   end
 

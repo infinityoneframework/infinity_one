@@ -372,7 +372,7 @@ defmodule UccChat.ChannelService do
     |> Hooks.build_sidenav_room()
   end
 
-  defp side_nav_search(user, match, channel, opts \\ []) do
+  defp side_nav_search(user, match, channel, opts) do
     match
     |> run_search(user.id, opts[:fuzzy])
     |> Enum.map(fn cc -> channel_room(cc, user.id, channel, channel.id) end)

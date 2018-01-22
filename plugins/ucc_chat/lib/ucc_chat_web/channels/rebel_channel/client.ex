@@ -157,9 +157,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def push_rooms_list_update(socket, channel_id, user_id) do
-    user = Accounts.get_user user_id
     html = SideNavService.render_rooms_list(channel_id, user_id)
-
     Query.update socket, :html,
       set: html,
       on: "aside.side-nav .rooms-list"

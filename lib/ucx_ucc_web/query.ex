@@ -35,7 +35,9 @@ defmodule UcxUccWeb.Query do
 
   def do_insert(socket, type, %{set: set, on: on}, fun) do
     method = jquery_method(:insert, type)
-    fun.(socket, build_js(on, method, set))
+    js = build_js(on, method, set) <>
+      update_events(on, method)
+    fun.(socket, js)
     socket
   end
 
@@ -85,7 +87,7 @@ defmodule UcxUccWeb.Query do
       acc <> ".#{method}(" <> build_args(args) <> ")"
     end)
     #"$('#{selector}').#{method}('#{value}').#{method1}();" #
-    |> IO.inspect(label: "build_js 4")
+    # |> IO.inspect(label: "build_js 4")
   end
   defp build_js(selector, {method, attr}, value) do
     "$('#{selector}').#{method}('#{attr}',#{escape_value(value)});" # |> IO.inspect(label: "build_js 1")

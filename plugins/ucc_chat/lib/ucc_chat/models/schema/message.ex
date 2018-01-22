@@ -35,7 +35,7 @@ defmodule UccChat.Schema.Message do
     timestamps(type: :utc_datetime)
   end
 
-  @fields [:body, :user_id, :channel_id, :sequential, :timestamp, :edited_id, :type, :expire_at, :system]
+  @fields [:body, :user_id, :channel_id, :sequential, :timestamp, :edited_id, :type, :expire_at, :system, :inserted_at]
   @required [:user_id]
 
   @doc """

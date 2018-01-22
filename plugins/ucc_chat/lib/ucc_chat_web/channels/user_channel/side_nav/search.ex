@@ -7,11 +7,11 @@ defmodule UccChatWeb.UserChannel.SideNav.Search do
 
   require Logger
 
-  def search_click(socket, sender) do
+  def search_click(socket, _sender) do
     Query.insert socket, :class, set: "search", on: ".side-nav .rooms-list"
   end
 
-  def search_keydown(socket, sender) do
+  def search_keydown(socket, _sender) do
     html =
       socket
       |> exec_js!("$('input.toolbar-search__input').val();")
@@ -20,7 +20,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Search do
     Query.update(socket, :html, set: html, on: ".side-nav .rooms-list")
   end
 
-  def search_blur(socket, sender) do
+  def search_blur(socket, _sender) do
     assigns = socket.assigns
     channel_id = if assigns.channel_id == "", do: nil, else: assigns.channel_id
 
