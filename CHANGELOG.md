@@ -13,6 +13,7 @@
 * [UCX-3707] Fixed auto linking phone number errors
 * Use inserted_at for date and times in messages.
 * Fix next day indication for pinned, starred, and mentions.
+* [UCX-3651] Updated message grouping after a message delete.
 
 ### Enhancements
 

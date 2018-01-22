@@ -217,4 +217,10 @@ defmodule UccChat.Message do
     |> @repo.all
     # |> Enum.reverse
   end
+  def get_by_later(inserted_at, channel_id) do
+    @schema
+    |> where([m], m.channel_id == ^channel_id and m.inserted_at > ^inserted_at)
+    |> order_by(asc: :inserted_at)
+    |> @repo.all
+  end
 end
