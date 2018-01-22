@@ -11,6 +11,8 @@
 * [UCX-3661] Fix broken auto grow message input box and make it shrink correctly
 * [UCX-3686] Fix mention linking for usernames with .
 * [UCX-3707] Fixed auto linking phone number errors
+* Use inserted_at for date and times in messages.
+* Fix next day indication for pinned, starred, and mentions.
 
 ### Enhancements
 

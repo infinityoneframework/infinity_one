@@ -24,7 +24,11 @@ defmodule UccChatWeb.FlexBar.Helpers do
     user = Accounts.get_user user_id
     collection
     |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
-      day = DateTime.to_date(m.updated_at)
+      day =
+        m.message.inserted_at
+        |> MessageView.tz_offset(user)
+        |> DateTime.to_date()
+
       msg =
         %{
           channel_id: channel_id,
@@ -34,8 +38,8 @@ defmodule UccChatWeb.FlexBar.Helpers do
           own: m.message.user_id == user_id,
           id: m.id,
           new_day: day != last_day,
-          date: MessageView.format_date(m.message.updated_at, user),
-          time: MessageView.format_time(m.message.updated_at, user),
+          date: MessageView.format_date(m.message.inserted_at, user),
+          time: MessageView.format_time(m.message.inserted_at, user),
           timestamp: m.message.timestamp
         }
       {day, [msg|acc]}
@@ -48,7 +52,11 @@ defmodule UccChatWeb.FlexBar.Helpers do
     user = Accounts.get_user user_id
     collection
     |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
-      day = DateTime.to_date(m.updated_at)
+      day =
+        m.message.inserted_at
+        |> MessageView.tz_offset(user)
+        |> DateTime.to_date()
+
       msg =
         %{
           channel_id: channel_id,
@@ -58,8 +66,8 @@ defmodule UccChatWeb.FlexBar.Helpers do
           own: m.message.user_id == user_id,
           id: m.id,
           new_day: day != last_day,
-          date: MessageView.format_date(m.message.updated_at, user),
-          time: MessageView.format_time(m.message.updated_at, user),
+          date: MessageView.format_date(m.message.inserted_at, user),
+          time: MessageView.format_time(m.message.inserted_at, user),
           timestamp: m.message.timestamp
         }
       {day, [msg|acc]}
