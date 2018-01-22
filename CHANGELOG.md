@@ -16,6 +16,7 @@
 * [UCX-3686] Fix mention linking for usernames with .
 * [UCX-3707] Fixed auto linking phone number errors
 * [UCX-3607] Fixed the blue flashing led
+* [UCX-3696] Remove the shift toggle aux pad shortcut on the compact theme
 
 ### Enhancements
 
