@@ -1,10 +1,14 @@
-# This file is responsible for parsing SSL certificates from
-# ssl configuration file to be used for Mscs web server.
+# Copyright (C) E-MetroTel, 2018 - All Rights Reserved
+# This software contains material which is proprietary and confidential
+# to E-MetroTel and is made available solely pursuant to the terms of
+# a written license agreement with E-MetroTel.
+
+
 
 defmodule UcxUcc.CertManager do
   @moduledoc """
 
-  Handle finding ssl certificates on the UCx.
+  This module gets SSL certificates file path from ssl configuration file for use in UcxUcc application.
 
   General functions to manage ssl certificate files on a UCx.
   """
@@ -43,13 +47,13 @@ defmodule UcxUcc.CertManager do
       line = Regex.replace ~r/#.*/, line, ""
       cond do
         value = find_key(@ssl_cert, line) ->
-          value = String.strip value
+          value = String.trim value
           Keyword.put(acc, :certfile, value)
           |> Keyword.put_new(:cacertfile, value)
         value = find_key(@ssl_cert_key, line) ->
-          Keyword.put(acc, :keyfile, String.strip(value))
+          Keyword.put(acc, :keyfile, String.trim(value))
         value = find_key(@ssl_ca_cert, line) ->
-          Keyword.put(acc, :cacertfile, String.strip(value))
+          Keyword.put(acc, :cacertfile, String.trim(value))
         true -> acc
       end
     end)
@@ -84,7 +88,7 @@ defmodule UcxUcc.CertManager do
   defp find_key(key, line) do
     case Regex.run(~r/#{key}[\s]+(.+)$/, line) do
       [_, result] ->
-        String.strip(result)
+        String.trim(result)
       _ -> nil
     end
   end
