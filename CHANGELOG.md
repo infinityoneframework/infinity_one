@@ -22,6 +22,7 @@
 * [UCX-3651] Updated message grouping after a message delete.
 * [UCX-3717] Support auto linking markdown style links
 * [UCX-3716] Allow auto linking in markdown
+* [UCX-3718] Add styles to status-messages to ensure options are visible
 
 ### Enhancements
 
