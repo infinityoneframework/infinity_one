@@ -330,17 +330,40 @@ footer.footer span.version {
   }
 }
 
-nav.options {
+aside.side-nav nav.options {
   .status-message-box {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 14px;
+    padding-right: 12px;
     padding-bottom: 10px;
     border-bottom: 1px solid #888;
+    margin-top: 10px;
     position: relative;
 
-    option[value="__clear__"] { color: red; }
-    option[value="__new__"] { color: green; }
+    .select-arrow {
+      right: 12px;
+      i {
+        color: rgba(255,255,255,0.3);
+      }
+    }
+    select {
+      option[value="__clear__"] { color: red; }
+      option[value="__new__"] { color: green; }
+      option[selected="selected"] {
+        font-style: italic;
+      }
+      option {
+        color: #666;
+        background-color: #f3f2f2;
+      }
+    }
 
+    &:before {
+      content: 'Status Message';
+      position: absolute;
+      right: 12px;
+      top: -20px;
+      color: rgba(255,255,255,0.3);
+    }
     input {
       width: 100%;
       padding: 8px;
@@ -356,7 +379,7 @@ nav.options {
         position: absolute;
         border-radius: 0 4px 4px 0;
         top: 2px;
-        right: 21px;
+        right: 14px;
         .button {
           padding: 0px;
           display: inline-block;
