@@ -72,11 +72,14 @@ defmodule UccChat.ServiceHelpers do
   @dt_re ~r/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d+)/
 
   def get_timestamp() do
+    get_timestamp(DateTime.utc_now())
+  end
+
+  def get_timestamp(dt) do
     @dt_re
-    |> Regex.run(DateTime.utc_now() |> to_string)
+    |> Regex.run(dt |> to_string)
     |> tl
     |> to_string
-    # |> String.to_integer
   end
 
   def format_date(%NaiveDateTime{} = dt) do

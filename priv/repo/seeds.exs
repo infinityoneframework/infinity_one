@@ -162,7 +162,7 @@ ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id, default:
 ch2 = ChannelService.insert_channel!(%{name: "support", user_id: u2.id})
 
 channels =
-  ~w(Research Marketing HR Accounting Shipping Sales) ++ ["UCxWebUser", "UCxChat"]
+  ~w(Research Marketing HR Accounting Shipping Sales) ++ ["UCxWebUser", "UCxChat", "BigRoom"]
   |> Enum.map(fn name ->
     ChannelService.insert_channel!(%{name: name, user_id: u1.id})
   end)

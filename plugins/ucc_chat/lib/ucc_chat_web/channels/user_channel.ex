@@ -991,6 +991,18 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+  # A generic timer handler that was introduced for the message search
+  # feature. The message is provide with a module, function, arity tuple
+  # as means of a callback.
+  def handle_info({:forward_timeout, {m, f, a}}, socket) do
+    case apply(m, f, [socket | a]) do
+      tuple when is_tuple(tuple) ->
+        tuple
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
   def handle_info(payload, socket) do
     Logger.warn "default handle info payload: #{inspect payload}"
     {:noreply, socket}
@@ -1520,6 +1532,17 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+  defdelegate side_nav_search_click(socket, sender), to: __MODULE__.SideNav.Search, as: :search_click
+  defdelegate side_nav_search_keydown(socket, sender), to: __MODULE__.SideNav.Search, as: :search_keydown
+  defdelegate side_nav_search_blur(socket, sender), to: __MODULE__.SideNav.Search, as: :search_blur
+  defdelegate side_nav_channels_select(socket, sender), to: __MODULE__.SideNav.Channels, as: :channels_select
+  defdelegate side_nav_channels_search(socket, sender), to: __MODULE__.SideNav.Channels, as: :channels_search
+  defdelegate side_nav_create_channel(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel
+  defdelegate side_nav_create_channel_search_members(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_search_members
+  defdelegate side_nav_create_channel_save(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_save
+  defdelegate side_nav_create_channel_cancel(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_cancel
+  defdelegate side_nav_create_channel_select_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_select_member
+  defdelegate side_nav_create_channel_remove_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_remove_member
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer

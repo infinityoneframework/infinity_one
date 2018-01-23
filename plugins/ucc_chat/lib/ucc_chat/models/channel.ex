@@ -115,14 +115,19 @@ defmodule UccChat.Channel do
   # privates that I'm subscribed too
   # and all channels I own
   def get_all_channels(%User{id: user_id} = user) do
+    query =
+      from c in @schema,
+      left_join: s in SubscriptionSchema,
+      on: s.channel_id == c.id and s.user_id == ^user_id,
+      preload: [:subscriptions]
     cond do
       Accounts.has_role?(user, "admin") ->
-        from c in @schema, where: c.type == 0 or c.type == 1, preload: [:subscriptions]
+        where query, [c], c.type in [0, 1]
       Accounts.has_role?(user, "user") ->
-        from c in @schema,
-          left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
-          where: c.type == 0 or (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
-      true -> from c in @schema, where: false
+        where query, [c, s], c.type == 0 or
+          (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
+      true ->
+        where query, [c], false
     end
   end
 
@@ -132,7 +137,11 @@ defmodule UccChat.Channel do
     |> get_all_channels
   end
 
-  def get_channels_by_pattern(user_id, pattern, count \\ 5) do
+  def get_channels_by_pattern(user_id, pattern, count \\ 5)
+  def get_channels_by_pattern(%{id: id}, pattern, count) do
+    get_channels_by_pattern(id, pattern, count)
+  end
+  def get_channels_by_pattern(user_id, pattern, count) do
     user_id
     |> get_authorized_channels
     |> where([c], like(c.name, ^pattern))
@@ -141,6 +150,54 @@ defmodule UccChat.Channel do
     |> select([c], {c.id, c.name})
     |> @repo.all
   end
+
+  def get_channels_search(user_id, pattern, opts \\ %{})
+  def get_channels_search(user_id, pattern, opts) do
+    user_id
+    |> get_authorized_channels
+    |> where([c], like(fragment("LOWER(?)", c.name), ^pattern))
+    |> get_search_where(opts)
+    |> get_search_order_by(opts)
+    |> @repo.all
+    |> filter_joined(opts, user_id)
+    |> sort_by(opts)
+  end
+
+  defp filter_joined(dataset, %{joined: true}, user_id) do
+    joined =
+      [user_id: user_id]
+      |> UccChat.Subscription.list_by()
+      |> Enum.map(& &1.channel_id)
+    Enum.filter dataset, &  &1.id in joined
+  end
+  defp filter_joined(dataset, _, _), do: dataset
+
+  defp get_search_where(query, %{types: types}) do
+    where(query, [c], c.type in ^types)
+  end
+  defp get_search_where(query, _), do: query
+
+  defp get_search_order_by(query, %{order_by: :msgs}) do
+    preload query, [:messages]
+  end
+  defp get_search_order_by(query, %{order_by: :last_seen}), do: query
+
+  defp get_search_order_by(query, %{order_by: order_by}) do
+    order_by query, asc: ^order_by
+  end
+  defp get_search_order_by(query, _), do: query
+
+  defp sort_by(dataset, %{order_by: :msgs} = opts) do
+    op = if opts[:order] == :asc, do: &Kernel.</2, else: &Kernel.>/2
+    dataset
+    |> Enum.map(& {length(&1.messages), &1})
+    |> Enum.sort(& op.(elem(&1, 0), elem(&2, 0)))
+    |> Enum.map(& elem(&1, 1))
+  end
+  defp sort_by(dataset, %{order_by: :last_seen}) do
+    dataset
+  end
+  defp sort_by(dataset, _), do: dataset
 
   def room_route(channel) do
     case channel.type do
@@ -171,7 +228,7 @@ defmodule UccChat.Channel do
   end
 
   def archive(%ChannelSchema{archived: true} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     changeset =
       channel
       |> changeset(get_user!(user_id), %{archived: true})
@@ -180,7 +237,7 @@ defmodule UccChat.Channel do
   end
 
   def archive(%ChannelSchema{id: id} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     channel
     |> changeset(get_user!(user_id), %{archived: true})
     |> update
@@ -195,7 +252,7 @@ defmodule UccChat.Channel do
   end
 
   def unarchive(%ChannelSchema{archived: false} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     changeset =
       channel
       |> changeset(get_user!(user_id), %{archived: false})
@@ -204,7 +261,7 @@ defmodule UccChat.Channel do
   end
 
   def unarchive(%ChannelSchema{id: id} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     channel
     |> changeset(get_user!(user_id), %{archived: false})
     |> update

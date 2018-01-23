@@ -204,13 +204,9 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def create_message(body, user_id, channel_id, params \\ %{}) do
     sequential? =
-      case Message.last_message(channel_id) do
-        nil -> false
-        lm ->
-          Timex.after?(Timex.shift(lm.inserted_at,
-            seconds: UccSettings.grouping_period_seconds()), Timex.now) and
-            user_id == lm.user_id
-      end
+      channel_id
+      |> Message.last_message()
+      |> sequential_message?(user_id)
 
     message =
       Message.create!(Map.merge(
@@ -228,6 +224,17 @@ defmodule UccChatWeb.RoomChannel.Message do
       Service.embed_link_previews(body, channel_id, message.id)
     end
     message
+  end
+
+  @doc """
+  Calculate if this message should be grouped (sequential) or not.
+  """
+  def sequential_message?(last_message, current_user_id, dt \\ Timex.now)
+  def sequential_message?(nil, _, _), do: false
+  def sequential_message?(last_message, current_user_id, dt) do
+    current_user_id == last_message.user_id and
+      Timex.after?(Timex.shift(last_message.inserted_at,
+        seconds: UccSettings.grouping_period_seconds()), dt)
   end
 
   def render_message(message) do
@@ -376,6 +383,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
       case MessageService.delete_message message do
         {:ok, _} ->
+          rebuild_sequentials(message)
           client.delete_message! message_id, socket
         _ ->
           client.toastr! socket, :error,
@@ -385,6 +393,31 @@ defmodule UccChatWeb.RoomChannel.Message do
       client.toastr! socket, :error, ~g(You are not authorized to delete that message)
     end
     socket
+  end
+
+  defp rebuild_sequentials(message) do
+    spawn fn ->
+      message.inserted_at
+      |> Message.get_by_later(message.channel_id)
+      |> Enum.reduce({nil, nil}, fn message, acc ->
+        case {acc, message} do
+          {_, %{system: true}} ->
+            {nil, nil}
+          {{last_message, user_id}, %{user_id: user_id, sequential: false, inserted_at: inserted_at}} ->
+            if sequential_message?(last_message, user_id, inserted_at) do
+              Message.update message, %{sequential: true}
+              Process.sleep(10)
+            end
+            {message, user_id}
+          {{_, uid1}, %{user_id: user_id, sequential: true}} when uid1 != user_id ->
+            Message.update message, %{sequential: false}
+            Process.sleep(10)
+            {message, user_id}
+          {_, %{user_id: user_id}} ->
+            {message, user_id}
+        end
+      end)
+    end
   end
 
   # @doc """

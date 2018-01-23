@@ -95,6 +95,55 @@ defmodule UccChat.Message do
     |> new_days(tz || 0, [])
   end
 
+  def search_messages(channel_id, %{tz_offset: tz}, pattern) do
+    # The database handler will throw an exception if an invalid
+    # query is entered. So, catch the exception here.
+    try do
+      pattern1 =
+        case pattern do
+          "/" <> _ = pattern ->
+            pattern
+          pattern ->
+            String.split(pattern, " ", trim: true)
+        end
+
+      @schema
+      |> where([m], m.channel_id == ^channel_id)
+      |> pattern_clause(pattern1)
+      |> Helpers.last_page
+      |> preload(^@preloads)
+      |> order_by([m], desc: m.inserted_at)
+      |> @repo.all
+      |> new_days(tz || 0, [])
+    rescue
+      _ ->
+        []
+    end
+  end
+
+  defp pattern_clause(query, "/" <> rest) do
+    regex = String.trim_trailing rest, "/"
+    where query, [m], fragment("? REGEXP ?", m.body, ^regex)
+  end
+
+  defp pattern_clause(query, []) do
+    where query, false
+  end
+
+  defp pattern_clause(query, [word]) do
+    where query, [m], like(fragment("lower(?)", m.body), ^("%" <> word <> "%"))
+  end
+
+  defp pattern_clause(query, [word1, word2]) do
+    where query, [m], like(fragment("lower(?)", m.body), ^("%" <> word1 <> "%")) or
+      like(fragment("lower(?)", m.body), ^("%" <> word2 <> "%"))
+  end
+
+  defp pattern_clause(query, words) do
+    regex = Enum.join(words, "|")
+    where query, [m], fragment("? REGEXP ?", m.body, ^regex)
+  end
+
   def get_room_messages(channel_id, %{id: user_id} = user) do
     page_size = AppConfig.page_size()
     case SubscriptionService.get(channel_id, user_id) do
@@ -167,5 +216,11 @@ defmodule UccChat.Message do
     |> order_by([m], desc: m.inserted_at)
     |> @repo.all
     # |> Enum.reverse
+  end
+  def get_by_later(inserted_at, channel_id) do
+    @schema
+    |> where([m], m.channel_id == ^channel_id and m.inserted_at > ^inserted_at)
+    |> order_by(asc: :inserted_at)
+    |> @repo.all
   end
 end
