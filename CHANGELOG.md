@@ -1,6 +1,21 @@
 # UcxUcc Changelog
 
+## 1.0.0-alpha14 (2018-01-24)
+
+### Enhancements
+
+### Bug Fixes
+
 ## 1.0.0-alpha12 (2018-01-23)
+
+### Enhancements
+
+* [UCX-3708] Made the WebRTC client compact theme the default
+* [UCX-2724] Implement SideNav Channel Search
+* [UCX-3725] Implement SideNav More Channels Filters
+* [UCX-3726] Implement SideNav Create channel
+* [UCX-3727] Add message searching
+* Added Mac Address display on phone settings page
 
 ### Bug Fixes
 
@@ -24,22 +39,7 @@
 * [UCX-3716] Allow auto linking in markdown
 * [UCX-3718] Add styles to status-messages to ensure options are visible
 
-### Enhancements
-
-* [UCX-3708] Made the WebRTC client compact theme the default
-* [UCX-2724] Implement SideNav Channel Search
-* [UCX-3725] Implement SideNav More Channels Filters
-* [UCX-3726] Implement SideNav Create channel
-* [UCX-3727] Add message searching
-* Added Mac Address display on phone settings page
-
 ## 1.0.0-alpha11 (2018-01-16)
-
-### Bug Fixes
-
-* [UCX-3566] Closing Admin section now closes Admin panels
-* [UCX-2605] Fix client initialization after reset
-* Update ex_ami to support asterisk 13
 
 ### Enhancements
 
@@ -51,6 +51,12 @@
 * [UCX-3681] Improved the logger format, reducing noise
 * [UCX-3679] Added status messages
 * [UCX-3878] Added labels to the presence blocks on accounts drop-down
+
+### Bug Fixes
+
+* [UCX-3566] Closing Admin section now closes Admin panels
+* [UCX-2605] Fix client initialization after reset
+* Update ex_ami to support asterisk 13
 
 ## 1.0.0-alpha9 (2018-01-14)
 
