@@ -328,14 +328,9 @@ defmodule UccChatWeb.MessageView do
     markdown? = md_key && String.contains?(body, md_key)
     quoted? = String.contains?(body, "```") && !markdown?
 
-    if message.system || markdown? do
-      body
-    else
-      body
-      |> Phoenix.HTML.html_escape
-      |> Phoenix.HTML.safe_to_string
-      |> autolink(markdown?)
-    end
+    body
+    |> html_escape(!message.system)
+    |> autolink()
     |> encode_mentions
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
@@ -347,6 +342,14 @@ defmodule UccChatWeb.MessageView do
     |> raw
   end
 
+  defp html_escape(body, escape? \\ true)
+  defp html_escape(body, true) do
+    body
+    |> Phoenix.HTML.html_escape
+    |> Phoenix.HTML.safe_to_string
+  end
+  defp html_escape(body, _), do: body
+
   def run_message_replacement_patterns(body, [_ | _] = patterns) do
     Enum.reduce(patterns, body, fn {re, sub}, body ->
       Regex.replace(re, body, sub)
@@ -355,10 +358,11 @@ defmodule UccChatWeb.MessageView do
 
   def run_message_replacement_patterns(body, _), do: body
 
-  defp autolink(body, false) do
-    AutoLinker.link(body, exclude_patterns: ["```"])
+  defp autolink(body, opts \\ [])
+  defp autolink(body, false), do: body
+  defp autolink(body, opts) do
+    AutoLinker.link(body, Keyword.put(opts, :exclude_patterns, ["```"]))
   end
-  defp autolink(body, _), do: body
 
   def run_markdown(body, false, _), do: body
   def run_markdown(body, true, md_key) do
