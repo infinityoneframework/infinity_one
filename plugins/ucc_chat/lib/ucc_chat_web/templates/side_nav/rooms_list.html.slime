@@ -5,3 +5,5 @@
   = if @chatd.room_types[:can_view_history] do
     h3.history-div
       a(href="#")= ~g(History)
+  = if @chatd.search_empty do
+    p.search-empty= ~g(No Search Results)

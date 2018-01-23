@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 1.0.0-alpha12 (2018-01-xx)
+## 1.0.0-alpha12 (2018-01-23)
 
 ### Bug Fixes
 
@@ -16,8 +16,22 @@
 * [UCX-3686] Fix mention linking for usernames with .
 * [UCX-3707] Fixed auto linking phone number errors
 * [UCX-3607] Fixed the blue flashing led
+* [UCX-3696] Remove the shift toggle aux pad shortcut on the compact theme
+* [UCX-3722] Use inserted_at for date and times in messages.
+* [UCX-3723] Fix next day indication for pinned, starred, and mentions.
+* [UCX-3651] Updated message grouping after a message delete.
+* [UCX-3717] Support auto linking markdown style links
+* [UCX-3716] Allow auto linking in markdown
+* [UCX-3718] Add styles to status-messages to ensure options are visible
 
 ### Enhancements
+
+* [UCX-3708] Made the WebRTC client compact theme the default
+* [UCX-2724] Implement SideNav Channel Search
+* [UCX-3725] Implement SideNav More Channels Filters
+* [UCX-3726] Implement SideNav Create channel
+* [UCX-3727] Add message searching
+* Added Mac Address display on phone settings page
 
 ## 1.0.0-alpha11 (2018-01-16)
 

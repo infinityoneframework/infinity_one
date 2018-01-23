@@ -3,7 +3,7 @@ defmodule UcxUcc.Mixfile do
 
   def project do
     [app: :ucx_ucc,
-     version: "1.0.0-alpha11",
+     version: "1.0.0-alpha12",
      elixir: "~> 1.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -70,8 +70,8 @@ defmodule UcxUcc.Mixfile do
       # {:coherence, path: "../coherence3"},
       {:faker_elixir_octopus, "~> 1.0", only: [:dev, :test]},
       {:arc_ecto, "~> 0.7.0"},
-      {:auto_linker, "~> 0.2"},
-      # {:auto_linker, github: "smpallen99/auto_linker"},
+      # {:auto_linker, "~> 0.2"},
+      {:auto_linker, github: "smpallen99/auto_linker"},
       # {:auto_linker, path: "../auto_linker"},
       {:link_preview, "~> 1.0.0"},
       {:cowboy, "~> 1.0"},

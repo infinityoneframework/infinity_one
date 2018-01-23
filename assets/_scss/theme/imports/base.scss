@@ -1202,7 +1202,7 @@ label.required::after {
     direction: rtl;
     position: absolute;
     top: $header-min-height;
-    height: calc(100% -  $header-min-height + $footer-min-height);
+    height: calc(100% -  #{$header-min-height});
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;

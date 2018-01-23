@@ -368,7 +368,7 @@ footer.footer span.version {
   }
 }
 
-nav.options {
+aside.side-nav nav.options {
   .status-message-box {
     padding-left: 14px;
     padding-right: 12px;
@@ -383,8 +383,17 @@ nav.options {
         color: rgba(255,255,255,0.3);
       }
     }
-    option[value="__clear__"] { color: red; }
-    option[value="__new__"] { color: green; }
+    select {
+      option[value="__clear__"] { color: red; }
+      option[value="__new__"] { color: green; }
+      option[selected="selected"] {
+        font-style: italic;
+      }
+      option {
+        color: #666;
+        background-color: #f3f2f2;
+      }
+    }
 
     &:before {
       content: 'Status Message';
@@ -464,3 +473,45 @@ nav.options {
 }
 
 
+.side-nav {
+  .-autocomplete-list {
+    background-color: #999;
+    opacity: .9;
+    z-index: 1000;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-top: 3px;
+    .-autocomplete-item {
+      border-top: 1px solid #ccc;
+      &:first-child {
+        border: none;
+      }
+    }
+  }
+  ul.selected-users {
+    li {
+      border-radius: 3px !important;
+    }
+  }
+
+  .rooms-list {
+    &.search {
+      h3,
+      .empty,
+      .more {
+        display: none;
+      }
+      .opt {
+        display: none;
+      }
+      li.room-link.active {
+        background-color: inherit !important;
+      }
+      .search-empty {
+        padding-top: 15px;
+        padding-left: 5px;
+        font-weight: bold;
+      }
+    }
+  }
+}

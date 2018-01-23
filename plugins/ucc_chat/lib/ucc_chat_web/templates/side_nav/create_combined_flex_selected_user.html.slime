@@ -1,0 +1,4 @@
+li.background-transparent-darker
+  input.hidden name="members[#{@user.username}]"
+  = @user.username
+  i.icon-cancel.remove-room-member rebel-click="side_nav_create_channel_remove_member"

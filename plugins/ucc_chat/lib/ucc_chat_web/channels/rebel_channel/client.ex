@@ -94,12 +94,6 @@ defmodule UccChatWeb.RebelChannel.Client do
     async_js(socket, "history.replaceState(history.state, " <>
       "ucxchat.display_name, '/' + ucxchat.room_route + '/' + " <>
       "ucxchat.display_name)")
-    |> case do
-      {:ok, _} ->
-        socket
-      {:error, error} ->
-        raise "replace_history error: #{inspect error}"
-    end
   end
 
   def toastr!(socket, which, message) do
@@ -163,15 +157,9 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def push_rooms_list_update(socket, channel_id, user_id) do
-    user = Accounts.get_user user_id
     html = SideNavService.render_rooms_list(channel_id, user_id)
-    # TODO: for testing purposes
-    Logger.info "username: " <> user.username
-    Logger.info html
-
     Query.update socket, :html,
       set: html,
-      # set: SideNavService.render_rooms_list(channel_id, user_id),
       on: "aside.side-nav .rooms-list"
   end
 
@@ -230,7 +218,11 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def more_channels(socket, html) do
-    async_js socket, more_channels_js(html)
+    # async_js socket, more_channels_js(html)
+    socket
+    |> Query.update(:html, set: html, on: ".flex-nav section")
+    |> async_js("$('.flex-nav section').parent().removeClass('animated-hidden')")
+    |> async_js("$('.arrow').toggleClass('close', 'bottom');")
   end
 
   def more_channels_js(html) do

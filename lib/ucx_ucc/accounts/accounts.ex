@@ -40,16 +40,20 @@ defmodule UcxUcc.Accounts do
     |> Repo.all
   end
 
-  def list_all_users_by_pattern(pattern, exclude, count) do
+  def list_all_users_by_pattern(pattern, {column, exclude}, count) do
+    pattern = String.downcase(pattern)
     User
-    |> where([c], like(c.username, ^pattern) and not c.id in ^exclude)
+    |> where([c], like(fragment("LOWER(?)", c.username), ^pattern) and not field(c, ^column) in ^exclude)
     |> join(:left, [c], r in assoc(c, :roles))
     |> where([c, r], not(r.name == "bot" and r.scope == "global"))
     |> preload([c, r], [roles: c])
-    |> select([c], c)
     |> order_by([c], asc: c.username)
     |> limit(^count)
     |> Repo.all
+  end
+
+  def list_all_users_by_pattern(pattern, exclude, count) do
+    list_all_users_by_pattern(pattern, {:id, exclude}, count)
   end
 
   @doc """
