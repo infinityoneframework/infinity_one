@@ -58,6 +58,11 @@
 
       audio.volume = stream.volume = keypad.volume = volume;
 
+      var event = new Event('alerting_ctrl');
+      event.topic = 'device_manager:init';
+      event.value = this;
+      document.querySelector('body').dispatchEvent(event);
+
     },
     set_webrtc: function(web_rtc) {
       this.webrtc = web_rtc
@@ -356,6 +361,19 @@
         }
       }
     },
+    get_volume(key) {
+      switch(key) {
+        case "alerting":
+        case "special":
+        case "paging":
+          var active_audio_ctrl = document.getElementById('audio-alerting');
+          return active_audio_ctrl.volume;
+          break;
+        default:
+          console.error("Unknown transducer tone", key);
+          break;
+      }
+    },
     set_tone_volume: function(level, key) {
       this.active_audio_ctrl = document.getElementById('audio-alerting');
       var tone_volume = 0;
@@ -379,17 +397,18 @@
       if (level < 1) level = 1;
 
       // let new_volume = tone_volume;
-
       if (level > 0) {
         new_volume = level / tone_volume;
       }
 
+      console.log('tone_volume', tone_volume, 'level', level, 'new_volume', new_volume);
       if (this.debug)
         console.log('set_tone_volume', key, level, tone_volume, new_volume)
 
       this.active_audio_ctrl.volume = new_volume;
     },
     transducer_tone_volume: function(msg) {
+      console.log('transducer_tone_volume', msg);
       switch (msg.key) {
         case "alerting":
         case "special":
@@ -403,14 +422,24 @@
     feedback: {
       set_volume: function(value) {
         console.log('TBD: implement this', value);
+        var event = new Event('alerting_ctrl');
+        event.topic = 'set_volume';
+        event.value = value;
+        document.querySelector('body').dispatchEvent(event);
       }
     },
     Alerting: {
       volume_up: function() {
         console.log('TBD: implement this');
+        var event = new Event('alerting_ctrl');
+        event.topic = 'volume_up';
+        document.querySelector('body').dispatchEvent(event);
       },
       volume_down: function() {
         console.log('TBD: implement this');
+        var event = new Event('alerting_ctrl');
+        event.topic = 'volume_down';
+        document.querySelector('body').dispatchEvent(event);
       },
       get_vol_step_factor: function() {
         return 8;
@@ -429,9 +458,14 @@
   };
 
   UccChat.on_connect(function(ucc_chat, socket) {
-    console.log('device_manager on_connect');
+    console.log('on_connect >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    console.log('device_manager on_connect ...............................');
     window.UcxUcc.DeviceManager = DeviceManager;
-    window.UcxUcc.DeviceManager.init();
+    setTimeout(function() {
+      window.UcxUcc.DeviceManager.init();
+    }, 1500);
+  });
+  $(document).ready(function() {
   });
 
   if (UcxUcc.trace_startup) { console.log('complete loading device_manager'); }
