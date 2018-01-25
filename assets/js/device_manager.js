@@ -401,14 +401,13 @@
         new_volume = level / tone_volume;
       }
 
-      console.log('tone_volume', tone_volume, 'level', level, 'new_volume', new_volume);
       if (this.debug)
         console.log('set_tone_volume', key, level, tone_volume, new_volume)
 
       this.active_audio_ctrl.volume = new_volume;
     },
     transducer_tone_volume: function(msg) {
-      console.log('transducer_tone_volume', msg);
+      // console.log('transducer_tone_volume', msg);
       switch (msg.key) {
         case "alerting":
         case "special":
@@ -421,7 +420,7 @@
     },
     feedback: {
       set_volume: function(value) {
-        console.log('TBD: implement this', value);
+        // console.log('TBD: implement this', value);
         var event = new Event('alerting_ctrl');
         event.topic = 'set_volume';
         event.value = value;
@@ -430,13 +429,13 @@
     },
     Alerting: {
       volume_up: function() {
-        console.log('TBD: implement this');
+        // console.log('TBD: implement this');
         var event = new Event('alerting_ctrl');
         event.topic = 'volume_up';
         document.querySelector('body').dispatchEvent(event);
       },
       volume_down: function() {
-        console.log('TBD: implement this');
+        // console.log('TBD: implement this');
         var event = new Event('alerting_ctrl');
         event.topic = 'volume_down';
         document.querySelector('body').dispatchEvent(event);
@@ -458,8 +457,7 @@
   };
 
   UccChat.on_connect(function(ucc_chat, socket) {
-    console.log('on_connect >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-    console.log('device_manager on_connect ...............................');
+    console.log('device_manager on_connect');
     window.UcxUcc.DeviceManager = DeviceManager;
     setTimeout(function() {
       window.UcxUcc.DeviceManager.init();

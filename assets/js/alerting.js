@@ -12,7 +12,7 @@
     }
   }
 
-  let Alerting = {
+  var Alerting = {
     // not sure we need this, but it will allow us to query the Alerting
     // module to ensure that all the plugins have been initialized
     ready: false,
@@ -24,13 +24,15 @@
     default_plugin: undefined,
     // called after the page is loaded.
     init: function() {
-      console.log('Init alerting.js');
+      console.log('init alerting.js');
       this.default_plugin = AlertingDefaultPlugin;
       // call the init function on each plugin if it defines one
       Object.keys(this.plugins).forEach(function (key) {
         var init = null;
-        if (init = this.plugins[key].init) {
-          init(this);
+        console.log('init plugins, key', key);
+        if (init = UccChat.Alerting.plugins[key].init) {
+          //init(UccChat.Alerting);
+          init();
         }
       });
       this.ready = true;
@@ -38,7 +40,7 @@
     add_plugin: function(name, plugin) {
       this.plugins[name] = plugin;
     },
-    // encapsulate the plugin getter so it will return the named pluging
+    // encapsulate the plugin getter so it will return the named plugin
     // if installed, or the default plugin otherwise
     get_plugin: function(name) {
       var plugin = this.plugins[name];
@@ -69,15 +71,10 @@
     volume_set: function(name, ...args) {
       safe_call(this, name, 'volume_set', args);
     },
-    // We can use this interface to run custom functions on the plugin.
-    // This is really an approach of polymorphism. I wound if we should
-    // be using OO here?
-    //
     // Another approach could be that the application runs custom APIs
     // by getting its plugin first. Like:
-    //     UccChat.Alerting.get_plugin('mscs').some_custome_api()
+    //     UccChat.Alerting.get_plugin('mscs').some_custom_api()
     //
-    // This would mean we don't need this extend helper.
     extend: function(name, extension, ...args) {
       var extension = null;
       if (extension = this.get_plugin(name)[extension]) {
