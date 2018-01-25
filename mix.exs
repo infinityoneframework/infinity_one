@@ -23,8 +23,10 @@ defmodule UcxUcc.Mixfile do
     [mod: {UcxUcc.Application, []},
      extra_applications: extra_applications(Mix.env)]
   end
-  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence, :ex_syslogger]
-  defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
+
+  defp extra_applications(:dev),  do: [:logger, :runtime_tools, :coherence]
+  defp extra_applications(:prod), do: extra_applications(:dev) ++[:ex_syslogger]
+  defp extra_applications(_),     do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test) do
@@ -104,8 +106,7 @@ defmodule UcxUcc.Mixfile do
       {:distillery, "~> 1.4"},
       {:conform, "~> 2.5"},
       # {:ex_syslogger, path: "../ex_syslogger"},
-      {:ex_syslogger, github: "smpallen99/ex_syslogger"},
-      # {:ex_syslogger, github: "smpallen99/ex_syslogger"},
+      {:ex_syslogger, github: "smpallen99/ex_syslogger", only: [:prod]},
       {:gen_smtp, "~> 0.12.0"},
       {:exprof, "~> 0.2.0"},
       # {:jira_bot, path: "../jira_bot"}

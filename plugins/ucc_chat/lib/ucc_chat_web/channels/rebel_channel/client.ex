@@ -6,7 +6,6 @@ defmodule UccChatWeb.RebelChannel.Client do
 
   alias UccChatWeb.ClientView
   alias UccChat.{MessageService, SideNavService}
-  alias UcxUcc.Accounts
   alias UcxUccWeb.Query
 
   require Logger

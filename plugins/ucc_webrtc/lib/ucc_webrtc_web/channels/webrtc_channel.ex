@@ -224,12 +224,12 @@ defmodule UccWebrtcWeb.WebrtcChannel do
     icon = "videocam"
     SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
       [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
-      confirm: fn result ->
+      confirm: fn _result ->
         open_my_video_tab(socket, payload)
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:confirmed_video_call",
           %{user_id: socket.assigns.user_id}
       end,
-      cancel: fn result ->
+      cancel: fn _result ->
         Endpoint.broadcast "user:" <>  payload[:from], "webrtc:declined_video_call",
           %{user_id: socket.assigns.user_id}
       end
