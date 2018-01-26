@@ -1,3 +1,5 @@
+$red: rgb(244, 67, 54);
+
 @-webkit-keyframes spinnerRotate
 {
   0% {
@@ -39,7 +41,7 @@ i.phone-status {
     }
   }
   &[data-status="in_use"] {
-    color: #bc2031 !important;
+    color: $red !important;
     &:before {
       content: '\e82f';
     }
@@ -51,7 +53,7 @@ i.phone-status {
     }
   }
   &[data-status="busy"] {
-    color: #bc2031 !important;
+    color: $red !important;
     &:before {
       content: '\58';
     }
@@ -63,7 +65,7 @@ i.phone-status {
     }
   }
   &[data-status="ringing"] {
-    color: #bc2031 !important;
+    color: $red !important;
     -webkit-animation-name: spinnerRotate;
     -webkit-animation-duration: 0.5s;
     -webkit-animation-iteration-count: infinite;
