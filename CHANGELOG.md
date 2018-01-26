@@ -1,10 +1,15 @@
 # UcxUcc Changelog
 
-## 1.0.0-alpha14 (2018-01-24)
+## 1.0.0-alpha14 (2018-01-26)
 
 ### Enhancements
 
+* [UCX-3739] Added ability to control ClientSm logging for some messages
+
 ### Bug Fixes
+
+* [UCX-3733] Fixed Mscs and Phone presence issues when Astrisk dies or restarts
+* [UCX-3701] Fixed phone presence stops working
 
 ## 1.0.0-alpha12 (2018-01-23)
 
