@@ -5,6 +5,47 @@
 
   const item_selector = '.popup-item';
   const selected_selector = item_selector + '.selected';
+  const animation_styles = `
+        .loading-animation {
+          top: 0; right: 0; bottom: 0; left: 0;
+          display: flex;
+          align-items: center;
+          position: absolute;
+          justify-content: center;
+          text-align: center;
+          z-index: 100;
+        }
+        .loading-animation > div {
+          width: 10px;
+          height: 10px;
+          margin: 2px;
+          border-radius: 100%;
+          display: inline-block;
+          background-color: rgba(255,255,255,0.6);
+          -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+          animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+        }
+        .loading-animation .bounce1 {
+          -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+        }
+        .loading-animation .bounce2 {
+          -webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+        }
+        @-webkit-keyframes loading-bouncedelay {
+          0%,
+          80%,
+          100% { -webkit-transform: scale(0) }
+          40% { -webkit-transform: scale(1.0) }
+        }
+        @keyframes loading-bouncedelay {
+          0%,
+          80%,
+          100% { transform: scale(0); }
+          40% { transform: scale(1.0); }
+        }
+    `;
 
   var Utils = {
     remove: function(arr, item) {
@@ -99,50 +140,22 @@
           background: linear-gradient(to top, #6c6c6c 0%, #aaaaaa 100%);
           z-index: 1000;
         }
-        .loading-animation {
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          display: flex;
-          align-items: center;
+        ${animation_styles}
+        .page-loading-container {
           position: absolute;
-          justify-content: center;
-          text-align: center;
-          z-index: 100;
+          top: 0; right: 0; left: 0; bottom: 0;
+          z-index: 5000;
+          background: black;
+          opacity: 0.8;
         }
-        .loading-animation > div {
-          width: 10px;
-          height: 10px;
-          margin: 2px;
-          border-radius: 100%;
-          display: inline-block;
-          background-color: rgba(255,255,255,0.6);
-          -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-          animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-        }
-        .loading-animation .bounce1 {
-          -webkit-animation-delay: -0.32s;
-          animation-delay: -0.32s;
-        }
-        .loading-animation .bounce2 {
-          -webkit-animation-delay: -0.16s;
-          animation-delay: -0.16s;
-        }
-        @-webkit-keyframes loading-bouncedelay {
-          0%,
-          80%,
-          100% { -webkit-transform: scale(0) }
-          40% { -webkit-transform: scale(1.0) }
-        }
-        @keyframes loading-bouncedelay {
-          0%,
-          80%,
-          100% { transform: scale(0); }
-          40% { transform: scale(1.0); }
+        .page-loading-container .loading-animation > div {
+          background-color: #eee !important;
         }
         </style>`
      $('head').prepend(stylesheet)
+    },
+    add_page_animation_styles: function() {
+      $('head').prepend(`<style>${animation_styles}</style>`);
     },
     remove_page_loading: function() {
       $('head > style').remove()

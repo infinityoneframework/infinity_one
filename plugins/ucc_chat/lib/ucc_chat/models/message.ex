@@ -4,11 +4,7 @@ defmodule UccChat.Message do
 
   alias UcxUcc.Repo
   alias UccChat.Schema.Channel
-  alias UccChat.{AppConfig, SubscriptionService,}
-  #   TypingAgent, Mention, Subscription,
-  #   Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
-  #   MessageAgent, AttachmentService
-  # }
+  alias UccChat.{AppConfig, SubscriptionService}
   alias UccChat.ServiceHelpers, as: Helpers
 
   require Logger
@@ -60,25 +56,37 @@ defmodule UccChat.Message do
   end
 
   def get_surrounding_messages(channel_id, ts, user) when ts in ["", nil] do
+    Logger.warn "ts: " <> "#{ts}"
     get_messages channel_id, user
   end
   def get_surrounding_messages(channel_id, timestamp, %{tz_offset: tz} = user) do
-    message = @repo.one from m in @schema,
-      where: m.timestamp == ^timestamp and m.channel_id == ^channel_id,
-      preload: ^@preloads
-    if message do
-      before_q = from m in @schema,
-        where: m.inserted_at < ^(message.inserted_at) and m.channel_id == ^channel_id,
-        order_by: [desc: :inserted_at],
-        limit: 50,
-        preload: ^@preloads
-      after_q = from m in @schema,
-        where: m.inserted_at > ^(message.inserted_at) and m.channel_id == ^channel_id,
-        limit: 50,
-        preload: ^@preloads
+    Logger.warn "timestamp: " <> timestamp
+    page_size = AppConfig.page_size()
+    half_page = div page_size, 2
 
-      Enum.reverse(@repo.all(before_q)) ++ [message|@repo.all(after_q)]
+    message = @repo.one first((from m in @schema,
+      where: m.timestamp <= ^timestamp and m.channel_id == ^channel_id,
+        order_by: [asc: :inserted_at],
+        limit: ^half_page), :inserted_at)
+
+    Logger.warn "body: " <> message.timestamp <> " " <> message.body
+
+    if message do
+      # before_q = from m in @schema,
+      #   where: m.inserted_at < ^(message.inserted_at) and m.channel_id == ^channel_id,
+      #   order_by: [desc: :inserted_at],
+      #   limit: 40,
+      #   preload: ^@preloads
+      (from m in @schema,
+        where: m.inserted_at >= ^(message.inserted_at) and m.channel_id == ^channel_id,
+        order_by: [asc: :inserted_at],
+        limit: ^page_size,
+        preload: ^@preloads)
+      |> @repo.all
       |> new_days(tz || 0, [])
+
+      # Enum.reverse(@repo.all(before_q)) ++ [message|@repo.all(after_q)]
+      # |> new_days(tz || 0, [])
     else
       Logger.debug "did not find a message"
       get_messages(channel_id, user)
@@ -86,6 +94,7 @@ defmodule UccChat.Message do
   end
 
   def get_messages(channel_id, %{tz_offset: tz}) do
+    Logger.warn ""
     @schema
     |> where([m], m.channel_id == ^channel_id)
     |> Helpers.last_page
@@ -145,37 +154,52 @@ defmodule UccChat.Message do
   end
 
   def get_room_messages(channel_id, %{id: user_id} = user) do
+    Logger.warn ""
     page_size = AppConfig.page_size()
-    case SubscriptionService.get(channel_id, user_id) do
-      %{current_message: ""} -> nil
-      %{current_message: cm} ->
-        cnt1 = @repo.one from m in @schema,
-          where: m.channel_id == ^channel_id and m.timestamp >= ^cm,
-          select: count(m.id)
-        if cnt1 > page_size, do: cm, else: nil
-      _ -> nil
-    end
-    |> case do
-      nil ->
-        get_messages(channel_id, user)
-      ts ->
-        get_messsages_ge_ts(channel_id, user, ts)
-    end
+    timestamp =
+      case SubscriptionService.get(channel_id, user_id) do
+        %{current_message: ""} -> nil
+        %{current_message: cm} ->
+          cnt1 = @repo.one from m in @schema,
+            where: m.channel_id == ^channel_id and m.timestamp >= ^cm,
+            select: count(m.id)
+          if cnt1 > page_size, do: cm, else: nil
+        _ -> nil
+      end
+    get_surrounding_messages(channel_id, timestamp, user)
   end
 
-  def get_messsages_ge_ts(channel_id, %{tz_offset: tz}, ts) do
-    before_q = from m in @schema,
-      where: m.timestamp < ^ts,
-      order_by: [desc: :inserted_at],
-      limit: 25,
-      preload: ^@preloads
+  def get_messsages_ge_ts(channel_id, user, ts) do
+    Logger.warn "get_messsages_ge_ts is deprecated. Use next_page_by_ts/3 instead."
+    next_page_by_ts(channel_id, user, ts)
+  end
 
-    after_q = from m in @schema,
-      where: m.channel_id == ^channel_id and m.timestamp >= ^ts,
-      preload: ^@preloads
+  def next_page_by_ts(channel_id, %{tz_offset: tz}, ts) do
+    Logger.warn "ts: " <> "#{ts}"
+    # before_q = from m in @schema,
+    #   where: m.timestamp < ^ts,
+    #   order_by: [desc: :inserted_at],
+    #   limit: 25,
+    #   preload: ^@preloads
+    page_size = AppConfig.page_size()
 
-    Enum.reverse(@repo.all before_q) ++ @repo.all(after_q)
+    first =
+      (from m in @schema,
+        where: m.channel_id == ^channel_id and m.timestamp > ^ts,
+        order_by: [asc: m.inserted_at],
+        limit: 1)
+      |> @repo.one
+
+    (from m in @schema,
+      where: m.channel_id == ^channel_id and m.inserted_at >= ^first.inserted_at,
+      order_by: [asc: m.inserted_at],
+      limit: ^page_size,
+      preload: ^@preloads)
+    |> @repo.all
     |> new_days(tz || 0, [])
+
+    # Enum.reverse(@repo.all before_q) ++ @repo.all(after_q)
+    # |> new_days(tz || 0, [])
   end
 
   defp new_days([h|t], tz, []), do: new_days(t, tz, [Map.put(h, :new_day, true)])
@@ -196,7 +220,7 @@ defmodule UccChat.Message do
     @schema
     |> where([m], m.channel_id == ^channel_id)
     |> order_by([m], asc: m.inserted_at)
-    |> last
+    |> last(:inserted_at)
     |> @repo.one
   end
 
@@ -204,7 +228,7 @@ defmodule UccChat.Message do
     @schema
     |> where([m], m.channel_id == ^channel_id)
     |> order_by([m], asc: m.inserted_at)
-    |> first
+    |> first(:inserted_at)
     |> @repo.one
   end
 
@@ -215,9 +239,9 @@ defmodule UccChat.Message do
     |> select([m], m.user_id)
     |> order_by([m], desc: m.inserted_at)
     |> @repo.all
-    # |> Enum.reverse
   end
   def get_by_later(inserted_at, channel_id) do
+    Logger.warn ""
     @schema
     |> where([m], m.channel_id == ^channel_id and m.inserted_at > ^inserted_at)
     |> order_by(asc: :inserted_at)

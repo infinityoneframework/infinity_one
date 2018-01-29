@@ -160,16 +160,19 @@ defmodule UccChat.MessageService do
         _res -> false
       end
 
-    %{
+    res = %{
       has_more: has_more,
       has_more_next: has_more_next,
       can_preview: true,
-      last_read: Map.get(subscription || %{}, :last_read, "")
+      last_read: Map.get(subscription || %{}, :last_read, ""),
     }
+    Logger.warn "res: " <> inspect(res)
+    res
   end
 
+  # TODO: This should be called merge, not into
   def messages_info_into(messages, channel_id, user, params) do
-    messages |> get_messages_info(channel_id, user) |> Enum.into(params)
+    messages |> get_messages_info(channel_id, user) |> Map.merge(params)
   end
 
   def last_user_id(channel_id) do

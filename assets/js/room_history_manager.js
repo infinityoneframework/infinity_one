@@ -14,7 +14,7 @@ UccChat.on_load(function(ucc_chat) {
 class RoomHistoryManager {
   constructor(ucc_chat) {
     this.ucc_chat = ucc_chat
-    this.is_loading = false
+    this.is_loading = true
     this.has_more = false
     this.has_more_next = false
     this.scroll_pos = {}
@@ -68,11 +68,12 @@ class RoomHistoryManager {
     if (target.offset()) {
       this.scroll_to(target)
     } else {
-      this.getSurroundingMessages(ts)
+      // this.getSurroundingMessages(ts)
     }
   }
 
   fix_new_days() {
+    if (debug) { console.log('fix_new_days'); }
     let list = $(container + ' li[id]')
     let last = list.length - 1
     for (let i = 0; i < last - 1; i++) {
@@ -97,49 +98,55 @@ class RoomHistoryManager {
 
   get getMore() {
     if (debug) { console.log('roomHistoryManager.getMore()')}
+
+
+    this.is_loading = true
+    UccUtils.add_page_animation_styles()
+    this.startGetMoreAnimation()
+
     let html = $('.messages-box .wrapper ul').html()
     let first_id = $('.messages-box .wrapper ul li[id]').first().attr('id')
 
-    this.is_loading = true
-
-    UccUtils.page_loading()
-    this.startGetMoreAnimation()
-
     cc.get('/messages', {timestamp: $('li.message').first().attr('data-timestamp')})
       .receive("ok", resp => {
-        if (debug) { console.log('got response back from loading', resp) }
+        if (debug) { console.log('++++++++++! got response back from loading', resp) }
+        let has_more = `<li class="load-more">${UccUtils.loading_animation()}</li>`
 
-        $(container)[0].innerHTML = resp.html + html
+        $(container)[0].innerHTML = has_more + resp.html + html
 
         if (debug) { console.log('finished loading', first_id) }
 
-        this.startGetMoreAnimation()
-
         this.scroll_to($('#' + first_id), -80)
-        UccUtils.remove_page_loading()
 
         this.fix_new_days()
+
+        $('li.load-more').remove()
 
         if (!resp.has_more) {
           $(container).children().first().addClass('new-day')
           $(container).prepend(start_conversation)
         } else {
-          $('li.load-more').remove()
           $(container).prepend(UccUtils.loadmore())
         }
+
+        UccUtils.remove_page_loading()
+        this.removeGetMoreAnimation()
         this.is_loading = false
         this.has_more = resp.has_more
+        this.has_more_next = resp.has_more_next
         this.ucc_chat.main.run(this.ucc_chat)
         Rebel.set_event_handlers(container);
       })
   }
   get getMoreNext() {
+
+    UccUtils.add_page_animation_styles()
+    this.startGetMoreNextAnimation()
+    this.is_loading = true
+
     let html = $(container).html()
     let ts = $('.messages-box li[data-timestamp]').last().data('timestamp')
     let last_id = $('.messages-box li[data-timestamp]').last().attr('id')
-    UccUtils.page_loading()
-    this.startGetMoreNextAnimation()
-    this.is_loading = true
 
     cc.get('/messages/previous', {timestamp: ts})
       .receive("ok", resp => {
@@ -148,8 +155,7 @@ class RoomHistoryManager {
 
         $('.messages-box .wrapper ul')[0].innerHTML = html + resp.html
 
-        this.scroll_to($('#' + last_id), 400)
-        $('.load-more-next').remove()
+        this.scroll_to($('#' + last_id), 0)
         if (resp.has_more_next) {
           this.setHasMoreNext = true
           $('.messages-box .wrapper ul').append(UccUtils.loadmore())
@@ -157,6 +163,9 @@ class RoomHistoryManager {
           this.setHasMoreNext = false
         }
 
+        // $('.load-more-next').remove()
+        UccUtils.remove_page_loading()
+        this.removeGetMoreNextAnimation()
         this.is_loading = false
         this.has_more_next = resp.has_more_next
         this.ucc_chat.main.run(this.ucc_chat)
@@ -165,14 +174,17 @@ class RoomHistoryManager {
   }
 
   new_room(room) {
-    // console.log('new_room', room)
+    console.log('new_room', room)
     this.current_room = room
     this.is_loading = false
+    this.has_more_next = $('.messages-box .wrapper.has-more-next')[0]
+    console.log('has_more_next', this.has_more_next);
     // this.has_more = false
     // this.has_more_next = false
   }
 
   scroll_new_window() {
+    this.is_loading = true
     this.scroll_window = $(wrapper)[0]
     if (!this.scroll_pos[this.current_room]) {
       // console.log('scroll_new_window this.current_room', this.current_room)
@@ -180,15 +192,24 @@ class RoomHistoryManager {
         .receive("ok", resp => {
           // console.warn('scroll_new_window ok resp', resp)
           this.set_scroll_top("ok", resp)
+          // UccUtils.remove_page_loading()
+          console.log('scroll new window after get:currentMessage response')
         })
         .receive("error", resp => {
           // console.warn('scroll_new_window err resp', resp)
+          //UccUtils.remove_page_loading()
           this.set_scroll_top("error", resp)
         })
     } else {
       // console.warn('scroll_new_window else this', this)
+      // UccUtils.remove_page_loading()
       this.set_scroll_top("ok", {value: this.scroll_pos[this.current_room]})
     }
+
+    setTimeout(function() {
+      UccChat.roomHistoryManager.is_loading = false;
+      console.log('scroll new window timeout')
+    }, 1800);
   }
 
   set_scroll_top(code, resp) {
@@ -287,11 +308,11 @@ class RoomHistoryManager {
   }
   removeGetMoreAnimation() {
     if (debug) { console.log('removeGetMoreAnimation') }
-    $('.messages-box .wrapper ul > li:first.load-more').remove()
+    $('.messages-box .wrapper ul > li.load-more').remove()
   }
   removeGetMoreNextAnimation() {
     if (debug) { console.log('removeGetMoreNextAnimation') }
-    $('.messages-box .wrapper ul > li:last.load-more').remove()
+    $('.messages-box .wrapper ul > li)').not(':eq(0)').find('.load-more').remove()
   }
 }
 

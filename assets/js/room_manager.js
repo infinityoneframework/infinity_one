@@ -65,6 +65,60 @@ class RoomManager {
 
   get userchan() { return this.ucc_chat.userchan }
 
+  new_room() {
+    if (debug) { console.log('new_room', this)}
+    let ucxchat = this.ucc_chat.ucxchat
+    this.has_more = $('.messages-box li.load-more').length > 0
+    this.roomHistoryManager.new_room(ucxchat.room)
+    this.updateMentionsMarksOfRoom()
+
+    let html = $('.messages-box .wrapper ul').html()
+    $('.messages-box .wrapper ul').html(html)
+
+    $('.messages-box .wrapper ul .body img.emojione').each((i, elem) => {
+      if ($(elem).closest('.body').text().trim() == "") {
+        $(elem).addClass('big')
+      }
+    })
+
+    this.ucc_chat.roomchan.on('room:open', resp => {
+      // UccUtils.page_loading()
+      // $('.page-loading-container').html(UccUtils.loading_animation())
+      // this.open_room(resp.room, resp.room)
+      // if (resp.state) {
+      //   this.focus = true
+      // } else {
+      //   this.focus = false
+      // }
+    })
+  }
+
+  open_room(room, display_name, callback) {
+    if (debug) { console.log('open_room', this) }
+    console.log('open_room room', room, 'old_room', ucxchat.room)
+    console.log('open_room', $('.messages-container'))
+
+    cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
+      .receive("ok", resp => {
+        console.log('open_room ok', resp)
+        if (resp.redirect) {
+          console.log('location')
+          window.location = resp.redirect
+        } else {
+          this.render_room(resp)
+          this.bind_history_manager_scroll_event()
+          $('textarea.input-message').autogrow();
+        }
+        if (callback) { callback() }
+        if (debug) { console.log('open_room after callback', this) }
+        UccUtils.remove_page_loading()
+      })
+      .receive("error", resp => {
+        console.log('open_room error', resp)
+        UccUtils.remove_page_loading()
+      })
+  }
+
   render_room(resp) {
     if (debug) { console.log('render_room resp', resp) }
     let ucxchat = this.ucc_chat.ucxchat
@@ -338,42 +392,18 @@ class RoomManager {
     }
   }
 
-  new_room() {
-    if (debug) { console.log('new_room', this)}
-    let ucxchat = this.ucc_chat.ucxchat
-    this.has_more = $('.messages-box li.load-more').length > 0
-    this.roomHistoryManager.new_room(ucxchat.room)
-    this.updateMentionsMarksOfRoom()
-
-    let html = $('.messages-box .wrapper ul').html()
-    $('.messages-box .wrapper ul').html(html)
-
-    $('.messages-box .wrapper ul .body img.emojione').each((i, elem) => {
-      if ($(elem).closest('.body').text().trim() == "") {
-        $(elem).addClass('big')
-      }
-    })
-
-    this.ucc_chat.roomchan.on('room:open', resp => {
-      UccUtils.page_loading()
-      $('.page-loading-container').html(UccUtils.loading_animation())
-      this.open_room(resp.room, resp.room)
-      if (resp.state) {
-        this.focus = true
-      } else {
-        this.focus = false
-      }
-    })
-  }
-
   bind_history_manager_scroll_event() {
     if (!this.ucc_chat.ucxchat.channel_id) {
       return false
     }
     $('.messages-box .wrapper').bind('scroll', _.throttle((e) => {
       let at_bottom = e.currentTarget.scrollTop >= e.currentTarget.scrollHeight
-        - e.currentTarget.clientHeight - 80
+        - e.currentTarget.clientHeight - 5
       let roomHistoryManager = this.roomHistoryManager
+
+      // if (at_bottom) {
+      //   console.log('at bottom!!!!!')
+      // }
 
       this.at_bottom = at_bottom
       if (at_bottom && this.new_message_button) {
@@ -414,18 +444,18 @@ class RoomManager {
           if (debug) { console.log('count', count) }
         }
       }
-    }, 200))
+    }, 50))
   }
 
   scroll_to(elem, offset = 0) {
     let offst = offset
     let msgbox = $('.messages-box .wrapper')
-    console.log('msgbox', msgbox, 'elem', elem)
+    // console.log('msgbox', msgbox, 'elem', elem)
     let valof = msgbox.scrollTop().valueOf()
     let offtop = msgbox.offset().top
     let item_top = elem.offset().top
     if (offset == 0) {
-      offst = -$(msgbox).height() + elem.height() - 5
+      offst = -$(msgbox).height() + elem.height() + 10
     }
     let val = msgbox.scrollTop().valueOf() + item_top - msgbox.offset().top + offst
     $('.messages-box .wrapper').scrollTop(val)
@@ -467,32 +497,6 @@ class RoomManager {
     $('li.link-room-' + ucxchat.room).removeClass('has-alert').removeClass('has-unread')
   }
 
-
-  open_room(room, display_name, callback) {
-    if (debug) { console.log('open_room', this) }
-    console.log('open_room room', room, 'old_room', ucxchat.room)
-    console.log('open_room', $('.messages-container'))
-
-    cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
-      .receive("ok", resp => {
-        console.log('open_room ok', resp)
-        if (resp.redirect) {
-          console.log('location')
-          window.location = resp.redirect
-        } else {
-          this.render_room(resp)
-          this.bind_history_manager_scroll_event()
-          $('textarea.input-message').autogrow();
-        }
-        if (callback) { callback() }
-        if (debug) { console.log('open_room after callback', this) }
-        UccUtils.remove_page_loading()
-      })
-      .receive("error", resp => {
-        console.log('open_room error', resp)
-        UccUtils.remove_page_loading()
-      })
-  }
 
   get_unreads() {
     let unread = 0

@@ -61,10 +61,9 @@ defmodule UccChatWeb.MasterView do
     end
   end
 
-  def has_more_next(text) do
-    # {{#unless hasMoreNext}}not{{/unless}}">
-    text |> to_string |> String.replace("_", "-")
-  end
+  def has_more_next(true), do: " has-more-next"
+  def has_more_next(_), do: ""
+
   def has_more(), do: false
   def can_preview, do: true
 

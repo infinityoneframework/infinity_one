@@ -26,6 +26,7 @@ defmodule UccChatWeb.MessageView do
       |> Enum.reduce("message background-transparent-dark-hover", fn fun, acc ->
         acc <> apply(__MODULE__, fun, [msg, user])
       end)
+      # |> add_new_day(msg, user, opts)
     attrs =
       [
         id: msg.id,
@@ -114,6 +115,9 @@ defmodule UccChatWeb.MessageView do
   end
   def edited(_msg, _), do: false
 
+
+  # def add_new_day(cls, msg, user, %{no_new_days: true}), do: cls
+  # def add_new_day(cls, msg, user, _), do: cls <> get_new_day(msg, user)
 
   def get_new_day(%{new_day: true}, _), do: " new-day"
   def get_new_day(_, _), do: ""

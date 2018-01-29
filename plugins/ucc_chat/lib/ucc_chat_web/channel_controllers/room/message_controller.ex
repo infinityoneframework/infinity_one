@@ -6,7 +6,7 @@ defmodule UccChatWeb.MessageChannelController do
 
   alias UccChat.{
     Message, MessageService, Attachment,
-    AttachmentService
+    AttachmentService, AppConfig
   }
   alias UcxUcc.Permissions
   # alias UcxUcc.Accounts.User
@@ -70,20 +70,25 @@ defmodule UccChatWeb.MessageChannelController do
   # end
 
   def index(%{assigns: assigns} = socket, params) do
-    user = Helpers.get_user(assigns[:user_id], preload: [])
+    Logger.warn "params: " <> inspect(params)
+    user = Helpers.get_user(assigns[:user_id], preload: [:subscriptions])
 
     channel_id = assigns[:channel_id]
-    timestamp = params["timestamp"]
+    timestamp = params["timestamp"] |> IO.inspect(label: "timestamp")
 
-    page_size = Application.get_env :ucx_chat, :page_size, 30
+    page_size = AppConfig.page_size()
     preloads = MessageService.preloads()
 
     list =
       MessageSchema
-      |> where([m], m.timestamp < ^timestamp and m.channel_id == ^channel_id)
+      |> where([m], m.timestamp <= ^timestamp and m.channel_id == ^channel_id)
       |> Helpers.last_page(page_size)
       |> preload(^preloads)
       |> Repo.all
+
+    ## TODO: remove this
+    last = List.last(list) |> Map.get(:body)
+    Logger.warn "last: " <> inspect(last)
 
     previews = MessageService.message_previews(user.id, list)
 
@@ -107,28 +112,35 @@ defmodule UccChatWeb.MessageChannelController do
   end
 
   def previous(%{assigns: assigns} = socket, params) do
+    Logger.warn "params: " <> inspect(params)
     user = Helpers.get_user(assigns[:user_id], preload: [])
 
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
 
-    page_size = Application.get_env :ucx_chat, :page_size, 75
+    page_size = AppConfig.page_size()
     preloads = MessageService.preloads()
+
     list =
-      MessageSchema
-      |> where([m], m.timestamp > ^timestamp and m.channel_id == ^channel_id)
-      |> limit(^page_size)
-      |> preload(^preloads)
-      |> Repo.all
+      case Message.next_page_by_ts(channel_id, user, timestamp) do
+        [first | messages] ->
+          [Map.put(first, :new_day, false) | messages]
+        other ->
+          other
+      end
+      # MessageSchema
+      # |> where([m], m.timestamp <= ^timestamp and m.channel_id == ^channel_id)
+      # |> limit(^page_size)
+      # |> preload(^preloads)
+      # |> Repo.all
 
     previews = MessageService.message_previews(user.id, list)
-    message_opts = UccChatWeb.MessageView.message_opts()
+    message_opts = UccChatWeb.MessageView.message_opts() |> Keyword.put(:no_new_days, true)
 
     messages_html =
       list
       |> Enum.map(fn message ->
         previews = List.keyfind(previews, message.id, 0, {nil, []}) |> elem(1)
-
         "message.html"
         |> UccChatWeb.MessageView.render(user: user, message: message,
           previews: previews, message_opts: message_opts)
@@ -139,10 +151,11 @@ defmodule UccChatWeb.MessageChannelController do
     messages_html = String.replace(messages_html, "\n", "")
 
     {:reply, {:ok, MessageService.messages_info_into(list, channel_id,
-      user, %{html: messages_html})}, socket}
+      user, %{html: messages_html, last_read: timestamp})}, socket}
   end
 
   def surrounding(%{assigns: assigns} = socket, params) do
+    Logger.warn "params: " <> inspect(params)
     user = Helpers.get_user(assigns[:user_id], preload: [])
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
@@ -157,7 +170,6 @@ defmodule UccChatWeb.MessageChannelController do
       list
       |> Enum.map(fn message ->
         previews = List.keyfind(previews, message.id, 0, {nil, []}) |> elem(1)
-
         "message.html"
         |> UccChatWeb.MessageView.render(user: user, message: message,
           previews: previews, message_opts: message_opts)
@@ -171,7 +183,8 @@ defmodule UccChatWeb.MessageChannelController do
       user, %{html: messages_html})}, socket}
   end
 
-  def last(%{assigns: assigns} = socket, _params) do
+  def last(%{assigns: assigns} = socket, params) do
+    Logger.warn "params: " <> inspect(params)
     user = Helpers.get_user assigns[:user_id], preload: []
     channel_id = assigns[:channel_id]
 
