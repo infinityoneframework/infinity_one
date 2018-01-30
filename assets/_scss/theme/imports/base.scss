@@ -1331,7 +1331,7 @@ label.required::after {
   }
 
   .rooms-list {
-    direction: rtl;
+    direction: ltr !important;
     position: absolute;
     top: $header-min-height + $toolbar-height;
     bottom: $footer-min-height;
