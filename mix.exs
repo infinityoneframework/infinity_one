@@ -105,7 +105,9 @@ defmodule UcxUcc.Mixfile do
       {:conform, "~> 2.5"},
       {:ex_syslogger, github: "smpallen99/ex_syslogger"},
       {:gen_smtp, "~> 0.12.0"},
-      {:exprof, "~> 0.2.0"}
+      {:exprof, "~> 0.2.0"},
+      # {:scrivener_ecto, path: "../scrivener_ecto"}
+      {:scrivener_ecto, github: "smpallen99/scrivener_ecto"}
 
     ] ++ plugin_deps()
   end

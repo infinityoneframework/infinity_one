@@ -86,34 +86,53 @@
     },
     scroll_bottom: function() {
       let elem = $('.messages-box .wrapper')[0]
-      if (elem)
-        elem.scrollTop = elem.scrollHeight - elem.clientHeight
-      else
-        console.warn('invalid elem')
+      if (elem) {
+        elem.scrollTop = elem.scrollHeight - elem.clientHeight;
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+      }
     },
     scroll_down: function(height) {
-      let elem = $('.messages-box .wrapper')
-      if (elem)
-        elem.scrollTop(getScrollBottom() + height)
-      else
+      let elem = $('.messages-box .wrapper');
+      if (elem) {
+        elem.scrollTop(elem.scrollTop() - height);
+      } else {
         if (debug) { console.warn('invalid elem') }
+      }
+    },
+    scroll_up: function(height) {
+      let elem = $('.messages-box .wrapper');
+      if (elem) {
+        elem.scrollTop(elem.scrollTop() + height);
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+      }
     },
     getScrollBottom: function() {
       let elem = $('.messages-box .wrapper')[0]
       if (elem) {
-        return elem.scrollHeight - $(elem).innerHeight
+        return elem.scrollHeight - $(elem).innerHeight()
       } else {
         if (debug) { console.warn('invalid elem') }
-        return 1000
+        return 1000;
       }
     },
-    is_scroll_bottom: function() {
+    is_scroll_bottom: function(tolerence = 1) {
       let elem = $('.messages-box .wrapper')[0]
       if (elem) {
-        return elem.scrollTop + $(elem).innerHeight() + 1 >= elem.scrollHeight
+        return elem.scrollTop + $(elem).innerHeight() + tolerence >= elem.scrollHeight;
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+        return true;
+      }
+    },
+    is_scroll_top: function (tolerence = 2) {
+      let elem = $('.messages-box .wrapper')[0]
+      if (elem) {
+        return elem.scrollTop < tolerence;
       } else {
         if (debug) { console.warn('invalid elem') }
-        return true
+        return true;
       }
     },
     empty_string: function(string) {

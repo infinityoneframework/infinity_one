@@ -9,6 +9,18 @@ defmodule UccChatWeb.MasterView do
 
   require IEx
 
+  def get_pagination(info) do
+    attrs =
+      ~w(page_number page_size total_entries total_pages)a
+      |> Enum.reduce([class: "pagination", style: "display: none;"], fn key, acc ->
+        if val = info[:page][key] do
+          Keyword.put(acc, String.to_atom("data-#{key}"), val)
+        else
+          acc
+        end
+      end)
+    content_tag :div, attrs, do: []
+  end
   def get_admin_class(_user), do: ""
   def get_window_id(channel), do: "chat-window-#{channel.id}"
 

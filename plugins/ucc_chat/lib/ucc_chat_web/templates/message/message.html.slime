@@ -32,7 +32,6 @@
     button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
       = username
   span.info.border-component-color.color-info-font-color
-    / - # Logger.error "===== message: #{inspect @message}"
     = unless @message.type == "d" do
       = for tag <- role_tags(@message) do
         span.role-tag.background-info-font-color(data-role="#{tag}")= tag
@@ -55,10 +54,10 @@
   - info = get_info_class(@message)
   .body.color-primary-font-color(class="#{info}" dir="auto")
     / TODO: Remove this, its for testing only
-    - body = to_string(@message.timestamp) <> " " <> to_string(@message.body)
-    - message = struct(@message, body: body)
-    = format_message_body(message, @message_opts)
-    =# format_message_body(@message, @message_opts)
+    / -# body = to_string(@message.timestamp) <> " " <> to_string(@message.body)
+    / -#message = struct(@message, body: body)
+    / =#format_message_body(message, @message_opts)
+    = format_message_body(@message, @message_opts)
     = for attachment <- @message.attachments  do
       = render UccChatWeb.AttachmentView, "attachment.html", attachment: UccChatWeb.AttachmentView.get_attachment(attachment)
     - previews = @previews

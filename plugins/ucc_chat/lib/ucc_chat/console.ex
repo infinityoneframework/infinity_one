@@ -73,7 +73,7 @@ defmodule UccChat.Console do
   @doc """
   Get accounts by opts
   """
-  def accounts(opts), do: Accounts.list_by_account(opts)
+  def accounts(opts), do: Accounts.list_by_accounts(opts)
 
   @doc """
   Get channel by opts

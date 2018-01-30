@@ -346,7 +346,6 @@ defmodule UccChatWeb.MessageView do
     |> raw
   end
 
-  defp html_escape(body, escape? \\ true)
   defp html_escape(body, true) do
     body
     |> Phoenix.HTML.html_escape

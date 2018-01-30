@@ -78,13 +78,12 @@ defmodule UccChatWeb.ChannelRouter do
   def match(:post, socket, ["messages"], params) do
     apply(MessageChannelController, :create, [socket, params])
   end
-
   def match(:get, socket, ["messages", "surrounding"], params) do
     apply(MessageChannelController, :surrounding, [socket, params])
   end
-  def match(:get, socket, ["messages", "last"], params) do
-    apply(MessageChannelController, :last, [socket, params])
-  end
+  # def match(:get, socket, ["messages", "last"], params) do
+  #   apply(MessageChannelController, :last, [socket, params])
+  # end
   def match(:get, socket, ["messages", "previous"], params) do
     apply(MessageChannelController, :previous, [socket, params])
   end
