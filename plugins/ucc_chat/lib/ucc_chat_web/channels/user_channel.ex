@@ -1112,11 +1112,14 @@ defmodule UccChatWeb.UserChannel do
     account = user.account
 
     case sender["value"] do
+      "__edit__" ->
+        account
+        |> push_status_message_edit(socket)
       "__new__" ->
         account
         |> push_status_message_select(socket)
         |> show_status_message_input()
-        |> async_js(~s/$('.status-message-input input').focus();/)
+        |> async_js(~s/$('.status-message-input input').val('').focus();/)
 
       "__clear__" ->
         case UcxUcc.Accounts.update_account(account, %{status_message: ""}) do
@@ -1166,11 +1169,132 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  def edit_status_message_close(socket, _sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    push_status_message_select user.account,
+      async_js(socket, "$('.status-message-edit').hide();")
+  end
+
+  def edit_status_message(socket, %{"value" => ""} = sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    index = String.to_integer(sender["dataset"]["index"])
+
+    case exec_js socket, ~s/$('.status-message-edit-ctrl input[data-index="#{index}"]').val()/ do
+      {:ok, ""} -> socket
+      {:error, _} -> socket
+      {:ok, message} ->
+        edit_status_message(socket, sender, user, index, message)
+    end
+  end
+
+  defp edit_status_message(socket, _sender, user, index, message) do
+    # Logger.warn inspect(sender)
+
+    case UccChat.Accounts.replace_status_message(user.account, index, message) do
+      {:ok, _account} ->
+        socket
+        |> async_js(disable_edit_status_control_buttons_js(index))
+        |> SweetAlert.swal(~g"Updated!", ~g"Your message has been Updated!", "success",
+            timer: 2000, showConfirmButton: false)
+      {:error, _} ->
+        socket
+        |> async_js(~s/.status-message-edit-ctrl .cancel[data-index="#{index}"]').click()/)
+        |> SweetAlert.swal(~g"Error!", ~g"There was a problem updating your message!", "error",
+            timer: 2000, showConfirmButton: false)
+    end
+  end
+
+  def delete_status_message(socket, sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    index = String.to_integer(sender["dataset"]["index"])
+
+    current_message? =
+      user.account
+      |> UccChat.Accounts.get_status_message_history()
+      |> Enum.at(index)
+      |> Kernel.==(user.account.status_message)
+
+    success = fn _ ->
+      case UccChat.Accounts.delete_status_message(user.account, index) do
+        {:ok, _account} ->
+
+          if current_message? do
+            broadcast_status_message(socket, user.username, "")
+          end
+
+          socket
+          |> Query.delete(~s(.status-message-edit-ctrl[data-index="#{index}"]))
+          |> update_message_ids()
+          |> SweetAlert.swal(~g"Deleted!", ~g"Your message was Deleted!", "success",
+            timer: 2000, showConfirmButton: false)
+        {:error, changeset} ->
+          Logger.warn inspect(changeset.errors)
+          SweetAlert.swal(socket, ~g"Error!", ~g"Something went wrong", "error",
+            timer: 2000, showConfirmButton: false)
+      end
+    end
+
+    SweetAlert.swal_modal socket, ~g(Are you sure?),
+      ~g(The message will be permanently deleted), "warning",
+      [
+        showCancelButton: true, closeOnConfirm: false, closeOnCancel: true,
+        confirmButtonColor: "#DD6B55", confirmButtonText: ~g(Yes, delete it)
+      ],
+      confirm: success
+  end
+
+  defp update_message_ids(socket) do
+    js = """
+      items = $('.status-message-edit-ctrl');
+      for(var i = 0; i < items.length; i++) {
+        $(items[i]).attr('data-index', i).find('[data-index]')
+        .attr('data-index', i);
+      }
+      """ |> String.replace("\n", "")
+    async_js socket, js
+  end
+
+  def cancel_edit_status_message(socket, sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    index = String.to_integer(sender["dataset"]["index"])
+
+    current_message =
+      user.account
+      |> UccChat.Accounts.get_status_message_history()
+      |> Enum.at(index)
+
+    js = ~s/$('.status-message-edit-ctrl input[data-index="#{index}"]').val('#{current_message}');/ <>
+      disable_edit_status_control_buttons_js(index)
+
+    async_js socket, js
+  end
+
+  def disable_edit_status_control_buttons_js(index) do
+    """
+    $('.status-message-edit-ctrl button.save[data-index="#{index}"]').attr('disabled', true);
+    $('.status-message-edit-ctrl button.cancel[data-index="#{index}"]').attr('disabled', true);
+    $('.status-message-edit-ctrl input[data-index="#{index}"]').blur();
+    """ |> String.replace("\n", "")
+  end
+
   defp push_status_message_select(account, socket) do
     html =
       Phoenix.View.render_to_string(UccChatWeb.SideNavView,
         "account_box_status_select.html", account: account)
     Query.update(socket, :replaceWith, set: html, on: ".status-message-select")
+  end
+
+  defp push_status_message_edit(account, socket) do
+    html =
+      Phoenix.View.render_to_string(UccChatWeb.SideNavView,
+        "account_box_status_edit.html", account: account)
+    socket
+    |> Query.update(:html, set: html, on: ".status-message-edit")
+    |> async_js("$('.status-message-edit').show(); $('.status-message-select').hide()")
   end
 
   defp show_status_message_select(socket) do

@@ -76,7 +76,7 @@
   "poolboy": {:hex, :poolboy, "1.5.1", "6b46163901cfd0a1b43d692657ed9d7e599853b3b21b95ae5ae0a777cf9b6ca8", [:rebar], [], "hexpm"},
   "postgrex": {:hex, :postgrex, "0.13.4", "f58e319c5451bfda86ba6a45ce6dca311193d0a9861323d0d16e8d02e25adc41", [:mix], [{:connection, "~> 1.0", [hex: :connection, repo: "hexpm", optional: false]}, {:db_connection, "~> 1.1", [hex: :db_connection, repo: "hexpm", optional: false]}, {:decimal, "~> 1.0", [hex: :decimal, repo: "hexpm", optional: false]}], "hexpm"},
   "ranch": {:hex, :ranch, "1.3.2", "e4965a144dc9fbe70e5c077c65e73c57165416a901bd02ea899cfd95aa890986", [:rebar3], [], "hexpm"},
-  "rebel": {:git, "https://github.com/smpallen99/rebel.git", "f47ca879b75784dcd1e40d528b6fdac9f3e2a617", []},
+  "rebel": {:git, "https://github.com/smpallen99/rebel.git", "1d7213b4294a378746fb1c1712231d5d02bf1e66", []},
   "rudp": {:git, "git@bitbucket.org:emetrotel/rudp.git", "1b39409b2059d98ecf4b415e16f9d3e776818606", []},
   "sbroker": {:hex, :sbroker, "1.0.0", "28ff1b5e58887c5098539f236307b36fe1d3edaa2acff9d6a3d17c2dcafebbd0", [:rebar3], [], "hexpm"},
   "scrivener": {:hex, :scrivener, "2.5.0", "e1f78c62b6806d91cc9c4778deef1ea4e80aa9fadfce2c16831afe0468cc8a2c", [:mix], [], "hexpm"},

@@ -89,10 +89,23 @@ class SideNav {
 
     this.bind_scroll_event()
     $('body')
+    .on('keyup', '.status-message-edit-ctrl input', e => {
+      let current = $(e.currentTarget);
+      current.parent().children().find('[disabled]').removeAttr('disabled');
+    })
+    .on('keydown', '.status-message-edit-ctrl input', e => {
+      if (e.key == "Enter") {
+        let current = $(e.currentTarget);
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(function() {
+          current.parent().children().find('button.save').click();
+        }, 100);
+      }
+    })
     .on('click', 'button.test-notifications', e => {
       e.preventDefault()
       this.notifier.desktop('Desktop Notification Test', 'This is a desktop notification.', {duration: 5})
-      // console.log('test notifications')
       return false
     })
     .on('change', '#account_new_room_notification', e => {

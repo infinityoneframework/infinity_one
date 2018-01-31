@@ -19,7 +19,7 @@
 * Added previous messages banner when contents less than window size and scroll detection does not work
 * Added 1px scroll at top and bottom of window so load more can be properly detected when at the top or bottom of the page
 * Move the sidenav scrollbar to the right side
-
+* Add Status Message History Editing and Deleting
 
 ## 0.2.2 (2018-01-18)
 

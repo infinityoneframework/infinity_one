@@ -94,4 +94,54 @@ defmodule UccChat.Accounts do
 
     Accounts.update_account(account, attrs)
   end
+
+  def delete_status_message(%Account{} = account, index) do
+    history_list = get_status_message_history(account)
+    deleted_message = Enum.at history_list, index
+
+    history =
+      history_list
+      |> List.delete_at(index)
+      |> Enum.join(<<0::8>>)
+      |> case do
+        "" -> ""
+        other -> <<0::8>> <> other
+      end
+
+    attrs =
+      (account.status_message == deleted_message)
+      |> if do
+        %{status_message: ""}
+      else
+        %{}
+      end
+      |> Map.put(:status_message_history, history)
+
+    Accounts.update_account(account, attrs)
+  end
+
+  def replace_status_message(%Account{} = account, index, message) do
+    history_list = get_status_message_history(account)
+    current_message = Enum.at history_list, index
+
+    history =
+      history_list
+      |> List.replace_at(index, message)
+      |> Enum.join(<<0::8>>)
+      |> case do
+        "" -> ""
+        other -> <<0::8>> <> other
+      end
+
+    attrs =
+      (account.status_message == current_message)
+      |> if do
+        %{status_message: ""}
+      else
+        %{}
+      end
+      |> Map.put(:status_message_history, history)
+
+    Accounts.update_account(account, attrs)
+  end
 end
