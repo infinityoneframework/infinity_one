@@ -515,11 +515,11 @@ defmodule UccChat.ChannelService do
     |> User.changeset(%{open_id: channel.id})
     |> Repo.update!
 
-    messages = Message.get_messages(channel.id, user)
+    page = Message.get_room_messages(channel.id, user)
 
     chatd =
       user
-      |> ChatDat.new(channel, messages)
+      |> ChatDat.new(channel, page)
       |> ChatDat.get_messages_info(user)
 
     Logger.debug fn -> "messages_info: #{inspect chatd.messages_info}" end
@@ -539,6 +539,11 @@ defmodule UccChat.ChannelService do
     side_nav_html = SideNavService.render_rooms_list(channel.id, user_id)
 
     %{
+      # page: %{
+      #   page_number: page.page_number,
+      #   page_size: page.page_size,
+      #   total_pages: page.total_pages
+      # },
       display_name: display_name,
       room_title: room,
       channel_id: channel.id,

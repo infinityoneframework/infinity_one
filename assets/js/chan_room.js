@@ -156,11 +156,11 @@ function start_room_channel(ucc_chat, socket) {
 }
 
 UccChat.on_connect(function(ucc_chat, socket) {
-  console.warn('running room channel on_connect');
+  console.log('running room channel on_connect');
   start_room_channel(ucc_chat, socket)
 
   $('body').on('restart-socket', () => {
-    // console.warn('received restart-socket event', UccChat)
+    console.log('received restart-socket event', UccChat)
     Rebel.run_channel("room", Rebel.get_rebel_session_token('room'), UccChat.ucxchat.room)
     start_room_channel(ucc_chat, socket)
   })

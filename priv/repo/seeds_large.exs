@@ -77,12 +77,44 @@ messages = [
 
 usernames = ~w(steve jason jamie ardavan simon eric jeff merilee)
 
-channel = Channel.get_by name: "HiThere" #"BigRoom"
+chan_name =
+  case System.argv do
+    [] -> "BigRoom"
+    [name | _] -> name
+  end
+
+channel = Channel.get_by(name: chan_name) || raise("invalid channel name")
 user_ids = Enum.map usernames, fn name ->
   Accounts.get_by_username(name) |> Map.get(:id)
 end
 
-for _ <- 1..50 do
+count = 300
+grouping = 5
+
+IO.puts "Starting to generate #{count} to #{count * grouping} messages"
+
+Enum.reduce(1..count, {1, []}, fn _, {cnt, acc} ->
+  gr = :rand.uniform(grouping) - 1
+  lst = for inx <- (cnt..(cnt + gr)), do: inx
+  {cnt + gr + 1, [lst|acc]}
+end)
+|> elem(1)
+|> Enum.reverse
+|> Enum.each(fn sub ->
   id = Enum.random user_ids
-  Message.create!(%{channel_id: channel.id, user_id: id, body: Enum.random(messages)})
-end
+  IO.inspect sub
+  for inx <- sub do
+    Message.create!(%{channel_id: channel.id, user_id: id, body: "#{inx} " <> Enum.random(messages)})
+    Process.sleep(1000)
+  end
+end)
+
+
+# for cnt <- 1..count do
+#   if rem(cnt, 25) == 0, do: IO.puts("Creating #{cnt}th message group ...")
+#   id = Enum.random user_ids
+
+#   for _ <- 1..(:rand.uniform(grouping)) do
+#     Message.create!(%{channel_id: channel.id, user_id: id, body: Enum.random(messages)})
+#   end
+# end

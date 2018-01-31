@@ -17,15 +17,13 @@ defmodule UccChat.ChatDat do
     |> Repo.preload([:roles, user_roles: :role])
     |> new(channel, messages)
   end
+
   def new(%User{} = user, %ChannelSchema{} = channel, messages) do
     user = Hooks.preload_user user, []
-    %{room_types: room_types, rooms: rooms, room_map: room_map,
-      active_room: ar} =
-        UccChat.ChannelService.get_side_nav(user, channel.id)
+    %{room_types: room_types, rooms: rooms, room_map: room_map, active_room: ar} =
+      UccChat.ChannelService.get_side_nav(user, channel.id)
 
     previews = MessageService.message_previews(user.id, messages)
-    # Logger.warn "message previews: #{inspect previews}"
-
     status = UccChat.PresenceAgent.get user.id
 
     %__MODULE__{
@@ -99,11 +97,11 @@ defmodule UccChat.ChatDat do
   def get_messages_info(chatd) do
     get_messages_info(chatd, chatd.user)
   end
+
   def get_messages_info(chatd, user) do
     case chatd.channel do
       %ChannelSchema{id: id} ->
         value = MessageService.get_messages_info(chatd.messages, id, user)
-        # Logger.warn "chatd value: value: #{inspect value}"
         set(chatd, :messages_info, value)
       _ ->
         chatd

@@ -1,16 +1,14 @@
 defmodule UccChat.ServiceHelpers do
   # use UccChatWeb, :service
-  alias UccChat.{
-    # Channel, MessageService
-    Channel
-  }
-
-  require UccChatWeb.SharedView
   use UcxUccWeb.Gettext
 
-  alias UcxUcc.{Repo, Hooks, Accounts.User}
-
   import Ecto.Query
+  require UccChatWeb.SharedView
+
+  alias UcxUcc.{Repo, Hooks, Accounts.User}
+  alias UccChat.{AppConfig, Channel}
+
+  require Logger
 
   @default_user_preload [:account, :roles, user_roles: :role]
 
@@ -53,17 +51,32 @@ defmodule UccChat.ServiceHelpers do
   end
 
   def count(query) do
-    query |> select([m], count(m.id)) |> Repo.one
+    query
+    |> exclude(:order_by)
+    |> exclude(:preload)
+    |> exclude(:select)
+    |> select([m], count(m.id))
+    |> Repo.one
   end
 
-  def last_page(query, page_size \\ 75) do
-    count = count(query)
-    offset = case count - page_size do
-      offset when offset >= 0 -> offset
-      _ -> 0
-    end
-    query |> offset(^offset) |> limit(^page_size)
+  def last_page(query, page_size \\ AppConfig.page_size) do
+    query
+    |> exclude(:order_by)
+    |> order_by(desc: :inserted_at)
+    |> limit(^page_size)
+    |> subquery
+    |> order_by(asc: :inserted_at)
   end
+
+  # def last_page(query, page_size \\ 75) do
+  #   count = count(query)
+  #   offset = case count - page_size do
+  #     offset when offset >= 0 -> offset
+  #     _ -> 0
+  #   end
+  #   Logger.warn "{page_size, count, offset}: " <> inspect({page_size, count, offset})
+  #   query |> offset(^offset) |> limit(^page_size)
+  # end
 
   def user_preload(preload) do
     Hooks.user_preload preload

@@ -5,6 +5,47 @@
 
   const item_selector = '.popup-item';
   const selected_selector = item_selector + '.selected';
+  const animation_styles = `
+        .loading-animation {
+          top: 0; right: 0; bottom: 0; left: 0;
+          display: flex;
+          align-items: center;
+          position: absolute;
+          justify-content: center;
+          text-align: center;
+          z-index: 100;
+        }
+        .loading-animation > div {
+          width: 10px;
+          height: 10px;
+          margin: 2px;
+          border-radius: 100%;
+          display: inline-block;
+          background-color: rgba(255,255,255,0.6);
+          -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+          animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+        }
+        .loading-animation .bounce1 {
+          -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+        }
+        .loading-animation .bounce2 {
+          -webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+        }
+        @-webkit-keyframes loading-bouncedelay {
+          0%,
+          80%,
+          100% { -webkit-transform: scale(0) }
+          40% { -webkit-transform: scale(1.0) }
+        }
+        @keyframes loading-bouncedelay {
+          0%,
+          80%,
+          100% { transform: scale(0); }
+          40% { transform: scale(1.0); }
+        }
+    `;
 
   var Utils = {
     remove: function(arr, item) {
@@ -45,34 +86,53 @@
     },
     scroll_bottom: function() {
       let elem = $('.messages-box .wrapper')[0]
-      if (elem)
-        elem.scrollTop = elem.scrollHeight - elem.clientHeight
-      else
-        console.warn('invalid elem')
+      if (elem) {
+        elem.scrollTop = elem.scrollHeight - elem.clientHeight;
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+      }
     },
     scroll_down: function(height) {
-      let elem = $('.messages-box .wrapper')
-      if (elem)
-        elem.scrollTop(getScrollBottom() + height)
-      else
+      let elem = $('.messages-box .wrapper');
+      if (elem) {
+        elem.scrollTop(elem.scrollTop() - height);
+      } else {
         if (debug) { console.warn('invalid elem') }
+      }
+    },
+    scroll_up: function(height) {
+      let elem = $('.messages-box .wrapper');
+      if (elem) {
+        elem.scrollTop(elem.scrollTop() + height);
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+      }
     },
     getScrollBottom: function() {
       let elem = $('.messages-box .wrapper')[0]
       if (elem) {
-        return elem.scrollHeight - $(elem).innerHeight
+        return elem.scrollHeight - $(elem).innerHeight()
       } else {
         if (debug) { console.warn('invalid elem') }
-        return 1000
+        return 1000;
       }
     },
-    is_scroll_bottom: function() {
+    is_scroll_bottom: function(tolerence = 1) {
       let elem = $('.messages-box .wrapper')[0]
       if (elem) {
-        return elem.scrollTop + $(elem).innerHeight() + 1 >= elem.scrollHeight
+        return elem.scrollTop + $(elem).innerHeight() + tolerence >= elem.scrollHeight;
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+        return true;
+      }
+    },
+    is_scroll_top: function (tolerence = 2) {
+      let elem = $('.messages-box .wrapper')[0]
+      if (elem) {
+        return elem.scrollTop < tolerence;
       } else {
         if (debug) { console.warn('invalid elem') }
-        return true
+        return true;
       }
     },
     empty_string: function(string) {
@@ -99,50 +159,22 @@
           background: linear-gradient(to top, #6c6c6c 0%, #aaaaaa 100%);
           z-index: 1000;
         }
-        .loading-animation {
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          display: flex;
-          align-items: center;
+        ${animation_styles}
+        .page-loading-container {
           position: absolute;
-          justify-content: center;
-          text-align: center;
-          z-index: 100;
+          top: 0; right: 0; left: 0; bottom: 0;
+          z-index: 5000;
+          background: black;
+          opacity: 0.8;
         }
-        .loading-animation > div {
-          width: 10px;
-          height: 10px;
-          margin: 2px;
-          border-radius: 100%;
-          display: inline-block;
-          background-color: rgba(255,255,255,0.6);
-          -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-          animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-        }
-        .loading-animation .bounce1 {
-          -webkit-animation-delay: -0.32s;
-          animation-delay: -0.32s;
-        }
-        .loading-animation .bounce2 {
-          -webkit-animation-delay: -0.16s;
-          animation-delay: -0.16s;
-        }
-        @-webkit-keyframes loading-bouncedelay {
-          0%,
-          80%,
-          100% { -webkit-transform: scale(0) }
-          40% { -webkit-transform: scale(1.0) }
-        }
-        @keyframes loading-bouncedelay {
-          0%,
-          80%,
-          100% { transform: scale(0); }
-          40% { transform: scale(1.0); }
+        .page-loading-container .loading-animation > div {
+          background-color: #eee !important;
         }
         </style>`
      $('head').prepend(stylesheet)
+    },
+    add_page_animation_styles: function() {
+      $('head').prepend(`<style>${animation_styles}</style>`);
     },
     remove_page_loading: function() {
       $('head > style').remove()
