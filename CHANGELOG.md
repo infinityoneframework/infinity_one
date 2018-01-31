@@ -22,6 +22,7 @@
   * Refactored a lot of the JS related to room message handling
   * Added direction detection to scroll so scrolling up does not trigger load more next at the bottom of the page
   * Fixed double fetch issues when opening a new room
+* [UCX-3745] Fix Volume Down title on WebRTC Client
 
 ## 1.0.0-alpha14 (2018-01-26)
 
