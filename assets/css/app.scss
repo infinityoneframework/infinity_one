@@ -432,8 +432,8 @@ aside.side-nav nav.options {
       }
     }
     .status-message-edit {
-      margin: -8px -8px -3px -8px;
-      padding: 8px 8px 5px 8px;
+      margin: -8px -8px -3px -10px;
+      padding: 8px 4px 5px 5px;
       border-radius: 5px;
       border: 1px solid #aaa;
 
@@ -441,6 +441,15 @@ aside.side-nav nav.options {
         max-height: 230px;
         overflow-y: auto;
         overflow-x: hidden;
+        padding-right: 3px;
+        margin-right: -3px;
+        &::-webkit-scrollbar-track {
+          background-color: #7b7b7b !important;
+          border-radius: 10px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background-color: #6c6c6c !important;
+        }
       }
 
       .header-bar {
