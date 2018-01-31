@@ -34,7 +34,7 @@ class Admin {
     $('body')
       .on('click', 'button.discard', function() {
         // admin.disable_save_button()
-        $('a.admin-link[data-link="info"]').click()
+        $('a.admin-link[data-id="admin_info"]').click()
       })
       .on('change', '.admin-settings form input', function(e) {
         let target = e.currentTarget
@@ -43,6 +43,10 @@ class Admin {
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })
       .on('keyup keypress paste', '.admin-settings form input', function(e) {
+        admin.enable_save_button()
+        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      })
+      .on('keyup keypress paste', '.admin-settings form textarea', function(e) {
         admin.enable_save_button()
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })

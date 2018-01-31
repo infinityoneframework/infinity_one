@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+* Increase the height of the layout body content textarea
+* Fix the cancel button on the admin pages
 * Move the layout home page body field from string to text
 * Fixed Message order issue when dynamically loading more pages up and down
 * Fixed loading more prev and next animation
