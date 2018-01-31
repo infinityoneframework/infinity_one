@@ -27,6 +27,8 @@ defmodule UccChat.ChannelService do
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
   alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
+  alias UccUiFlexTabWeb.TabBarView
+
   require UccChat.ChatConstants, as: CC
   require Logger
   require IEx
@@ -83,17 +85,19 @@ defmodule UccChat.ChannelService do
 
   def set_subscription_state(channel, user_id, state)
     when state in [true, false] do
+    attrs = if state == true, do: %{open: true, hidden: false}, else: %{open: state}
     case Subscription.get_by channel_id: channel, user_id: user_id do
       nil -> nil
-      sub -> Subscription.update(sub, %{open: state})
+      sub -> Subscription.update(sub, attrs)
     end
   end
 
   def set_subscription_state_room(name, user_id, state)
     when state in [true, false] do
+    attrs = if state == true, do: %{open: true, hidden: false}, else: %{open: state}
     case Subscription.get_by_room(name, user_id) do
       nil -> nil
-      sub -> Subscription.update(sub, %{open: state})
+      sub -> Subscription.update(sub, attrs)
     end
   end
 
@@ -249,6 +253,23 @@ defmodule UccChat.ChannelService do
   ##################
   #
 
+  def get_side_nav_rooms_search(%User{} = user, pattern, opts \\ []) do
+    pattern =
+      if opts[:fuzzy] do
+        pattern
+        |> String.to_charlist
+        |> Enum.intersperse("%")
+        |> to_string
+      else
+        pattern
+      end
+
+    user.id
+    |> Channel.get_channels_by_pattern("%" <> pattern <> "%", 1000)
+    |> order_by([c], [asc: c.name])
+    |> Repo.all
+  end
+
   def get_side_nav_rooms(%User{} = user) do
     user
     |> Channel.get_all_channels
@@ -280,6 +301,25 @@ defmodule UccChat.ChannelService do
   end
   def unhide_current_channel(cc, _channel_id), do: cc
 
+  def get_side_nav_search(user, match, channel_id, opts \\ [])
+  def get_side_nav_search(%User{} = user, match, channel_id, opts) do
+    channel = get_channel channel_id
+    rooms = side_nav_search(user, match, channel, opts)
+    %{
+      room_types: rooms |> all_room_types() |> room_types(false),
+      room_map: room_map(rooms),
+      rooms: [],
+      active_room: Enum.find(rooms, &(&1[:open])) || build_active_room(channel),
+      search_empty: rooms == [],
+    }
+  end
+
+  def get_side_nav_search(user_id, match, channel_id, opts) do
+    user_id
+    |> Accounts.get_user
+    |> get_side_nav_search(match, channel_id, opts)
+  end
+
   @doc """
   Get the side_nav data used in the side_nav templates
   """
@@ -305,9 +345,13 @@ defmodule UccChat.ChannelService do
       get_channel_display_name(type, chan, id)
     unread = if cc.unread == 0, do: false, else: cc.unread
     # cc = unhide_current_channel(cc, channel_id)
+    status_message =
+      if chan.type == 2 and user.account.status_message != "",
+        do: user.account.status_message, else: nil
 
     %{
       open: open,
+      status_message: status_message,
       has_unread: cc.has_unread,
       unread: unread,
       alert: cc.alert,
@@ -327,6 +371,18 @@ defmodule UccChat.ChannelService do
     }
     |> Hooks.build_sidenav_room()
   end
+
+  defp side_nav_search(user, match, channel, opts) do
+    match
+    |> run_search(user.id, opts[:fuzzy])
+    |> Enum.map(fn cc -> channel_room(cc, user.id, channel, channel.id) end)
+    |> Enum.sort(fn a, b ->
+      String.downcase(a.display_name) < String.downcase(b.display_name)
+    end)
+  end
+
+  defp run_search(match, user_id, true),  do: Subscription.fuzzy_search(match, user_id)
+  defp run_search(match, user_id, _),  do: Subscription.search(match, user_id)
 
   defp side_nav_rooms(user, channel, channel_id, chat_mode) do
     user
@@ -447,7 +503,7 @@ defmodule UccChat.ChannelService do
     end
 
     channel = Channel.get_by! name: room, preload: [:subscriptions]
-    # old_channel = Helpers.get_by! Channel, :name, old_room, preload: [:subscriptions]
+    old_channel = Channel.get_by! name: old_room
 
     # {subscribed, hidden} = Channel.subscription_status(channel, user.id)
 
@@ -459,11 +515,11 @@ defmodule UccChat.ChannelService do
     |> User.changeset(%{open_id: channel.id})
     |> Repo.update!
 
-    messages = Message.get_messages(channel.id, user)
+    page = Message.get_room_messages(channel.id, user)
 
     chatd =
       user
-      |> ChatDat.new(channel, messages)
+      |> ChatDat.new(channel, page)
       |> ChatDat.get_messages_info(user)
 
     Logger.debug "messages_info: #{inspect chatd.messages_info}"
@@ -477,14 +533,17 @@ defmodule UccChat.ChannelService do
     #   "messages_header.html"
     #   |> UccChat.View.MasterView.render(chatd: chatd)
     #   |> Helpers.safe_to_string
-    html =
-      "messages_container.html"
-      |> UccChatWeb.MasterView.render(chatd: chatd)
-      |> Helpers.safe_to_string
+    html = Phoenix.View.render_to_string(UccChatWeb.MasterView,
+      "messages_container.html", chatd: chatd)
 
-    side_nav_html = SideNavService.render_rooms_list(channel.id, user_id )
+    side_nav_html = SideNavService.render_rooms_list(channel.id, user_id)
 
     %{
+      # page: %{
+      #   page_number: page.page_number,
+      #   page_size: page.page_size,
+      #   total_pages: page.total_pages
+      # },
       display_name: display_name,
       room_title: room,
       channel_id: channel.id,
@@ -496,6 +555,17 @@ defmodule UccChat.ChannelService do
       side_nav_html: side_nav_html,
       room_route: Channel.room_route(channel)
     }
+    |> set_flex_html(channel.type, old_channel.type)
+  end
+
+  defp set_flex_html(map, type, type) do
+    map
+  end
+  defp set_flex_html(map, 2, _) do
+    Map.put map, :flex_html, Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: ["direct"])
+  end
+  defp set_flex_html(map, _, _) do
+    Map.put map, :flex_html, Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: ["channel"])
   end
 
   def toggle_favorite(user_id, channel_id) do
@@ -1141,7 +1211,6 @@ defmodule UccChat.ChannelService do
   def invite_user(user, channel_id, current_user_id \\ [], opts \\ [])
   def invite_user(%User{} = user, channel_id, current_user_id, opts)
     when is_binary(current_user_id) do
-    user.id
     invite_user(user.id, channel_id, opts)
   end
 

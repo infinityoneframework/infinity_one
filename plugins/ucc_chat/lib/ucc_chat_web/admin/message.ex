@@ -20,6 +20,7 @@ defmodule UccChatWeb.Admin.Page.Message do
     {[
       user: Repo.preload(user, Hooks.user_preload([])),
       changeset: Message.get |> Message.changeset,
+      message_opts: UccChatWeb.MessageView.message_opts()
     ], user, page, socket}
   end
 

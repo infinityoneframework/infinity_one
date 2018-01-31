@@ -1,4 +1,5 @@
-- username = get_username @message
+- username = get_username(@message)
+- avatar_url = @message.user |> Map.get(:avatar_url)
 - reactions = Enum.sort @message.reactions, &(&1.inserted_at < &2.inserted_at)
 = get_message_wrapper_opts(@message, @user)
   = if @message.avatar do
@@ -8,8 +9,8 @@
     - else
       button.thumb.user-card-message(data-username="#{username}" tabindex="1")
         .avatar
-          = if @user.avatar_url do
-            .avatar-image(style="background-image:url(#{@user.avatar_url});")
+          = if avatar_url do
+            .avatar-image(style="background-image:url(#{avatar_url});")
           - else
             .avatar-image(style="background-image:url(#{avatar_url(username)});")
   - else
@@ -19,8 +20,8 @@
     - else
       button.thumb.user-card-message(data-username="#{username}" tabindex="1")
         .avatar
-          = if @user.avatar_url do
-            .avatar-image(style="background-image:url(#{@user.avatar_url});")
+          = if avatar_url do
+            .avatar-image(style="background-image:url(#{avatar_url});")
           - else
             .avatar-image(style="background-image:url(#{avatar_url(username)});")
   = if alias? = alias?(@message) do
@@ -31,7 +32,6 @@
     button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
       = username
   span.info.border-component-color.color-info-font-color
-    / - # Logger.error "===== message: #{inspect @message}"
     = unless @message.type == "d" do
       = for tag <- role_tags(@message) do
         span.role-tag.background-info-font-color(data-role="#{tag}")= tag
@@ -53,7 +53,11 @@
       i.icon-cog.message-cog(aria-label="Actions")
   - info = get_info_class(@message)
   .body.color-primary-font-color(class="#{info}" dir="auto")
-    = format_message_body(@message)
+    / TODO: Remove this, its for testing only
+    / -# body = to_string(@message.timestamp) <> " " <> to_string(@message.body)
+    / -#message = struct(@message, body: body)
+    / =#format_message_body(message, @message_opts)
+    = format_message_body(@message, @message_opts)
     = for attachment <- @message.attachments  do
       = render UccChatWeb.AttachmentView, "attachment.html", attachment: UccChatWeb.AttachmentView.get_attachment(attachment)
     - previews = @previews

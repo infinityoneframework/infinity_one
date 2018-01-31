@@ -12,7 +12,7 @@ defmodule UccChat.PinnedMessage do
     @schema
     |> where([m], m.channel_id == ^channel_id)
     |> preload([message: [:user]])
-    |> order_by([m], desc: m.inserted_at)
+    |> order_by(desc: :inserted_at)
     |> @repo.all
   end
 end

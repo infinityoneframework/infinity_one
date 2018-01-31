@@ -3,7 +3,7 @@ defmodule UcxUcc.Mixfile do
 
   def project do
     [app: :ucx_ucc,
-     version: "0.1.0",
+     version: "0.2.2",
      elixir: "~> 1.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -97,12 +97,17 @@ defmodule UcxUcc.Mixfile do
       {:postgrex, ">= 0.0.0", only: [:test]},
       # {:rebel, path: "../rebel"},
       {:rebel, github: "smpallen99/rebel"},
-      # {:ucc_chat, path: "plugins/ucc_chat", app: false},
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
       {:floki, "~> 0.0", override: true},
       {:phoenix_markdown, "~> 0.1"},
       {:distillery, "~> 1.4"},
+      {:conform, "~> 2.5"},
+      {:ex_syslogger, github: "smpallen99/ex_syslogger"},
+      {:gen_smtp, "~> 0.12.0"},
+      {:exprof, "~> 0.2.0"},
+      # {:scrivener_ecto, path: "../scrivener_ecto"}
+      {:scrivener_ecto, github: "smpallen99/scrivener_ecto"}
 
     ] ++ plugin_deps()
   end

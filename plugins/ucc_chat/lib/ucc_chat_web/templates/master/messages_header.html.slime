@@ -5,5 +5,12 @@
 - else
   - class = get_room_icon_class @chatd, "offline"
   i(class="#{class}")
-span.room-title= @chatd.active_room[:display_name]
-span.room-topic= markdown @chatd.channel.topic
+
+- active_room = @chatd.active_room
+span.room-title= active_room[:display_name]
+
+= if active_room.channel_type == 2 do
+  span.room-topic.status-message data-username="#{active_room.display_name}"
+    = status_message @chatd, active_room.display_name
+- else
+  span.room-topic= markdown @chatd.channel.topic

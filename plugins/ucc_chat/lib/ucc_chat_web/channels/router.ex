@@ -28,7 +28,7 @@ defmodule UccChatWeb.ChannelRouter do
 
   def match(:delete, socket, ["attachment", id], params) do
     params = Map.put(params, "id", id)
-    apply(Web.MessageChannelController, :delete_attachment,
+    apply(MessageChannelController, :delete_attachment,
       [socket, params])
   end
   def match(:delete, socket, ["room", "has_unread"], params) do
@@ -78,13 +78,12 @@ defmodule UccChatWeb.ChannelRouter do
   def match(:post, socket, ["messages"], params) do
     apply(MessageChannelController, :create, [socket, params])
   end
-
   def match(:get, socket, ["messages", "surrounding"], params) do
     apply(MessageChannelController, :surrounding, [socket, params])
   end
-  def match(:get, socket, ["messages", "last"], params) do
-    apply(MessageChannelController, :last, [socket, params])
-  end
+  # def match(:get, socket, ["messages", "last"], params) do
+  #   apply(MessageChannelController, :last, [socket, params])
+  # end
   def match(:get, socket, ["messages", "previous"], params) do
     apply(MessageChannelController, :previous, [socket, params])
   end

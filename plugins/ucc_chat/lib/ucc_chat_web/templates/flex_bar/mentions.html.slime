@@ -6,15 +6,13 @@
     = if @mentions == [] do
       h2 No mentions found
   .ul.mentioned-messages-list.list.clearfix(rebel-channel="room")
+    - message_opts = UccChatWeb.MessageView.message_opts()
     = for mention <- @mentions do
       - user = Map.get mention[:message], :user
       li(id="#{mention[:id]}" class="#{get_li_class(mention, :mention)}" data-username="#{user.username}" data-date="#{mention[:date]}" data-timestamp="#{mention[:timestamp]}")
         button.thumb.user-card-message(data-username="#{user.username}" tabindex="1")
           .avatar
-            = if user.avatar_url do
-              .avatar-image(style="background-image:url(#{user.avatar_url});")
-            - else
-              .avatar-image(style="background-image:url(#{avatar_url(user.username)});")
+            .avatar-image(style="background-image:url(#{avatar_url(user)});")
         button.user.user-card-message.color-primary-font-color(type="button" data-username="#{user.username}" tabindex="1")
           = user.username
         span.info.border-component-color.color-info-font-color
@@ -22,6 +20,6 @@
           .message-cog-container(class="#{UccChatWeb.MessageView.hide_cog(mention[:message])}" rebel-click="flex_message_cog_click")
             i.icon-cog.message-cog(aria-label="Actions")
         .body.color-primary-font-color(dir="auto")
-          = UccChatWeb.MessageView.format_message_body(mention[:message])
+          = UccChatWeb.MessageView.format_message_body(mention[:message], message_opts)
         ul.actionLinks.hidden
         ul.reactions.hidden

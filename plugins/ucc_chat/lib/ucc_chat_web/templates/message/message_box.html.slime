@@ -36,7 +36,10 @@
 
         = if @mb[:show_send] do
           .message-buttons.send-button
-            i.icon-paper-plane(aria-label="#{~g(Send)}")
+            i.icon-paper-plane(aria-label="#{~g(Send)}" rebel-click="message_send")
+        - else
+          .message-buttons.send-button  style="display:none;"
+            i.icon-paper-plane(aria-label="#{~g(Send)}" rebel-click="message_send")
     - else
       .stream-info
         = if @mb[:blocked?] do

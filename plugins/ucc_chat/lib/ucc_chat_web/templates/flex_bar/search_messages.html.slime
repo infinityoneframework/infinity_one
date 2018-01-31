@@ -1,0 +1,22 @@
+- message_opts = UccChatWeb.MessageView.message_opts()
+= for search <- @searches do
+  - username = search.user.username
+  - avatar_url = search.user |> Map.get(:avatar_url)
+  - seq = if search.message.sequential, do: " sequential", else: ""
+  li(id="#{search[:id]}" class="#{get_li_class(search, :search)}#{seq}" data-username="#{username}" data-date="#{search[:date]}" data-timestamp="#{search[:timestamp]}")
+    button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+      .avatar
+        = if avatar_url do
+          .avatar-image(style="background-image:url(#{avatar_url});")
+        - else
+          .avatar-image(style="background-image:url(#{avatar_url(search[:user])});")
+    button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
+      = username
+    span.info.border-component-color.color-info-font-color
+      span.time(title="#{search[:date]}")= search[:time]
+      .message-cog-container(class="#{UccChatWeb.MessageView.hide_cog(search[:message])}" rebel-click="flex_message_cog_click")
+        i.icon-cog.message-cog(aria-label="#{~g(Actions)}")
+    .body.color-primary-font-color(dir="auto")
+      = UccChatWeb.MessageView.format_message_body(search[:message], message_opts)
+    ul.actionLinks.hidden
+    ul.reactions.hidden

@@ -44,7 +44,7 @@ defmodule UccChat.SlashCommands do
     %{command: "shrug", args: ~g"your message (optional)", description: ~g"Displays ¯\_(ツ)_/¯ after your message"},
     %{command: "unmute", args: "@username", description: ~g"Unmute someone in the room"},
     %{command: "unhide", args: "#channel", description: ~g"Unhide a hidden channel"},
-    %{command: "call", args: "phone number", description: ~g"Call a phone number"}
+    %{command: "call", args: "phone number | @username", description: ~g"Call a phone number or a user"}
   ]
 
   @command_map @command_data |> Enum.reduce(%{}, fn %{command: command} = map, acc -> Map.put(acc, command, map) end)
@@ -54,7 +54,6 @@ defmodule UccChat.SlashCommands do
   def commands(pattern, count \\ @default_count) do
     pattern
     |> find(count)
-    |> IO.inspect(label: "find result")
     |> Enum.reduce([], fn
       cmd, [] -> [format_command(@command_map[cmd], " selected")]
       cmd, acc -> [format_command(@command_map[cmd])|acc]
@@ -101,10 +100,13 @@ defmodule UccChat.SlashCommands do
     end
   end
 
-  def special_text(message) do
+
+  def special_text(message) when is_binary(message) do
     case @special_text[message] do
       nil   -> "/" <> message
       value -> value
     end
   end
+
+  def special_text(_), do: nil
 end

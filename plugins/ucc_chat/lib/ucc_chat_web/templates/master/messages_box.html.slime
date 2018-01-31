@@ -1,29 +1,23 @@
 - info = @chatd.messages_info
+= get_pagination(info)
 .ticks-bar
 button.new-message.background-primary-action-color.color-content-background-color.not
   i.icon-down-big
   = ~g(New messages)
-div(class="jump-recent primary-action-color background-component-color #{has_more_next(:not)}")
+.jump-recent.primary-action-color.background-component-color.not
   button
     = ~g(Jump to recent messages)
     i.icon-level-down
+.jump-previous.primary-action-color.background-component-color.not
+  button
+    = ~g(Jump to previous messages)
+    i.icon-level-up
 = unless info[:can_preview] do
   .content.room-not-found.error-color
     div= ~g(You must join to view messages in this channel)
-div(class="wrapper #{has_more_next(:has_more_next)} #{hide_username(@chatd.user)} #{hide_avatar(@chatd.user)}")
+div(class="wrapper #{hide_username(@chatd.user)} #{hide_avatar(@chatd.user)}")
   ul(aria-live="polite")
-    = if info[:can_preview] do
-      = if info[:has_more] do
-        li.load-more
-          = if info[:is_loading] do
-            = get_loading()
-      - else
-        li.start.color-info-font-color
-          = ~g(Start of conversation)
+    - message_opts = UccChatWeb.MessageView.message_opts()
     = for message <- @chatd.messages do
       - previews = List.keyfind(@chatd.previews, message.id, 0, {nil, []}) |> elem(1)
-      = render UccChatWeb.MessageView, "message.html", user: @chatd.user, message: message, previews: previews
-    = if has_more_next() do
-      li.load-more
-        - if is_loading() do
-          = loading()
+      = render UccChatWeb.MessageView, "message.html", user: @chatd.user, message: message, previews: previews, message_opts: message_opts

@@ -488,6 +488,10 @@ aside.side-nav {
   .jump-recent {
     color: $primary-action-color;
   }
+
+  .jump-previous {
+    color: $primary-action-color;
+  }
 }
 
 .message-form {
@@ -579,8 +583,11 @@ aside.side-nav {
   }
 
   .mention-link {
+    &:not(.mention-link-me) {color: $primary-action-color !important; }
+
     &.mention-link-me {
       color: $primary-action-contrast;
+      background-color: $primary-action-color !important;
     }
 
     &.mention-link-all {

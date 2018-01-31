@@ -5,6 +5,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   alias UccChatWeb.RoomChannel.MessageInput.Buffer
   alias MessageInput.SlashCommands
   alias UccChat.MessageService
+  alias UccChatWeb.Client
 
   use UccChatWeb.RoomChannel.Constants
   require Logger
@@ -39,44 +40,45 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
   end
 
   def handle_in(context, @cr) do
-    # Logger.info "cr event: #{inspect context.sender["event"]}"
     # The following is a little tricky. SlashCommands.Commands.run returns
     # true if further processing is required. When false, its indicating
     # that the cr key should be ignored.
     if SlashCommands.Commands.run(context.state.buffer, context.sender, context.socket) do
       unless context.sender["event"]["shiftKey"] do
         if editing?(context.sender) do
-          Message.edit_message(context.socket, context.sender, context.client)
+          Message.edit_message(context.socket, context.sender["value"], context.client)
         else
           # this is the case for a new message to be posted
-          Message.new_message(context.socket, context.sender, context.client)
+          Message.new_message(context.socket, context.sender["value"], context.client)
         end
         MessageService.stop_typing context.socket
       end
     end
   end
 
-
   def handle_in(%{app: _, open?: true} = context, @esc) do
     MessageInput.close_popup context
   end
 
   def handle_in(context, @esc) do
-    Message.cancel_edit context.socket, context.sender, context.client
+    Message.cancel_edit context.socket, context.client
   end
 
   def handle_in(%{app: _} = context, @dn_arrow) do
     # Logger.info "down arrow"
-    MessageInput.send_js context, "UccUtils.downArrow()"
+    Client.async_js context.socket, "UccUtils.downArrow()"
   end
 
   def handle_in(%{app: _, open?: true} = context, @up_arrow) do
     # Logger.info "up arrow"
-    MessageInput.send_js context, "UccUtils.upArrow()"
+    Client.async_js context.socket, "UccUtils.upArrow()"
   end
 
   def handle_in(context, @up_arrow) do
-    Message.open_edit context.socket
+    # only open message for editing if the text area is blank.
+    if context.sender["text_len"] == 0 do
+      Message.open_edit context.socket
+    end
   end
 
   def handle_in(context, _key), do: context

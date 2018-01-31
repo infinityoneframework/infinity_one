@@ -40,16 +40,20 @@ defmodule UcxUcc.Accounts do
     |> Repo.all
   end
 
-  def list_all_users_by_pattern(pattern, exclude, count) do
+  def list_all_users_by_pattern(pattern, {column, exclude}, count) do
+    pattern = String.downcase(pattern)
     User
-    |> where([c], like(c.username, ^pattern) and not c.id in ^exclude)
+    |> where([c], like(fragment("LOWER(?)", c.username), ^pattern) and not field(c, ^column) in ^exclude)
     |> join(:left, [c], r in assoc(c, :roles))
     |> where([c, r], not(r.name == "bot" and r.scope == "global"))
     |> preload([c, r], [roles: c])
-    |> select([c], c)
     |> order_by([c], asc: c.username)
     |> limit(^count)
     |> Repo.all
+  end
+
+  def list_all_users_by_pattern(pattern, exclude, count) do
+    list_all_users_by_pattern(pattern, {:id, exclude}, count)
   end
 
   @doc """
@@ -104,6 +108,10 @@ defmodule UcxUcc.Accounts do
       nil -> nil
       user -> user.username
     end
+  end
+
+  def get_by_username(username, opts \\ []) do
+    get_by_user [{:username, username} | opts]
   end
 
   @doc """
@@ -506,6 +514,32 @@ defmodule UcxUcc.Accounts do
 
   """
   def get_account!(id), do: Repo.get!(Account, id)
+
+  @doc """
+  Gets an account by one or more fields
+  """
+  def get_by_account(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(Account, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.one
+  end
+
+  @doc """
+  Gets a list of accounts by one or more fields.
+  """
+  def list_by_accounts(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(Account, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.all
+  end
 
   @doc """
   Creates an account.

@@ -7,7 +7,7 @@ defmodule UccChat.AppConfig do
 
 
   [
-    {:page_size, 150}
+    {:page_size, 76}
     # :page_size,
     # {:token_assigns_key, :user_token},
   ]

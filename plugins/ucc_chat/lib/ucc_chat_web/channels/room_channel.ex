@@ -28,6 +28,7 @@ defmodule UccChatWeb.RoomChannel do
     "broadcast:message",
     "broadcast:message:update",
     "message:new",
+    "message:push",
     "message:new:attachment"
   ]
 
@@ -41,10 +42,12 @@ defmodule UccChatWeb.RoomChannel do
   alias UcxUccWeb.Endpoint
   alias UccChatWeb.RoomChannel.KeyStore
   alias UccChatWeb.RoomChannel.Message, as: WebMessage
+  alias UccChatWeb.Client, as: WebClient
 
   import Rebel.Core, warn: false
   import Rebel.Query, warn: false
 
+  alias UcxUccWeb.Query
   require UccChat.ChatConstants, as: CC
 
   onconnect :on_connect
@@ -86,8 +89,8 @@ defmodule UccChatWeb.RoomChannel do
       %{message: message}
   end
 
-  def broadcast_bot_message(_room, _user_id, _body) do
-    raise "TBD: Implement this"
+  def broadcast_bot_message(room, user_id, body) do
+    WebMessage.broadcast_bot_message room, user_id, body
   end
 
   def broadcast_updated_message(message, _opts) do
@@ -173,8 +176,19 @@ defmodule UccChatWeb.RoomChannel do
   ##########
   # Outgoing message handlers
 
-  def handle_out("message:new", _, socket) do
-    Logger.debug "message:new"
+  def handle_out("message:push", %{rendered: rendered}, socket) do
+    WebClient.push_message(rendered, socket)
+    {:noreply, socket}
+  end
+
+  def handle_out("message:new", %{message: %{system: true} = message}, socket) do
+    message
+    |> WebMessage.render_message
+    |> WebClient.broadcast_message(socket)
+    {:noreply, socket}
+  end
+
+  def handle_out("message:new", _payload, socket) do
     {:noreply, socket}
   end
 
@@ -188,7 +202,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_out("send:message" = ev, payload, socket) do
     trace ev, payload
-    broadcast_js socket, payload[:js]
+    async_js socket, payload[:js]
     {:noreply, socket}
   end
 
@@ -204,9 +218,8 @@ defmodule UccChatWeb.RoomChannel do
     {:noreply, socket}
   end
 
-
   def handle_out("update:message_box", _payload, socket) do
-    Client.broadcast_message_box socket, socket.assigns.channel_id,
+    Client.push_message_box socket, socket.assigns.channel_id,
       socket.assigns.user_id
     {:noreply, socket}
   end
@@ -230,14 +243,14 @@ defmodule UccChatWeb.RoomChannel do
   def handle_out(ev = "update:topic", %{field: field} = payload, socket) do
     debug ev, payload
     socket
-    |> update!(:text, set: field, on: "header.fixed-title .room-topic")
-    |> update!(:text, set: field, on: ~s(.current-setting[data-edit="topic"]))
+    |> Query.update!(:text, set: field, on: "header.fixed-title .room-topic")
+    |> Query.update!(:text, set: field, on: ~s(.current-setting[data-edit="topic"]))
     {:noreply, socket}
   end
 
   def handle_out(ev = "update:description", %{field: field} = payload, socket) do
     debug ev, payload
-    update!(socket, :text, set: field,
+    Query.update!(socket, :text, set: field,
       on: ~s(.current-setting[data-edit="description"]))
     {:noreply, socket}
   end
@@ -252,7 +265,7 @@ defmodule UccChatWeb.RoomChannel do
   def handle_out(ev = "update:settings:name", %{field: field} = payload, socket) do
     debug ev, payload
     socket
-    |> update!(:text, set: field, on: ~s(.current-setting[data-edit="name"]))
+    |> Query.update!(:text, set: field, on: ~s(.current-setting[data-edit="name"]))
     {:noreply, socket}
   end
 
@@ -318,7 +331,7 @@ defmodule UccChatWeb.RoomChannel do
 
   def handle_out("update:remove_user", %{username: username, js: js}, socket) do
     Logger.debug "username: #{username}"
-    exec_js socket, js
+    async_js socket, js
     {:noreply, socket}
   end
 
@@ -427,7 +440,7 @@ defmodule UccChatWeb.RoomChannel do
     html = Phoenix.View.render_to_string MasterView,
       "messages_header.html", chatd: chatd
     on = ".messages-container header>h2"
-    update socket, :html, set: html, on: on
+    Query.update socket, :html, set: html, on: on
   end
 
   defp get_chatd(%{user_id: user_id, channel_id: channel_id}) do
@@ -438,6 +451,7 @@ defmodule UccChatWeb.RoomChannel do
 
   defdelegate message_keydown(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate click_popup(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
+  defdelegate message_send(socket, sender), to: UccChatWeb.RoomChannel.MessageInput
   defdelegate emoji_show(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_filter(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput
   defdelegate emoji_select(socket, sender), to: UccChatWeb.RoomChannel.EmojiInput

@@ -7,4 +7,5 @@
       .page-loading-container
       = render "messages_container.html", chatd: @chatd
       .flex-tab-container#flex-tabs.border-component-color
-        = render TabBarView, "index.html", chatd: @chatd, groups: ~w(channel)
+        - groups = if @chatd.channel.type == 2, do: ~w(direct), else: ~w(channel)
+        = render TabBarView, "index.html", chatd: @chatd, groups: groups

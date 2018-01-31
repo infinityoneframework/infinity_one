@@ -16,7 +16,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   def video_args(socket, current_user_id, _channel_id, user_id) do
     username = socket.assigns.username
     other_user = Accounts.get_user user_id
-    Logger.warn "video args curr_id: #{current_user_id}, user_id: #{user_id}"
+    Logger.info "video args curr_id: #{current_user_id}, user_id: #{user_id}"
     # remote_item = %{connected: false, state_text: "state", id: other_user.id,
     #   username: other_user.username}
 
@@ -42,7 +42,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
   def open(socket, {current_user_id, channel_id, tab, sender}, args) do
     Logger.debug "open assigns: #{inspect socket.assigns}"
     user_id = args["user_id"]
-    Logger.warn "stuff: #{inspect %{current_user_id: current_user_id, user_id: user_id, assigns_user_id: socket.assigns.user_id}}"
+    # Logger.warn "stuff: #{inspect %{current_user_id: current_user_id, user_id: user_id, assigns_user_id: socket.assigns.user_id}}"
     {view_args, socket} = MembersList.video_args(socket,
       current_user_id, channel_id, user_id)
     Logger.debug "args: #{inspect view_args}"
@@ -60,7 +60,7 @@ defmodule UccWebrtcWeb.FlexBar.Tab.MembersList do
       |> ChatMembersList.open({user_id, channel_id, tab, sender}, nil)
       |> update(:class, toggle: "animated-hidden", on: ".flex-tab-container .user-view")
       |> insert(html, append: ".flex-tab .content")
-    exec_js socket, "window.WebRTC.start();"
+    broadcast_js socket, "window.WebRTC.start();"
     socket
   end
 

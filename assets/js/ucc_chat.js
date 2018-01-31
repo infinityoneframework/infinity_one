@@ -102,11 +102,11 @@ window.UccChat = {
   // },
   message_preview: function(msg) {
     setTimeout(() => {
-      let bottom = this.utils.is_scroll_bottom()
+      let bottom = UccUtils.is_scroll_bottom()
       if (msg.html)
         $('#' + msg.message_id + ' div.body').append(msg.html)
       if  (bottom) {
-        this.utils.scroll_bottom()
+        UccUtils.scroll_bottom()
       }
     }, 100)
   },
@@ -268,7 +268,6 @@ require('./file_upload')
 require('./menu')
 require('./message_popup')
 require('./message_cog')
-require('./message_input')
 require('./utils')
 require('./chat_dropzone')
 require('./typing')

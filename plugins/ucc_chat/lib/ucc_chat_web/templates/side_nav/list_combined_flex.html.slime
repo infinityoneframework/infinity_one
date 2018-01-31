@@ -10,12 +10,12 @@ header.primary-background-color
       .search
         form.search-form(role="form")
           .input-line.search
-            select.c-select#show
-              option.primary-background-color(value="joined" selected="")=~g(Joined)
+            select.c-select#show rebel-change="side_nav_channels_select"
               option.primary-background-color(value="all" selected="")= ~g(All)
+              option.primary-background-color(value="joined" selected="")=~g(Joined)
             i.icon-comment.secondary-font-color
           .input-line.search
-            select.c-select#sort-channels
+            select.c-select#sort-channels rebel-change="side_nav_channels_select"
               option.primary-background-color(value="name" selected="")= ~g(Name)
               option.primary-background-color(value="msgs" selected="")= ~g(Number of messages)
             select.c-select#sort-subscriptions(style="display: none")
@@ -23,28 +23,14 @@ header.primary-background-color
               option.primary-background-color(value="ls" selected="")= ~g(Last seen)
             i.icon-sort-alt-up.secondary-font-color
           .input-line.search
-            select.c-select#channel-type
+            select.c-select#channel-type rebel-change="side_nav_channels_select"
               option.primary-background-color(value="all" selected="")= ~g(All)
               option.primary-background-color(value="public" selected="")= ~g(Public)
               option.primary-background-color(value="private" selected="")= ~g(Private)
             i.icon-lock.secondary-font-color
           .input-line.search
-            input.search#channel-search(type="text" placeholder="#{~g(Search)}" autocomplete="off")
+            input.search#channel-search(type="text" placeholder="#{~g(Search)}" autocomplete="off" rebel-keydown="side_nav_channels_search")
             i.icon-search.secondary-font-color
     h4= ~g(List of Channels)
-    ul
-      = for channel <- @channels do
-        - {subscribed?, hidden?} = UccChat.Channel.subscription_status(channel, @current_user.id)
-        li
-          a.channel-link(href="/channels/#{channel.name}")
-            i(class="#{UccChat.ChannelService.get_icon(channel.type)}")
-            = channel.name
-            span.opt.fixed
-              = if subscribed? do
-                = if hidden? do
-                  i.icon-eye-off(title="#{~g(Hidden)}" aria-label="#{~g(Hidden)}")
-                - else
-                  i.icon-eye(title="#{~g(Open)}" aria-label="#{~g(Open)}")
-    = if false do
-      .load-more
-        / {{> loading}}
+    ul.channel_list
+      = render "list_combined_flex_list.html", channels: @channels, current_user: @current_user

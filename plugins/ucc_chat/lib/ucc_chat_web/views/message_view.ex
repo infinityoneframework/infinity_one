@@ -26,6 +26,7 @@ defmodule UccChatWeb.MessageView do
       |> Enum.reduce("message background-transparent-dark-hover", fn fun, acc ->
         acc <> apply(__MODULE__, fun, [msg, user])
       end)
+      # |> add_new_day(msg, user, opts)
     attrs =
       [
         id: msg.id,
@@ -69,7 +70,7 @@ defmodule UccChatWeb.MessageView do
     Helpers.format_date_time tz_offset(dt, user)
   end
 
-  defp tz_offset(dt, user) do
+  def tz_offset(dt, user) do
     Timex.shift(dt, hours: user.tz_offset || 0)
   end
 
@@ -114,6 +115,9 @@ defmodule UccChatWeb.MessageView do
   end
   def edited(_msg, _), do: false
 
+
+  # def add_new_day(cls, msg, user, %{no_new_days: true}), do: cls
+  # def add_new_day(cls, msg, user, _), do: cls <> get_new_day(msg, user)
 
   def get_new_day(%{new_day: true}, _), do: " new-day"
   def get_new_day(_, _), do: ""
@@ -176,7 +180,8 @@ defmodule UccChatWeb.MessageView do
       |> Enum.into(settings)
 
     if Application.get_env :ucx_chat, :defer, true do
-      [:katex_syntax?, :show_mark_down?, :show_markdown_code?, :show_markdown?]
+      [:show_mark_down?, :show_markdown_code?, :show_markdown?]
+      # [:katex_syntax?, :show_mark_down?, :show_markdown_code?, :show_markdown?]
       # [:katex_syntax?, :show_mark_down?, :show_markdown_code?, :show_markdown?]
     else
       [:katex_syntax?,
@@ -258,6 +263,7 @@ defmodule UccChatWeb.MessageView do
     end
   end
 
+
   defp hidden_br do
     content_tag :span, class: "hidden-br" do
       tag :br
@@ -279,27 +285,139 @@ defmodule UccChatWeb.MessageView do
   def get_popup_data(%{data: data}), do: data
   def get_popup_data(_), do: false
 
-  def format_message_body(message) do
-    # Logger.warn "type: #{inspect message.type}, system: #{inspect message.system}, body: #{inspect message.body}"
-    body = AutoLinker.link message.body || "", exclude_pattern: "```"
-    quoted? = String.contains?(body, "```")
+  def md_key, do: Application.get_env(:ucx_ucc, :markdown_key, "!md")
+
+  @doc """
+  Get the configured options for processing the message body.
+
+  Returns a keyword list of the options.
+
+  * md_key - The message tag to mark a block as markdown formatted text
+  * message_replacement_patterns - A compiled version of Regex translations
+  """
+  def message_opts do
+    [md_key: md_key(), message_replacement_patterns: compile_message_replacement_patterns()]
+  end
+
+  defp compile_message_replacement_patterns do
+    :ucx_ucc
+    |> Application.get_env(:message_replacement_patterns, [])
+    |> Enum.reduce([], fn {re, sub}, acc ->
+      case Regex.compile re do
+        {:ok, re} -> [{re, sub} | acc]
+        _         -> acc
+      end
+    end)
+  end
+
+  @doc """
+  Format the message body.
+
+  Processes the message body for:
+
+  * html escaping
+  * encoding mention links
+  * encoding room links
+  * converting emoji short cuts to images
+  * running configurable Regex replacement patterns
+  * Converting newlines to <br/>
+  * Adding markup to quoted code
+  * Processing built-in markup like ~strike~ formatting
+  """
+  def format_message_body(message, opts \\ []) do
+    body = message.body || ""
+    md_key = Keyword.get(opts, :md_key, md_key())
+    message_replacement_patterns = opts[:message_replacement_patterns] || compile_message_replacement_patterns()
+
+    markdown? = md_key && String.contains?(body, md_key)
+    quoted? = String.contains?(body, "```") && !markdown?
+
     body
+    |> html_escape(!message.system)
+    |> autolink()
+    |> encode_mentions
+    |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
-    |> message_formats
-    # |> String.replace("&lt;", "<")
-    # |> String.replace("&gt;", ">")
-    |> format_newlines(quoted?, message.system)
-    |> UccChatWeb.SharedView.format_quoted_code(quoted?, message.system)
+    |> message_formats(markdown?)
+    |> run_message_replacement_patterns(message_replacement_patterns)
+    |> run_markdown(markdown?, md_key)
+    |> format_newlines(quoted? || markdown?, message.system)
+    |> UccChatWeb.SharedView.format_quoted_code(quoted? && !markdown?, message.system)
     |> raw
   end
 
-  def message_formats(body) do
+  defp html_escape(body, true) do
     body
-    # TODO: Fix this. Don't convert content inside html tags
-    #       Probably should write an elixir parser
-    # |> String.replace(~r/_(.+?)_/, "<i>\\1</i>")
-    # |> String.replace(~r/\*(.+?)\*/, "<strong>\\1</strong>")
-    # |> String.replace(~r/\~(.+?)\~/, "<strike>\\1</strike>")
+    |> Phoenix.HTML.html_escape
+    |> Phoenix.HTML.safe_to_string
+  end
+  defp html_escape(body, _), do: body
+
+  def run_message_replacement_patterns(body, [_ | _] = patterns) do
+    Enum.reduce(patterns, body, fn {re, sub}, body ->
+      Regex.replace(re, body, sub)
+    end)
+  end
+
+  def run_message_replacement_patterns(body, _), do: body
+
+  defp autolink(body, opts \\ [])
+  defp autolink(body, false), do: body
+  defp autolink(body, opts) do
+    AutoLinker.link(body, Keyword.put(opts, :exclude_patterns, ["```"]))
+  end
+
+  def run_markdown(body, false, _), do: body
+  def run_markdown(body, true, md_key) do
+    case String.split(body, md_key) do
+      [first, markdown | rest] ->
+        markdown = String.trim_leading(markdown, "\n")
+        first <> ~s|<div class="markdown-body">| <>
+          Earmark.as_html!(markdown, %Earmark.Options{gfm: true, plugins: %{"" => UcxUcc.EarmarkPlugin.Task}})
+          <> "</div>" <> String.trim_leading(Enum.join(rest, ""))
+      _ ->
+        body
+    end
+  end
+
+  def encode_mentions(body) do
+    Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body,
+      ~s'\\1<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
+      ~s' data-fun="flex_user_open" class="mention-link" data-username="\\2">@\\2</a>'
+  end
+
+  def encode_room_links(body) do
+    Regex.replace ~r/(^|\s)#([\w]+)/, body, ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
+  end
+
+  def message_formats(body, false) do
+    body
+    |> italic_formats()
+    |> bold_formats()
+    |> strike_formats()
+  end
+  def message_formats(body, _), do: body
+
+  defp italic_formats(body) do
+    if body =~ ~r/(\<.*?_.*?_.*?\>)|`|!md/ do
+      body
+    else
+      String.replace(body, ~r/_([^\<\>]+?)_/, "<i>\\1</i>")
+    end
+  end
+  defp bold_formats(body) do
+    if body =~ ~r/\<.*?\*.*?\*.*?\>|`|!md/ do
+      body
+    else
+      String.replace(body, ~r/\*([^\<\>]+?)\*/, "<strong>\\1</strong>")
+    end
+  end
+  defp strike_formats(body) do
+    if body =~ ~r/\<.*?~.*?~.*?\>|`|!md/ do
+      body
+    else
+      String.replace(body, ~r/\~([^\<\>]+?)\~/, "<strike>\\1</strike>")
+    end
   end
 
   defp format_newlines(string, true, _), do: string

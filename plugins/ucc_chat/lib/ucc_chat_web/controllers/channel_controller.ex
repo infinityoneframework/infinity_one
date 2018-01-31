@@ -65,11 +65,11 @@ defmodule UccChatWeb.ChannelController do
 
     UccChat.PresenceAgent.load user.id
 
-    messages = Message.get_room_messages(channel.id, user)
+    page = Message.get_room_messages(channel.id, user)
 
     chatd =
       user
-      |> ChatDat.new(channel, messages)
+      |> ChatDat.new(channel, page)
       |> ChatDat.get_messages_info
 
     conn
@@ -95,14 +95,15 @@ defmodule UccChatWeb.ChannelController do
 
   def direct(conn, %{"name" => name}) do
     with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(name),
-         user_id <- Coherence.current_user(conn) |> IO.inspect(label: "curr user") |> Map.get(:id),
+         user_id <- Coherence.current_user(conn) |> Map.get(:id),
          false <- user.id == user_id do
 
       case get_direct(user_id, name) do
         nil ->
+          IO.inspect {user_id, name}
           # create the direct and redirect
-          ChannelService.add_direct(name, user_id, nil) |> IO.inspect(label: "direct")
-          direct = get_direct(user_id, name) |> IO.inspect(label: "direct 1")
+          ChannelService.add_direct(name, user_id, nil) #  |> IO.inspect(label: "direct")
+          direct = get_direct(user_id, name) #|> IO.inspect(label: "direct 1")
           show(conn, direct.channel)
         direct ->
           show(conn, direct.channel)
@@ -112,9 +113,10 @@ defmodule UccChatWeb.ChannelController do
     end
   end
 
-  defp get_direct(user_id, name) do
+  def get_direct(user_id, name) do
     (from d in DirectSchema,
-      where: d.user_id == ^user_id and like(d.users, ^"%#{name}%"),
+      # where: d.user_id == ^user_id and like(d.users, ^"#{name}__%") or like(d.users, ^"%__#{name}")),
+      where: d.user_id == ^user_id and d.users == ^name,
       preload: [:channel])
     |> Repo.one
   end

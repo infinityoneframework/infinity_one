@@ -2,10 +2,12 @@ defmodule UccChatWeb.Client do
   use UccChatWeb.RoomChannel.Constants
 
   import UcxUccWeb.Utils
-  import Rebel.{Query, Core}, warn: false
+  import Rebel.Query, warn: false
+  import Rebel.Core, except: [broadcast_js: 2, async_js: 2]
 
   alias Rebel.Element
   alias UccChatWeb.RebelChannel.Client, as: RebelClient
+  alias UcxUccWeb.Query
 
   require Logger
   # alias Rebel.Element
@@ -55,25 +57,32 @@ defmodule UccChatWeb.Client do
   end
 
   def replace_with(socket, selector, html) do
-    html = Poison.encode!(html)
-    exec_js(socket, ~s/$('#{selector}').replaceWith(#{html})/)
-    set_event_handlers(socket, selector)
+    Query.update socket, :replaceWith, set: html, on: selector
   end
 
   def html(socket, selector, html) do
-    Rebel.Query.update socket, :html, set: html, on: selector
+    Query.update socket, :html, set: html, on: selector
   end
 
   def remove_closest(socket, selector, parent, children) do
     js =
       ~s/$('#{selector}').closest('#{parent}').find('#{children}').remove()/
     # Logger.warn "remove closest js: #{inspect js}"
-    exec_js socket, js
+    async_js socket, js
     socket
   end
 
   def close_popup(socket) do
-    update socket, :html, set: "", on: ".message-popup-results"
+    Query.update socket, :html, set: "", on: ".message-popup-results"
+  end
+
+  def has_class?(socket, selector, class) do
+    exec_js! socket,
+      "document.querySelector('#{selector}').classList.contains('#{class}')"
+  end
+
+  def editing_message?(socket) do
+    has_class?(socket, @message_box, "editing")
   end
 
   def get_message_box_value(socket) do
@@ -81,21 +90,24 @@ defmodule UccChatWeb.Client do
   end
 
   def set_message_box_focus(socket) do
-    exec_js socket, set_message_box_focus_js()
+    async_js socket, set_message_box_focus_js()
   end
 
   def set_message_box_focus_js,
     do: "var elem = document.querySelector('#{@message_box}'); elem.focus();"
 
   def clear_message_box(socket) do
-    exec_js socket, clear_message_box_js()
+    assigns = socket.assigns
+    socket
+    |> UccChatWeb.RebelChannel.Client.push_message_box(assigns.channel_id, assigns.user_id)
+    |> set_inputbox_buttons(false)
   end
 
   def clear_message_box_js,
     do: set_message_box_focus_js() <> ~s(elem.value = "";)
 
   def render_popup_results(html, socket) do
-    update socket, :html, set: html, on: ".message-popup-results"
+    Query.update socket, :html, set: html, on: ".message-popup-results"
   end
 
   def get_selected_item(socket) do
@@ -104,8 +116,9 @@ defmodule UccChatWeb.Client do
       _other -> nil
     end
   end
+
   def push_message({message, html}, socket) do
-    exec_js socket, push_message_js(html, message) <>
+    async_js socket, push_message_js(html, message) <>
       RebelClient.scroll_bottom_js('#{@wrapper}')
   end
 
@@ -146,6 +159,22 @@ defmodule UccChatWeb.Client do
     delete! socket, "li.message#" <> message_id
   end
 
+  def set_inputbox_buttons(socket, mode) when mode in [true, :active] do
+    async_js socket, """
+      $('.message-buttons').hide();
+      $('.message-buttons.send-button').show();
+      $('#{@message_box}').addClass('dirty');
+      """
+  end
+
+  def set_inputbox_buttons(socket, mode) when mode in [false, nil, :empty] do
+    async_js socket, """
+      $('.message-buttons').show();
+      $('.message-buttons.send-button').hide();
+      $('#{@message_box}').removeClass('dirty');
+      """
+  end
+
   def desktop_notify(socket, name, body, message, duration) do
     name = inspect name
     body = Poison.encode! body
@@ -153,7 +182,7 @@ defmodule UccChatWeb.Client do
     channel_id = inspect message.channel_id
     channel_name = inspect message.channel.name
 
-    exec_js socket, """
+    async_js socket, """
       UccChat.notifier.desktop(#{name}, #{body}, {
         duration: #{duration},
         onclick: function(event) {
@@ -166,9 +195,8 @@ defmodule UccChatWeb.Client do
     socket
   end
 
-
   def notify_audio(socket, sound) do
-    exec_js socket, ~s/UccChat.notifier.audio('#{sound}')/
+    async_js socket, ~s/UccChat.notifier.audio('#{sound}')/
     socket
   end
 
@@ -177,4 +205,6 @@ defmodule UccChatWeb.Client do
   defdelegate insert_html(socket, selector, position, html), to: Rebel.Element
   defdelegate toastr!(socket, which, message), to: UccChatWeb.RebelChannel.Client
   defdelegate toastr(socket, which, message), to: UccChatWeb.RebelChannel.Client
+  defdelegate broadcast_js(socket, js), to: Rebel.Core
+  defdelegate async_js(socket, js), to: Rebel.Core
 end

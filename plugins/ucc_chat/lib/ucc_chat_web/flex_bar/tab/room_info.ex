@@ -40,7 +40,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
 
     type = Map.get channel || %{}, :type
 
-    exec_js socket, set_active_js(sender);
+    broadcast_js socket, set_active_js(sender);
 
 
     # assigns =
@@ -76,8 +76,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
       |> hd
 
     params = %{channel_id: opts.resource.id, field: field}
-    socket
-    |> broadcast("room:update", params)
+    broadcast(socket, "room:update", params)
   end
 
   def flex_form_toggle(socket, _sender, resource, id, val) do

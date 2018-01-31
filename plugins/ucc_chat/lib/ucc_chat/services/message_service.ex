@@ -10,6 +10,7 @@ defmodule UccChat.MessageService do
   }
   alias UccChatWeb.{MessageView, UserChannel}
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UcxUcc.Accounts
   # alias UccChat.Schema.Message, as: MessageSchema
 
   require UccChat.ChatConstants, as: CC
@@ -49,95 +50,19 @@ defmodule UccChat.MessageService do
     end
   end
 
-  # def broadcast_updated_message(message, _opts \\ []) do
-  #   message = Message.get message.id, preload: @preloads
-  #   channel = Channel.get message.channel_id
-  #   html =
-  #     message
-  #     |> Repo.preload(@preloads)
-  #     |> render_message
-  #   broadcast_message message.id, channel.name, message.user_id, html,
-  #     event: "update"
-  #   # event = if opts[:reaction], do: "code:update:reaction", else: "code:update"
-  #   # UccUcc.Web.Endpoint.broadcast! CC.chan_room <> channel.name, "code:update:reaction",
-  #   #   %{selector: "##{message.id}", html: html, action: "replaceWith"}
+  def get_messages_info(%{} = page, channel_id, user) do
+    subscription = SubscriptionService.get(channel_id, user.id)
+    last_read = Map.get(subscription || %{}, :last_read, "")
 
-  # end
-
-  # def broadcast_bot_message(%{} = channel, _user_id, body) do
-  #   Logger.debug "broadcast_bot_message body: #{inspect body}"
-  #   bot_id = Helpers.get_bot_id()
-  #   message = create_message(String.replace(body, "\n", "<br>"), bot_id,
-  #     channel.id,
-  #     %{
-  #       system: true,
-  #       sequential: false,
-  #     })
-
-  #   html = render_message message
-  #   resp = create_broadcast_message(message.id, channel.name, html)
-  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-  #     "message:new", resp
-  # end
-
-  # def broadcast_bot_message(channel_id, user_id, body) do
-  #   channel_id
-  #   |> Channel.get
-  #   |> broadcast_bot_message(user_id, body)
-
-  # end
-
-  # def broadcast_system_message(%{} = channel, user_id, body) do
-  #   message = create_system_message(channel.id, user_id, body)
-  #   html = render_message message
-  #   resp = create_broadcast_message(message.id, channel.name, html)
-  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-  #     "message:new", resp
-  # end
-  # def broadcast_system_message(channel_id, user_id, body) do
-  #   channel_id
-  #   |> Channel.get
-  #   |> broadcast_system_message(user_id, body)
-  # end
-
-  # def broadcast_private_message(%{} = channel, _user_id, body) do
-  #   message = create_private_message(channel.id, body)
-  #   html = render_message message
-  #   resp = create_broadcast_message(message.id, channel.name, html)
-  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> channel.name,
-  #     "message:new", resp
-  # end
-  # def broadcast_private_message(channel_id, user_id, body) do
-  #   channel_id
-  #   |> Channel.get
-  #   |> broadcast_private_message(user_id, body)
-  # end
-
-  # def broadcast_message(id, room, user_id, html, opts \\ []) #event \\ "new")
-  # def broadcast_message(%{} = socket, id, user_id, html, opts) do
-  #   event = opts[:event] || "new"
-  #   Phoenix.Channel.broadcast! socket, "message:" <> event,
-  #     create_broadcast_message(id, user_id, html, opts)
-  # end
-  # def broadcast_message(id, room, user_id, html, opts) do
-  #   event = opts[:event] || "new"
-  #   UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:" <> event,
-  #     create_broadcast_message(id, user_id, html, opts)
-  # end
-
-  # def push_message(socket, id, user_id, html, opts \\ []) do
-  #   Phoenix.Channel.push socket, "message:new",
-  #     create_broadcast_message(id, user_id, html, opts)
-  # end
-
-  # defp create_broadcast_message(id, user_id, html, opts \\ []) do
-  #   Enum.into opts,
-  #     %{
-  #       html: html,
-  #       id: id,
-  #       user_id: user_id
-  #     }
-  # end
+    %{}
+    |> Map.put(:page, %{
+      page_number: page.page_number,
+      page_size: page.page_size,
+      total_pages: page.total_pages
+    })
+    |> Map.put(:can_preview, true)
+    |> Map.put(:last_read, last_read)
+  end
 
   def get_messages_info(messages, channel_id, user) do
     subscription = SubscriptionService.get(channel_id, user.id)
@@ -159,16 +84,17 @@ defmodule UccChat.MessageService do
         _res -> false
       end
 
-    %{
+   %{
       has_more: has_more,
       has_more_next: has_more_next,
       can_preview: true,
-      last_read: Map.get(subscription || %{}, :last_read, "")
+      last_read: Map.get(subscription || %{}, :last_read, ""),
     }
   end
 
+  # TODO: This should be called merge, not into
   def messages_info_into(messages, channel_id, user, params) do
-    messages |> get_messages_info(channel_id, user) |> Enum.into(params)
+    messages |> get_messages_info(channel_id, user) |> Map.merge(params)
   end
 
   def last_user_id(channel_id) do
@@ -177,61 +103,6 @@ defmodule UccChat.MessageService do
       message -> Map.get(message, :user_id)
     end
   end
-
-  # def render_message(message) do
-  #   user_id = message.user.id
-  #   user = Repo.one(from u in User, where: u.id == ^user_id)
-
-  #   "message.html"
-  #   |> MessageView.render(message: message, user: user, previews: [])
-  #   |> Helpers.safe_to_string
-  # end
-
-  # def create_system_message(channel_id, user_id, body) do
-  #   create_message(body, user_id, channel_id,
-  #     %{
-  #       system: true,
-  #       sequential: false,
-  #     })
-  # end
-
-  # def create_private_message(channel_id, body) do
-  #   bot_id = Helpers.get_bot_id()
-  #   create_message(body, bot_id, channel_id,
-  #     %{
-  #       type: "p",
-  #       system: true,
-  #       sequential: false,
-  #     })
-  # end
-
-  # def create_message(body, user_id, channel_id, params \\ %{}) do
-  #   sequential? =
-  #     case Message.last_message(channel_id) do
-  #       nil -> false
-  #       lm ->
-  #         Timex.after?(Timex.shift(lm.inserted_at,
-  #           seconds: UccSettings.grouping_period_seconds()), Timex.now) and
-  #           user_id == lm.user_id
-  #     end
-
-  #   message =
-  #     Message.create!(Map.merge(
-  #       %{
-  #         sequential: sequential?,
-  #         channel_id: channel_id,
-  #         user_id: user_id,
-  #         body: body
-  #       }, params))
-  #     |> Repo.preload(@preloads)
-
-  #   if params[:type] == "p" do
-  #     Repo.delete(message)
-  #   else
-  #     embed_link_previews(body, channel_id, message.id)
-  #   end
-  #   message
-  # end
 
   def embed_link_previews(body, channel_id, message_id) do
     if UccSettings.embed_link_previews() do
@@ -258,8 +129,10 @@ defmodule UccChat.MessageService do
       spawn fn ->
         case MessageAgent.get_preview url do
           nil ->
+
             html =
               MessageAgent.put_preview url, create_link_preview(url, message_id)
+
             broadcast_link_preview(html, room, message_id)
           html ->
             spawn fn ->
@@ -297,6 +170,9 @@ defmodule UccChat.MessageService do
       %{html: html, message_id: message_id}
   end
 
+  def message_previews(user_id, %{entries: entries}) do
+    message_previews(user_id, entries)
+  end
   def message_previews(user_id, messages) when is_list(messages) do
     Enum.reduce messages, [], fn message, acc ->
       case get_preview_links(message.body) do
@@ -417,6 +293,24 @@ defmodule UccChat.MessageService do
     {body, [{user.id, name}|acc]}
   end
 
+  def update_mentions([], _, _, _), do: :ok
+  def update_mentions([mention|mentions], message_id, channel_id, body) do
+    update_mention(mention, message_id, channel_id, body)
+    update_mentions(mentions, message_id, channel_id, body)
+  end
+
+  def update_mention({nil, _}, _, _, _), do: nil
+  def update_mention({mention, name}, message_id, channel_id, body) do
+    case Accounts.get_by_user(username: name)  do
+      nil -> :error
+      user ->
+        case Mention.list_by(message_id: message_id, user_id: user.id) do
+          [] -> create_mention({mention, name}, message_id, channel_id, body)
+          _list -> :ok
+        end
+    end
+  end
+
   def create_mentions([], _, _, _), do: :ok
   def create_mentions([mention|mentions], message_id, channel_id, body) do
     create_mention(mention, message_id, channel_id, body)
@@ -438,8 +332,6 @@ defmodule UccChat.MessageService do
 
     subs =
       Subscription.get_by(user_id: mention, channel_id: channel_id)
-      # |> where([s], s.user_id == ^mention and s.channel_id == ^channel_id)
-      # |> Repo.one
       |> case do
         nil ->
           {:ok, subs} = ChannelService.join_channel(channel_id, mention)
@@ -459,11 +351,6 @@ defmodule UccChat.MessageService do
     end)
   end
   def update_direct_notices(_channel, _message), do: nil
-
-  # def create_and_render(body, user_id, channel_id, opts \\ []) do
-  #   message = create_message(body, user_id, channel_id, Enum.into(opts, %{}))
-  #   {message, render_message(message)}
-  # end
 
   def render_message_box(channel_id, user_id) do
     user = Helpers.get_user! user_id

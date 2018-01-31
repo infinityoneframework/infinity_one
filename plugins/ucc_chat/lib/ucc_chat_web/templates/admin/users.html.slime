@@ -37,7 +37,7 @@
                   td.border-component-color
                     div(class="user-image status-#{get_status(user)}" data-status-name="#{user.username}")
                       .avatar
-                        - avatar = if user.avatar_url, do: user.avatar_url, else: "/avatar/#{user.username}"
+                        - avatar = if user.avatar_url, do: user.avatar_url, else: avatar_url(user.username)
                         .avatar-image(style="background-image:url(#{avatar});")
                   td.border-component-color= user.name
                   td.border-component-color= user.username

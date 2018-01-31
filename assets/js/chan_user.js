@@ -71,6 +71,7 @@ UccChat.on_connect(function(ucc_chat, socket) {
     ucc_chat.message_preview(msg)
   })
   chan.on('update:alerts', msg => {
+    console.log('update:alerts', msg)
     ucc_chat.roomManager.update_burger_alert()
   })
 

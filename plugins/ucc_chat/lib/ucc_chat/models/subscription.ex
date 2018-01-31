@@ -64,6 +64,24 @@ defmodule UccChat.Subscription do
     |> @repo.all
   end
 
+  def fuzzy_search(text, user_id, opts \\ []) do
+    text
+    |> String.to_charlist
+    |> Enum.intersperse("%")
+    |> to_string
+    |> search(user_id, opts)
+  end
+
+  def search(text, user_id, _opts \\ []) do
+    # preload = Keyword.put_new opts[:preload] || [], :channel
+    match = "%" <> String.downcase(text) <> "%"
+    (from s in @schema,
+      join: c in Channel, on: s.channel_id == c.id,
+      where: s.user_id == ^user_id and like(fragment("LOWER(?)", c.name), ^match),
+      select: s, preload: [:channel])
+    |> @repo.all
+  end
+
   def update_all_hidden(channel_id, state) do
     @schema
     |> where([s], s.channel_id == ^channel_id)

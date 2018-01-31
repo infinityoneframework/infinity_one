@@ -14,6 +14,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   alias RoomChannel.Channel, as: WebChannel
   alias UccChatWeb.UserChannel
   alias UccDialerWeb.Channel.Dialer
+  alias UcxUcc.Hooks
 
   require UccChat.ChatConstants, as: CC
   require UccChatWeb.RoomChannel.MessageInput
@@ -213,15 +214,26 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   def run_command("call", args, _sender, socket, client) do
     number_string = Enum.join(args, "")
+
     number = String.replace(number_string, ~r/[\.\+\- x\(\)]+/, "")
     # Logger.warn "slash call number: #{number}"
-    if Regex.match? ~r/^\d+$/, number do
-      client.toastr! socket, :success,
-        gettext("Calling %{number}", number: number_string)
-      Dialer.dial(socket, number)
-    else
-      client.toastr! socket, :error,
-        gettext("Invalid phone number, %{number}", number: number_string)
+    cond do
+      Regex.match?(~r/^\d+$/, number) ->
+        dial(socket, number, client)
+
+      Regex.match?(~r/^@[\w\.\-]+$/, number) ->
+        "@" <> username = number
+        with %{} = user <- Accounts.get_by_user(username: username, preload: Hooks.user_preload([:phone_numbers])),
+             %{number: number} <- Enum.find(user.phone_numbers, & &1.primary) do
+          dial(socket, number, client)
+        else
+          _ ->
+            client.toastr! socket, :error,
+              gettext("User %{username} is invalid or does not have a phone number", username: username)
+        end
+      true ->
+        client.toastr! socket, :error,
+          gettext("Invalid phone number or username, %{number}", number: number_string)
     end
   end
 
@@ -347,5 +359,19 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
         error
     end
   end
+
+  defp dial(socket, number, client) do
+    try do
+      Dialer.dial(socket, number)
+      client.toastr! socket, :success,
+        gettext("Calling %{number}", number: number)
+    rescue
+      e ->
+        Logger.error inspect(e)
+        client.toastr! socket, :error,
+          gettext("Problem dialing, %{number}. Contact your system administrator.", number: number)
+    end
+  end
+
 
 end

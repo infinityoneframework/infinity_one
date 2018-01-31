@@ -1,0 +1,3 @@
+.status-message-select
+  = form_for UcxUcc.Accounts.change_account(@account), "#", fn f ->
+    = select f, :status_message, status_message_list(f.data), prompt: ~g(Status message), "rebel-change": "change_status_message"

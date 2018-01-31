@@ -13,38 +13,22 @@ defmodule UccChatWeb.FlexBar.Helpers do
 
     end
   end
+  import Rebel.{Core, Query, Browser}, warn: false
 
   alias UccChat.ServiceHelpers, as: Helpers
   alias UcxUcc.Permissions
-  import Rebel.{Core, Query, Browser}, warn: false
+  alias UcxUcc.Accounts
+  alias UccChatWeb.MessageView
 
   def do_messages_args(collection, user_id, channel_id) do
+    user = Accounts.get_user user_id
     collection
     |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
-      day = DateTime.to_date(m.updated_at)
-      msg =
-        %{
-          channel_id: channel_id,
-          message: m.message,
-          username: m.user.username,
-          user: m.user,
-          own: m.message.user_id == user_id,
-          id: m.id,
-          new_day: day != last_day,
-          date: Helpers.format_date(m.message.updated_at),
-          time: Helpers.format_time(m.message.updated_at),
-          timestamp: m.message.timestamp
-        }
-      {day, [msg|acc]}
-    end)
-    |> elem(1)
-    |> Enum.reverse
-  end
+      day =
+        m.message.inserted_at
+        |> MessageView.tz_offset(user)
+        |> DateTime.to_date()
 
-  def do_pinned_messages_args(collection, user_id, channel_id) do
-    collection
-    |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
-      day = DateTime.to_date(m.updated_at)
       msg =
         %{
           channel_id: channel_id,
@@ -54,8 +38,36 @@ defmodule UccChatWeb.FlexBar.Helpers do
           own: m.message.user_id == user_id,
           id: m.id,
           new_day: day != last_day,
-          date: Helpers.format_date(m.message.updated_at),
-          time: Helpers.format_time(m.message.updated_at),
+          date: MessageView.format_date(m.message.inserted_at, user),
+          time: MessageView.format_time(m.message.inserted_at, user),
+          timestamp: m.message.timestamp
+        }
+      {day, [msg|acc]}
+    end)
+    |> elem(1)
+    |> Enum.reverse
+  end
+
+  def do_pinned_messages_args(collection, user_id, channel_id) do
+    user = Accounts.get_user user_id
+    collection
+    |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
+      day =
+        m.message.inserted_at
+        |> MessageView.tz_offset(user)
+        |> DateTime.to_date()
+
+      msg =
+        %{
+          channel_id: channel_id,
+          message: m.message,
+          username: m.message.user.username,
+          user: m.message.user,
+          own: m.message.user_id == user_id,
+          id: m.id,
+          new_day: day != last_day,
+          date: MessageView.format_date(m.message.inserted_at, user),
+          time: MessageView.format_time(m.message.inserted_at, user),
           timestamp: m.message.timestamp
         }
       {day, [msg|acc]}
@@ -89,7 +101,7 @@ defmodule UccChatWeb.FlexBar.Helpers do
 
   def toastr(socket, action, message) when action in ~w(success warning error)a do
     message = Poison.encode message
-    exec_js socket, "window.toastr.#{action}('#{message}')"
+    broadcast_js socket, "window.toastr.#{action}('#{message}')"
     socket
   end
 

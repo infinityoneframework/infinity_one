@@ -18,6 +18,7 @@ defmodule UccChatWeb.UserChannel do
     "webrtc:incoming_video_call",
     "webrtc:confirmed_video_call",
     "webrtc:declined_video_call",
+    "webrtc:leave",
     "get",
   ]
 
@@ -29,7 +30,7 @@ defmodule UccChatWeb.UserChannel do
   import Ecto.Query, except: [update: 3]
 
   alias Phoenix.Socket.Broadcast
-  alias UcxUcc.{Repo, Accounts, Hooks}
+  alias UcxUcc.{Repo, Accounts, Hooks, TabBar}
   # alias UcxUcc.TabBar.Ftab
   alias Accounts.{Account, User}
   alias UccAdmin.AdminService
@@ -49,6 +50,7 @@ defmodule UccChatWeb.UserChannel do
   alias UccChatWeb.RebelChannel.Client
   alias UccChatWeb.RoomChannel.Channel, as: WebChannel
   alias UcxUcc.UccPubSub
+  alias UcxUccWeb.Query
 
   require UccChat.ChatConstants, as: CC
 
@@ -56,7 +58,7 @@ defmodule UccChatWeb.UserChannel do
   onload :page_loaded
 
   def on_connect(socket) do
-    exec_js socket, "window.UccChat.run()"
+    broadcast_js socket, "window.UccChat.run()"
 
     WebrtcChannel.on_connect(socket)
   end
@@ -141,6 +143,13 @@ defmodule UccChatWeb.UserChannel do
     #   showCancelButton: true
     #   confirmButtonText: "Yes"
     #   cancelButtonText: "No"
+
+   def handle_out("webrtc:leave" = ev, payload, socket) do
+     trace ev, payload
+     broadcast_js socket, ~s/$('.webrtc-video button.stop-call').click()/
+     {:noreply, socket}
+   end
+
   def handle_out("webrtc:" <> event, payload, socket) do
     apply WebrtcChannel, String.to_atom(event), [payload, socket]
   end
@@ -295,15 +304,15 @@ defmodule UccChatWeb.UserChannel do
   def handle_in("notification:click", params, socket) do
     message = Message.get params["message_id"]
     if params["channel_id"] == socket.assigns.channel_id do
-      exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+      broadcast_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
     else
       room = params["channel_name"]
-      exec_js socket, ~s/$('aside.side-nav a.open-room[data-room="#{room}"]').click()/
+      broadcast_js socket, ~s/$('aside.side-nav a.open-room[data-room="#{room}"]').click()/
 
       # TODO: This is a hack. We should have a notification when the room is loaded and then run the JS below.
       spawn fn ->
         Process.sleep 3500
-        exec_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
+        broadcast_js socket, ~s/UccChat.roomHistoryManager.scroll_to_message('#{message.timestamp}')/
       end
     end
 
@@ -364,6 +373,26 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_in("side_nav:close" = ev, params, socket) do
     trace ev, params
+    assigns = socket.assigns
+
+    UccUiFlexTab.FlexTabChannel.flex_close socket, %{}
+
+    assigns.user_id
+    |> UcxUcc.TabBar.get_ftabs
+    |> Enum.find(fn {tab_name, _} -> String.starts_with?(tab_name, "admin_") end)
+    |> case do
+        {tab_name, _} ->
+          Logger.warn "found open admin tab: " <> tab_name
+          module =
+            "admin_user_info"
+            |> TabBar.get_button
+            |> Map.get(:module)
+
+          module.close socket, %{}
+          TabBar.close_ftab assigns.user_id, assigns.channel_id
+        _ ->
+          :ok
+    end
 
     {:noreply, socket}
   end
@@ -576,7 +605,7 @@ defmodule UccChatWeb.UserChannel do
     user = Helpers.get_user! socket
     html = AdminService.render user, link, "#{link}.html"
     push socket, "code:update", %{html: html, selector: ".main-content", action: "html"}
-    exec_js socket, "Rebel.set_event_handlers('.main-content')"
+    broadcast_js socket, "Rebel.set_event_handlers('.main-content')"
     {:noreply, socket}
   end
 
@@ -757,6 +786,7 @@ defmodule UccChatWeb.UserChannel do
     # TODO: add Hooks for this
     # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     subscribe_callback "user:all", "callback", :user_all_event
+    subscribe_callback "user:all", "status_message:update", :status_message_update
     {:noreply, socket}
   end
 
@@ -958,6 +988,18 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+  # A generic timer handler that was introduced for the message search
+  # feature. The message is provide with a module, function, arity tuple
+  # as means of a callback.
+  def handle_info({:forward_timeout, {m, f, a}}, socket) do
+    case apply(m, f, [socket | a]) do
+      tuple when is_tuple(tuple) ->
+        tuple
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
   def handle_info(payload, socket) do
     Logger.warn "default handle info payload: #{inspect payload}"
     {:noreply, socket}
@@ -1038,7 +1080,7 @@ defmodule UccChatWeb.UserChannel do
     # Logger.warn "room: #{inspect room}, assigns: #{inspect assigns}"
     ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, false)
 
-    exec_js socket, """
+    broadcast_js socket, """
       $('link-room-#{room}').removeClass('has-unread')
         .removeClass('has-alert');
       """ |> String.replace("\n", "")
@@ -1054,11 +1096,237 @@ defmodule UccChatWeb.UserChannel do
     unless has_unread do
       ChannelService.set_has_unread(channel_id, assigns.user_id, true)
 
-      exec_js socket,
+      broadcast_js socket,
         "$('.link-room-#{room}').addClass('has-unread').addClass('has-alert');"
       push socket, "update:alerts", %{}
     end
   end
+
+  #################################
+  # Status Messages Implementation
+  #
+
+  def change_status_message(socket, sender) do
+    Logger.debug fn -> inspect(sender) end
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    account = user.account
+
+    case sender["value"] do
+      "__edit__" ->
+        account
+        |> push_status_message_edit(socket)
+      "__new__" ->
+        account
+        |> push_status_message_select(socket)
+        |> show_status_message_input()
+        |> async_js(~s/$('.status-message-input input').val('').focus();/)
+
+      "__clear__" ->
+        case UcxUcc.Accounts.update_account(account, %{status_message: ""}) do
+          {:ok, account} ->
+            Client.toastr(socket, :success, ~g(Your status message as been cleared))
+            account
+          {:error, _} ->
+            Client.toastr socket, :error, ~g(Problem updating clearing your status message)
+            account
+        end
+        |> push_status_message_select(socket)
+        |> Rebel.Query.execute(:click, on: ".account-box.active")
+        |> broadcast_status_message(user.username, "")
+
+      "" ->
+        if sender["event"]["type"] == "click" do
+          async_js socket, "$('.status-message-input input').change();"
+        else
+          socket
+          |> Rebel.Query.execute(:click, on: ".account-box.active")
+          |> show_status_message_select()
+        end
+
+      message  ->
+        message = String.trim(message)
+        user = Accounts.get_user socket.assigns.user_id, preload: [:account]
+        case UccChat.Accounts.update_status_message(user.account, message) do
+          {:ok, account} ->
+            account
+            |> push_status_message_select(socket)
+            |> Client.toastr(:success, ~g(Your status message was updated))
+            |> broadcast_status_message(user.username, message)
+          {:error, _} ->
+            Client.toastr socket, :error, ~g(Problem updating your status message)
+        end
+        socket
+        |> Rebel.Query.execute(:click, on: ".account-box.active")
+        |> show_status_message_select()
+    end
+
+    socket
+  end
+
+  def cancel_status_message(socket, sender) do
+    Logger.debug fn -> inspect(sender) end
+    async_js socket, "$('.status-message-input').hide(); $('.status-message-select').show();"
+    socket
+  end
+
+  def edit_status_message_close(socket, _sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    push_status_message_select user.account,
+      async_js(socket, "$('.status-message-edit').hide();")
+  end
+
+  def edit_status_message(socket, %{"value" => ""} = sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    index = String.to_integer(sender["dataset"]["index"])
+
+    case exec_js socket, ~s/$('.status-message-edit-ctrl input[data-index="#{index}"]').val()/ do
+      {:ok, ""} -> socket
+      {:error, _} -> socket
+      {:ok, message} ->
+        edit_status_message(socket, sender, user, index, message)
+    end
+  end
+
+  defp edit_status_message(socket, _sender, user, index, message) do
+    # Logger.warn inspect(sender)
+
+    case UccChat.Accounts.replace_status_message(user.account, index, message) do
+      {:ok, _account} ->
+        socket
+        |> async_js(disable_edit_status_control_buttons_js(index))
+        |> SweetAlert.swal(~g"Updated!", ~g"Your message has been Updated!", "success",
+            timer: 2000, showConfirmButton: false)
+      {:error, _} ->
+        socket
+        |> async_js(~s/.status-message-edit-ctrl .cancel[data-index="#{index}"]').click()/)
+        |> SweetAlert.swal(~g"Error!", ~g"There was a problem updating your message!", "error",
+            timer: 2000, showConfirmButton: false)
+    end
+  end
+
+  def delete_status_message(socket, sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    index = String.to_integer(sender["dataset"]["index"])
+
+    current_message? =
+      user.account
+      |> UccChat.Accounts.get_status_message_history()
+      |> Enum.at(index)
+      |> Kernel.==(user.account.status_message)
+
+    success = fn _ ->
+      case UccChat.Accounts.delete_status_message(user.account, index) do
+        {:ok, _account} ->
+
+          if current_message? do
+            broadcast_status_message(socket, user.username, "")
+          end
+
+          socket
+          |> Query.delete(~s(.status-message-edit-ctrl[data-index="#{index}"]))
+          |> update_message_ids()
+          |> SweetAlert.swal(~g"Deleted!", ~g"Your message was Deleted!", "success",
+            timer: 2000, showConfirmButton: false)
+        {:error, changeset} ->
+          Logger.warn inspect(changeset.errors)
+          SweetAlert.swal(socket, ~g"Error!", ~g"Something went wrong", "error",
+            timer: 2000, showConfirmButton: false)
+      end
+    end
+
+    SweetAlert.swal_modal socket, ~g(Are you sure?),
+      ~g(The message will be permanently deleted), "warning",
+      [
+        showCancelButton: true, closeOnConfirm: false, closeOnCancel: true,
+        confirmButtonColor: "#DD6B55", confirmButtonText: ~g(Yes, delete it)
+      ],
+      confirm: success
+  end
+
+  defp update_message_ids(socket) do
+    js = """
+      items = $('.status-message-edit-ctrl');
+      for(var i = 0; i < items.length; i++) {
+        $(items[i]).attr('data-index', i).find('[data-index]')
+        .attr('data-index', i);
+      }
+      """ |> String.replace("\n", "")
+    async_js socket, js
+  end
+
+  def cancel_edit_status_message(socket, sender) do
+    # Logger.warn inspect(sender)
+    user = Accounts.get_user(socket.assigns.user_id, preload: [:account])
+    index = String.to_integer(sender["dataset"]["index"])
+
+    current_message =
+      user.account
+      |> UccChat.Accounts.get_status_message_history()
+      |> Enum.at(index)
+
+    js = ~s/$('.status-message-edit-ctrl input[data-index="#{index}"]').val('#{current_message}');/ <>
+      disable_edit_status_control_buttons_js(index)
+
+    async_js socket, js
+  end
+
+  def disable_edit_status_control_buttons_js(index) do
+    """
+    $('.status-message-edit-ctrl button.save[data-index="#{index}"]').attr('disabled', true);
+    $('.status-message-edit-ctrl button.cancel[data-index="#{index}"]').attr('disabled', true);
+    $('.status-message-edit-ctrl input[data-index="#{index}"]').blur();
+    """ |> String.replace("\n", "")
+  end
+
+  defp push_status_message_select(account, socket) do
+    html =
+      Phoenix.View.render_to_string(UccChatWeb.SideNavView,
+        "account_box_status_select.html", account: account)
+    Query.update(socket, :replaceWith, set: html, on: ".status-message-select")
+  end
+
+  defp push_status_message_edit(account, socket) do
+    html =
+      Phoenix.View.render_to_string(UccChatWeb.SideNavView,
+        "account_box_status_edit.html", account: account)
+    socket
+    |> Query.update(:html, set: html, on: ".status-message-edit")
+    |> async_js("$('.status-message-edit').show(); $('.status-message-select').hide()")
+  end
+
+  defp show_status_message_select(socket) do
+    async_js(socket, "$('.status-message-select').show(); $('.status-message-input').hide();")
+    socket
+  end
+
+  defp show_status_message_input(socket) do
+    async_js(socket, "$('.status-message-select').hide(); $('.status-message-input').show();")
+    socket
+  end
+
+  defp broadcast_status_message(socket, username, message) do
+    UccPubSub.broadcast "user:all", "status_message:update", %{username: username, message: message}
+    socket
+  end
+
+  @doc """
+  The user callback used to update status messages.
+
+  This is a UccPubSub Callback.
+
+  Note: This is run for all users in the system. It does not check to see if a user is
+        subscribed or not. It should really to that.
+
+  TBD: Implement a filter to only push out if the user is subscribed to this person.
+  """
+  def status_message_update("status_message:update", %{username: username, message: message}, socket) do
+    Query.update socket, :text, set: message, on: ~s(.status-message[data-username="#{username}"])
+  end
+
+  # End of States messages implementation
 
   # TOOD: this needs to be moved like the video stuff
   def start_audio_call(socket, sender) do
@@ -1203,7 +1471,7 @@ defmodule UccChatWeb.UserChannel do
   def video_stop(socket, sender) do
 
     trace "video_stop", sender
-    exec_js(socket, "window.WebRTC.hangup()")
+    broadcast_js(socket, "window.WebRTC.hangup()")
     execute(socket, :click, on: ".tab-button.active")
   end
 
@@ -1265,7 +1533,7 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
-  def mousedown(socket, sender) do
+  def mousedown(socket, _sender) do
     # Logger.debug "mousedown sender: #{inspect sender}"
     socket
   end
@@ -1365,6 +1633,17 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+  defdelegate side_nav_search_click(socket, sender), to: __MODULE__.SideNav.Search, as: :search_click
+  defdelegate side_nav_search_keydown(socket, sender), to: __MODULE__.SideNav.Search, as: :search_keydown
+  defdelegate side_nav_search_blur(socket, sender), to: __MODULE__.SideNav.Search, as: :search_blur
+  defdelegate side_nav_channels_select(socket, sender), to: __MODULE__.SideNav.Channels, as: :channels_select
+  defdelegate side_nav_channels_search(socket, sender), to: __MODULE__.SideNav.Channels, as: :channels_search
+  defdelegate side_nav_create_channel(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel
+  defdelegate side_nav_create_channel_search_members(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_search_members
+  defdelegate side_nav_create_channel_save(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_save
+  defdelegate side_nav_create_channel_cancel(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_cancel
+  defdelegate side_nav_create_channel_select_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_select_member
+  defdelegate side_nav_create_channel_remove_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_remove_member
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer
