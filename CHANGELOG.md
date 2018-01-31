@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+* Move the layout home page body field from string to text
 * Fixed Message order issue when dynamically loading more pages up and down
 * Fixed loading more prev and next animation
 * Fixed messages screen lockup issue caused by not clearing page loading animation
