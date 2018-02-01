@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+* Fix the admin info refresh button
 * Increase the height of the layout body content textarea
 * Fix the cancel button on the admin pages
 * Move the layout home page body field from string to text

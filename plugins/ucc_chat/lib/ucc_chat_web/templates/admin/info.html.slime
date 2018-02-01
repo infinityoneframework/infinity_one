@@ -1,4 +1,4 @@
-section.page-container.page-list(data-page="info")
+section.page-container.page-list(data-page="admin_info")
   header.fixed-title.border-component-color
     = render UccChatWeb.MasterView, "burger.html"
     h2

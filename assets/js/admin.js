@@ -83,7 +83,7 @@ class Admin {
           .addClass('section-collapsed')
       })
       .on('click', '.admin-settings button.save', function(e) {
-        console.log('saving form....', $('form').data('id'))
+        //console.log('saving form....', $('form').data('id'))
         e.preventDefault()
         UccChat.userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
           .receive("ok", resp => {
@@ -97,7 +97,7 @@ class Admin {
       })
       .on('click', 'button.refresh', function(e) {
         let page = $(this).closest('section').data('page')
-        $('a.admin-link[data-link="' + page + '"]').click()
+        $('a.admin-link[data-id="' + page + '"]').click()
       })
       .on('click', 'section.admin .list-view.channel-settings span[data-edit]', (e) => {
         let channel_id = $(e.currentTarget).closest('[data-id]').data('id')
