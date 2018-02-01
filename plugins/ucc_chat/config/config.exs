@@ -5,7 +5,7 @@ config :unbrella, :plugins, ucc_chat: [
   application: UccChat.Application,
   schemas: [UccChat.Accounts.Account, UccChat.Accounts.User],
   router: UccChatWeb.Router,
-  page_size: 150,
+  page_size: 76,
   defer: true,
   emoji_one: [
     # single_class: "big",

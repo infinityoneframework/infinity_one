@@ -395,7 +395,7 @@ defmodule UccChatWeb.RoomChannel.Message do
     socket
   end
 
-  defp rebuild_sequentials(message) do
+  def rebuild_sequentials(message) do
     spawn fn ->
       message.inserted_at
       |> Message.get_by_later(message.channel_id)

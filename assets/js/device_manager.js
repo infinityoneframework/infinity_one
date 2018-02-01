@@ -28,7 +28,7 @@
   const vol_chg = 1;
 
   let DeviceManager = {
-    debug: true,
+    debug: false,
     devices: {
       handsfree_input_id: "",
       handsfree_output_id: "",
@@ -53,8 +53,10 @@
       let stream = document.getElementById('audio-stream')
       let keypad = document.getElementById('audio-keypad')
 
-      console.log('apb_volumes', this.apb_volume[2],this.apb_volume[3])
-      console.log('control volumes', audio.volume, stream.volume)
+      if (this.debug) {
+        console.log('apb_volumes', this.apb_volume[2],this.apb_volume[3])
+        console.log('control volumes', audio.volume, stream.volume)
+      }
 
       audio.volume = stream.volume = keypad.volume = volume;
 
@@ -89,8 +91,10 @@
     },
     has_headset_device: function() {
       var status = false;
-      console.log('has_headset_device devices', this.devices);
-      console.log('has_headset_device installed devices', this.installed_devices);
+      if (this.debug) {
+        console.log('has_headset_device devices', this.devices);
+        console.log('has_headset_device installed devices', this.installed_devices);
+      }
       if(this.devices.headset_input_id && this.devices.headset_output_id)
         status = true;
       if (this.debug) console.log("has_headset_device", status)
@@ -112,7 +116,7 @@
           DeviceManager.installed_devices[device.deviceId] = device
           devices.push({kind: device.kind, label: device.label, id: device.deviceId})
         } else {
-          console.log('---------- other device', device)
+          if (this.debug) { console.log('---------- other device', device); }
         }
       }
       UcxUcc.installed_devices = devices

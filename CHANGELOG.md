@@ -1,5 +1,31 @@
 # UcxUcc Changelog
 
+## 1.0.0-alpha15 (2018-01-31)
+
+### Enhancements
+
+* [UCX-3729] Fix Dynamic Message Loading
+  * Changed message pagination to use 3rd party library
+  * Added previous messages banner when contents less than window size and scroll detection does not work
+  * Added 1px scroll at top and bottom of window so load more can be properly detected when at the top or bottom of the page
+* [UCX-3749] Move the sidenav scrollbar to the right side
+* [UCX-3719] Add Status Message History Editing and Deleting
+* [UCX-3589] Include ssl certificates to configuration
+
+### Bug Fixes
+
+* [UCX-3729] Fix Dynamic Message Loading
+  * Fixed Message order issue when dynamically loading more pages up and down
+  * Fixed loading more prev and next animation
+  * Fixed messages screen lockup issue caused by not clearing page loading animation
+  * Fixed more messages up and down detection
+  * Fixed links in new messages banner
+  * Refactored a lot of the JS related to room message handling
+  * Added direction detection to scroll so scrolling up does not trigger load more next at the bottom of the page
+  * Fixed double fetch issues when opening a new room
+* [UCX-3745] Fix Volume Down title on WebRTC Client
+* Fixed Upload extension uppercase issue
+
 ## 1.0.0-alpha14 (2018-01-26)
 
 ### Enhancements

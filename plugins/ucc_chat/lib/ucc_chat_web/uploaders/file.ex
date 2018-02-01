@@ -17,7 +17,7 @@ defmodule UccChat.File do
   # Whitelist file extensions:
   def validate({file, _}) do
     ~w(.jpg .jpeg .gif .png .txt .text .doc .pdf .wav .mp3 .mp4 .mov .m4a .xls)
-    |> Enum.member?(Path.extname(file.file_name))
+    |> Enum.member?(Path.extname(file.file_name) |> String.downcase)
   end
 
   def transform(:poster, {_, %{type: "video" <> _}}) do

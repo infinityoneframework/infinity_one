@@ -65,11 +65,11 @@ defmodule UccChatWeb.ChannelController do
 
     UccChat.PresenceAgent.load user.id
 
-    messages = Message.get_room_messages(channel.id, user)
+    page = Message.get_room_messages(channel.id, user)
 
     chatd =
       user
-      |> ChatDat.new(channel, messages)
+      |> ChatDat.new(channel, page)
       |> ChatDat.get_messages_info
 
     conn

@@ -516,6 +516,32 @@ defmodule UcxUcc.Accounts do
   def get_account!(id), do: Repo.get!(Account, id)
 
   @doc """
+  Gets an account by one or more fields
+  """
+  def get_by_account(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(Account, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.one
+  end
+
+  @doc """
+  Gets a list of accounts by one or more fields.
+  """
+  def list_by_accounts(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(Account, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.all
+  end
+
+  @doc """
   Creates an account.
 
   ## Examples
