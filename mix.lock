@@ -99,6 +99,6 @@
   "ucx_alarm_manager": {:git, "git@bitbucket.org:emetrotel/ucx_alarm_manager.git", "155c31090bb627ee80bdc36e5e5a9b8b3d38bfd1", []},
   "ucx_license_manager": {:git, "git@bitbucket.org:emetrotel/ucx_license_manager.git", "f84e0a09a28f5e4788b347529349a9c6238b47a7", []},
   "ucx_unit": {:git, "git@bitbucket.org:emetrotel/ucx_unit.git", "5c576c64248637e0094fa5ce369c776ae060d59e", []},
-  "unbrella": {:git, "https://github.com/smpallen99/unbrella.git", "74950339cdb9004464138a18cee7e18e0452b711", []},
+  "unbrella": {:git, "https://github.com/smpallen99/unbrella.git", "2d87fd399596c4f0f01e2ce889fcec0a1c8c0522", []},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.3.1", "a1f612a7b512638634a603c8f401892afbf99b8ce93a45041f8aaca99cadb85e", [:rebar3], [], "hexpm"},
   "uuid": {:hex, :uuid, "1.1.8", "e22fc04499de0de3ed1116b770c7737779f226ceefa0badb3592e64d5cfb4eb9", [:mix], [], "hexpm"}}

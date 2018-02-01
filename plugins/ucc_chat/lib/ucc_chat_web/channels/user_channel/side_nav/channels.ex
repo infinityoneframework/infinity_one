@@ -169,13 +169,16 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
     |> Query.insert(:class, set: "animated-hidden", on: ".flex-nav.create-channel")
   end
 
-  def format_error(%Ecto.Changeset{errors: errors}) do
-    Enum.reduce(errors, [], fn {field, {error, _}}, message ->
-      [to_string(field) <> ": " <> error | message]
-    end)
-    |> Enum.join(", \n")
-  end
-  def format_error(term), do: to_string(term)
+  # TODO: find all the references to this and change them to use the shared view
+  defdelegate format_error(term), to: UccChatWeb.SharedView, as: :format_errors
+
+  # def format_error(%Ecto.Changeset{errors: errors}) do
+  #   Enum.reduce(errors, [], fn {field, {error, _}}, message ->
+  #     [to_string(field) <> ": " <> error | message]
+  #   end)
+  #   |> Enum.join(", \n")
+  # end
+  # def format_error(term), do: to_string(term)
 
   def create_channel_select_member(socket, sender) do
     select_member(sender["dataset"]["username"], socket)

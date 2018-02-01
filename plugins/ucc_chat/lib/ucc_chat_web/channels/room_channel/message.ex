@@ -147,7 +147,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   defp handle_new_attachment_message(socket, message_body, opts, client) do
-    Logger.debug "message_body: #{inspect message_body}"
+    Logger.debug fn -> "message_body: #{inspect message_body}" end
     user = opts[:user]
     channel = opts[:channel]
     params = opts[:params]
@@ -167,19 +167,28 @@ defmodule UccChatWeb.RoomChannel.Message do
 
         broadcast_message(socket, message.id, user.id, message.body, [])
 
-        client.toastr! socket, :success,
+        client.toastr socket, :success,
           ~g(Attachment posted successfully.)
 
         message
         |> render_message
         |> client.broadcast_message(socket)
+      {:error, :attachment, changeset, _message} ->
+        errors =
+          changeset
+          |> UccChatWeb.SharedView.format_errors()
+          |> String.replace("\n", "<br>")
+
+        client.toastr socket, :error,
+          ~g(Upload problem. Please review the following errors:) <>
+          "<br><br>" <> errors
 
       error ->
-        client.toastr! socket, :error,
-          ~g(There was a problem creating that attachment.)
-        Logger.error "error: " <> inspect(error)
-    end
+        Logger.error "unhandled error: " <> inspect(error)
 
+        client.toastr socket, :error,
+          ~g(There was a problem creating that attachment.)
+    end
     socket
   end
 
@@ -386,11 +395,11 @@ defmodule UccChatWeb.RoomChannel.Message do
           rebuild_sequentials(message)
           client.delete_message! message_id, socket
         _ ->
-          client.toastr! socket, :error,
+          client.toastr socket, :error,
             ~g(There was an error deleting that message)
       end
     else
-      client.toastr! socket, :error, ~g(You are not authorized to delete that message)
+      client.toastr socket, :error, ~g(You are not authorized to delete that message)
     end
     socket
   end
