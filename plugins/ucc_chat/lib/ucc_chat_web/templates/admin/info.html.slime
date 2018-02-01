@@ -4,7 +4,7 @@ section.page-container.page-list(data-page="admin_info")
     h2
       span.room-title= ~g"Info"
   .content
-    h3= ~g"UCx Chat"
+    h3= ~g"UCc Chat"
     br
 
     table.statistics-table.secondary-background-color
@@ -12,5 +12,15 @@ section.page-container.page-list(data-page="admin_info")
         tr.admin-table-row
           th.content-background-color.border-component-color= item[:title]
           td.border-component-color= item[:value]
+
+    h3= ~g(System Information)
+    br
+
+    table.statistics-table.secondary-background-color
+      = for item <- @info[:system] do
+        tr.admin-table-row
+          th.content-background-color.border-component-color= item[:title]
+          td.border-component-color= item[:value]
+
 
     button.button.primary.refresh= ~g"Refresh"

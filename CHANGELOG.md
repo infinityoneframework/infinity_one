@@ -24,6 +24,9 @@
 * Added 1px scroll at top and bottom of window so load more can be properly detected when at the top or bottom of the page
 * Move the sidenav scrollbar to the right side
 * Add Status Message History Editing and Deleting
+* Added Uploads disk quota feature
+* Added Uploads disk usage on Admin info page
+* Added Application uptime to Admin info page
 
 ## 0.2.2 (2018-01-18)
 
