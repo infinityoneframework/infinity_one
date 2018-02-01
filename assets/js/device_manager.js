@@ -1,6 +1,195 @@
 //
-// Copyright @E-MetroTel 2015-2017
+// Copyright @E-MetroTel 2015-2018
 //
+// assets/js/device_manager.js
+
+(function() {
+  // helper functions
+  console.log('loading device_manager.js');
+
+  function safe_call(device_manager, name, function_name, args) {
+    var plugin = device_manager.get_plugin(name);
+    var fun = null;
+    if (fun = plugin[function_name]) {
+      fun(args);
+    }
+  }
+
+  function trace(text) {
+    if (text[text.length - 1] === '\n') {
+      text = text.substring(0, text.length - 1);
+    }
+    if (window.performance) {
+      var now = (window.performance.now() / 1000).toFixed(3);
+      console.log(now + ': ' + text);
+    } else {
+      console.log(text);
+    }
+  }
+/*
+  const transducer_handset = 0;
+  const transducer_headset = 1;
+  const transducer_handsfree = 2;
+  const transducer_all_pairs = 0x3f;
+*/
+
+  var DeviceManager = {
+    // query module to ensure that all the plugins have been initialized
+    ready: false,
+    // An object containing all the plug-ins
+    plugins: {},
+    // Keep the default plug-in as its own field. It is not in the list.
+    // note that we can't set his here since its defined below. It will be
+    // set when init is called
+    default_plugin: undefined,
+    // called after the page is loaded.
+    debug: true,
+/*
+    devices: {
+      handsfree_input_id: "",
+      handsfree_output_id: "",
+      headset_input_id: "",
+      headset_output_id: "",
+      video_input_id: "",
+      current_device: ""
+    },
+    active_audio_ctrl: undefined,
+    transducer_tone_level: 0,
+    transducer_tx: 0,
+    transducer_rx: 0,
+    installed_devices: {},
+*/
+    init: function() {
+      console.log('init device_manager.js');
+      this.default_plugin = DeviceManagerDefaultPlugin;
+      // call the init function on each plugin if it defines one
+      Object.keys(this.plugins).forEach(function (key) {
+        var init = null;
+        console.log('init plugins, key', key);
+        if (init = UccChat.DeviceManager.plugins[key].init) {
+          init(UccChat.DeviceManager);
+        }
+      });
+      this.ready = true;
+    },
+    add_plugin: function(name, plugin) {
+      this.plugins[name] = plugin;
+    },
+    get_plugin: function(name) {
+      var plugin = this.plugins[name];
+      if (plugin) {
+        return plugin;
+      } else {
+        return this.default_plugin;
+      }
+    },
+    // ***************
+    // The mandatory operational API for all plugins (an interface)
+    // ***************
+
+    get_device: function(name, ...args) {
+      safe_call(this, name, 'get_device', args)
+    },
+    get_devices: function(name, ...args) {
+      safe_call(this, name, 'get_devices', args)
+    },
+    set_devices: function(name, ...args) {
+      safe_call(this, name, 'set_devices', args)
+    },
+    set_devices_id: function(name, ...args) {
+      safe_call(this, name, 'set_devices_id', args)
+    },
+    has_headset_device: function(name, ...args) {
+      safe_call(this, name, 'has_headset_device', args)
+    },
+    set_webrtc: function(name, ...args) {
+      safe_call(this, name, 'set_webrtc', args)
+    },
+    enumerateDevices: function(name, ...args) {
+      safe_call(this, name, 'enumerateDevices', args)
+    },
+    save_devices: function(name, ...args) {
+      safe_call(this, name, 'save_devices', args)
+    },
+    load_devices: function(name, ...args) {
+      safe_call(this, name, 'load_devices', args)
+    },
+    get_current_device: function(name, ...args) {
+      safe_call(this, name, 'get_current_device', args)
+    },
+    volume_up: function(name, ...args) {
+      safe_call(this, name, 'volume_up', args);
+    },
+    volume_down: function(name, ...args) {
+      safe_call(this, name, 'volume_down', args);
+    },
+    set_volume_level: function(name, ...args) {
+      safe_call(this, name, 'set_volume_level', args);
+    },
+    get_volume: function(name, ...args) {
+      safe_call(this, name, 'get_volume', args);
+    },
+    set_tone_volume: function(name, ...args) {
+      safe_call(this, name, 'set_tone_volume', args);
+    },
+    transducer_tone_volume: function(name, ...args) {
+      safe_call(this, name, 'transducer_tone_volume', args);
+    },
+    extend: function(name, extension, ...args) {
+      var extension = null;
+      if (extension = this.get_plugin(name)[extension]) {
+        extension(args);
+      }
+    },
+  };
+
+/*
+  UccChat.on_connect(function(ucc_chat, socket) {
+    console.log('device_manager on_connect');
+    window.UccChat.DeviceManager = DeviceManager;
+    setTimeout(function() {
+      window.UccChat.DeviceManager.init();
+    }, 1500);
+  });
+*/
+
+  $(document).ready(function() {
+  });
+
+  var DeviceManagerDefaultPlugin = {
+    is_device_manager: false,
+    init: function() {
+      console.log('The optional init callback');
+      // do so setup after the page has been loaded
+    },
+    start: function(args) {
+      this.is_device_manager = true;
+      console.log('starting device_manager with args', args)
+    },
+    stop: function(args) {
+      this.is_device_manager = false;
+      console.log('stopping device_manager with args', args)
+    },
+    volume_up: function() {},
+    volume_set: function(args) {
+      // note that calls with splat arguments (...args) come in as an array
+      var value = args[0];
+      $('#audio-control')[0].volume = value;
+    }
+  };
+
+  DeviceManager.default_plugin = DeviceManagerDefaultPlugin;
+  window.UccChat.DeviceManager = DeviceManager;
+
+  // Just in case we are loaded after the plugins
+  document.dispatchEvent(new Event('DeviceManagerLoaded'));
+
+  $(document).ready(function() {
+    UccChat.DeviceManager.init();
+  })
+})();
+
+/*
 (function() {
   if (UcxUcc.trace_startup) { console.log('loading device_manager'); }
   function trace(text) {
@@ -14,11 +203,6 @@
       console.log(text);
     }
   }
-
-  const transducer_handset = 0;
-  const transducer_headset = 1;
-  const transducer_handsfree = 2;
-  const transducer_all_pairs = 0x3f;
 
   const apb_handset = 1;
   const apb_headset = 2;
@@ -38,6 +222,7 @@
       current_device: ""
     },
     active_audio_ctrl: undefined,
+    transducer_tone_level: 0,
     transducer_tx: 0,
     transducer_rx: 0,
     installed_devices: {},
@@ -258,7 +443,9 @@
     },
     get_audio_ctrl_volume: function() {
       if (this.debug) console.log("get_audio_ctrl_volume")
-      return 0.7;
+      //return 0.7;
+      var active_audio_ctrl = document.getElementById('audio-alerting');
+      return active_audio_ctrl.volume;
     },
     get_active_apb: function() {
       if (this.debug) console.log("get_active_apb")
@@ -314,7 +501,7 @@
             break;
           case "audio-alerting":
             this.Alerting.volume_up();
-            this.feedback.set_volume(active_control.volume);
+            this.feedback.set_volume(control.volume);
             break
           default:
             console.error('Unsupported audio control: ', active_control);
@@ -344,7 +531,7 @@
             break;
           case "audio-alerting":
             this.Alerting.volume_down();
-            this.feedback.set_volume(active_control.volume);
+            this.feedback.set_volume(control.volume);
             break
           default:
             console.error('Unsupported audio control: ', active_control);
@@ -376,6 +563,7 @@
     },
     set_tone_volume: function(level, key) {
       this.active_audio_ctrl = document.getElementById('audio-alerting');
+      console.log('set_tone_volume active_audio_ctrl.volume', this.active_audio_ctrl.volume);
       var tone_volume = 0;
       var new_volume = 0;
 
@@ -404,13 +592,14 @@
       if (this.debug)
         console.log('set_tone_volume', key, level, tone_volume, new_volume)
 
-      this.active_audio_ctrl.volume = new_volume;
+//      this.active_audio_ctrl.volume = new_volume;
     },
     transducer_tone_volume: function(msg) {
-      // console.log('transducer_tone_volume', msg);
+      console.log('transducer_tone_volume', msg);
       switch (msg.key) {
         case "alerting":
         case "special":
+          this.set_transducer_tone_level(msg.tone_level);
           this.set_tone_volume(msg.tone_level, msg.key);
           break;
         default:
@@ -418,9 +607,15 @@
           break;
       }
     },
+    set_transducer_tone_level: function(level) {
+      this.transducer_tone_level = level;
+    },
+    get_transducer_tone_level: function() {
+      this.transducer_tone_level;
+    },
     feedback: {
       set_volume: function(value) {
-        // console.log('TBD: implement this', value);
+        console.log('feedback: set_volume', value);
         var event = new Event('alerting_ctrl');
         event.topic = 'set_volume';
         event.value = value;
@@ -429,13 +624,13 @@
     },
     Alerting: {
       volume_up: function() {
-        // console.log('TBD: implement this');
+        console.log('Alerting volume_up');
         var event = new Event('alerting_ctrl');
         event.topic = 'volume_up';
         document.querySelector('body').dispatchEvent(event);
       },
       volume_down: function() {
-        // console.log('TBD: implement this');
+        console.log('Alerting volume_down');
         var event = new Event('alerting_ctrl');
         event.topic = 'volume_down';
         document.querySelector('body').dispatchEvent(event);
@@ -468,3 +663,4 @@
 
   if (UcxUcc.trace_startup) { console.log('complete loading device_manager'); }
 })();
+*/
