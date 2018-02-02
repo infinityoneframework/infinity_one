@@ -53,7 +53,7 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   defp sort_opt(opts, _), do: opts
 
   def create_channel(socket, _sender) do
-    Query.delete(socket, class: "animated-hidden", on: ".flex-nav.create-channel")
+    open_create_channel(socket)
   end
 
   def create_channel_search_members(socket, %{"event" => %{"key" => key}})
@@ -160,6 +160,13 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
 
   def create_channel_cancel(socket, _sender) do
     close_create_channel(socket)
+  end
+
+  defp open_create_channel(socket) do
+    html = render_to_string(SideNavView, "create_combined_flex.html", [])
+    socket
+    |> Query.update(:html, set: html, on: ".flex-nav.create-channel section")
+    |> Query.delete(class: "animated-hidden", on: ".flex-nav.create-channel")
   end
 
   defp close_create_channel(socket) do
