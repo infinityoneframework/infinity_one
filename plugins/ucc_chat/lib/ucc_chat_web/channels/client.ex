@@ -127,12 +127,17 @@ defmodule UccChatWeb.Client do
     """
     var node = document.createRange().createContextualFragment(#{encoded});
     var elem = document.querySelector('#{@wrapper_list}');
+    var at_bottom = UccUtils.is_scroll_bottom(30);
+    var user_id = '#{message.user_id}';
+    var id = '#{message.id}';
     elem.append(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
-    UccChat.normalize_message('#{message.id}');
+    UccChat.normalize_message(id);
+    if (at_bottom || user_id == ucxchat.user_id) {
+      UccUtils.scroll_bottom();
+    }
     UccChat.roomManager.updateMentionsMarksOfRoom();
-    UccChat.roomManager.new_message_scroll('#{message.user_id}');
-    UccChat.roomManager.new_message('#{message.id}', '#{message.user_id}');
+    UccChat.roomManager.new_message(id, user_id);
     """
   end
 

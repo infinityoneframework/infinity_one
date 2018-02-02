@@ -117,6 +117,15 @@
         return 1000;
       }
     },
+    scroll_bottom_diff: function() {
+      let elem = $('.messages-box .wrapper')[0]
+      if (elem) {
+        return elem.scrollHeight - (elem.scrollTop + $(elem).innerHeight());
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+        return 'no wrapper founds';
+      }
+    },
     is_scroll_bottom: function(tolerence = 1) {
       let elem = $('.messages-box .wrapper')[0]
       if (elem) {
