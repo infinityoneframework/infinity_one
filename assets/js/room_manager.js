@@ -568,14 +568,16 @@ class RoomManager {
       let room = room_elem.data('room');
 
       if (following_link.length == 0) {
-        following_link = $('.room-link').first();
+        following_link = $('.room-link a.open-room')
+          .not(`[data-room="${room}"]`).parent().first();
+
         if (following_link.length == 0) {
           // don't allow them to hide the room
           swal({
               title: 'Sorry',
               text: "Can't hide the last room",
               type: 'error',
-              timer: 1000,
+              timer: 2500,
               showConfirmButton: false,
           });
           return false;

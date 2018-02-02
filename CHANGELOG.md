@@ -10,6 +10,7 @@
 
 * [UCX-3770] Fix JS exception when selecting from a message popup
 * Trim a message before saving it
+* [UCX-3764] Allow user to hide the first listed room
 
 ## 0.2.3 (2018-02-02)
 
