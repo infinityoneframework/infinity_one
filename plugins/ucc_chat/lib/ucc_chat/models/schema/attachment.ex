@@ -3,6 +3,7 @@ defmodule UccChat.Schema.Attachment do
   use Arc.Ecto.Schema
 
   alias UccChat.Schema.{Channel, Message}
+  alias UccChat.Settings.FileUpload
 
   schema "attachments" do
     field :file, UccChat.File.Type
@@ -25,6 +26,19 @@ defmodule UccChat.Schema.Attachment do
       :type, :size])
     |> cast_attachments(params, [:file], allow_paths: true)
     |> validate_required([:file, :channel_id, :message_id])
+    |> validate_quota(params)
   end
 
+  def validate_quota(cs, params) do
+    size =
+      params["file"]
+      |> Map.get(:path)
+      |> File.lstat!
+      |> Map.get(:size)
+    if FileUpload.quota_check_success?(file_size_kb: size / 1024) do
+      cs
+    else
+      add_error cs, :size, UcxUccWeb.Gettext.gettext("has exceeded storage quota")
+    end
+  end
 end

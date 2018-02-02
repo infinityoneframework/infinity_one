@@ -368,6 +368,10 @@ footer.footer span.version {
   }
 }
 
+#layout_content_home_body {
+  height: 200px;
+}
+
 aside.side-nav nav.options {
   .status-message-box {
     padding-left: 14px;
@@ -386,6 +390,25 @@ aside.side-nav nav.options {
     select {
       option[value="__clear__"] { color: red; }
       option[value="__new__"] { color: green; }
+      // option[value="__edit__"] {
+      //   &:before {
+      //     content:'\e958';
+      //     font-family: "fontello";
+      //     font-style: normal;
+      //     font-weight: normal;
+      //     speak: none;
+      //     display: inline-block;
+      //     text-decoration: inherit;
+      //     width: 1em;
+      //     margin-right: .2em;
+      //     text-align: center;
+      //     font-variant: normal;
+      //     text-transform: none;
+      //     line-height: 1em;
+      //     margin-left: .2em;
+      //     -webkit-font-smoothing: antialiased;
+      //   }
+      // }
       option[selected="selected"] {
         font-style: italic;
       }
@@ -412,6 +435,76 @@ aside.side-nav nav.options {
         border-color: rgba(255, 255, 255, 0.5);
       }
     }
+    .status-message-edit {
+      margin: -8px -8px -3px -10px;
+      padding: 8px 4px 5px 5px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+
+      .control-list {
+        max-height: 230px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 3px;
+        margin-right: -3px;
+        &::-webkit-scrollbar-track {
+          background-color: #7b7b7b !important;
+          border-radius: 10px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background-color: #6c6c6c !important;
+        }
+      }
+
+      .header-bar {
+        color: #eee;
+        position: relative;
+        margin-bottom: 5px;
+        background-color: #555;
+        padding: 5px 8px;
+        border-radius: 5px;
+        .title {
+          cursor: auto;
+        }
+        .btn {
+          position: absolute;
+          top: 4px;
+          right: 1px;
+          cursor: pointer;
+          i {
+            color: #ddd;
+          }
+        }
+      }
+    }
+    .status-message-edit-ctrl {
+      position: relative;
+      input {
+        margin-bottom: 3px;
+        padding-right: 75px;
+      }
+      .buttons {
+        // position: absolute;
+        // border-radius: 0 4px 4px 0;
+        // top: 2px;
+        right: 2px !important;
+        .button {
+          i.danger-color-light {
+            color: #F44336 !important;
+          }
+          // padding: 0px;
+          // display: inline-block;
+          // background-color: #6c6c6c;
+          // width: 22px;
+          // height: 31px;
+          // border-width: 0;
+          // // // &.save {
+          // //   border-radius: 0 5px 5px 0;
+          // }
+        }
+      }
+    }
+    .status-message-edit-ctrl,
     .status-message-input {
       .buttons {
         position: absolute;
@@ -427,6 +520,12 @@ aside.side-nav nav.options {
           border-width: 0;
           &.save {
             border-radius: 0 5px 5px 0;
+          }
+          &[disabled] i {
+            color: rgba(255,255,255,0.3) !important;
+          }
+          i.success-color {
+            color: #4dff4d;
           }
         }
       }
@@ -515,3 +614,7 @@ nav.options {
     }
   }
 }
+
+// ::-webkit-scrollbar {
+//   z-index: 8000;
+// }

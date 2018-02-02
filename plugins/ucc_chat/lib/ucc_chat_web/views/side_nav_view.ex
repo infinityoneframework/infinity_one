@@ -64,7 +64,14 @@ defmodule UccChatWeb.SideNavView do
       |> UccChat.Accounts.get_status_message_history
       |> Enum.map(& {&1, &1})
 
-    [{"➖" <> ~g" (No Message)", "__clear__"}, {"➕" <> ~g" (Enter new Message)", "__new__"} | list]
+    [{"➖ " <> ~g"(No Message)", "__clear__"}, {"➕ " <> ~g"(Enter new Message)", "__new__"},
+     {"✏  " <> ~g"(Edit History)", "__edit__"} | list]
+  end
+
+  def status_message_edit(account) do
+    account
+    |> UccChat.Accounts.get_status_message_history
+    |> Enum.reject(& &1 == "")
   end
 end
 

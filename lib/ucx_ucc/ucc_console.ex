@@ -60,4 +60,29 @@ defmodule UccConsole do
   def log_level do
     Logger.level
   end
+
+  @doc """
+  Get the subscription for a given username and channel name
+
+      iex> UccConsole.subscription "admin", "general"
+
+      %UccChat.Schema.Subscription{__meta__: #Ecto.Schema.Metadata<:loaded, "subscriptions">,
+        alert: false,
+        channel: #Ecto.Association.NotLoaded<association :channel is not loaded>,
+        channel_id: "b29fe176-64aa-44ba-86de-e846eaf39865",
+        current_message: "20180123030942207911", f: false, has_unread: false,
+        hidden: false, id: "e51cb56b-f388-45e1-9537-c1e31ec7b1a3",
+        inserted_at: #DateTime<2018-01-20 16:30:03.000000Z>,
+        last_read: "20180123030942207911", ls: nil, open: false, type: 0, unread: 0,
+        updated_at: #DateTime<2018-01-23 04:04:02.000000Z>,
+        user: #Ecto.Association.NotLoaded<association :user is not loaded>,
+        user_id: "349a35e5-f7c0-40ee-b150-d43e925be789"}
+  """
+  @spec subscription(username :: String.t, room :: String.t) :: struct
+  def subscription(username, room) do
+    with %{} = user <- Accounts.get_by_username(username),
+         %{} = channel <- UccChat.Channel.get_by(name: room) do
+      UccChat.Subscription.get_by user_id: user.id, channel_id: channel.id
+    end
+  end
 end

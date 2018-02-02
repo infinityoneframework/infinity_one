@@ -3,7 +3,7 @@ defmodule UcxUcc.Mixfile do
 
   def project do
     [app: :ucx_ucc,
-     version: "1.0.0-alpha14",
+     version: "1.0.0-alpha15",
      elixir: "~> 1.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -110,6 +110,8 @@ defmodule UcxUcc.Mixfile do
       {:gen_smtp, "~> 0.12.0"},
       {:exprof, "~> 0.2.0"},
       # {:jira_bot, path: "../jira_bot"}
+      # {:scrivener_ecto, path: "../scrivener_ecto"}
+      {:scrivener_ecto, github: "smpallen99/scrivener_ecto"}
 
     ] ++ plugin_deps()
   end

@@ -24,6 +24,7 @@
               i.icon-cancel
             button.button.save.primary-background-color rebel-click="change_status_message"
               .icon-ok.success-color
+        .status-message-edit style="display: none;"
 
       button.status.online(data-status="online" rebel-click="click_status")
         span= ~g(Online)

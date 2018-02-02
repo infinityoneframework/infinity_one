@@ -38,7 +38,6 @@
     default_plugin: undefined,
     // called after the page is loaded.
     debug: true,
-
     devices: {
       handsfree_input_id: "",
       handsfree_output_id: "",
@@ -103,8 +102,10 @@
     },
     has_headset_device: function() {
       var status = false;
-      console.log('has_headset_device devices', this.devices);
-      console.log('has_headset_device installed devices', this.installed_devices);
+      if (this.debug) {
+        console.log('has_headset_device devices', this.devices);
+        console.log('has_headset_device installed devices', this.installed_devices);
+      }
       if(this.devices.headset_input_id && this.devices.headset_output_id)
         status = true;
       if (this.debug) console.log("has_headset_device", status)
@@ -126,7 +127,7 @@
           DeviceManager.installed_devices[device.deviceId] = device
           devices.push({kind: device.kind, label: device.label, id: device.deviceId})
         } else {
-          console.log('---------- other device', device)
+          if (this.debug) { console.log('---------- other device', device); }
         }
       }
       UcxUcc.installed_devices = devices

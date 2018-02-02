@@ -834,6 +834,6 @@ label.required::after {
     color: #bc2031
 }
 
-.main-content .loading-animation>div,.flex-tab .loading-animation>div {
+.main-content .loading-animation>div, .flex-tab .loading-animation>div {
     background-color: #444
 }

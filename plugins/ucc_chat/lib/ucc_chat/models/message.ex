@@ -4,11 +4,7 @@ defmodule UccChat.Message do
 
   alias UcxUcc.Repo
   alias UccChat.Schema.Channel
-  alias UccChat.{AppConfig, SubscriptionService,}
-  #   TypingAgent, Mention, Subscription,
-  #   Web.MessageView, ChatDat, Channel, ChannelService, Web.UserChannel,
-  #   MessageAgent, AttachmentService
-  # }
+  alias UccChat.{AppConfig, SubscriptionService}
   alias UccChat.ServiceHelpers, as: Helpers
 
   require Logger
@@ -59,39 +55,67 @@ defmodule UccChat.Message do
     Repo.one total_direct()
   end
 
-  def get_surrounding_messages(channel_id, ts, user) when ts in ["", nil] do
-    get_messages channel_id, user
-  end
-  def get_surrounding_messages(channel_id, timestamp, %{tz_offset: tz} = user) do
-    message = @repo.one from m in @schema,
-      where: m.timestamp == ^timestamp and m.channel_id == ^channel_id,
-      preload: ^@preloads
-    if message do
-      before_q = from m in @schema,
-        where: m.inserted_at < ^(message.inserted_at) and m.channel_id == ^channel_id,
-        order_by: [desc: :inserted_at],
-        limit: 50,
-        preload: ^@preloads
-      after_q = from m in @schema,
-        where: m.inserted_at > ^(message.inserted_at) and m.channel_id == ^channel_id,
-        limit: 50,
-        preload: ^@preloads
+  def get_room_messages(channel_id, %{id: user_id, tz_offset: tz}) do
+    count =
+      case SubscriptionService.get(channel_id, user_id) do
+        %{current_message: ""} -> 0
+        %{current_message: cm} ->
+          get_message_index(cm, channel_id)
+        _ -> 0
+      end
 
-      Enum.reverse(@repo.all(before_q)) ++ [message|@repo.all(after_q)]
-      |> new_days(tz || 0, [])
-    else
-      Logger.debug "did not find a message"
-      get_messages(channel_id, user)
-    end
+    count
+    |> get_page_by_row(channel_id)
+    |> new_days(tz || 0, [])
   end
 
-  def get_messages(channel_id, %{tz_offset: tz}) do
+  defp get_message_index(nil_or_empty, _channel_id) when nil_or_empty in ["", nil] do
+    0
+  end
+
+  defp get_message_index(timestamp, channel_id) do
+    @repo.one from m in @schema,
+      where: m.channel_id == ^channel_id and m.timestamp <= ^timestamp,
+      order_by: [asc: :inserted_at],
+      select: count(m.id)
+  end
+
+  defp get_page_by_row(row, channel_id, opts \\ [])
+  defp get_page_by_row(nil, channel_id, opts) do
+    get_page_by_row(0, channel_id, opts)
+  end
+
+  defp get_page_by_row(row, channel_id, opts) do
+    opts = Enum.into(opts, %{})
+    page_size = opts[:page_size] || opts["page_size"] || AppConfig.page_size()
+    (from m in @schema,
+      where: m.channel_id == ^channel_id,
+      order_by: [asc: :inserted_at],
+      preload: ^@preloads)
+    |> @repo.paginate(page_size: page_size, options: [row: row])
+  end
+
+  def get_surrounding_messages(channel_id, ts, user, opts \\ [])
+  def get_surrounding_messages(channel_id, timestamp, user, opts) when timestamp in ["", nil] do
+    get_messages channel_id, user, opts
+  end
+
+  def get_surrounding_messages(channel_id, timestamp, %{tz_offset: tz}, opts) do
+    timestamp
+    |> get_message_index(channel_id)
+    |> get_page_by_row(channel_id, opts)
+    |> new_days(tz || 0, [])
+  end
+
+  def get_messages(channel_id, %{tz_offset: tz}, opts \\ []) do
+    preload = opts[:preload] || @preloads
+    page = opts[:page] || [page_size: AppConfig.page_size()]
+
     @schema
     |> where([m], m.channel_id == ^channel_id)
-    |> Helpers.last_page
-    |> preload(^@preloads)
+    |> preload(^preload)
     |> order_by([m], asc: m.inserted_at)
-    |> @repo.all
+    |> @repo.paginate(page)
     |> new_days(tz || 0, [])
   end
 
@@ -144,38 +168,8 @@ defmodule UccChat.Message do
     where query, [m], fragment("? REGEXP ?", m.body, ^regex)
   end
 
-  def get_room_messages(channel_id, %{id: user_id} = user) do
-    page_size = AppConfig.page_size()
-    case SubscriptionService.get(channel_id, user_id) do
-      %{current_message: ""} -> nil
-      %{current_message: cm} ->
-        cnt1 = @repo.one from m in @schema,
-          where: m.channel_id == ^channel_id and m.timestamp >= ^cm,
-          select: count(m.id)
-        if cnt1 > page_size, do: cm, else: nil
-      _ -> nil
-    end
-    |> case do
-      nil ->
-        get_messages(channel_id, user)
-      ts ->
-        get_messsages_ge_ts(channel_id, user, ts)
-    end
-  end
-
-  def get_messsages_ge_ts(channel_id, %{tz_offset: tz}, ts) do
-    before_q = from m in @schema,
-      where: m.timestamp < ^ts,
-      order_by: [desc: :inserted_at],
-      limit: 25,
-      preload: ^@preloads
-
-    after_q = from m in @schema,
-      where: m.channel_id == ^channel_id and m.timestamp >= ^ts,
-      preload: ^@preloads
-
-    Enum.reverse(@repo.all before_q) ++ @repo.all(after_q)
-    |> new_days(tz || 0, [])
+  defp new_days(%{entries: entries} = page, tz, list) do
+    struct(page, entries: new_days(entries, tz, list))
   end
 
   defp new_days([h|t], tz, []), do: new_days(t, tz, [Map.put(h, :new_day, true)])
@@ -196,7 +190,7 @@ defmodule UccChat.Message do
     @schema
     |> where([m], m.channel_id == ^channel_id)
     |> order_by([m], asc: m.inserted_at)
-    |> last
+    |> last(:inserted_at)
     |> @repo.one
   end
 
@@ -204,7 +198,7 @@ defmodule UccChat.Message do
     @schema
     |> where([m], m.channel_id == ^channel_id)
     |> order_by([m], asc: m.inserted_at)
-    |> first
+    |> first(:inserted_at)
     |> @repo.one
   end
 
@@ -215,7 +209,6 @@ defmodule UccChat.Message do
     |> select([m], m.user_id)
     |> order_by([m], desc: m.inserted_at)
     |> @repo.all
-    # |> Enum.reverse
   end
   def get_by_later(inserted_at, channel_id) do
     @schema

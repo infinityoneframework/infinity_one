@@ -2,6 +2,7 @@ defmodule UccChatWeb.Admin.Page.Info do
   use UccAdmin.Page
 
   alias UccChat.{Message, Channel, UserService}
+  alias UccChatWeb.SharedView
 
   def add_page do
     new("admin_info", __MODULE__, ~g(Info), UccChatWeb.AdminView, "info.html", 10)
@@ -11,6 +12,12 @@ defmodule UccChatWeb.Admin.Page.Info do
     # Logger.warn "..."
     total = UserService.total_users_count()
     online = UserService.online_users_count()
+    uptime =
+      :wall_clock
+      |> :erlang.statistics()
+      |> elem(0)
+      |> Timex.Duration.from_milliseconds()
+      |> Timex.format_duration(:humanized)
 
     usage = [
       %{title: ~g"Total Users", value: total},
@@ -26,9 +33,18 @@ defmodule UccChatWeb.Admin.Page.Info do
       %{title: ~g"Total in Direct Messages", value: Message.get_total_direct()},
     ]
 
+    settings = UccChat.Settings.FileUpload.get()
+
+    system = [
+      %{title: ~g(Application Uptime), value: uptime},
+      %{title: ~g(Space Remaining on Uploads Partition), value: SharedView.get_available_capacity(settings)},
+      %{title: ~g(Size of Uploads Folder), value: SharedView.get_uploads_size(settings)},
+      %{title: ~g(Percent of Uploads Partition Used), value: SharedView.get_uploads_used_percent(settings)}
+    ]
+
     {[
       user: user,
-      info: [usage: usage],
+      info: [usage: usage, system: system],
     ], user, page, socket}
   end
 
