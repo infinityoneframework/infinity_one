@@ -74,10 +74,6 @@ class RoomManager {
     this.roomHistoryManager.new_room(ucxchat.room);
     this.updateMentionsMarksOfRoom();
 
-    // let html = $('.messages-box .wrapper ul').html();
-
-    // $('.messages-box .wrapper ul').html(html);
-
     $('.messages-box .wrapper ul .body img.emojione').each((i, elem) => {
       if ($(elem).closest('.body').text().trim() == "") {
         $(elem).addClass('big');
@@ -85,41 +81,13 @@ class RoomManager {
     })
 
     this.ucc_chat.roomchan.on('room:open', resp => {
-      // UccUtils.page_loading()
-      // $('.page-loading-container').html(UccUtils.loading_animation())
-      // this.open_room(resp.room, resp.room)
-      // if (resp.state) {
-      //   this.focus = true
-      // } else {
-      //   this.focus = false
-      // }
     })
   }
 
   open_room(room, display_name, callback) {
     if (debug) { console.log('open_room', this) }
-    console.log('open_room room', room, 'old_room', ucxchat.room)
-    console.log('open_room', $('.messages-container'))
 
     cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
-      .receive("ok", resp => {
-        console.log('open_room ok', resp)
-        if (resp.redirect) {
-          console.log('location')
-          window.location = resp.redirect
-        } else {
-          this.render_room(resp)
-          this.bind_history_manager_scroll_event()
-          $('textarea.input-message').autogrow();
-        }
-        if (callback) { callback() }
-        if (debug) { console.log('open_room after callback', this) }
-        UccUtils.remove_page_loading()
-      })
-      .receive("error", resp => {
-        console.log('open_room error', resp)
-        UccUtils.remove_page_loading()
-      })
   }
 
   render_room(resp) {
@@ -550,10 +518,10 @@ class RoomManager {
 
     $('body').on('click', 'a.open-room', e => {
       e.preventDefault();
-      if (debug) { console.log('clicked a.open-room', e, $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
-      UccUtils.page_loading();
-      $('.page-loading-container').html(UccUtils.loading_animation());
-      this.open_room($(e.currentTarget).attr('data-room'), $(e.currentTarget).attr('data-name'));
+      if (debug) { console.log('clicked a.open-room', e,
+        $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
+      this.open_room($(e.currentTarget).attr('data-room'),
+        $(e.currentTarget).attr('data-name'));
     })
     .on('click', 'a.toggle-favorite', e => {
       if (debug) { console.log('click a.toggle-favorite') }
@@ -595,8 +563,24 @@ class RoomManager {
     })
     .on('click', 'a.open-room i.hide-room', e => {
       e.preventDefault()
-      let room = $(e.currentTarget).closest('.open-room').data('room');
-      // console.log('cliecked open-room', room)
+      let room_elem = $(e.currentTarget).closest('.open-room');
+      let following_link = $(e.currentTarget).closest('.room-link').prev();
+      let room = room_elem.data('room');
+
+      if (following_link.length == 0) {
+        following_link = $('.room-link').first();
+        if (following_link.length == 0) {
+          // don't allow them to hide the room
+          swal({
+              title: 'Sorry',
+              text: "Can't hide the last room",
+              type: 'error',
+              timer: 1000,
+              showConfirmButton: false,
+          });
+          return false;
+        }
+      }
       sweetAlert({
         title: gettext.are_you_sure,
         text: gettext.are_you_sure_you_want_to_hide_the_room + ' "' + room + '"?',
@@ -604,21 +588,19 @@ class RoomManager {
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: gettext.yes_hide_it,
-        closeOnConfirm: false
+        closeOnConfirm: true
       },
       function(){
-        cc.put("/room/hide/" + room)
-          .receive("ok", resp => {
-            if (resp.redirect) {
-              if (debug) { console.log('location'); }
-              window.location = resp.redirect;
-            }
+        let target_room = following_link.find('a.open-room');
+        cc.put("/room/hide/" + room, {
+          next_room: target_room.attr('data-room'),
+          next_room_display_name: target_room.attr('data-name')
           })
+          .receive("ok", resp => {})
           .receive("error", resp => {
             toastr.error(resp.error);
           })
       });
-      return false;
     })
     .on('click', 'a.open-room i.leave-room', e => {
       e.preventDefault();

@@ -50,6 +50,16 @@ defmodule UccChatWeb.ClientView do
         100% { transform: scale(0); }
         40% { transform: scale(1.0); }
       }
+      .page-loading-container {
+        position: absolute;
+        top: 0; right: 0; left: 0; bottom: 0;
+        z-index: 5000;
+        background: black;
+        opacity: 0.8;
+      }
+      .page-loading-container .loading-animation > div {
+        background-color: #eee !important;
+      }
     </style>
     """
   end

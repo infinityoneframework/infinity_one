@@ -1667,6 +1667,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate side_nav_create_channel_cancel(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_cancel
   defdelegate side_nav_create_channel_select_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_select_member
   defdelegate side_nav_create_channel_remove_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_remove_member
+  defdelegate side_nav_open_direct(socket, sender), to: __MODULE__.SideNav.Directs, as: :open_direct
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer
