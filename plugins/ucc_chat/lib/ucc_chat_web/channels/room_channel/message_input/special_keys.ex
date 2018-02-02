@@ -45,11 +45,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SpecialKeys do
     # that the cr key should be ignored.
     if SlashCommands.Commands.run(context.state.buffer, context.sender, context.socket) do
       unless context.sender["event"]["shiftKey"] do
+        value = String.trim context.sender["value"]
         if editing?(context.sender) do
-          Message.edit_message(context.socket, context.sender["value"], context.client)
+          Message.edit_message(context.socket, value, context.client)
         else
           # this is the case for a new message to be posted
-          Message.new_message(context.socket, context.sender["value"], context.client)
+          Message.new_message(context.socket, value, context.client)
         end
         MessageService.stop_typing context.socket
       end
