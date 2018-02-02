@@ -27,6 +27,7 @@
 * Added Uploads disk quota feature
 * Added Uploads disk usage on Admin info page
 * Added Application uptime to Admin info page
+* Removed the page load on selecting direct rooms
 
 ## 0.2.2 (2018-01-18)
 

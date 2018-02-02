@@ -172,14 +172,6 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   # TODO: find all the references to this and change them to use the shared view
   defdelegate format_error(term), to: UccChatWeb.SharedView, as: :format_errors
 
-  # def format_error(%Ecto.Changeset{errors: errors}) do
-  #   Enum.reduce(errors, [], fn {field, {error, _}}, message ->
-  #     [to_string(field) <> ": " <> error | message]
-  #   end)
-  #   |> Enum.join(", \n")
-  # end
-  # def format_error(term), do: to_string(term)
-
   def create_channel_select_member(socket, sender) do
     select_member(sender["dataset"]["username"], socket)
   end
@@ -206,5 +198,31 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
     |> Query.update(:value, set: "", on: "input.search#channel-members")
     |> Query.insert(:class, set: "animated-hidden", on: ".-autocomplete-container")
     |> Query.delete(".-autocomplete-list")
+  end
+
+  def open_room(socket, old_name, new_name, new_display_name) do
+    assigns = socket.assigns
+    if assigns.room == "lobby" do
+      Rebel.Browser.redirect_to socket,
+        ChannelService.room_redirect(new_name, new_display_name)
+    else
+      assigns[:user_id]
+      |> ChannelService.open_room(new_name, old_name, new_display_name)
+      |> Poison.encode!()
+      |> do_open_room(socket)
+    end
+  end
+
+  defp do_open_room(reply, socket) do
+    socket
+    |> Client.page_loading()
+    |> Rebel.Core.async_js("""
+      $('.page-loading-container').html(UccUtils.loading_animation());
+      UccChat.roomManager.render_room(#{reply});
+      UccChat.roomManager.bind_history_manager_scroll_event();
+      $('textarea.input-message').autogrow();
+      $('head > style').remove();
+      $('aside.side-nav .flex-nav').addClass('animated-hidden');
+      """ |> String.replace("\n", ""))
   end
 end
