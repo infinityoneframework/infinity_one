@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 1.0.0-alpha15 (2018-01-31)
+## 1.0.0-alpha15 (2018-02-01)
 
 ### Enhancements
 
