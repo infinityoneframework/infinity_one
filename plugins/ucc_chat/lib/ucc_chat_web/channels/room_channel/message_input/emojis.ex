@@ -30,7 +30,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Emojis do
         |> Kernel.<>(" ")
         |> Poison.encode!()
 
-      context.client.broadcast_js context.socket, """
+      context.client.async_js context.socket, """
         var te = document.querySelector('#{@message_box}');
         te.value = #{buffer};
         te.focus();

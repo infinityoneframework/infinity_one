@@ -15,6 +15,7 @@
 * [UCX-3769] Fix incoming message does not scroll window down
 * [UCX-3766] Move the flex-nav scollbars to the right of page
 * [UCX-3731] Fix rendering create channel after more channels
+* Don't broadcast message popup selections
 
 ## 0.2.3 (2018-02-02)
 

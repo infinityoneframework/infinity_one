@@ -25,7 +25,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Users do
   def handle_select(buffer, selected, context) do
     if selected != "" do
       buffer = Poison.encode!(buffer <> " ")
-      context.client.broadcast_js context.socket, """
+      context.client.async_js context.socket, """
         var te = document.querySelector('#{@message_box}');
         te.value = #{buffer};
         te.focus();
