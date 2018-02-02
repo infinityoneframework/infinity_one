@@ -1,12 +1,12 @@
 defmodule UccChatWeb.UserChannel.SideNav.Directs do
-  import Rebel.Core
-  import Phoenix.View, only: [render_to_string: 3]
+  # import Rebel.Core
+  # import Phoenix.View, only: [render_to_string: 3]
   import UcxUccWeb.Gettext
 
-  alias UcxUccWeb.Query
-  alias UccChat.{Channel, ChannelService, Direct}
-  alias UccChatWeb.{SideNavView, RebelChannel.Client}
-  alias UcxUcc.Accounts
+  # alias UcxUccWeb.Query
+  alias UccChat.{ChannelService, Direct}
+  alias UccChatWeb.{RebelChannel.Client}
+  # alias UcxUcc.Accounts
   alias UccChatWeb.UserChannel.SideNav.Channels
 
   require Logger

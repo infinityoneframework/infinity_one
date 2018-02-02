@@ -4,6 +4,8 @@
 
 ## Enhancements
 
+* Add configuration of the uploads path
+
 ### Bug Fixes
 
 ## 0.2.3 (2018-02-02)

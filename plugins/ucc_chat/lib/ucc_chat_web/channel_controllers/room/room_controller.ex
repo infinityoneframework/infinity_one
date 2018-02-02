@@ -4,13 +4,13 @@ defmodule UccChatWeb.RoomChannelController do
   alias UccChat.ChannelService
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChatWeb.RebelChannel.Client
-  alias UcxUccWeb.Query
-  alias UccChatWeb.ClientView
+  # alias UcxUccWeb.Query
+  # alias UccChatWeb.ClientView
   alias UccChatWeb.UserChannel.SideNav.Channels
 
   require Logger
 
-  def show(%{assigns: assigns} = socket, params) do
+  def show(%{assigns: _assigns} = socket, params) do
     Channels.open_room socket, params["room"], params["room_id"],
       params["display_name"]
     {:noreply, socket}

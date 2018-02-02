@@ -42,7 +42,6 @@ defmodule UccChatWeb.Admin.Page.Info do
       %{title: ~g(Percent of Uploads Partition Used), value: SharedView.get_uploads_used_percent(settings)}
     ]
 
-    info = [usage: usage, system: system]
     {[
       user: user,
       info: [usage: usage, system: system],
