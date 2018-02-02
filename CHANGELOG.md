@@ -8,6 +8,8 @@
 
 ### Bug Fixes
 
+* [UCX-3770] Fix JS exception when selecting from a message popup
+
 ## 0.2.3 (2018-02-02)
 
 ### Bug Fixes
