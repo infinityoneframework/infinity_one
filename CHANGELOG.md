@@ -5,6 +5,7 @@
 ## Enhancements
 
 * Add configuration of the uploads path
+* Don't reload page when using the conversation button from members list
 
 ### Bug Fixes
 

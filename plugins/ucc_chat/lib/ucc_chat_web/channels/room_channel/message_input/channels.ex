@@ -60,4 +60,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Channels do
     |> Channel.get_channels_by_pattern(pattern, 5)
     |> Enum.map(fn {id, name} -> %{id: id, name: name, username: name} end)
   end
+
+  def add_private(socket, sender) do
+    username = exec_js! socket, ~s{$('#{this(sender)}').parent().data('username')}
+
+    socket
+    |> UccUiFlexTab.FlexTabChannel.flex_close(sender)
+    |> UccChatWeb.UserChannel.SideNav.Directs.open_direct_channel(username)
+  end
+
 end

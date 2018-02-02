@@ -1336,12 +1336,6 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
-  def add_private(socket, sender) do
-    trace "add_private", sender
-    username = exec_js! socket, ~s{$('#{this(sender)}').parent().data('username')}
-    redirect_to socket, "/direct/#{username}"
-  end
-
   def new_subscription(_event, payload, socket) do
     channel_id = payload.channel_id
     user_id = socket.assigns.user_id
@@ -1645,6 +1639,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate side_nav_create_channel_select_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_select_member
   defdelegate side_nav_create_channel_remove_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_remove_member
   defdelegate side_nav_open_direct(socket, sender), to: __MODULE__.SideNav.Directs, as: :open_direct
+  defdelegate add_private(socket, sender), to: UccChatWeb.RoomChannel.MessageInput.Channels
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer

@@ -12,17 +12,19 @@ defmodule UccChatWeb.UserChannel.SideNav.Directs do
   require Logger
 
   def open_direct(socket, sender) do
-    assigns = socket.assigns
-    name = sender["dataset"]["direct"]
+    open_direct_channel(socket, sender["dataset"]["direct"])
+  end
 
-    with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(name),
+  def open_direct_channel(socket, username) do
+    assigns = socket.assigns
+    with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(username),
          user_id <- socket.assigns.user_id,
          false <- user.id == user_id do
       direct =
-        case get_direct(user_id, name) do
+        case get_direct(user_id, username) do
           nil ->
-            ChannelService.add_direct(name, user_id, nil)
-            get_direct(user_id, name)
+            ChannelService.add_direct(username, user_id, nil)
+            get_direct(user_id, username)
           direct ->
             direct
         end
