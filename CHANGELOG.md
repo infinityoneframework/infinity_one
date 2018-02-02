@@ -12,6 +12,7 @@
 * Trim a message before saving it
 * [UCX-3764] Allow user to hide the first listed room
 * [UCX-3769] Fix incoming message does not scroll window down
+* [UCX-3766] Move the flex-nav scollbars to the right of page
 
 ## 0.2.3 (2018-02-02)
 
