@@ -503,13 +503,16 @@ defmodule UccChat.ChannelService do
     end
 
     channel = Channel.get_by! name: room, preload: [:subscriptions]
-    old_channel = Channel.get_by! name: old_room
 
-    # {subscribed, hidden} = Channel.subscription_status(channel, user.id)
+    old_channel =
+      if old_room do
+        set_subscription_state_room(old_room, user_id, false)
+        Channel.get_by! name: old_room
+      else
+        %{type: nil}
+      end
 
     set_subscription_state(channel.id, user_id, true)
-
-    set_subscription_state_room(old_room, user_id, false)
 
     user
     |> User.changeset(%{open_id: channel.id})
@@ -524,34 +527,18 @@ defmodule UccChat.ChannelService do
 
     Logger.debug fn -> "messages_info: #{inspect chatd.messages_info}" end
 
-    # box_html =
-    #   "messages_box.html"
-    #   |> UccChat.View.MasterView.render(chatd: chatd)
-    #   |> Helpers.safe_to_string
-
-    # header_html =
-    #   "messages_header.html"
-    #   |> UccChat.View.MasterView.render(chatd: chatd)
-    #   |> Helpers.safe_to_string
     html = Phoenix.View.render_to_string(UccChatWeb.MasterView,
       "messages_container.html", chatd: chatd)
 
     side_nav_html = SideNavService.render_rooms_list(channel.id, user_id)
 
     %{
-      # page: %{
-      #   page_number: page.page_number,
-      #   page_size: page.page_size,
-      #   total_pages: page.total_pages
-      # },
       display_name: display_name,
       room_title: room,
       channel_id: channel.id,
       html: html,
       messages_info: chatd.messages_info,
       allow_upload: UccChat.AttachmentService.allowed?(channel),
-      # box_html: box_html,
-      # header_html: header_html,
       side_nav_html: side_nav_html,
       room_route: Channel.room_route(channel)
     }

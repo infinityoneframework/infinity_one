@@ -17,6 +17,7 @@ defmodule UccAdmin.AdminService do
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChatWeb.AdminView, as: ChatAdminView
   alias UccAdminWeb.FlexBarView
+  alias UccChatWeb.SharedView
 
   def handle_in("save:general", params, socket) do
     params =
@@ -412,43 +413,41 @@ defmodule UccAdmin.AdminService do
 
     [user: user, users: users]
   end
-  def get_args("rooms", user) do
-    # view_a = String.to_atom view
-    # mod = Module.concat Config, String.capitalize(view)
-    rooms = Repo.all(from c in ChannelSchema, order_by: [asc: c.name],
-      preload: [:subscriptions, :messages])
-    [user: user, rooms: rooms]
-  end
-  # defp get_args("message", user) do
-  #   cs =
-  #     Config
-  #     |> Repo.one
-  #     |> Map.get(:message)
-  #     |> Config.Message.changeset(%{})
-  #   [user: user, changeset: cs]
+  # def get_args("rooms", user) do
+  #   # view_a = String.to_atom view
+  #   # mod = Module.concat Config, String.capitalize(view)
+  #   rooms = Repo.all(from c in ChannelSchema, order_by: [asc: c.name],
+  #     preload: [:subscriptions, :messages])
+  #   [user: user, rooms: rooms]
   # end
-  def get_args("info", user) do
-    total = UserService.total_users_count()
-    online = UserService.online_users_count()
+  # # defp get_args("message", user) do
+  # #   cs =
+  # #     Config
+  # #     |> Repo.one
+  # #     |> Map.get(:message)
+  # #     |> Config.Message.changeset(%{})
+  # #   [user: user, changeset: cs]
+  # # end
+  # def get_args("info", user) do
+  #   total = UserService.total_users_count()
+  #   online = UserService.online_users_count()
 
-    usage = [
-      %{title: ~g"Total Users", value: total},
-      %{title: ~g"Online Users", value: online},
-      %{title: ~g"Offline Users", value: total - online},
-      %{title: ~g"Total Rooms", value: Channel.total_rooms() |> Repo.one},
-      %{title: ~g"Total Channels", value: Channel.total_channels() |> Repo.one},
-      %{title: ~g"Total Private Groups", value: Channel.total_private() |> Repo.one},
-      %{title: ~g"Total Direct Message Rooms", value: Channel.total_direct() |> Repo.one},
-      %{title: ~g"Total Messages", value: Message.total_count() |> Repo.one},
-      %{title: ~g"Total Messages in Channels", value: Message.total_channels() |> Repo.one},
-      %{title: ~g"Total in Private Groups", value: Message.total_private() |> Repo.one},
-      %{title: ~g"Total in Direct Messages", value: Message.total_direct() |> Repo.one},
-    ]
+  #   usage = [
+  #     %{title: ~g"Total Users", value: total},
+  #     %{title: ~g"Online Users", value: online},
+  #     %{title: ~g"Offline Users", value: total - online},
+  #     %{title: ~g"Total Rooms", value: Channel.total_rooms() |> Repo.one},
+  #     %{title: ~g"Total Channels", value: Channel.total_channels() |> Repo.one},
+  #     %{title: ~g"Total Private Groups", value: Channel.total_private() |> Repo.one},
+  #     %{title: ~g"Total Direct Message Rooms", value: Channel.total_direct() |> Repo.one},
+  #     %{title: ~g"Total Messages", value: Message.total_count() |> Repo.one},
+  #     %{title: ~g"Total Messages in Channels", value: Message.total_channels() |> Repo.one},
+  #     %{title: ~g"Total in Private Groups", value: Message.total_private() |> Repo.one},
+  #     %{title: ~g"Total in Direct Messages", value: Message.total_direct() |> Repo.one},
+  #   ]
 
-    info = [usage: usage]
-
-    [user: user, info: info]
-  end
+  #   [user: user, info: info]
+  # end
 
   def send_invitation_emails(_current_user, emails) do
     Enum.reject(emails, fn email ->
