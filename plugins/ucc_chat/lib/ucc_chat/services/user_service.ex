@@ -53,11 +53,15 @@ defmodule UccChat.UserService do
   end
 
   def insert_user(params, opts \\ []) do
-    multi =
-      Multi.new
-      |> Multi.insert(:account, Account.changeset(%Account{}, %{}))
-      |> Multi.run(:user, &do_insert_user(&1, params, opts))
-    Repo.transaction(multi)
+    params
+    |> add_user(opts)
+    |> Repo.transaction()
+  end
+
+  def add_user(params, opts \\ []) do
+    Multi.new
+    |> Multi.insert(:account, Account.changeset(%Account{}, %{}))
+    |> Multi.run(:user, &do_insert_user(&1, params, opts))
   end
 
   defp do_insert_user(%{account: %{id: id}}, params, opts) do

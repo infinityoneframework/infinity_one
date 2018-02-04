@@ -41,6 +41,7 @@ defmodule UccChat.Schema.Channel do
     params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
+    |> unique_constraint(:name)
     |> validate(params)
   end
 
@@ -55,6 +56,7 @@ defmodule UccChat.Schema.Channel do
     params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
+    |> unique_constraint(:name)
     |> validate(params)
   end
 

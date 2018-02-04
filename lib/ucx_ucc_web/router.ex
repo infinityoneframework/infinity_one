@@ -8,6 +8,7 @@ defmodule UcxUccWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UcxUcc.Plugs.Setup
     plug Coherence.Authentication.Session
   end
 
@@ -17,6 +18,7 @@ defmodule UcxUccWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UcxUcc.Plugs.Setup
     plug Coherence.Authentication.Session, protected: true
   end
 
@@ -26,6 +28,7 @@ defmodule UcxUccWeb.Router do
 
   scope "/", UcxUccWeb  do
     pipe_through :browser
+    get "/landing", LandingController, :index
     coherence_routes()
   end
 
