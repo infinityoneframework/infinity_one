@@ -188,10 +188,10 @@
     set_mute_status: function(state) {
       if (this.debug) console.log("set_mute_status", state)
     },
-    volume_increment: function() {
+    volume_increment: function(device, increment) {
       if (this.debug) console.log("volume_increment")
     },
-    volume_decrement: function(active_control) {
+    volume_decrement: function(device, decrement) {
       if (this.debug) console.log("volume_decrement")
     },
     call_on_hold: function(state) {
