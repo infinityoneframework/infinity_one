@@ -276,7 +276,14 @@
   // Just in case we are loaded after the plugins
   document.dispatchEvent(new Event('DeviceManagerLoaded'));
 
+  UccChat.on_connect(function(ucc_chat, socket) {
+    console.log('device_manager on_connect');
+    window.UccChat.DeviceManager = DeviceManager;
+    setTimeout(function() {
+      window.UccChat.DeviceManager.init();
+    }, 1500);
+  });
+
   $(document).ready(function() {
-    UccChat.DeviceManager.init();
   })
 })();
