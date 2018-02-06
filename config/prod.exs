@@ -16,9 +16,7 @@ use Mix.Config
 config :ucx_ucc, UcxUccWeb.Endpoint,
   url: [host: "localhost", port: 4021],
   https: [port: 4021,
-    otp_app: :ucx_ucc,
-    keyfile: "priv/key.pem",
-    certfile: "priv/cert.pem"
+    otp_app: :ucx_ucc
   ],
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,

@@ -9,9 +9,7 @@ use Mix.Config
 config :ucx_ucc, UcxUccWeb.Endpoint,
   http: [port: 4017],
   https: [port: 4317,
-    otp_app: :ucx_ucc,
-    keyfile: "priv/key.pem",
-    certfile: "priv/cert.pem"
+    otp_app: :ucx_ucc
   ],
   debug_errors: true,
   code_reloader: true,
