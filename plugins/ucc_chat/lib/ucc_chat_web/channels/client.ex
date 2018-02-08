@@ -179,7 +179,7 @@ defmodule UccChatWeb.Client do
 #     Rebel.Query.delete! socket, "li.message#" <> message_id
 # =======
   def delete_message(message_id, socket) do
-    delete socket, "li.message#" <> message_id
+    Rebel.Query.delete socket, "li.message#" <> message_id
 # >>>>>>> master
   end
 

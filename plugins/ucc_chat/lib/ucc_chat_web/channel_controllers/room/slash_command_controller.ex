@@ -2,7 +2,7 @@ defmodule UccChatWeb.SlashCommandChannelController do
   use UccChatWeb, :channel_controller
 
   alias UccChat.{SlashCommands, Channel}
-  alias UccChat.{ChannelService, MessageService}
+  alias UccChat.{ChannelService}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UcxUcc.Repo
   alias UcxUcc.Permissions
@@ -21,7 +21,7 @@ defmodule UccChatWeb.SlashCommandChannelController do
     user_id = socket.assigns[:user_id]
     user = Helpers.get_user user_id
     channel_id = socket.assigns[:channel_id]
-    MessageService.stop_typing(socket, user_id, channel_id)
+    UccChatWeb.RoomChannel.Channel.stop_typing(socket, user_id, channel_id)
     command = String.replace(command, "-", "_") |> String.to_atom
     if authorized? user, command, channel_id do
       case handle_command(socket, command, args, user_id, channel_id) do
