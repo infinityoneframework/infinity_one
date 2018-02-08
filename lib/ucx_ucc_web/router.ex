@@ -44,6 +44,14 @@ defmodule UcxUccWeb.Router do
     get "/phone", MasterController, :phone
   end
 
+  # The following is a prototype of an API implementation. It is basically
+  # working, without authentication. Need updates in Coherence to get it
+  # working
+  # scope "/api/v1", UcxUccWeb.API do
+  #   pipe_through :api
+  #   post "/login", SessionController, :create
+  # end
+
   # forward "/admin", UccAdminWeb.Router
   # TODO: get unbrella working for this
   # forward "/client", MscsWeb.Router

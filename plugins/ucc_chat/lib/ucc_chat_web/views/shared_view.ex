@@ -161,7 +161,7 @@ defmodule UccChatWeb.SharedView do
   def has_role?(user, role, scope), do: Accounts.has_role?(user, role, scope)
   def has_role?(user, role), do: Accounts.has_role?(user, role)
 
-  def user_muted?(%{} = user, channel_id), do: UccChat.ChannelService.user_muted?(user.id, channel_id)
+  def user_muted?(%{} = user, channel_id), do: UccChat.Channel.user_muted?(user.id, channel_id)
 
   def content_home_title do
     "test"

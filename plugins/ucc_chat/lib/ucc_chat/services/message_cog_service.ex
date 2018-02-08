@@ -65,6 +65,7 @@ defmodule UccChat.MessageCogService do
 
   # end
   def handle_in("delete-message", msg, socket) do
+    Logger.warn "delete-message"
     UccChatWeb.MessageChannelController.delete socket, msg
   end
 

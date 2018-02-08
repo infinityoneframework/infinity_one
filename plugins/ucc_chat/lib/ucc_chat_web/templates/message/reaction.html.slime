@@ -2,9 +2,10 @@
 - name = reaction.emoji |> String.replace(":", "")
 li.selected(data-emoji="#{name}")
   span.reaction-emoji
-    = @reaction.emoji |> EmojiOne.shortname_to_image |> Phoenix.HTML.raw
+    = @reaction.emoji |> EmojiOne.shortname_to_image(title: false) |> Phoenix.HTML.raw
+    / =# @reaction.emoji |> EmojiOne.shortname_to_image |> String.replace(~r/title=".*"/, "") |> Phoenix.HTML.raw
   span.reaction-count= reaction.count
   ul.people
-    span(style="font-weight: bold;")
+    span.names style="font-weight: bold;"
       = get_reaction_people reaction, @user
-      span(style="color: #aaa;")= ~g(reacted with) <> " #{reaction.emoji}"
+    span(style="font-weight: bold; color: #aaa;")= ~g(reacted with) <> " #{reaction.emoji}"

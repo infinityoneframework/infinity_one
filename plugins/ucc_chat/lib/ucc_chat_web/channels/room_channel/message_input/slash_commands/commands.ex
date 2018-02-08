@@ -50,12 +50,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
         assigns = socket.assigns
         case WebChannel.join channel, assigns.user_id do
           {:ok, _message} ->
-            client.toastr! socket, :success, ~g(Successfully joined the channel)
+            client.toastr socket, :success, ~g(Successfully joined the channel)
           {:error, message} ->
-            client.toastr! socket, :error, message
+            client.toastr socket, :error, message
         end
       else
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
       end
     end
   end
@@ -64,10 +64,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     assigns = socket.assigns
     with channel when not is_nil(channel) <- Channel.get(assigns.channel_id),
          {:ok, _message} <- WebChannel.leave(channel, assigns.user_id) do
-      client.toastr! socket, :success, ~g(Successfully left the channel)
+      client.toastr socket, :success, ~g(Successfully left the channel)
     else
-      {:error, message} -> client.toastr! socket, :error, message
-      _ -> client.toastr! socket, :error, ~g(Sorry, could not do that!)
+      {:error, message} -> client.toastr socket, :error, message
+      _ -> client.toastr socket, :error, ~g(Sorry, could not do that!)
     end
   end
 
@@ -83,12 +83,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
          {:ok, _message} <- ChannelService.channel_command(socket, :create,
             name, assigns.user_id, assigns.channel_id) do
 
-      client.toastr! socket, :success, ~g(Channel created successfully)
+      client.toastr socket, :success, ~g(Channel created successfully)
     else
       {:error, message} ->
-        client.toastr! socket, :error, message
+        client.toastr socket, :error, message
       _ ->
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
     end
   end
 
@@ -97,7 +97,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       if Channel.get_by(name: name) do
         Phoenix.Channel.push socket, "room:open", %{room: name}
       else
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
       end
     end
   end
@@ -107,7 +107,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     if channel = Channel.get assigns.channel_id do
       archive_channel(channel, sender, socket, client)
     else
-      client.toastr! socket, :error, sorry_message()
+      client.toastr socket, :error, sorry_message()
     end
   end
 
@@ -116,13 +116,13 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       if channel = Channel.get_by name: name do
         archive_channel(channel, sender, socket, client)
       else
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
       end
     end
   end
 
   def run_command("unarchive", [], _sender, socket, client) do
-    client.toastr! socket, :error, ~g(The unarchive command requires a room name)
+    client.toastr socket, :error, ~g(The unarchive command requires a room name)
   end
 
   def run_command("invite-all-to", args, sender, socket, client) do
@@ -130,7 +130,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       if channel = Channel.get_by name: name do
         invite_all_to(channel, sender, socket, client)
       else
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
       end
     end
   end
@@ -140,7 +140,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       if channel = Channel.get_by name: name do
         invite_all_from(channel, sender, socket, client)
       else
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
       end
     end
   end
@@ -150,7 +150,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       if channel = Channel.get_by name: name do
         unarchive_channel(channel, sender, socket, client)
       else
-        client.toastr! socket, :error, no_room_message()
+        client.toastr socket, :error, no_room_message()
       end
     end
   end
@@ -160,10 +160,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
       case ChannelService.invite_user user, socket.assigns.channel_id, current_user.id do
         {:ok, _} ->
-          client.toastr! socket, :success, ~g(User added successfully)
+          client.toastr socket, :success, ~g(User added successfully)
         {:error, changeset} ->
           Logger.warn "invite failed #{inspect changeset.errors}"
-          client.toastr! socket, :error, sorry_message()
+          client.toastr socket, :error, sorry_message()
         nil ->
           nil
       end
@@ -179,9 +179,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       UserChannel.remove_user socket, user.id
       # case UserChannel.remove_user socket, user.id  do
       #   {:ok, _} ->
-      #     client.toastr! socket, :success, ~g(User removed successfully)
+      #     client.toastr socket, :success, ~g(User removed successfully)
       #   {:error, _} ->
-      #     client.toastr! socket, :error, sorry_message()
+      #     client.toastr socket, :error, sorry_message()
       #   nil ->
       #     nil
       # end
@@ -193,9 +193,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     if user = get_user args, socket, client do
       case WebChannel.mute_user(socket.assigns.channel_id, user, current_user) do
         {:ok, _} ->
-          client.toastr! socket, :success, "User muted successfully"
+          client.toastr socket, :success, "User muted successfully"
         {:error, message} ->
-          client.toastr! socket, :error, message
+          client.toastr socket, :error, message
       end
     end
   end
@@ -205,9 +205,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
     if user = get_user args, socket, client do
       case WebChannel.unmute_user(socket.assigns.channel_id, user, current_user) do
         {:ok, _} ->
-          client.toastr! socket, :success, ~g"User unmuted successfully"
+          client.toastr socket, :success, ~g"User unmuted successfully"
         {:error, message} ->
-          client.toastr! socket, :error, message
+          client.toastr socket, :error, message
       end
     end
   end
@@ -228,11 +228,11 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
           dial(socket, number, client)
         else
           _ ->
-            client.toastr! socket, :error,
+            client.toastr socket, :error,
               gettext("User %{username} is invalid or does not have a phone number", username: username)
         end
       true ->
-        client.toastr! socket, :error,
+        client.toastr socket, :error,
           gettext("Invalid phone number or username, %{number}", number: number_string)
     end
   end
@@ -280,20 +280,20 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       if user = Accounts.get_by_user username: name, preload: [:roles, user_roles: :role] do
         user
       else
-        client.toastr! socket, :error, ~g(Could not find that user)
+        client.toastr socket, :error, ~g(Could not find that user)
       end
     end
   end
 
   defp invalid_args_error(args, socket, client) do
-    client.toastr! socket, :error, ~g(Invalid argument!) <> " " <> Enum.join(args, " ")
+    client.toastr socket, :error, ~g(Invalid argument!) <> " " <> Enum.join(args, " ")
   end
 
   defp no_room_message, do: ~g(No room by that name)
   defp sorry_message, do: ~g(Sorry, something went wrong.)
 
   defp archive_channel(%{archived: true} = _channel, _sender, socket, client) do
-    client.toastr! socket, :error, ~g(Room is already archived.)
+    client.toastr socket, :error, ~g(Room is already archived.)
   end
 
   defp archive_channel(%{id: id} = channel, _sender, socket, client) do
@@ -306,12 +306,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
         socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:update:list", %{}
       {:error, changeset} ->
         Logger.warn "error archiving channel #{inspect changeset.errors}"
-        client.toastr! socket, :error, ~g(Problem archiving channel)
+        client.toastr socket, :error, ~g(Problem archiving channel)
     end
   end
 
   defp unarchive_channel(%{archived: false} = _channel, _sender, socket, client) do
-    client.toastr! socket, :error, ~g(Room is not archived.)
+    client.toastr socket, :error, ~g(Room is not archived.)
   end
 
   defp unarchive_channel(%{id: id} = channel, _sender, socket, client) do
@@ -324,7 +324,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
         socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:update:list", %{}
       {:error, changeset} ->
         Logger.warn "error unarchiving channel #{inspect changeset.errors}"
-        client.toastr! socket, :error, ~g(Problem unarchiving channel)
+        client.toastr socket, :error, ~g(Problem unarchiving channel)
     end
   end
 
@@ -344,7 +344,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
       ChannelService.invite_user(subs.user.id, to_channel_id)
     end)
 
-    client.toastr! socket, :success, ~g"The users have been added."
+    client.toastr socket, :success, ~g"The users have been added."
   end
 
   def invite_user(current_user, channel_id, user_id \\ [], opts \\ [])
@@ -363,12 +363,12 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   defp dial(socket, number, client) do
     try do
       Dialer.dial(socket, number)
-      client.toastr! socket, :success,
+      client.toastr socket, :success,
         gettext("Calling %{number}", number: number)
     rescue
       e ->
         Logger.error inspect(e)
-        client.toastr! socket, :error,
+        client.toastr socket, :error,
           gettext("Problem dialing, %{number}. Contact your system administrator.", number: number)
     end
   end

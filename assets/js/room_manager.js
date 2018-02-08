@@ -350,7 +350,8 @@ class RoomManager {
   remove_unread_class() {
     if (this.has_first_unread()) {
       $('.first-unread').removeClass('first-unread first-unread-opaque')
-      this.push_channel('unread:clear')
+      // this.push_channel('unread:clear')
+      this.userchan.push('unread:clear')
       this.unread = false
     }
   }

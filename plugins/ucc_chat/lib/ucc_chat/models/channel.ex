@@ -3,8 +3,8 @@ defmodule UccChat.Channel do
 
   import Ecto.Changeset
 
-  alias UcxUcc.{Accounts, Accounts.User,  Repo}
-  alias UccChat.Subscription
+  alias UcxUcc.{Accounts, Accounts.User, Repo}
+  alias UccChat.{Mute, Subscription}
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
   alias UccChat.Schema.Channel, as: ChannelSchema
 
@@ -279,4 +279,7 @@ defmodule UccChat.Channel do
     Accounts.get_user! user_id, preload: [:roles, user_roles: :role]
   end
 
+  def user_muted?(channel_id, user_id) do
+    Mute.user_muted?(channel_id, user_id)
+  end
 end

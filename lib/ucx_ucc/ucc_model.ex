@@ -37,11 +37,16 @@ defmodule UccModel do
         @schema.changeset(%@schema{}, attrs)
       end
 
-      @spec list() :: [Struct.t]
-      def list do
-        @repo.all @schema
+      @spec list(Keword.t) :: [Struct.t]
+      def list(opts \\ []) do
+        if preload = opts[:preload] do
+          @schema
+          |> preload(^preload)
+          |> @repo.all
+        else
+          @repo.all @schema
+        end
       end
-
 
       @spec list_by(Keyword.t) :: List.t
       def list_by(opts) do

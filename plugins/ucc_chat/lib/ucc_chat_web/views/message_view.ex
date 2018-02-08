@@ -1,7 +1,18 @@
 defmodule UccChatWeb.MessageView do
+  @moduledoc """
+  Helpers for rendering a message.
+
+  There are many functions in this module to support the complexity of
+  rendering messages.
+
+  Some of the message features have not yet been implemented. So there
+  are some constant return functions below that will need to be implemented
+  when we add the missing features.
+
+  TODO: This module is due for a major clean up.
+  """
   use UccChatWeb, :view
   import Phoenix.HTML.Tag, only: [content_tag: 2, content_tag: 3, tag: 1]
-  # import UccChat.AvatarService, only: [avatar_url: 1]
 
   alias UccChat.{Message, Subscription, AttachmentService}
   alias UccChat.ServiceHelpers, as: Helpers
@@ -20,6 +31,17 @@ defmodule UccChatWeb.MessageView do
     %{}
   end
 
+  @doc """
+  Get the message attributes for the main message li tag.
+
+  Each message is presented in the web page as a `li` tag with a large
+  number of attributes. They are calculated here and a single `<li ...>`
+  tag is returned. Note that only the open tag is returned. The template
+  contains a closing `</li>` tag.
+
+  This approach was taken because I was not sure how to do it otherwise.
+  However, I believe there is a better approach.
+  """
   def get_message_wrapper_opts(msg, user) do
     cls =
       ~w(get_sequential get_system get_t get_own get_is_temp get_chat_opts get_custom_class get_new_day)a
@@ -33,28 +55,34 @@ defmodule UccChatWeb.MessageView do
         class: cls,
         "data-username": msg.user.username,
         "data-groupable": msg.is_groupable,
-        "data-date": format_date(msg.updated_at, user),
+        "data-date": format_date(msg.inserted_at, user),
         "data-timestamp": msg.timestamp,
         "rebel-channel": "room"
       ]
     Phoenix.HTML.Tag.tag(:li, attrs)
   end
-  def format_date(%{updated_at: dt}, user) do
+
+  def format_date(%{inserted_at: dt}, user) do
     Helpers.format_date tz_offset(dt, user)
   end
+
   def format_date(dt, user) do
     Helpers.format_date tz_offset(dt, user)
   end
+
   def format_timestamp(dt, _user) do
     Message.format_timestamp dt
   end
-  def format_time(%{updated_at: dt}, user) do
+
+  def format_time(%{inserted_at: dt}, user) do
     format_time dt, user
   end
+
   def format_time(dt, user) do
     Helpers.format_time tz_offset(dt, user)
   end
-  def format_date_time(%{updated_at: dt}, user) do
+
+  def format_date_time(%{inserted_at: dt}, user) do
     format_date_time dt, user
   end
 
@@ -64,20 +92,39 @@ defmodule UccChatWeb.MessageView do
     |> NaiveDateTime.from_erl!
     |> format_date_time(user)
   end
+
   def format_date_time(nil, _), do: ""
 
   def format_date_time(dt, user) do
     Helpers.format_date_time tz_offset(dt, user)
   end
 
+  def format_edited_date_time(%{updated_at: dt}, user) do
+    format_date_time dt, user
+  end
+
   def tz_offset(dt, user) do
     Timex.shift(dt, hours: user.tz_offset || 0)
   end
 
-  def avatar_from_username(_msg), do: false
+  def avatar_from_message(message) do
+    avatar = message.avatar
+    if is_binary(avatar) and String.length(avatar) > 0 do
+      avatar
+    else
+      false
+    end
+  end
+
+  def avatar_from_username(_message) do
+    Logger.warn "deprecated"
+    false
+  end
+
   def emoji(_msg) do
     false
   end
+
   def get_username(msg), do: msg.user.username
   def get_users_typing(_msg), do: []
   def get_users_typing(_msg, _cmd), do: []
@@ -109,21 +156,18 @@ defmodule UccChatWeb.MessageView do
   def has_oembed(_msg), do: false
   def edited(%{edited_id: edited_id} = msg, user) when not is_nil(edited_id) do
     %{
-      edit_time: format_date_time(msg, user),
+      edit_time: format_edited_date_time(msg, user),
       edited_by: msg.edited_by.username,
     }
   end
   def edited(_msg, _), do: false
-
-
-  # def add_new_day(cls, msg, user, %{no_new_days: true}), do: cls
-  # def add_new_day(cls, msg, user, _), do: cls <> get_new_day(msg, user)
 
   def get_new_day(%{new_day: true}, _), do: " new-day"
   def get_new_day(_, _), do: ""
   def get_sequential(%{sequential: true}, _), do: " sequential"
   def get_sequential(_, _), do: ""
   def get_system(%{system: true}, _), do: " system"
+  def get_system(%{type: "p"}, _), do: " system"
   def get_system(_, _), do: ""
   def get_t(%{t: t}, _), do: "#{t}"
   def get_t(_, _), do: ""
@@ -439,4 +483,13 @@ defmodule UccChatWeb.MessageView do
   defp rebel_event("reaction-message"), do: ["rebel-click": "reaction_open"]
   defp rebel_event("delete-message"), do: ["rebel-click": "message_action"]
   defp rebel_event(_), do: ["rebel-click": "message_action"]
+
+  def system_message(message) do
+    messages = %{
+      "You have been muted and cannot speak in this room" => ~g(You have been muted and cannot speak in this room),
+      "You are not authorized to create a message" => ~g(You are not authorized to create a message),
+    }
+    messages[message] || ~g(Invalid Message Lookup)
+  end
+
 end

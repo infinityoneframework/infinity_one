@@ -102,6 +102,7 @@ defmodule UccChat.ChannelService do
   end
 
   def get_unread(channel_id, user_id) do
+    Logger.warn "deprecated"
     case Subscription.get_by channel_id: channel_id, user_id: user_id do
       nil -> 0
       sub -> sub.unread
@@ -109,10 +110,12 @@ defmodule UccChat.ChannelService do
   end
 
   def set_has_unread(channel_id, user_id, false) do
+    Logger.warn "deprecated"
     clear_unread(channel_id, user_id)
   end
 
   def set_has_unread(channel_id, user_id, value) do
+    Logger.warn "deprecated"
     [channel_id: channel_id, user_id: user_id]
     |> Subscription.get_by
     |> case do
@@ -1276,6 +1279,7 @@ defmodule UccChat.ChannelService do
   end
 
   def user_muted?(user_id, channel_id) do
+    Logger.warn "deprecated. Use Channel.user_muted?/2 instead"
     !! Mute.get_by(user_id: user_id, channel_id: channel_id)
   end
 

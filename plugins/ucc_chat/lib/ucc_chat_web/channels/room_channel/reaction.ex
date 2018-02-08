@@ -6,8 +6,8 @@ defmodule UccChatWeb.RoomChannel.Reaction do
   # import UccChatWeb.RebelChannel.Client
 
   alias UccChatWeb.Client
-  alias UccChat.{Reaction, Message, MessageService}
-  alias UcxUcc.{Accounts, Repo}
+  alias UccChat.{Reaction, Message}
+  alias UcxUcc.{Accounts, Repo, UccPubSub}
 
 
   def select(socket, sender, client \\ Client) do
@@ -16,10 +16,8 @@ defmodule UccChatWeb.RoomChannel.Reaction do
     user = Accounts.get_user socket.assigns.user_id
     message_id = Rebel.get_assigns socket, :reaction
     Rebel.put_assigns socket, :reaction, nil
-    # IO.inspect {message_id, emoji}
 
-    message = Message.get message_id,
-      preload: MessageService.preloads()
+    message = Message.get message_id, preload: Message.preloads()
 
     case Enum.find message.reactions, &(&1.emoji == emoji) do
       nil ->
@@ -27,12 +25,17 @@ defmodule UccChatWeb.RoomChannel.Reaction do
       reaction ->
         update_reaction reaction, user.id
     end
-    # MessageService.broadcast_updated_message message, reaction: true
-    UccChatWeb.RoomChannel.broadcast_updated_message message, reaction: true
-    client.broadcast_js socket, """
+    message = Message.get message_id, preload: Message.preloads()
+
+    UccPubSub.broadcast "message:update:reactions", "channel:" <> message.channel_id,
+      %{message: message}
+
+    socket
+    |> client.async_js("""
       chat_emoji.close_picker();
       document.querySelector('#{@message_box}').focus();
-      """
+      """)
+    |> UccChatWeb.RoomChannel.MessageCog.close_cog(message.id, client)
     emoji
   end
 

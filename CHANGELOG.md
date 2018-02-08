@@ -1,11 +1,14 @@
 # UcxUcc Changelog
 
-## 0.2.4 (2018-02-XX)
+## 0.2.4 (2018-02-08)
 
 ## Enhancements
 
 * Add configuration of the uploads path
 * Don't reload page when using the conversation button from members list
+* Redesigned Message handling and broadcasting
+* Proof of concept for Messaging Rest API
+* Removed some code complexity around messaging
 
 ### Bug Fixes
 
@@ -16,6 +19,9 @@
 * [UCX-3766] Move the flex-nav scollbars to the right of page
 * [UCX-3731] Fix rendering create channel after more channels
 * Don't broadcast message popup selections
+* Fixed message timestamps
+* Fixed reaction tool tips
+* Fixed subscribing 3rd party in direct channel with @mention
 
 ## 0.2.3 (2018-02-02)
 

@@ -187,7 +187,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   #   end
   # end
 
-  def set_mute(socket, sender) do
+  def set_mute(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
     # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
@@ -204,7 +204,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def unset_mute(socket, sender) do
+  def unset_mute(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
     # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
@@ -221,7 +221,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def set_owner(socket, sender) do
+  def set_owner(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
     # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
@@ -238,7 +238,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def unset_owner(socket, sender) do
+  def unset_owner(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
     # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
@@ -255,7 +255,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def set_moderator(socket, sender) do
+  def set_moderator(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
     # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
@@ -272,7 +272,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def unset_moderator(socket, sender) do
+  def unset_moderator(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
     # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username

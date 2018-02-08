@@ -2,12 +2,9 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   use UccLogger
   use UccChatWeb.RoomChannel.Constants
 
-  # alias UccChatWeb.RoomChannel.KeyStore
   alias UccChatWeb.RoomChannel.MessageInput.{SpecialKeys, Buffer}
-  # alias UccChatWeb.RoomChannel.Message
-  alias UccChatWeb.RoomChannel.Message
+  alias UccChatWeb.RoomChannel.{Message, Channel}
   alias UccChatWeb.Client
-  alias UccChat.MessageService
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]
@@ -18,13 +15,15 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   def message_send(socket, _sender, client \\ Client) do
+    Logger.warn "deprecated"
+
     body = socket |> client.get_message_box_value |> String.trim_trailing
     if client.editing_message?(socket) do
-      Message.edit_message(socket, body, client)
+      Message.update_message(socket, body, client)
     else
       Message.new_message(socket, body, client)
     end
-    MessageService.stop_typing socket
+    Channel.stop_typing socket
     socket
   end
 
@@ -38,7 +37,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
 
   def typing_notification(%{sender: sender} = context) do
     if sender["value"] == "" do
-      MessageService.start_typing context.socket
+      Channel.start_typing context.socket
     end
     context
   end

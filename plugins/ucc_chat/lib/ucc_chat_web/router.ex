@@ -47,8 +47,19 @@ defmodule UccChatWeb.Router do
     # resources "/channel", ChannelController
   end
 
+  # TODO: This is not authenticated. It needs to be fixed
   scope "/", UccChatWeb do
     pipe_through :api
     post "/attachments/create", AttachmentController, :create
   end
+
+  # The following is a prototype of an API implementation. It is basically
+  # working, without authentication. Need updates in Coherence to get it
+  # working
+  # scope "/api/v1", UccChatWeb.API do
+  #   pipe_through :api
+
+  #   get "/channels/info/:name", ChannelController, :show
+  #   post "/messages/post", MessageController, :create
+  # end
 end

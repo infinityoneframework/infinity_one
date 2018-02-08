@@ -1,10 +1,13 @@
 defmodule UccChat.Schema.Message do
+  @moduledoc """
+  Schema and changesets for the Message schema.
+  """
   use UccChat.Shared, :schema
 
   import Ecto.Changeset
 
   alias UcxUcc.Accounts.User
-  alias UccChat.Schema.{Channel, Reaction, Attachment, StarredMessage}
+  alias UccChat.Schema.{Mention, Channel, Reaction, Attachment, StarredMessage}
 
   schema "messages" do
     field :body, :string
@@ -21,6 +24,7 @@ defmodule UccChat.Schema.Message do
     has_many :stars, StarredMessage, on_delete: :delete_all
     has_many :attachments, Attachment, on_delete: :delete_all
     has_many :reactions, Reaction, on_delete: :delete_all
+    has_many :mentions, Mention, on_delete: :delete_all
 
     field :is_groupable, :boolean, virtual: true
     field :t, :string, virtual: true
@@ -35,7 +39,10 @@ defmodule UccChat.Schema.Message do
     timestamps(type: :utc_datetime)
   end
 
-  @fields [:body, :user_id, :channel_id, :sequential, :timestamp, :edited_id, :type, :expire_at, :system, :inserted_at]
+  @fields [
+    :body, :user_id, :channel_id, :sequential, :timestamp, :edited_id,
+    :type, :expire_at, :system, :inserted_at
+  ]
   @required [:user_id]
 
   @doc """
@@ -46,13 +53,38 @@ defmodule UccChat.Schema.Message do
     |> cast(params, @fields)
     |> validate_required(@required)
     |> add_timestamp
+    |> prepare_changes(&delete_attachment_files/1)
   end
 
+  @doc """
+  Create the string time stamp and add to changes.
+
+  The time stamp is a string representation of the inserted at date with
+  millisecond precision. Only generate it for create requests.
+  """
   def add_timestamp(%{data: %{timestamp: nil}} = changeset) do
     put_change(changeset, :timestamp, UccChat.ServiceHelpers.get_timestamp())
   end
+
   def add_timestamp(changeset) do
     changeset
   end
 
+  # Handle deleting the uploads folder containing the attachments for
+  # the given deleted message
+  defp delete_attachment_files(%{action: :delete} = changeset) do
+    Enum.each changeset.data.attachments, fn attachment ->
+      {attachment.file, attachment}
+      |> UccChat.File.url()
+      |> String.replace(~r{/[^/]+$}, "")
+      |> String.trim_leading("/")
+      |> File.rm_rf!()
+    end
+    changeset
+  end
+
+  # Do nothing if this is not a delete
+  defp delete_attachment_files(changeset) do
+    changeset
+  end
 end

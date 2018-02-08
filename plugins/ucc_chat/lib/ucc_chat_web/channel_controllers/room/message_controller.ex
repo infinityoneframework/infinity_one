@@ -3,11 +3,12 @@ defmodule UccChatWeb.MessageChannelController do
   use UccLogger
 
   alias UccChat.{
-    Message, MessageService, Attachment,
+    Message, Attachment,
     AttachmentService
   }
   alias UcxUcc.Permissions
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
   require Logger
 
@@ -16,7 +17,7 @@ defmodule UccChatWeb.MessageChannelController do
 
     user = Helpers.get_user(assigns[:user_id], preload: [:subscriptions])
     channel_id = assigns[:channel_id]
-    preloads = MessageService.preloads()
+    preloads = Message.preloads()
 
     page =
       Message.get_messages(channel_id, user, preload: preloads,
@@ -24,7 +25,7 @@ defmodule UccChatWeb.MessageChannelController do
 
     messages_html = render_messages(page.entries, user)
 
-    {:reply, {:ok, MessageService.messages_info_into(page, channel_id,
+    {:reply, {:ok, WebMessage.messages_info_into(page, channel_id,
       user, %{html: messages_html})}, socket}
   end
 
@@ -35,7 +36,7 @@ defmodule UccChatWeb.MessageChannelController do
     channel_id = assigns[:channel_id]
     timestamp = params["timestamp"]
 
-    preloads = MessageService.preloads()
+    preloads = Message.preloads()
 
     page =
       Message.get_messages(channel_id, user, preload: preloads,
@@ -43,7 +44,7 @@ defmodule UccChatWeb.MessageChannelController do
 
     messages_html = render_messages(page.entries, user)
 
-    {:reply, {:ok, MessageService.messages_info_into(page, channel_id,
+    {:reply, {:ok, WebMessage.messages_info_into(page, channel_id,
       user, %{html: messages_html, last_read: timestamp})}, socket}
   end
 
@@ -57,12 +58,12 @@ defmodule UccChatWeb.MessageChannelController do
 
     messages_html = render_messages(page.entries, user)
 
-    {:reply, {:ok, MessageService.messages_info_into(page, channel_id,
+    {:reply, {:ok, WebMessage.messages_info_into(page, channel_id,
       user, %{html: messages_html})}, socket}
   end
 
   defp render_messages(entries, user) do
-    previews = MessageService.message_previews(user.id, entries)
+    previews = WebMessage.message_previews(user.id, entries)
 
     entries
     |> Enum.map(fn message ->
@@ -78,11 +79,12 @@ defmodule UccChatWeb.MessageChannelController do
 
   # new version of this in room_channel/message.ex
   def delete(%{assigns: assigns} = socket, params) do
+    Logger.warn "deprecated"
     user = Helpers.get_user assigns.user_id
     if user.id == params["message_id"] ||
       Permissions.has_permission?(user, "delete-message", assigns.channel_id) do
       message = Message.get params["message_id"], preload: [:attachments]
-      case MessageService.delete_message message do
+      case Message.delete message do
         {:ok, _} ->
           Phoenix.Channel.broadcast! socket, "code:update",
             %{selector: "li.message#" <> params["message_id"], action: "remove"}

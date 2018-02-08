@@ -1,7 +1,8 @@
 defmodule UccChat.ChatDat do
-  alias UccChat.{Channel, MessageService}
+  alias UccChat.{Channel}
   alias UcxUcc.{Repo, Hooks, Accounts, Accounts.User}
   alias UccChat.Schema.Channel, as: ChannelSchema
+  alias UccChatWeb.RoomChannel.Message
 
   require Logger
 
@@ -23,7 +24,7 @@ defmodule UccChat.ChatDat do
     %{room_types: room_types, rooms: rooms, room_map: room_map, active_room: ar} =
       UccChat.ChannelService.get_side_nav(user, channel.id)
 
-    previews = MessageService.message_previews(user.id, messages)
+    previews = Message.message_previews(user.id, messages)
     status = UccChat.PresenceAgent.get user.id
 
     %__MODULE__{
@@ -101,7 +102,7 @@ defmodule UccChat.ChatDat do
   def get_messages_info(chatd, user) do
     case chatd.channel do
       %ChannelSchema{id: id} ->
-        value = MessageService.get_messages_info(chatd.messages, id, user)
+        value = Message.get_messages_info(chatd.messages, id, user)
         set(chatd, :messages_info, value)
       _ ->
         chatd

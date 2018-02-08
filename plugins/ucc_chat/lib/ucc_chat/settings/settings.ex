@@ -23,6 +23,47 @@ defmodule UccChat.Settings do
     end
   end
 
+  def notifications_settings(%{} = user, %{id: channel_id}) do
+    notifications_settings(user, channel_id)
+  end
+
+  def notifications_settings(%{account: account}, channel_id) do
+    with true <- enable_desktop_notifications(),
+         true <- account.enable_desktop_notifications do
+      account
+      |> Notification.get_notification(channel_id)
+      |> Map.get(:settings, %{})
+    end
+  end
+
+  def desktop_notifications_mode(%{} = user, channel) do
+    case notifications_settings(user, channel) do
+      %{desktop: mode} -> mode
+      other -> other
+    end
+  end
+
+  def email_notifications_mode(%{} = user, channel) do
+    case notifications_settings(user, channel) do
+      %{email: mode} -> mode
+      other -> other
+    end
+  end
+
+  def mobile_notifications_mode(%{} = user, channel) do
+    case notifications_settings(user, channel) do
+      %{mobile: mode} -> mode
+      other -> other
+    end
+  end
+
+  def unread_alert_notifications_mode(%{} = user, channel) do
+    case notifications_settings(user, channel) do
+      %{unread_alert: mode} -> mode
+      other -> other
+    end
+  end
+
   def get_new_message_sound(user, channel_id) do
     default = get_system_new_message_sound()
     cond do
