@@ -54,4 +54,11 @@ defmodule UccChatWeb.Admin.Page.ChatGeneral do
     {~g(Mentions only), "mentions_only"}
   ]
 
+  def lookup_option(which, field) do
+    which
+    |> options()
+    |> Enum.find(fn {_, fd} -> fd == field end)
+    |> elem(0)
+  end
+
 end

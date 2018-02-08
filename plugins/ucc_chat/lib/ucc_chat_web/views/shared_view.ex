@@ -60,6 +60,16 @@ defmodule UccChatWeb.SharedView do
   def get_ftab_open_class(nil), do: ""
   def get_ftab_open_class(_), do: "opened"
 
+  def get_desktop_notifications_for do
+    default = UccChat.NotificationSetting.get_system_name()
+    [
+      {gettext("Default (%{default}}", default: default), "system_default"},
+      {~g(All messages), "all"},
+      {~g(Mentions), "mentions"},
+      {~g(Nothing), "none"}
+    ]
+  end
+
   def get_room_notification_sounds do
     [
       {~g"None", "none"},

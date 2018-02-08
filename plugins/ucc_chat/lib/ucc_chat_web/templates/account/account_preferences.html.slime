@@ -38,7 +38,7 @@ section.page-container.page-home.page-static
                           i.icon-comment-empty.secondary-font-color
                           span= ~g"Test Desktop Notifications"
 
-                = unless account.enable_desktop_notifications do
+                = if account.enable_desktop_notifications do
                   .input-line.double-col
                     label= ~g"Notification Duration"
                     div
@@ -46,6 +46,13 @@ section.page-container.page-home.page-static
                         = text_input f, :desktop_notification_duration, type: :number, min: "0"
                       - else
                         = text_input f, :desktop_notification_duration, type: :number, min: "0", placeholder: ~g"User Global Settings"
+                  .input-line.double-col
+                    label= ~g"Show Desktop Notifications For"
+                    div
+                      div.select-arrow
+                        i.icon-down-open.secondary-font-color
+                      = select f, :show_desktop_notifications_for, get_desktop_notifications_for()
+
               = unless defer do
                 = radio_button_line(f, "unreadAlert", ~g"Unread Alert", :unread_alert, account, labels: {~g"On", ~g"Off"})
                 = radio_button_line(f, "", ~g"Use Emojis", :use_emojis, account)

@@ -74,17 +74,18 @@ defmodule UccChatWeb.UserChannel.Notifier do
       count = Subscription.get_unread(channel.id, user.id) + 1
       Subscription.set_unread(channel.id, user.id, count)
       broadcast_unread_count(socket, channel.name, count, client)
+    end
 
-      if UccSettings.enable_desktop_notifications() do
-        client.desktop_notify(socket,
-          message.user.username,
-          Helpers.strip_tags(message.body),
-          message,
-          Settings.get_desktop_notification_duration(user, channel))
-      else
+    if UccChat.Settings.desktop_notification?(user, channel.id, mention_or_direct) do
+      client.desktop_notify(socket,
+        message.user.username,
+        Helpers.strip_tags(message.body),
+        message,
+        Settings.get_desktop_notification_duration(user, channel))
+    else
+      if mention_or_direct do
         broadcast_client_notification socket, [badges_only: true], client
       end
-
     end
   end
 

@@ -37,6 +37,45 @@ defmodule UccChat.Settings do
     end
   end
 
+  def desktop_notification?(user, channel, mention \\ true)
+
+  def desktop_notification?(user, %{id: channel_id}, mention) do
+    desktop_notification? user, channel_id, mention
+  end
+
+  def desktop_notification?(user, channel_id, mention) do
+    chat_general = UccChat.Settings.ChatGeneral.get
+
+    desktop =
+      if notifications_settings = notifications_settings(user, channel_id) do
+        notifications_settings.desktop
+      else
+        "default"
+      end
+
+    opts = %{
+      mention: mention,
+      desktop: desktop,
+      system_enable: UccSettings.enable_desktop_notifications,
+      system: chat_general.desktop_notifications_default_alert,
+      account_enable: user.account.enable_desktop_notifications,
+      account: user.account.show_desktop_notifications_for
+    }
+
+    case opts do
+      %{desktop: "none"} -> false
+      %{account_enable: false, desktop: "default"} -> false
+      %{desktop: "default", system_enable: false} -> false
+      %{desktop: "default", account: "system_default", system: "none"} -> false
+      %{desktop: "default", account: "none"} -> false
+      %{mention: true} -> true
+      %{desktop: "default", account: "all"} -> true
+      %{desktop: "default", account: "system_default", system: "all"} -> true
+      %{desktop: "all"} -> true
+      _ -> false
+    end
+  end
+
   def notifications_settings(%{} = user, %{id: channel_id}) do
     notifications_settings(user, channel_id)
   end
@@ -47,13 +86,6 @@ defmodule UccChat.Settings do
       account
       |> Notification.get_notification(channel_id)
       |> Map.get(:settings, %{})
-    end
-  end
-
-  def desktop_notifications_mode(%{} = user, channel) do
-    case notifications_settings(user, channel) do
-      %{desktop: mode} -> mode
-      other -> other
     end
   end
 
@@ -107,8 +139,6 @@ defmodule UccChat.Settings do
   sound is coded by pattern matching on 6 different attributes.
   """
   def get_new_message_sound(user, channel_id, mention \\ true) do
-    # channel = UccChat.Channel.get channel_id
-    # IO.inspect {user.username, channel.name, channel.id}
     chat_general = UccChat.Settings.ChatGeneral.get
     system_audio = chat_general.default_message_notification_audio
 
@@ -151,38 +181,7 @@ defmodule UccChat.Settings do
       %{audio_mode: "all", audio: sound} -> sound
       _ -> nil
     end
-
-    # # A version with instrumentation for debugging. TODO: Remove this before merging.
-    # case opts do
-    #   %{audio: "none"} -> nil |> print(1)
-    #   %{audio: "system_default", account: "none"} -> nil |> print(2)
-    #   %{audio_mode: "default", account: "system_default", system: "none"} -> nil |> print(3)
-    #   %{audio_mode: "default", account: "none"} -> nil |> print(4)
-    #   %{mention: true, audio_mode: "default", account: "system_default"} -> system_audio |> print(5)
-    #   %{mention: true, audio_mode: "default", account: sound} -> sound |> print(5.5)
-    #   %{mention: true, audio_mode: "default", audio: "system_default"} -> system_audio |> print(6)
-    #   %{mention: true, audio_mode: "default", audio: sound} -> sound |> print(7)
-    #   %{mention: true, audio: "system_default", account: "system_default"} -> system_audio |> print(8)
-    #   %{mention: true, audio: "system_default", account: sound} -> sound |> print(9)
-    #   %{mention: true, audio: "system_default"} -> system_audio |> print(10)
-    #   %{mention: true, audio: sound} -> sound |> print(11)
-    #   %{mention: true} -> nil |> print(12) # just in case we missed something
-    #   %{audio_mode: "default", audio: "system_default", system: "all"} ->  system_audio |> print(13)
-    #   %{audio_mode: "default", audio: sound, system: "all"} -> sound |> print(14)
-    #   # %{audio_mode: "default", audio: "system_default"} ->  nil  # this should be caught by default case
-    #   %{audio_mode: "all", account: "system_default", audio: "system_default"} ->  system_audio |> print(15)
-    #   %{audio_mode: "all", account: "none", audio: "system_default"} ->  nil |> print(16)
-    #   %{audio_mode: "all", account: sound, audio: "system_default"} ->  sound |> print(17)
-    #   %{audio_mode: "all", audio: sound} -> sound |> print(18)
-    #   _ -> nil |> print(16)
-    # end
-    # |> print(:result)
-
   end
-
-  # defp print(value, label) do
-  #   IO.inspect value, label: to_string(label)
-  # end
 
   def get_system_new_message_sound,
     do: UccChat.Settings.default_message_notification_audio()

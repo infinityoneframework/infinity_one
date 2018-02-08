@@ -11,6 +11,7 @@
 * Removed some code complexity around messaging
 * Added support for all messages audio alerts and system settings
 * Added audio mode in room notifications panel
+* Added support for all messages desktop notifications
 
 ### Bug Fixes
 
