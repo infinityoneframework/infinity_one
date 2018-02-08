@@ -9,6 +9,8 @@
 * Redesigned Message handling and broadcasting
 * Proof of concept for Messaging Rest API
 * Removed some code complexity around messaging
+* Added support for all messages audio alerts and system settings
+* Added audio mode in room notifications panel
 
 ### Bug Fixes
 

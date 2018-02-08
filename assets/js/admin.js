@@ -42,6 +42,10 @@ class Admin {
         let reset = `<button text='Reset' data-setting="${target.getAttribute('name')}" class="reset-setting button danger">${reset_i}</button>`
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })
+      .on('change', '.admin-settings form select', function(e) {
+        admin.enable_save_button()
+        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      })
       .on('keyup keypress paste', '.admin-settings form input', function(e) {
         admin.enable_save_button()
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)

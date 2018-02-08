@@ -9,7 +9,17 @@ defmodule UccChatWeb.UserChannel.Notifier do
 
   require Logger
 
-  def new_message(payload, socket, client \\ UccChatWeb.Client) do
+  def new_message(payload, socket, client \\ UccChatWeb.Client)
+
+  def new_message(%{message: %{user_id: user_id}}, %{assigns: %{user_id: user_id}} = socket, _client) do
+    # Ignore for your own message
+
+    # user = Accounts.get_user(user_id, preload: [:account])
+    # IO.inspect user.username, label: "new_message ignore"
+    socket
+  end
+
+  def new_message(payload, socket, client) do
     user_id = payload.user_id
     channel = payload.channel
     # room = channel.name
@@ -21,6 +31,7 @@ defmodule UccChatWeb.UserChannel.Notifier do
     active_open = payload.user_state == "active" and open
     user = Accounts.get_user(user_id, preload: [:account])
 
+    # IO.inspect {user.username, user.id, payload.message.user_id}, label: "new_message"
     cond do
       not active_open ->
         socket
@@ -52,16 +63,17 @@ defmodule UccChatWeb.UserChannel.Notifier do
   defp handle_notifications(socket, user, channel, payload, client) do
     message = payload.message
 
-    if Enum.find(message.mentions, & &1.user_id == user.id) || channel.type == 2 do
+    mention = !!Enum.find(message.mentions, & &1.user_id == user.id)
+    mention_or_direct = mention or channel.type == 2
+
+    if sound = Settings.get_new_message_sound(user, channel.id, mention_or_direct) do
+      client.notify_audio(socket, sound)
+    end
+
+    if mention_or_direct do
       count = Subscription.get_unread(channel.id, user.id) + 1
       Subscription.set_unread(channel.id, user.id, count)
       broadcast_unread_count(socket, channel.name, count, client)
-
-      payload =
-        case Settings.get_new_message_sound(user, channel.id) do
-          nil -> payload
-          sound -> Map.put(payload, :sound, sound)
-        end
 
       if UccSettings.enable_desktop_notifications() do
         client.desktop_notify(socket,
@@ -73,10 +85,6 @@ defmodule UccChatWeb.UserChannel.Notifier do
         broadcast_client_notification socket, [badges_only: true], client
       end
 
-      if sound = payload[:sound] do
-        # Logger.warn "sound: " <> inspect(sound)
-        client.notify_audio(socket, sound)
-      end
     end
   end
 

@@ -1,6 +1,8 @@
 defmodule UccChat.NotificationSetting do
   use UccModel, schema: UccChat.Schema.NotificationSetting
 
+  use UcxUccWeb.Gettext
+
   @audio_options [
     {"none", "None"},
     {"system_default", "Use account preferences (Default)"},
@@ -25,22 +27,29 @@ defmodule UccChat.NotificationSetting do
 
   def options(:audio),        do: @audio_options
 
+  def options(:audio_mode), do: [
+    {"default", gettext("Default (%{default})", default: "Mentions")},
+    {"all", ~g(All messages)},
+    {"mentions", ~g(Mentions)}
+  ]
+
+
   def options(field) when field in ~w(desktop mobile)a, do: [
-    {"all", "All messages"},
-    {"mentions", "Mentions (default)"},
-    {"nothing", "Nothing"}
+    {"all", ~g"All messages"},
+    {"mentions", ~g"Mentions (default)"},
+    {"nothing", ~g"Nothing"}
   ]
 
   def options(:email), do: [
-    {"all", "All messages"},
-    {"nothing", "Nothing"},
-    {"preferences", "Use account preference"}
+    {"all", ~g"All messages"},
+    {"nothing", ~g"Nothing"},
+    {"preferences", ~g"Use account preference"}
   ]
 
   def options(:unread_alert), do: [
-    {"on", "On"},
-    {"off", "Off"},
-    {"preferences", "Use account preference"}
+    {"on", ~g"On"},
+    {"off", ~g"Off"},
+    {"preferences", ~g"Use account preference"}
   ]
 
 end
