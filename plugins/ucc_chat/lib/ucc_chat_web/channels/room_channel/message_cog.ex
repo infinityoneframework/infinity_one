@@ -75,7 +75,6 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
     socket
   end
   def close_cog(socket, message_id, client) do
-    Logger.warn ""
     client.async_js socket, ~s/$('li[id="#{message_id}"] .message-cog-container .message-dropdown').remove()/
     socket
   end

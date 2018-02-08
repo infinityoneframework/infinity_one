@@ -69,6 +69,10 @@ defmodule UccChat.Subscription do
   def get(channel_id, user_id, field) when is_atom(field) do
     channel_id
     |> get(user_id)
+    |> case do
+      nil   -> %{}
+      other -> other
+    end
     |> Map.get(field)
   end
 

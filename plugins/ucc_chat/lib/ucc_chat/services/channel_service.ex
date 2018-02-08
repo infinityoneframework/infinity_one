@@ -319,7 +319,7 @@ defmodule UccChat.ChannelService do
 
   def get_side_nav_search(user_id, match, channel_id, opts) do
     user_id
-    |> Accounts.get_user
+    |> Accounts.get_user(preload: [:account, :roles, user_roles: [:role]])
     |> get_side_nav_search(match, channel_id, opts)
   end
 
@@ -442,14 +442,12 @@ defmodule UccChat.ChannelService do
   def get_channel_display_name(type, %ChannelSchema{id: id, name: name},
     user_id) when type == :direct or type == :starred do
 
-    case Direct.get_by channel_id: id, user_id: user_id do
+    case Direct.get_by channel_id: id, user_id: user_id, preload: [:friend] do
       %{} = direct ->
-        username = Map.get(direct, :users)
-        user =
-          [username: username]
-          |> Accounts.get_by_user
+        friend =
+          direct.friend
           |> Hooks.preload_user([:account])
-        {username, UccChat.PresenceAgent.get(user.id), user}
+        {friend.username, UccChat.PresenceAgent.get(friend.id), friend}
       _ ->
         {name, "offline", nil}
     end
@@ -605,24 +603,26 @@ defmodule UccChat.ChannelService do
     |> Helpers.safe_to_string
   end
 
-  def add_direct(username, user_id, channel_id) do
-    user_orig = Helpers.get_user user_id, preload: []
-    user_dest = Helpers.get_user_by_name(username)
+  def add_direct(%{} = friend, user_id, channel_id) do
+    user_orig = Accounts.get_user user_id, preload: [:account, :roles, user_roles: [:role]]
 
-    name = user_orig.username <> "__" <> username
+    name = user_orig.username <> "__" <> friend.username
     # Logger.warn "name: #{inspect name}"
     channel =
       case Channel.get_by(name: name) do
         %{} = channel -> channel
-        _  -> do_add_direct(name, user_orig, user_dest, channel_id)
+        _  -> do_add_direct(name, user_orig, friend, channel_id)
       end
 
     # user = Repo.one!(from u in User, where: u.id == ^user_id, preload: [:account, :roles])
     user =
       user_id
-      |> Helpers.get_user!
-      |> User.changeset(%{open_id: channel.id})
-      |> Repo.update!
+      |> Accounts.get_user(preload: [:account, :roles, user_roles: [:role]])
+      |> Accounts.update_user!(%{open_id: channel.id})
+
+    # TODO: I bet this is where we are not closing the existing subscription!
+    #       We need to be doing the operation above along with closing any
+    #       open subs.
 
     chatd = ChatDat.new user, channel, []
 
@@ -639,38 +639,44 @@ defmodule UccChat.ChannelService do
     {:ok, %{
       messages_html: messages_html,
       side_nav_html: side_nav_html,
-      display_name: username,
+      display_name: friend.username,
       channel_id: channel.id,
       room: channel.name,
       room_route: chatd.room_route
     }}
   end
 
-  defp do_add_direct(name, user_orig, user_dest, _channel_id) do
+  def add_direct(friend_id, user_id, channel_id) do
+    friend_id
+    |> Accounts.get_user(preload: [:account, :roles, user_role: [:role]])
+    |> add_direct(user_id, channel_id)
+  end
+
+  defp do_add_direct(name, user_orig, friend, _channel_id) do
     # create the channel
     {:ok, channel} = insert_channel(%{user_id: user_orig.id, name: name,
       type: room_type(:direct)})
 
     # Create the cc's, and the directs one for each user
-    user_names = %{
-      user_orig.id => user_dest.username,
-      user_dest.id => user_orig.username
+    user_ids = %{
+      user_orig.id => friend.id,
+      friend.id => user_orig.id
     }
 
-    for user <- [user_orig, user_dest] do
+    for user <- [user_orig, friend] do
       Subscription.create!(%{
         channel_id: channel.id,
         user_id: user.id,
         type: room_type(:direct)
       })
       Direct.create!(%{
-        users: user_names[user.id],
+        friend_id: user_ids[user.id],
         user_id: user.id,
         channel_id: channel.id
       })
     end
 
-    UcxUccWeb.Endpoint.broadcast! CC.chan_user() <> to_string(user_dest.id),
+    UcxUccWeb.Endpoint.broadcast! CC.chan_user() <> to_string(friend.id),
       "direct:new", %{room: channel.name}
     channel
   end
@@ -1103,7 +1109,7 @@ defmodule UccChat.ChannelService do
           message = ~g"User" <> " `@" <> user.username <> "` " <> ~g"already muted."
           {:error, message}
         _mute ->
-          current_user = Accounts.get_user user_id
+          current_user = Accounts.get_user user_id, preload: [:account, :roles, user_role: [:role]]
           unless UccSettings.hide_user_muted() do
             message = ~g(User ) <> user.username <> ~g( muted by ) <> current_user.username
             WebMessage.broadcast_system_message(channel_id, current_user.id, message)
@@ -1124,7 +1130,7 @@ defmodule UccChat.ChannelService do
             ~g"is not muted."}
         mute ->
           Repo.delete mute
-          current_user = Accounts.get_user user_id
+          current_user = Accounts.get_user user_id, preload: [:account, :roles, user_role: [:role]]
           unless UccSettings.hide_user_muted() do
             message = ~g(User ) <> user.username <> ~g( unmuted by ) <> current_user.username
             WebMessage.broadcast_system_message(channel_id, current_user.id, message)

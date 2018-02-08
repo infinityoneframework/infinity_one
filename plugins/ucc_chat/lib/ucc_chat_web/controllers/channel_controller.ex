@@ -94,16 +94,16 @@ defmodule UccChatWeb.ChannelController do
   end
 
   def direct(conn, %{"name" => name}) do
-    with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(name),
+    with friend when not is_nil(friend) <- UccChat.ServiceHelpers.get_user_by_name(name),
          user_id <- Coherence.current_user(conn) |> Map.get(:id),
-         false <- user.id == user_id do
+         false <- friend.id == user_id do
 
-      case get_direct(user_id, name) do
+      case get_direct(user_id, friend.id) do
         nil ->
-          IO.inspect {user_id, name}
+          # IO.inspect {user_id, name}
           # create the direct and redirect
-          ChannelService.add_direct(name, user_id, nil) #  |> IO.inspect(label: "direct")
-          direct = get_direct(user_id, name) #|> IO.inspect(label: "direct 1")
+          ChannelService.add_direct(friend, user_id, nil) #  |> IO.inspect(label: "direct")
+          direct = get_direct(user_id, friend.id) #|> IO.inspect(label: "direct 1")
           show(conn, direct.channel)
         direct ->
           show(conn, direct.channel)
@@ -113,10 +113,10 @@ defmodule UccChatWeb.ChannelController do
     end
   end
 
-  def get_direct(user_id, name) do
+  def get_direct(user_id, friend_id) do
     (from d in DirectSchema,
       # where: d.user_id == ^user_id and like(d.users, ^"#{name}__%") or like(d.users, ^"%__#{name}")),
-      where: d.user_id == ^user_id and d.users == ^name,
+      where: d.user_id == ^user_id and d.friend_id == ^friend_id,
       preload: [:channel])
     |> Repo.one
   end

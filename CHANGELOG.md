@@ -12,6 +12,7 @@
 * Added support for all messages audio alerts and system settings
 * Added audio mode in room notifications panel
 * Added support for all messages desktop notifications
+* Optimized how Direct Message channels are manged.
 
 ### Bug Fixes
 

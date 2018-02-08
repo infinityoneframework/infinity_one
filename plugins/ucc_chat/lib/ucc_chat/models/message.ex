@@ -199,8 +199,8 @@ defmodule UccChat.Message do
       {:ok, message} ->
         # TODO: Need to handle update attachment description yet.
         Mention.update_from_message(message)
-        channel = Channel.get message.channel_id
-        Subscription.update_direct_notices channel.type, channel.id, message.user_id
+        # channel = Channel.get message.channel_id
+        # Subscription.update_direct_notices channel.type, channel.id, message.user_id
         UccPubSub.broadcast "message:update", "channel:" <> message.channel_id, %{message: message}
         {:ok, message}
       error ->
