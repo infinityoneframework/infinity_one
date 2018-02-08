@@ -1,5 +1,33 @@
 # UcxUcc Changelog
 
+## 1.0.0-alpha16 (2018-02-09)
+
+## Enhancements
+
+* Add configuration of the uploads path
+* Don't reload page when using the conversation button from members list
+* Redesigned Message handling and broadcasting
+* Proof of concept for Messaging Rest API
+* Removed some code complexity around messaging
+* Added support for all messages audio alerts and system settings
+* Added audio mode in room notifications panel
+* Added support for all messages desktop notifications
+* Optimized how Direct Message channels are manged.
+
+### Bug Fixes
+
+* [UCX-3770] Fix JS exception when selecting from a message popup
+* Trim a message before saving it
+* [UCX-3764] Allow user to hide the first listed room
+* [UCX-3769] Fix incoming message does not scroll window down
+* [UCX-3766] Move the flex-nav scollbars to the right of page
+* [UCX-3731] Fix rendering create channel after more channels
+* Don't broadcast message popup selections
+* Fixed message timestamps
+* [UCX-3750] Fixed reaction tool tips
+* [UCX-3776] Fixed subscribing 3rd party in direct channel with @mention
+
+
 ## 1.0.0-alpha15 (2018-02-02)
 
 ### Enhancements
@@ -25,7 +53,7 @@
 * Increase the height of the layout body content textarea
 * Fix the cancel button on the admin pages
 * [UCX-3761] Move the layout home page body field from string to text
-* Fixed Message order issue when dynamically loading more pages up and down
+* [UCX-3729] Fixed Message order issue when dynamically loading more pages up and down
 * Fixed loading more prev and next animation
 * Fixed messages screen lockup issue caused by not clearing page loading animation
 * Fixed more messages up and down detection

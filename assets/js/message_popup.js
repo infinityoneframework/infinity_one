@@ -23,17 +23,19 @@ console.log('loading message_popup');
 
 $(document).ready(function() {
   var elem = document.querySelector(popup_window);
-  elem.addEventListener('mouseover', function(e) {
-    console.log('mouseover', e.target);
-    console.log('mouseover', e);
-    if (e.target) {
-      var curr = document.querySelector('.popup-item.selected');
-      if (curr) {
-        curr.classList.remove('selected');
+  if (elem) {
+    elem.addEventListener('mouseover', function(e) {
+      console.log('mouseover', e.target);
+      console.log('mouseover', e);
+      if (e.target) {
+        var curr = document.querySelector('.popup-item.selected');
+        if (curr) {
+          curr.classList.remove('selected');
+        }
+        e.target.classList.add('selected');
       }
-      e.target.classList.add('selected');
-    }
-  });
+    });
+  }
 });
 
 class MessagePopup {

@@ -16,7 +16,7 @@ class Notifier {
   }
 
   desktop(title, body, opts = {}) {
-    var icon = '/images/logo_globe.png';
+    var icon = '/images/notification_logo.png';
 
     if (opts.icon) {
       icon = opts.icon;
@@ -24,7 +24,7 @@ class Notifier {
 
     var notification = new Notification(title, {
       body: body,
-      icon: icon
+      icon: icon,
     });
 
     if (opts.duration) {

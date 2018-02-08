@@ -138,14 +138,6 @@ class RoomManager {
         $('aside .rooms-list').html(resp.side_nav_html)
       })
   }
-  new_message_scroll(user_id) {
-    let at_bottom = UccUtils.is_scroll_bottom(30);
-    if (debug) { console.log('new_message_scroll', at_bottom); }
-
-    if (at_bottom || user_id == ucxchat.user_id) {
-      UccUtils.scroll_bottom();
-    }
-  }
   // add_private(elem) {
   //   let username = elem.parent().attr('data-username')
   //   if (debug) { console.log('pvt-msg button clicked...', username) }
@@ -358,7 +350,8 @@ class RoomManager {
   remove_unread_class() {
     if (this.has_first_unread()) {
       $('.first-unread').removeClass('first-unread first-unread-opaque')
-      this.push_channel('unread:clear')
+      // this.push_channel('unread:clear')
+      this.userchan.push('unread:clear')
       this.unread = false
     }
   }
@@ -568,14 +561,16 @@ class RoomManager {
       let room = room_elem.data('room');
 
       if (following_link.length == 0) {
-        following_link = $('.room-link').first();
+        following_link = $('.room-link a.open-room')
+          .not(`[data-room="${room}"]`).parent().first();
+
         if (following_link.length == 0) {
           // don't allow them to hide the room
           swal({
               title: 'Sorry',
               text: "Can't hide the last room",
               type: 'error',
-              timer: 1000,
+              timer: 2500,
               showConfirmButton: false,
           });
           return false;

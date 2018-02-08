@@ -5,8 +5,8 @@ defmodule UccChat.MessageService do
 
   alias Ecto.Multi
   alias UccChat.{
-    Message, TypingAgent, Mention, Subscription, ChatDat, Channel,
-    ChannelService, SubscriptionService, MessageAgent, AttachmentService
+    Message, Mention, Subscription, ChatDat, Channel,
+    ChannelService, MessageAgent, AttachmentService
   }
   alias UccChatWeb.{MessageView, UserChannel}
   alias UccChat.ServiceHelpers, as: Helpers
@@ -22,6 +22,9 @@ defmodule UccChat.MessageService do
 
   def delete_message(%{attachments: attachments} = message)
     when is_list(attachments) do
+
+    Logger.warn "deprecated"
+
     Multi.new
     |> Multi.delete(:message, message)
     |> Multi.run(:attachments, &delete_attachments(&1, message.attachments))
@@ -33,12 +36,14 @@ defmodule UccChat.MessageService do
   end
 
   def delete_message(message) do
+    Logger.warn "deprecated"
     message
     |> Repo.preload([:attachments])
     |> delete_message
   end
 
   defp delete_attachments(_, attachments) do
+    Logger.warn "deprecated"
     attachments
     |> Enum.map(fn attachment ->
       AttachmentService.delete_attachment attachment
@@ -51,7 +56,8 @@ defmodule UccChat.MessageService do
   end
 
   def get_messages_info(%{} = page, channel_id, user) do
-    subscription = SubscriptionService.get(channel_id, user.id)
+    Logger.warn "deprecated"
+    subscription = Subscription.get(channel_id, user.id)
     last_read = Map.get(subscription || %{}, :last_read, "")
 
     %{}
@@ -65,7 +71,8 @@ defmodule UccChat.MessageService do
   end
 
   def get_messages_info(messages, channel_id, user) do
-    subscription = SubscriptionService.get(channel_id, user.id)
+    Logger.warn "deprecated"
+    subscription = Subscription.get(channel_id, user.id)
     has_more =
       with [first|_] <- messages,
            first_msg when not is_nil(first_msg) <-
@@ -93,10 +100,12 @@ defmodule UccChat.MessageService do
 
   # TODO: This should be called merge, not into
   def messages_info_into(messages, channel_id, user, params) do
+    Logger.warn "deprecated"
     messages |> get_messages_info(channel_id, user) |> Map.merge(params)
   end
 
   def last_user_id(channel_id) do
+    Logger.warn "deprecated"
     case Message.last_message channel_id do
       nil     -> nil
       message -> Map.get(message, :user_id)
@@ -104,6 +113,7 @@ defmodule UccChat.MessageService do
   end
 
   def embed_link_previews(body, channel_id, message_id) do
+    Logger.warn "deprecated"
     if UccSettings.embed_link_previews() do
       case get_preview_links body do
         [] ->
@@ -116,12 +126,14 @@ defmodule UccChat.MessageService do
 
   def get_preview_links(nil), do: []
   def get_preview_links(body) do
+    Logger.warn "deprecated"
     ~r/https?:\/\/[^\s]+/
     |> Regex.scan(body)
     |> List.flatten
   end
 
   def do_embed_link_previews(list, channel_id, message_id) do
+    Logger.warn "deprecated"
     room = (Channel.get(channel_id) || %{}) |> Map.get(:name)
 
     Enum.each(list, fn url ->
@@ -144,6 +156,7 @@ defmodule UccChat.MessageService do
   end
 
   defp create_link_preview(url, _message_id) do
+    Logger.warn "deprecated"
     case LinkPreview.create url do
       {:ok, page} ->
         img =
@@ -161,18 +174,22 @@ defmodule UccChat.MessageService do
   end
 
   defp broadcast_link_preview(nil, _room, _message_id) do
+    Logger.warn "deprecated"
     nil
   end
   defp broadcast_link_preview(html, room, message_id) do
+    Logger.warn "deprecated"
     # Logger.warn "broadcasting a preview: room: #{inspect room}, message_id: #{inspect message_id}, html: #{inspect html}"
     UcxUccWeb.Endpoint.broadcast! CC.chan_room <> room, "message:preview",
       %{html: html, message_id: message_id}
   end
 
   def message_previews(user_id, %{entries: entries}) do
+    Logger.warn "deprecated"
     message_previews(user_id, entries)
   end
   def message_previews(user_id, messages) when is_list(messages) do
+    Logger.warn "deprecated"
     Enum.reduce messages, [], fn message, acc ->
       case get_preview_links(message.body) do
         [] -> acc
@@ -191,48 +208,19 @@ defmodule UccChat.MessageService do
   end
 
   defp get_preview_html(list) do
+    Logger.warn "deprecated"
     Enum.map list, &({&1, MessageAgent.get_preview(&1)})
   end
 
-  def start_typing(%{assigns: assigns} = socket) do
-    %{channel_id: channel_id, user_id: user_id, username: username} = assigns
-    start_typing(socket, user_id, channel_id, username)
-  end
-
-  def start_typing(socket, user_id, channel_id, username) do
-    # Logger.warn "#{@module_name} create params: #{inspect params}, socket: #{inspect socket}"
-    TypingAgent.start_typing(channel_id, user_id, username)
-    update_typing(socket, channel_id)
-  end
-
-  def stop_typing(%{assigns: assigns} = socket) do
-    %{channel_id: channel_id, user_id: user_id} = assigns
-    stop_typing socket, user_id, channel_id
-  end
-
-  def stop_typing(socket, user_id, channel_id) do
-    TypingAgent.stop_typing(channel_id, user_id)
-    update_typing(socket, channel_id)
-  end
-
-  def update_typing(%{} = socket, channel_id) do
-    typing = TypingAgent.get_typing_names(channel_id)
-    Phoenix.Channel.broadcast! socket, "typing:update", %{typing: typing}
-  end
-
-  def update_typing(channel_id, room) do
-    typing = TypingAgent.get_typing_names(channel_id)
-    UcxUccWeb.Endpoint.broadcast(CC.chan_room <> room,
-      "typing:update", %{typing: typing})
-  end
-
   def encode_mentions(body, channel_id) do
+    Logger.warn "deprecated"
     body
     |> encode_user_mentions(channel_id)
     |> encode_channel_mentions
   end
 
   def encode_channel_mentions({body, acc}) do
+    Logger.warn "deprecated"
     re = ~r/(^|\s|\!|:|,|\?)#([\.a-zA-Z0-9_-]*)/
     body =
       if (list = Regex.scan(re, body)) != [] do
@@ -246,17 +234,23 @@ defmodule UccChat.MessageService do
   end
 
   def encode_channel_mention(name, body) do
+    Logger.warn "deprecated"
     Channel.get_by(name: name)
     |> do_encode_channel_mention(name, body)
   end
 
-  def do_encode_channel_mention(nil, _, body), do: body
+  def do_encode_channel_mention(nil, _, body) do
+    Logger.warn "deprecated"
+    body
+  end
   def do_encode_channel_mention(_channel, name, body) do
+    Logger.warn "deprecated"
     name_link = " <a class='mention-link' data-channel='#{name}'>##{name}</a> "
     String.replace body, ~r/(^|\s|\.|\!|:|,|\?)##{name}[\.\!\?\,\:\s]*/, name_link
   end
 
   def encode_user_mentions(body, channel_id) do
+    Logger.warn "deprecated"
     re = ~r/(^|\s|\!|:|,|\?)@([\.a-zA-Z0-9_-]*)/
     if (list = Regex.scan(re, body)) != [] do
       Enum.reduce(list, {body, []}, fn [_, _, name], {body, acc} ->
@@ -268,6 +262,7 @@ defmodule UccChat.MessageService do
   end
 
   def encode_user_mention(name, body, channel_id, acc) do
+    Logger.warn "deprecated"
     User
     |> where([c], c.username == ^name)
     |> Repo.one
@@ -276,14 +271,19 @@ defmodule UccChat.MessageService do
 
   def do_encode_user_mention(nil, name, body, _, acc)
     when name in ~w(all here) do
+    Logger.warn "deprecated"
     name_link = " <a class='mention-link mention-link-me mention-link-" <>
       "#{name} background-attention-color' >@#{name}</a> "
     body = String.replace body,
       ~r/(^|\s|\.|\!|:|,|\?)@#{name}[\.\!\?\,\:\s]*/, name_link
     {body, [{nil, name}|acc]}
   end
-  def do_encode_user_mention(nil, _, body, _, acc), do: {body, acc}
+  def do_encode_user_mention(nil, _, body, _, acc) do
+    Logger.warn "deprecated"
+    {body, acc}
+  end
   def do_encode_user_mention(user, name, body, _channel_id, acc) do
+    Logger.warn "deprecated"
     name_link =
       " <a class='mention-link' data-username='#{user.username}'>@#{name}</a> "
     body =
@@ -292,14 +292,22 @@ defmodule UccChat.MessageService do
     {body, [{user.id, name}|acc]}
   end
 
-  def update_mentions([], _, _, _), do: :ok
+  def update_mentions([], _, _, _) do
+    Logger.warn "deprecated"
+    :ok
+  end
   def update_mentions([mention|mentions], message_id, channel_id, body) do
+    Logger.warn "deprecated"
     update_mention(mention, message_id, channel_id, body)
     update_mentions(mentions, message_id, channel_id, body)
   end
 
-  def update_mention({nil, _}, _, _, _), do: nil
+  def update_mention({nil, _}, _, _, _) do
+    Logger.warn "deprecated"
+    nil
+  end
   def update_mention({mention, name}, message_id, channel_id, body) do
+    Logger.warn "deprecated"
     case Accounts.get_by_user(username: name)  do
       nil -> :error
       user ->
@@ -310,14 +318,23 @@ defmodule UccChat.MessageService do
     end
   end
 
-  def create_mentions([], _, _, _), do: :ok
+  def create_mentions([], _, _, _) do
+    Logger.warn "deprecated"
+    :ok
+  end
   def create_mentions([mention|mentions], message_id, channel_id, body) do
+    Logger.warn "deprecated"
     create_mention(mention, message_id, channel_id, body)
     create_mentions(mentions, message_id, channel_id, body)
   end
 
-  def create_mention({nil, _}, _, _, _), do: nil
+  def create_mention({nil, _}, _, _, _) do
+    Logger.warn "deprecated"
+    nil
+  end
+
   def create_mention({mention, name}, message_id, channel_id, body) do
+    Logger.warn "deprecated"
     {all, nm} = if name in ~w(all here), do: {true, name}, else: {false, nil}
     %{
       user_id: mention,
@@ -343,15 +360,20 @@ defmodule UccChat.MessageService do
   end
 
   def update_direct_notices(%{type: 2, id: id}, %{user_id: user_id}) do
+    Logger.warn "deprecated"
     id
     |> Subscription.get_by_channel_id_and_not_user_id(user_id)
     |> Enum.each(fn %{unread: unread} = sub ->
       Subscription.update(sub, %{unread: unread + 1})
     end)
   end
-  def update_direct_notices(_channel, _message), do: nil
+  def update_direct_notices(_channel, _message) do
+    Logger.warn "deprecated"
+    nil
+  end
 
   def render_message_box(channel_id, user_id) do
+    Logger.warn "deprecated"
     user = Helpers.get_user! user_id
     channel =
       case Channel.get(channel_id) do

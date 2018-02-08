@@ -46,7 +46,7 @@ defmodule UccChat.SideNavService do
     users =
       Repo.all(from u in User,
         left_join: d in DirectSchema, on: u.id == d.user_id and
-          d.users == ^(user.username),
+          d.friend_id == ^(user.id),
         left_join: s in SubscriptionSchema, on: s.user_id == ^user_id and
           s.channel_id == d.channel_id,
         # left_join: c in Channel, on: c.id == d.channel_id,

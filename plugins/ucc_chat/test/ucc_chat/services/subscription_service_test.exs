@@ -3,7 +3,7 @@ defmodule UccChat.SubscriptionServiceTest do
 
   import UccChat.TestHelpers
 
-  alias UccChat.SubscriptionService, as: Service
+  alias UccChat.Subscription, as: Service
 
   setup do
     UcxUcc.TestHelpers.insert_role "owner"

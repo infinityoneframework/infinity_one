@@ -2,11 +2,12 @@ defmodule UccChat.ReactionService do
   use UccChat.Shared, :service
 
   alias UccChat.{Message, MessageService, Reaction}
+  alias UcxUcc.UccPubSub
   # alias UccChatWeb.Client
 
   require Logger
 
-  def select("select", params, %{assigns: assigns} = _socket) do
+  def select("select", params, %{assigns: assigns}) do
     # Logger.warn "ReactionService.select message_id: " <> params["message_id"]
     user = Helpers.get_user assigns.user_id
     emoji = params["reaction"]
@@ -20,7 +21,12 @@ defmodule UccChat.ReactionService do
       reaction ->
         update_reaction reaction, user.id
     end
-    UccChatWeb.RoomChannel.broadcast_updated_message message, reaction: true
+    message = Message.get params["message_id"],
+      preload: MessageService.preloads()
+
+    UccPubSub.broadcast "message:update:reactions", "channel:" <> message.channel_id,
+      %{message: message}
+
     nil
   end
 
@@ -72,20 +78,22 @@ defmodule UccChat.ReactionService do
 
   def get_reaction_people_names(reaction, user) do
     username = user.username
-    reaction
-    |> reaction_user_ids
-    |> Enum.map(&Helpers.get_user(&1, preload: []))
-    |> Enum.reject(&(is_nil &1))
-    |> Enum.map(fn user ->
-      case user.username do
-        ^username -> "you"
-        username -> "@" <> username
-      end
-    end)
-    |> case do
+    {you, rest} =
+      reaction
+      |> reaction_user_ids
+      |> Enum.map(&Helpers.get_user(&1, preload: []))
+      |> Enum.reject(&(is_nil &1))
+      |> Enum.reduce({[], []}, fn user, {you, acc} ->
+        case user.username do
+          ^username -> {[~g"you"], acc}
+          username -> {you, ["@" <> username | acc]}
+        end
+      end)
+
+    case you ++ Enum.sort(rest) do
       [one] -> one
       [first | rest] ->
-        Enum.join(rest, ", ") <> " and " <> first
+        Enum.join(rest, ", ") <> " " <> ~g(and) <> " " <> first
     end
   end
 end

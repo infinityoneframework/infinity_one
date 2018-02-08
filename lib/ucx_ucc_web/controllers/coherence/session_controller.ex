@@ -73,6 +73,7 @@ defmodule UcxUccWeb.Coherence.SessionController do
   """
   @spec create(conn, params) :: conn
   def create(conn, params) do
+    # Logger.warn "params: " <> inspect(params)
     user_schema = Config.user_schema()
     lockable? = user_schema.lockable?()
     login_field = Config.login_field()
@@ -116,6 +117,48 @@ defmodule UcxUccWeb.Coherence.SessionController do
     end
   end
 
+  def create_api(conn, params) do
+    Logger.warn "params: " <> inspect(params)
+    user_schema = Config.user_schema()
+    lockable? = user_schema.lockable?()
+    login_field = Config.login_field()
+    login_field_str = to_string login_field
+    login = params["session"][login_field_str]
+
+    tz_offset =
+      case Regex.run ~r/^-?\d+$/, String.trim(params["tz-offset"]) do
+        [str] -> String.to_integer(str)
+        _     -> 0
+      end
+
+    _new_bindings = [{login_field, login}, remember: rememberable_enabled?()]
+    remember = false
+    # user = Config.repo.one(from u in user_schema, where: field(u, ^login_field) == ^login)
+    user = Schemas.get_by_user [{login_field, login}]
+    if valid_user_login? user, params do
+      if confirmed_access? user do
+        case Schemas.update_user user, %{tz_offset: tz_offset} do
+          {:ok, user} ->
+            do_lockable_api(conn, login_field, [user, user_schema, remember, lockable?, remember, params],
+              user_schema.lockable?() and user_schema.locked?(user))
+          {:error, changeset} ->
+            Logger.error "problem update user tz_offset. errors: #{inspect changeset.errors}"
+            render conn, message: "could not update user tz_offset"
+        end
+      else
+        conn
+        |> put_status(406)
+        |> render(message: Messages.backend().you_must_confirm_your_account())
+      end
+    else
+      conn
+      |> track_failed_login(user, user_schema.trackable_table?())
+      |> failed_login(user, lockable?)
+      |> put_status(401)
+      |> render(message: "Invalid Credentials")
+    end
+  end
+
   defp confirmed_access?(user) do
     ConfirmableService.confirmed?(user) || ConfirmableService.unconfirmed_access?(user)
   end
@@ -152,6 +195,36 @@ defmodule UcxUccWeb.Coherence.SessionController do
     |> redirect_to(:session_create, params)
   end
 
+  defp do_lockable_api(conn, _login_field, _, true) do
+    conn
+    |> assign(:locked, true)
+    |> put_status(423)
+    |> render(message: Messages.backend().too_many_failed_login_attempts())
+  end
+
+  defp do_lockable_api(conn, _login_field, opts, false) do
+    [user, user_schema, remember, lockable?, remember, _params] = opts
+    conn =
+      if lockable? && user.locked_at() do
+        Controller.unlock!(user)
+        track_unlock conn, user, user_schema.trackable_table?()
+      else
+        conn
+      end
+    token = create_login(conn, user)
+    conn
+    |> reset_failed_attempts(user, lockable?)
+    |> track_login(user, user_schema.trackable?(), user_schema.trackable_table?())
+    |> save_rememberable(user, remember)
+    |> render(data: [authToken: token, userId: user.id])
+  end
+
+  defp create_login(conn, user) do
+    token = Phoenix.Token.sign(conn, "user api", user.id)
+    Coherence.CredentialStore.Session.put_credentials({token, user, nil})
+    token
+  end
+
   @doc """
   Logout the user.
 
@@ -164,6 +237,21 @@ defmodule UcxUccWeb.Coherence.SessionController do
     |> redirect_to(:session_delete, params)
   end
 
+  def delete_api(conn, params) do
+    Logger.warn "params: " <> inspect(params)
+    conn
+    |> logout_user_api(params)
+    |> render(message: "You've been logged out.")
+  end
+
+  def logout_user_api(conn, _) do
+    conn
+    # user = Coherence.current_user conn
+    # Config.auth_module
+    # |> apply(Config.delete_login, [conn, [id_key: Config.schema_key] ++ opts])
+    # |> TrackableService.track_logout(user, user.__struct__.trackable?, user.__struct__.trackable_table?)
+    # |> RememberableService.delete_rememberable(user)
+  end
   # @doc """
   # Delete the user session.
   # """

@@ -122,17 +122,36 @@ defmodule UccChatWeb.Client do
       RebelClient.scroll_bottom_js('#{@wrapper}')
   end
 
+  def push_update_message({message, html}, socket) do
+    socket
+    |> Query.update(:replaceWith, set: html,
+      on: ~s/#{@wrapper_list} li[id="#{message.id}"]/)
+    |> async_js("UccChat.roomManager.updateMentionsMarksOfRoom()")
+  end
+
+  def push_update_reactions({message, html}, socket) do
+    socket
+    |> Query.update(:replaceWith, set: html,
+      on: ~s/#{@wrapper_list} li[id="#{message.id}"] ul.reactions/)
+    |> async_js("if (UccUtils.is_scroll_bottom(50)) { UccUtils.scroll_bottom(); }")
+  end
+
   def push_message_js(html, message) do
     encoded = Poison.encode! html
     """
     var node = document.createRange().createContextualFragment(#{encoded});
     var elem = document.querySelector('#{@wrapper_list}');
+    var at_bottom = UccUtils.is_scroll_bottom(30);
+    var user_id = '#{message.user_id}';
+    var id = '#{message.id}';
     elem.append(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
-    UccChat.normalize_message('#{message.id}');
+    UccChat.normalize_message(id);
+    if (at_bottom || user_id == ucxchat.user_id) {
+      UccUtils.scroll_bottom();
+    }
     UccChat.roomManager.updateMentionsMarksOfRoom();
-    UccChat.roomManager.new_message_scroll('#{message.user_id}');
-    UccChat.roomManager.new_message('#{message.id}', '#{message.user_id}');
+    UccChat.roomManager.new_message(id, user_id);
     """
   end
 
@@ -155,8 +174,13 @@ defmodule UccChatWeb.Client do
     """
   end
 
-  def delete_message!(message_id, socket) do
-    Rebel.Query.delete! socket, "li.message#" <> message_id
+# <<<<<<< HEAD
+#   def delete_message!(message_id, socket) do
+#     Rebel.Query.delete! socket, "li.message#" <> message_id
+# =======
+  def delete_message(message_id, socket) do
+    delete socket, "li.message#" <> message_id
+# >>>>>>> master
   end
 
   def set_inputbox_buttons(socket, mode) when mode in [true, :active] do

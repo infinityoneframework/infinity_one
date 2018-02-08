@@ -15,10 +15,13 @@
             label= ~g"Audio"
             div
               = if @editing == "audio" do
+                = notification_radio_button fp, :audio_mode, options(:audio_mode)
+                br
                 label= select fp, :audio, options_select(:audio), "rebel-change": "flex_call", "data-id": "notifications", "data-fun": "change_audio"
                 = notification_save_cancel()
               - else
                 span.current-setting
+                  = "#{option_text options(:audio_mode), settings.audio_mode}: "
                   = option_text options(:audio), settings.audio
                   i.icon-play-circled(data-play="audio" rebel-click="flex_call" data-fun="play" data-id="notifications")
                   i.icon-pencil(data-edit="audio" rebel-click="flex_form")

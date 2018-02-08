@@ -58,7 +58,8 @@ defmodule EmojiOne do
         src = src_path <> "/#{hash}" <> img_type <> src_version
         ~s(<img class="#{cls}#{id_class}#{extra_class}" alt="#{key}" src="#{src}">)
       wrapper ->
-        ~s(<#{wrapper} class="#{cls}#{id_class}#{extra_class}" title="#{key}">#{unicode}</#{wrapper}>)
+        title = if opts[:title] == false, do: "", else: ~s( title="#{key}")
+        ~s(<#{wrapper} class="#{cls}#{id_class}#{extra_class}"#{title}>#{unicode}</#{wrapper}>)
     end
   end
 

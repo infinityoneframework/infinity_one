@@ -4,10 +4,11 @@ defmodule UccChatWeb.RoomChannel.Channel do
 
   import UcxUccWeb.Gettext
 
-  alias UccChat.{Subscription, Settings, Mute}
+  alias UccChat.{Message, Subscription, Settings, Mute, TypingAgent}
   alias UcxUcc.{Accounts, UccPubSub, Permissions}
   alias UccChatWeb.UserChannel
-  alias UccChatWeb.RoomChannel.Message, as: WebMessage
+
+  require UccChat.ChatConstants, as: CC
 
   def join(%{} = channel, user_id) do
     case create_subscription channel, user_id do
@@ -182,46 +183,80 @@ defmodule UccChatWeb.RoomChannel.Channel do
 
   defp notify_user_join(channel_id, user) do
     unless Settings.hide_user_join do
-      WebMessage.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has joined the channel.)
+      Message.create_system_message(channel_id, user.id,
+        user.username <> ~g( has joined the channel.))
     end
   end
 
   defp notify_user_added(channel_id, user) do
     unless Settings.hide_user_added do
-      WebMessage.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has been added to the channel.)
+      Message.create_system_message(channel_id, user.id,
+        user.username <> ~g( has been added to the channel.))
     end
   end
 
   defp notify_user_removed(channel_id, user) do
     unless Settings.hide_user_removed do
-      WebMessage.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has been removed from the channel.)
+      Message.create_system_message(channel_id, user.id,
+        user.username <> ~g( has been removed from the channel.))
     end
   end
 
   defp notify_user_leave(channel_id, user) do
     unless Settings.hide_user_leave() do
-      WebMessage.broadcast_system_message channel_id, user.id,
-        user.username <> ~g( has left the channel.)
+      Message.create_system_message(channel_id, user.id,
+        user.username <> ~g( has left the channel.))
     end
   end
 
   defp notify_user_muted(channel_id, user, current_user) do
     unless UccSettings.hide_user_muted() do
       message = ~g(User ) <> user.username <> ~g( muted by ) <> current_user.username
-      WebMessage.broadcast_system_message(channel_id, current_user.id, message)
+      Message.create_system_message(channel_id, current_user.id, message)
     end
   end
 
   defp notify_user_unmuted(channel_id, user, current_user) do
     unless UccSettings.hide_user_muted() do
       message = ~g(User ) <> user.username <> ~g( unmuted by ) <> current_user.username
-      WebMessage.broadcast_system_message(channel_id, current_user.id, message)
+      # Message.create_system_message(channel_id, user_id, body)
+      Message.create_system_message(channel_id, current_user.id, message)
+      # WebMessage.broadcast_system_message(channel_id, current_user.id, message)
     end
   end
 
   defp permission_error, do: ~g(You don't have Permission for that action)
+
+  def start_typing(%{assigns: assigns} = socket) do
+    %{channel_id: channel_id, user_id: user_id, username: username} = assigns
+    start_typing(socket, user_id, channel_id, username)
+  end
+
+  def start_typing(socket, user_id, channel_id, username) do
+    # Logger.warn "#{@module_name} create params: #{inspect params}, socket: #{inspect socket}"
+    TypingAgent.start_typing(channel_id, user_id, username)
+    update_typing(socket, channel_id)
+  end
+
+  def stop_typing(%{assigns: assigns} = socket) do
+    %{channel_id: channel_id, user_id: user_id} = assigns
+    stop_typing socket, user_id, channel_id
+  end
+
+  def stop_typing(socket, user_id, channel_id) do
+    TypingAgent.stop_typing(channel_id, user_id)
+    update_typing(socket, channel_id)
+  end
+
+  def update_typing(%{} = socket, channel_id) do
+    typing = TypingAgent.get_typing_names(channel_id)
+    Phoenix.Channel.broadcast! socket, "typing:update", %{typing: typing}
+  end
+
+  def update_typing(channel_id, room) do
+    typing = TypingAgent.get_typing_names(channel_id)
+    UcxUccWeb.Endpoint.broadcast(CC.chan_room <> room,
+      "typing:update", %{typing: typing})
+  end
 
 end

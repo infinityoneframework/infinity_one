@@ -4,7 +4,7 @@ defmodule UccAdmin.AdminService do
 
   import UccAdminWeb.View.Utils, warn: false
 
-  alias UccChat.{Message, Channel, UserService}
+  alias UccChat.{Channel, UserService}
   alias UccChatWeb.FlexBarView
   alias UccAdminWeb.{AdminView}
   alias UccChat.Settings, as: ChatSettings
@@ -14,10 +14,8 @@ defmodule UccAdmin.AdminService do
   alias UcxUcc.{Permissions, Hooks}
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
-  alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChatWeb.AdminView, as: ChatAdminView
   alias UccAdminWeb.FlexBarView
-  alias UccChatWeb.SharedView
 
   def handle_in("save:general", params, socket) do
     params =

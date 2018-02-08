@@ -165,7 +165,14 @@
 }
 
 *::-webkit-scrollbar-corner {
-    background-color: rgba(0,0,0,0.05)
+    background-color: rgba(0,0,0,0.05);
+}
+
+aside.side-nav .flex-nav .content::-webkit-scrollbar-track {
+    background-color: rgba(255,255,255,0.15) !important;
+}
+aside.side-nav .flex-nav .content::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.3) !important;
 }
 
 .filter-item:hover {

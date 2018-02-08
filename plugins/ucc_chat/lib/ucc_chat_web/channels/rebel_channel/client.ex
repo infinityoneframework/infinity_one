@@ -5,8 +5,9 @@ defmodule UccChatWeb.RebelChannel.Client do
   import Rebel.{Core, Query}, warn: false
 
   alias UccChatWeb.ClientView
-  alias UccChat.{MessageService, SideNavService}
+  alias UccChat.{SideNavService}
   alias UcxUccWeb.Query
+  alias UccChatWeb.RoomChannel.Message
 
   require Logger
 
@@ -31,8 +32,8 @@ defmodule UccChatWeb.RebelChannel.Client do
   end
 
   def page_loading(socket) do
-    insert socket, ClientView.page_loading, prepend: "head"
-    socket
+    html = ClientView.page_loading() |> Poison.encode!
+    async_js socket, "$('head').prepend(#{html});"
   end
 
   def remove_page_loading(socket) do
@@ -141,13 +142,13 @@ defmodule UccChatWeb.RebelChannel.Client do
 
   def push_message_box(socket, channel_id, user_id) do
     socket
-    |> Query.update(:html, set: MessageService.render_message_box(channel_id, user_id), on: ".room-container footer.footer")
+    |> Query.update(:html, set: Message.render_message_box(channel_id, user_id), on: ".room-container footer.footer")
     |> async_js("$('textarea.input-message').focus().autogrow();")
     socket
   end
 
   def broadcast_message_box(socket, channel_id, user_id) do
-    html = MessageService.render_message_box(channel_id, user_id)
+    html = Message.render_message_box(channel_id, user_id)
 
     socket
     |> update!(:html, set: html, on: ".room-container footer.footer")

@@ -3,9 +3,9 @@ defmodule UccChatWeb.UserSocket do
 
   import Rebel.Query
 
-  alias UccChat.{MessageService}
   alias UcxUcc.Accounts.User
   alias UcxUcc.Repo
+  alias UccChatWeb.RoomChannel.Message, as: WebMessage
 
   require UccChat.ChatConstants, as: CC
   require Logger
@@ -69,13 +69,13 @@ defmodule UccChatWeb.UserSocket do
       "socket.assigns: #{inspect socket.assigns}" end
 
     update socket, :html,
-      set: MessageService.render_message_box(channel_id, user_id),
+      set: WebMessage.render_message_box(channel_id, user_id),
       on: ".room-container footer.footer"
   end
 
   def broadcast_message_box(socket, channel_id, user_id) do
     update! socket, :html,
-      set: MessageService.render_message_box(channel_id, user_id),
+      set: WebMessage.render_message_box(channel_id, user_id),
       on: ".room-container footer.footer"
   end
 

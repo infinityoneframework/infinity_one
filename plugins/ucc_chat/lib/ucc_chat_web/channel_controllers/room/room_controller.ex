@@ -1,16 +1,16 @@
 defmodule UccChatWeb.RoomChannelController do
   use UccChatWeb, :channel_controller
 
-  alias UccChat.ChannelService
+  alias UccChat.{ChannelService, Subscription}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UccChatWeb.RebelChannel.Client
-  alias UcxUccWeb.Query
-  alias UccChatWeb.ClientView
+  # alias UcxUccWeb.Query
+  # alias UccChatWeb.ClientView
   alias UccChatWeb.UserChannel.SideNav.Channels
 
   require Logger
 
-  def show(%{assigns: assigns} = socket, params) do
+  def show(%{assigns: _assigns} = socket, params) do
     Channels.open_room socket, params["room"], params["room_id"],
       params["display_name"]
     {:noreply, socket}
@@ -61,13 +61,13 @@ defmodule UccChatWeb.RoomChannelController do
 
   def clear_has_unread(%{assigns: assigns} = socket, _params) do
     if assigns[:channel_id] do
-      ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, false)
+      Subscription.set_has_unread(assigns.channel_id, assigns.user_id, false)
     end
     {:noreply, socket}
   end
 
   def set_has_unread(%{assigns: assigns} = socket, _params) do
-    ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, true)
+    Subscription.set_has_unread(assigns.channel_id, assigns.user_id, true)
     {:noreply, socket}
   end
 

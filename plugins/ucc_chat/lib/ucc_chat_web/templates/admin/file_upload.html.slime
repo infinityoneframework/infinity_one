@@ -22,10 +22,9 @@ section.page-container.page-home.page-static.page-settings.admin-settings
             = radio_button_line f, item, :dm_file_uploads, ~g"File Uploads Enabled in Direct Messages"
             = select_line f, item, :storage_system, [FileSystem: :file_system], ~g"Storage Type"
             =# reset_section_settings()
-        = if UcxUcc.env() == :dev do
-          = collapsable_section ~g"File System", fn _ ->
-            = text_input_line f, item, :system_path, ~g"System Path"
-            =# reset_section_settings()
+        = collapsable_section ~g"File System", fn _ ->
+          = text_input_line f, item, :system_path, ~g"System Path"
+          =# reset_section_settings()
 
         = collapsable_section ~g"Disk Quota", fn _ ->
           = radio_button_line f, item, :disk_quota_remaining_enabled, ~g"Capacity Remaining Quota Enabled"

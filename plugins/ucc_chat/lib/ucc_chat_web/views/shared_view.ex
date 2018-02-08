@@ -60,6 +60,16 @@ defmodule UccChatWeb.SharedView do
   def get_ftab_open_class(nil), do: ""
   def get_ftab_open_class(_), do: "opened"
 
+  def get_desktop_notifications_for do
+    default = UccChat.NotificationSetting.get_system_name()
+    [
+      {gettext("Default (%{default}}", default: default), "system_default"},
+      {~g(All messages), "all"},
+      {~g(Mentions), "mentions"},
+      {~g(Nothing), "none"}
+    ]
+  end
+
   def get_room_notification_sounds do
     [
       {~g"None", "none"},
@@ -161,7 +171,7 @@ defmodule UccChatWeb.SharedView do
   def has_role?(user, role, scope), do: Accounts.has_role?(user, role, scope)
   def has_role?(user, role), do: Accounts.has_role?(user, role)
 
-  def user_muted?(%{} = user, channel_id), do: UccChat.ChannelService.user_muted?(user.id, channel_id)
+  def user_muted?(%{} = user, channel_id), do: UccChat.Channel.user_muted?(user.id, channel_id)
 
   def content_home_title do
     "test"

@@ -1,4 +1,7 @@
 defmodule UccChat.Schema.Attachment do
+  @moduledoc """
+  Schema and changesets for the Attachment model.
+  """
   use UccChat.Shared, :schema
   use Arc.Ecto.Schema
 
@@ -25,20 +28,25 @@ defmodule UccChat.Schema.Attachment do
     |> cast(params, [:channel_id, :message_id, :file_name, :description,
       :type, :size])
     |> cast_attachments(params, [:file], allow_paths: true)
-    |> validate_required([:file, :channel_id, :message_id])
+    |> validate_required([:file, :channel_id])
     |> validate_quota(params)
   end
 
-  def validate_quota(cs, params) do
+  def validate_quota(changeset, %{"file" => file}) do
     size =
-      params["file"]
+      file
       |> Map.get(:path)
       |> File.lstat!
       |> Map.get(:size)
     if FileUpload.quota_check_success?(file_size_kb: size / 1024) do
-      cs
+      changeset
     else
-      add_error cs, :size, UcxUccWeb.Gettext.gettext("has exceeded storage quota")
+      # TODO: Do we really want to use Gettext here?
+      add_error changeset, :size, UcxUccWeb.Gettext.gettext("has exceeded storage quota")
     end
+  end
+
+  def validate_quota(changeset, _params) do
+    changeset
   end
 end

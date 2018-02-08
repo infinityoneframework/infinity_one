@@ -117,6 +117,15 @@
         return 1000;
       }
     },
+    scroll_bottom_diff: function() {
+      let elem = $('.messages-box .wrapper')[0]
+      if (elem) {
+        return elem.scrollHeight - (elem.scrollTop + $(elem).innerHeight());
+      } else {
+        if (debug) { console.warn('invalid elem'); }
+        return 'no wrapper founds';
+      }
+    },
     is_scroll_bottom: function(tolerence = 1) {
       let elem = $('.messages-box .wrapper')[0]
       if (elem) {
@@ -276,10 +285,9 @@
   window.pl = Utils.page_loading
   window.rpl = Utils.remove_page_loading
 
-
-  // window.UccChat.utils = Utils
+  if (window.UccChat) {
+    window.UccChat.utils = Utils
+  }
   window.UccUtils = Utils
-
-  console.log('utils', UccChat.utils);
 
  })();

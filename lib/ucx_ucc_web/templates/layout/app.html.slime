@@ -50,7 +50,4 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
   = render "translations.html"
   script(src='#{static_path(@conn, "/js/app.js")}')
 
-  elixir:
-    IO.inspect Plug.Conn.get_session(@conn, :user_peer), label: ":user_peer"
-
   = client_js(@conn)

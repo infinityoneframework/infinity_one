@@ -34,6 +34,7 @@ defmodule UccChat.Accounts.Account do
     field :emoji_recent, :string, default: ""
     field :status_message, :string, default: ""
     field :status_message_history, :string, default: ""
+    field :show_desktop_notifications_for, :string, default: "system_default"
 
     many_to_many :notifications, Notification, join_through: AccountNotification, on_delete: :delete_all
   end
@@ -44,7 +45,8 @@ defmodule UccChat.Accounts.Account do
           [:hide_user_names, :hide_flex_tab, :hide_avatars, :merge_channels, :view_mode] ++
           [:email_notification_mode, :highlights, :new_room_notification] ++
           [:new_message_notification, :chat_mode, :enable_desktop_notifications] ++
-          [:emoji_category, :emoji_tone, :emoji_recent, :status_message, :status_message_history]
+          [:emoji_category, :emoji_tone, :emoji_recent, :status_message, :status_message_history] ++
+          [:show_desktop_notifications_for]
 
   @doc """
   Builds a changeset based on the `struct` and `params`.

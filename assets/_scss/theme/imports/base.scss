@@ -1199,7 +1199,7 @@ label.required::after {
   }
 
   .content {
-    direction: rtl;
+    direction: ltr;
     position: absolute;
     top: $header-min-height;
     height: calc(100% -  #{$header-min-height});

@@ -615,6 +615,35 @@ nav.options {
   }
 }
 
+@media only screen and (max-height: 560px) {
+  .sweet-alert.showSweetAlert.visible {
+    font-family: inherit;
+    h2 {
+      font-size: 22px;
+      font-weight: 500;
+      margin: 10px 0;
+    }
+    p {
+      input {
+        font-size: 14px;
+        border-color: #e6e6e6;
+        color: #444;
+        border-radius: 5px;
+        padding: 2px 8px;
+        height: 35px;
+        line-height: normal;
+        margin-top: 5px;
+        margin-bottom: 0px;
+      }
+    }
+    .sa-button-container {
+      button {
+        margin: 10px 5px 0 5px;
+      }
+    }
+  }
+}
+
 // ::-webkit-scrollbar {
 //   z-index: 8000;
 // }
