@@ -83,9 +83,10 @@ defmodule UccChat.Settings do
   def notifications_settings(%{account: account}, channel_id) do
     with true <- enable_desktop_notifications(),
          true <- account.enable_desktop_notifications do
-      account
-      |> Notification.get_notification(channel_id)
-      |> Map.get(:settings, %{})
+      case Notification.get_notification(account, channel_id) do
+        nil -> nil
+        notification -> Map.get(notification, :settings, %{})
+      end
     end
   end
 
