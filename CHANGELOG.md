@@ -11,6 +11,7 @@
   * Configure the email from_name and from_email settings
 * Add Config file updater
 * Add restart server feature
+* Moved the `Administration` menu link above `My Account`
 
 ### Bug Fixes
 
