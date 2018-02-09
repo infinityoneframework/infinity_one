@@ -32,8 +32,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
 # config :ucx_ucc,
 #   release_simlink_uploads: {"uploads", "/var/lib/ucx_ucc/uploads"}
 config :ucx_ucc,
-  release_simlink_uploads: {"uploads", "/var/lib/ucx_ucc/uploads"}
-
+  release_simlink_uploads: {"uploads", "/var/lib/ucx_ucc/uploads"},
+  restart_command: ~w(sudo service ucx_ucc restart)
 
 # Do not print debug messages in production
 #config :logger, level: :info

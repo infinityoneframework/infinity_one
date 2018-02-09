@@ -195,6 +195,21 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       hidden: true,
       to: "auto_linker.attributes.rebel-click"
     ],
+    "ucx_ucc.restart_command": [
+      commented: false,
+      datatype: [
+        list: :binary
+      ],
+      default: [
+        "sudo",
+        "service",
+        "ucx_ucc",
+        "restart"
+      ],
+      doc: "Provide documentation for ucx_ucc.restart_command here.",
+      hidden: true,
+      to: "ucx_ucc.restart_command"
+    ],
     "unbrella.plugins.mscs.base_mac_address": [
       commented: false,
       datatype: :integer,
