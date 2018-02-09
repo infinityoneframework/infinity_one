@@ -18,10 +18,20 @@ defmodule UcxUcc.Plugs.Setup do
   def call(conn, opts \\ [])
 
   # don't allow users already logged in to use the landing page
-  def call(%{path_info: ["landing"], cookies: %{"_ucx_ucc_key" => _}} = conn, _opts) do
-    conn
-    |> redirect(to: "/")
-    |> halt
+  # def call(%{path_info: ["landing"], cookies: %{"_ucx_ucc_key" => cookies}} = conn, _opts) do
+  #   IO.inspect cookies, label: "cookies"
+  #   conn
+  #   |> redirect(to: "/")
+  #   |> halt
+  # end
+  def call(%{path_info: []} = conn, _opts) do
+    if length(Accounts.list_users()) > 1 do
+      conn
+    else
+      conn
+      |> redirect(to: "/landing")
+      |> halt
+    end
   end
 
   # only allow logged out users access when only the Bot account is configured

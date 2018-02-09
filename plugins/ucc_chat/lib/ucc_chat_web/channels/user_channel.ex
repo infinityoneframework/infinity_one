@@ -1643,6 +1643,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate side_nav_create_channel_remove_member(socket, sender), to: __MODULE__.SideNav.Channels, as: :create_channel_remove_member
   defdelegate side_nav_open_direct(socket, sender), to: __MODULE__.SideNav.Directs, as: :open_direct
   defdelegate add_private(socket, sender), to: UccChatWeb.RoomChannel.MessageInput.Channels
+  defdelegate admin_restart_server(socket, sender), to: UccAdminWeb.AdminChannel
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: UccDialerWeb.Channel.Dialer

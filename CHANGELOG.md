@@ -9,6 +9,8 @@
   * Add admin account so we don't need to seed one
   * Allow user to name and create the default channel
   * Configure the email from_name and from_email settings
+* Add Config file updater
+* Add restart server feature
 
 ### Bug Fixes
 
