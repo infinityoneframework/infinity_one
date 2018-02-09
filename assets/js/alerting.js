@@ -1,7 +1,9 @@
+//
+// Copyright @E-MetroTel 2015-2018
+//
 // assets/js/alerting.js
 
 (function() {
-  // helper functions
   console.log('loading alerting.js');
 
   function safe_call(alerting, name, function_name, args) {
@@ -31,8 +33,7 @@
         var init = null;
         console.log('init plugins, key', key);
         if (init = UccChat.Alerting.plugins[key].init) {
-          //init(UccChat.Alerting);
-          init();
+          init(UccChat.Alerting);
         }
       });
       this.ready = true;
@@ -71,10 +72,6 @@
     volume_set: function(name, ...args) {
       safe_call(this, name, 'volume_set', args);
     },
-    // Another approach could be that the application runs custom APIs
-    // by getting its plugin first. Like:
-    //     UccChat.Alerting.get_plugin('mscs').some_custom_api()
-    //
     extend: function(name, extension, ...args) {
       var extension = null;
       if (extension = this.get_plugin(name)[extension]) {

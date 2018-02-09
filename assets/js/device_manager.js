@@ -4,8 +4,9 @@
 // assets/js/device_manager.js
 
 (function() {
-  // helper functions
-  console.log('loading device_manager.js');
+  if (UcxUcc.trace_startup) console.log('loading device_manager.js');
+
+  const disconnect_stream = 255;
 
   function safe_call(device_manager, name, function_name, args) {
     var plugin = device_manager.get_plugin(name);
@@ -74,7 +75,6 @@
         return this.default_plugin;
       }
     },
-
     get_device: function(dev) {
       if (this.debug) console.log("get_device", dev)
       return this.devices[dev]
@@ -144,7 +144,6 @@
       .then(DeviceManager.gotDevices)
       .catch(DeviceManager.errorCallback)
     },
-
     get_current_device: function() {
       if (this.debug) console.log("get_current_device")
       return this.devices.current_device;
@@ -174,10 +173,46 @@
           console.log('Ignoring setSinkId for no sinkId', sinkId)
       }
     },
+    set_sink_id_headset_output_id_audio: function() {
+      this.setSinkId($('#audio'), this.devices.headset_output_id);
+    },
+    set_sink_id_headset_output_id_audio_stream: function() {
+      this.setSinkId($('#audio-stream'), this.devices.headset_output_id);
+    },
+    set_sink_id_handsfree_output_id_audio: function() {
+      this.setSinkId($('#audio'), this.devices.handsfree_output_id);
+    },
+    set_sink_id_handsfree_output_id_audio_stream: function() {
+      this.setSinkId($('#audio-stream'), this.devices.handsfree_output_id);
+    },
+    set_headset_input_id_active: function() {
+      this.devices.current_device = this.devices.headset_input_id;
+    },
+    set_handsfree_input_id_active: function() {
+      this.devices.current_device = this.devices.handsfree_input_id;
+    },
     stop: function(audio_control) {
       if (DeviceManager.debug) console.log("device manager stop")
       audio_control[0].pause()
       audio_control.attr('src','')
+    },
+    get_audio_control: function() {
+      return $('#audio');
+    },
+    get_audio_alerting_control: function() {
+      return $('#audio-alerting');
+    },
+    get_audio_ctrl_audio: function() {
+      return document.getElementById('audio');
+    },
+    get_audio_ctrl_audio_stream: function() {
+      return document.getElementById('audio-stream');
+    },
+    get_audio_ctrl_alerting: function() {
+      return document.getElementById('audio-alerting');
+    },
+    get_audio_ctrl: function(audio_control) {
+      return document.getElementById(audio_control);
     },
     gotDevices: function(deviceInfos) {
       if (DeviceManager.debug) console.log("gotDevices", deviceInfos)
@@ -194,45 +229,22 @@
     volume_decrement: function(device, decrement) {
       if (this.debug) console.log("volume_decrement")
     },
-    call_on_hold: function(state) {
-      if (this.debug) console.log("call_on_hold", state)
+    call_on_hold: function(key, audio_ctrl) {
+      if (this.debug) { console.log('call_on_hold, key', key, 'audio_ctrl', audio_ctrl) }
+      if (audio_ctrl.attr('src')) {
+        if (key == 0) {
+          audio_ctrl[0].play()
+        }
+        else if (key == disconnect_stream) {
+          audio_ctrl[0].pause()
+        }
+      }
     },
 
     // ***************
     // The mandatory operational API for all plugins (an interface)
     // ***************
-/*
-    get_device: function(name, ...args) {
-      safe_call(this, name, 'get_device', args)
-    },
-    get_devices: function(name, ...args) {
-      safe_call(this, name, 'get_devices', args)
-    },
-    set_devices: function(name, ...args) {
-      safe_call(this, name, 'set_devices', args)
-    },
-    set_devices_id: function(name, ...args) {
-      safe_call(this, name, 'set_devices_id', args)
-    },
-    has_headset_device: function(name, ...args) {
-      safe_call(this, name, 'has_headset_device', args)
-    },
-    volume_up: function(name, ...args) {
-      safe_call(this, name, 'volume_up', args);
-    },
-    volume_down: function(name, ...args) {
-      safe_call(this, name, 'volume_down', args);
-    },
-    set_volume_level: function(name, ...args) {
-      safe_call(this, name, 'set_volume_level', args);
-    },
-    get_volume: function(name, ...args) {
-      safe_call(this, name, 'get_volume', args);
-    },
-    set_tone_volume: function(name, ...args) {
-      safe_call(this, name, 'set_tone_volume', args);
-    },
-*/
+
     extend: function(name, extension, ...args) {
       var extension = null;
       if (extension = this.get_plugin(name)[extension]) {
@@ -240,9 +252,6 @@
       }
     },
   };
-
-  $(document).ready(function() {
-  });
 
   var DeviceManagerDefaultPlugin = {
     is_device_manager: false,
@@ -284,6 +293,4 @@
     }, 1500);
   });
 
-  $(document).ready(function() {
-  })
 })();
