@@ -7,6 +7,7 @@ defmodule UcxUcc.Landing do
   alias Ecto.Multi
   alias UcxUcc.{Accounts, Repo}
   alias UccChat.Channel
+  alias UcxUcc.Settings.General
 
   def create(attrs) do
     Multi.new()
@@ -54,6 +55,8 @@ defmodule UcxUcc.Landing do
       |> put_in([:url, :host], host_name)
 
     Application.put_env :ucx_ucc, UcxUccWeb.Endpoint, endpoint
+
+    General.update General.get, %{site_url: host_name}
 
     {:ok, host_name}
   end
