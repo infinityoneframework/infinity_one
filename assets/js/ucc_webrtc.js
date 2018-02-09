@@ -34,19 +34,14 @@ require('./device_manager');
     remoteAudio: undefined,
     constraints: function() {
       console.log('UcxUcc', UcxUcc);
-      console.log('Mscs', UcxUcc.Mscs);
       var dm = false;
-      console.log('DeviceManager', UcxUcc.DeviceManager);
-      if (UcxUcc.DeviceManager) {
-      console.log('dm 1', dm);
-        dm = UcxUcc.DeviceManager;
-      } else if (UcxUcc.Mscs) {
-      console.log('dm 2', dm);
-        dm = UcxUcc.Mscs.DeviceManager;
+      console.log('DeviceManager', UccChat.DeviceManager);
+      if (UccChat.DeviceManager) {
+        dm = UccChat.DeviceManager;
       }
       console.log('dm', dm);
       if (dm) {
-        if (this.callType == 'mscs' || this.callType == 'audio') {
+        if (this.callType == 'audio') {
           return {
             audio: {deviceid: {exact: dm.get_device("handsfree_input_id")}}
           }
@@ -77,10 +72,10 @@ require('./device_manager');
       this.create_channel();
       var contraints_video_hs = {
         video: {
-          optional: [{sourceId: UcxUcc.DeviceManager.get_device("video_input_id")}]
+          optional: [{sourceId: UccChat.DeviceManager.get_device("video_input_id")}]
         },
         audio: {
-          optional: [{sourceId: UcxUcc.DeviceManager.get_device("headset_input_id")}]
+          optional: [{sourceId: UccChat.DeviceManager.get_device("headset_input_id")}]
         }
       };
 
@@ -105,8 +100,8 @@ require('./device_manager');
       WebRTC.setVideoElements();
       WebRTC.startConnection();
     },
-    start_mscs: function() {
-      this.callType = 'mscs';
+    start_audio: function() {
+      this.callType = 'audio';
       WebRTC.setAudioElements();
       WebRTC.startConnection();
     },
@@ -320,7 +315,7 @@ require('./device_manager');
         var candidate = event.candidate;
 
         if (candidate) {
-          if (WebRTC.callType == 'mscs') {
+          if (WebRTC.callType == 'audio') {
             if (candidate.candidate.search(/ udp /i) == -1) {
               return;
             }
