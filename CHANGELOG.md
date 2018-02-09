@@ -1,5 +1,17 @@
 # UcxUcc Changelog
 
+## 0.2.5 (2018-02-09)
+
+## Enhancements
+
+* New Setup page to help configure new systems
+  * Setup the host name to ensure emails have the correct url
+  * Add admin account so we don't need to seed one
+  * Allow user to name and create the default channel
+  * Configure the email from_name and from_email settings
+
+### Bug Fixes
+
 ## 0.2.4 (2018-02-08)
 
 ## Enhancements

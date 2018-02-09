@@ -66,4 +66,10 @@ defmodule UcxUcc.Hooks do
 
   defhook :register_admin_pages, 1
   defhook :build_sidenav_room, 1
+  defhook :update_host, 1, doc: """
+    Notify a change in the Endpoint [url: [host: host_name]]
+    """
+  defhook :update_email_from , 1, doc: """
+    Notify a change in the email from settings.
+    """
 end

@@ -1,0 +1,14 @@
+.information
+  h2 = ~g(Success)
+  p
+    = ~g(Your system is ready to use. )
+    = ~g(You can )
+    a(href="/") = ~g(Login Here)
+    = ~g( with your username )
+    strong = @username
+    = ~g( and start inviting users under the Administration section.)
+  p
+    = ~g(New users will automatically be subscribed to your )
+    a(href="/channels/#{@channel_name}") = "##{@channel_name}."
+
+  h2 = ~g(Welcome to UCxUCc!)

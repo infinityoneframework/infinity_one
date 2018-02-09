@@ -8,6 +8,7 @@ exports.config = {
       // http://brunch.io/docs/config#-files-
       joinTo: {
        "js/app.js": /^(js|..\/deps|node_modules)/,
+       "js/landing.js": /^(landing_js|..\/deps|node_modules)/,
        "js/adapter.js": ["vendor/adapter.js"],
        "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"]
        // "js/vendor.js": /^(web\/static\/vendor)|(deps)/

@@ -55,12 +55,22 @@ defmodule UcxUccWeb.Query do
     do_delete(socket, to_map(opts), @broadcast)
   end
 
+  def do_delete(socket, %{class: class, from: on}, fun) do
+    method = jquery_method(:delete, :class)
+    fun.(socket, build_js(on, method, class))
+    socket
+  end
   def do_delete(socket, %{class: class, on: on}, fun) do
     method = jquery_method(:delete, :class)
     fun.(socket, build_js(on, method, class))
     socket
   end
 
+  def do_delete(socket, %{closest: selector, from: on}, fun) do
+    # method = jquery_method(:delete, :closest)
+    fun.(socket, build_js(on, closest: [selector], remove: nil))
+    socket
+  end
   def do_delete(socket, %{closest: selector, on: on}, fun) do
     # method = jquery_method(:delete, :closest)
     fun.(socket, build_js(on, closest: [selector], remove: nil))
