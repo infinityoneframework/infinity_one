@@ -13,6 +13,11 @@
 * Added audio mode in room notifications panel
 * Added support for all messages desktop notifications
 * Optimized how Direct Message channels are manged.
+* New Setup page to help configure new systems
+  * Setup the host name to ensure emails have the correct url
+  * Add admin account so we don't need to seed one
+  * Allow user to name and create the default channel
+  * Configure the email from_name and from_email settings
 
 ### Bug Fixes
 

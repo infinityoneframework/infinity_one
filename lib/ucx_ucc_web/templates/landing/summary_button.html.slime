@@ -1,0 +1,3 @@
+button.button.next.summary tabindex="#{@tab_inx}" rebel-click="click_summary"
+  = ~g(Summary)
+  i.icon-angle-double-right

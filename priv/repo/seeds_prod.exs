@@ -2,7 +2,7 @@ alias UcxUcc.Repo
 alias UcxUcc.{Accounts, Permissions}
 alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
-alias UccChat.{ChannelService, Subscription, Message, Channel}
+alias UccChat.{Subscription, Message, Channel}
 alias UcxPresence.Extension
 alias Mscs.Client
 
@@ -139,31 +139,13 @@ IO.puts "Creating First Users"
 # build the users
 random_string = fn len ->
   chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%&'
-  for ch <- 1..len do
+  for _ch <- 1..len do
     Enum.random chars
   end
   |> to_string
 end
-# _u0 = create_user.("Bot", "bot@emetrotel.com", "rtene31-#4%@zck93yurstrst", :bot)
-_u0 = create_user.("Bot", "bot@emetrotel.com", random_string.(32), :bot)
-u1 = create_user.("admin", "admin@emetrotel.com", "emetr0tel", true)
 
-IO.puts "Creating Channels"
-
-ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id, default: true})
-
-IO.puts "Creating Subscriptions"
-
-[ch1]
-|> Enum.each(fn ch ->
-  Subscription.create!(%{channel_id: ch.id, user_id: u1.id})
-end)
-
-IO.puts "Creating Messages"
-
-message = "Welcome to the UcxUcc `general` channel."
-
-Message.create!(%{channel_id: ch1.id, user_id: u1.id, body: message})
+_u0 = create_user.("Bot", "bot@example.com", random_string.(32), :bot)
 
 IO.puts "Creating Settings"
 
@@ -183,7 +165,6 @@ end)
 
 IO.puts "Setting phone numbers"
 
-# [_work, _home, _mobile] =
 ~w(Work Home Mobile)
 |> Enum.map(fn label ->
     Accounts.create_phone_number_label! %{name: label}

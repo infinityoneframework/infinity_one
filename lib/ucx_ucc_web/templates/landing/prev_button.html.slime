@@ -1,0 +1,3 @@
+button.button.prev tabindex="#{@tab_inx}" rebel-click="click_prev"
+  i.icon-angle-double-left
+  = ~g(Back)

@@ -8,6 +8,7 @@ defmodule UccChatWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UcxUcc.Plugs.Setup
     plug Coherence.Authentication.Session
   end
 
@@ -17,6 +18,7 @@ defmodule UccChatWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UcxUcc.Plugs.Setup
     plug Coherence.Authentication.Session, protected: true
   end
 
@@ -32,6 +34,7 @@ defmodule UccChatWeb.Router do
   scope "/", UcxUccWeb  do
     pipe_through :protected
 
+    get "/landing", LandingController, :index
     get "/logout", Coherence.SessionController, :delete
     coherence_routes :protected
   end
