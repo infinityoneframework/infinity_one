@@ -17,6 +17,7 @@ defmodule UcxUcc.Landing do
     |> Multi.run(:subscription, &subscribe_channel/1)
     |> Multi.run(:update_host, &update_host(&1, attrs))
     |> Multi.run(:update_email_from, &update_email_from(&1, attrs))
+    |> Multi.run(:run_hooks, &run_hooks(&1, attrs))
     |> Repo.transaction
   end
 
@@ -54,16 +55,18 @@ defmodule UcxUcc.Landing do
 
     Application.put_env :ucx_ucc, UcxUccWeb.Endpoint, endpoint
 
-    # Let others know of the host change so that config files can
-    # be updated
-    UcxUcc.Hooks.update_host(host_name)
-
     {:ok, host_name}
   end
 
   defp update_email_from(_changes, attrs) do
     email_from = attrs["email_from"]
-    UcxUcc.Hooks.update_email_from({email_from["name"], email_from["email"]})
+    Application.put_env :coherence, :email_from_name, email_from["name"]
+    Application.put_env :coherence, :email_from_email, email_from["email"]
     {:ok, email_from}
   end
+
+  defp run_hooks(_changes, attrs) do
+    {:ok, UcxUcc.Hooks.landing_update(attrs)}
+  end
 end
+
