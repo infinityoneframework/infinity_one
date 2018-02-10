@@ -244,7 +244,7 @@ defmodule UccChat.ChannelService do
     |> UcxUcc.Accounts.create_user_role() #, scope: "global"})
     |> case do
       {:ok, _} -> {:ok, channel}
-      error -> error
+      error    -> error
     end
   end
 
