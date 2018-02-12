@@ -13,6 +13,7 @@
 * Add restart server feature
 * Moved the `Administration` menu link above `My Account`
 * Added creating new N-way channel when mentioning someone in a DM channel
+* Disable WebRTC channel when WebRTC disabled.
 
 ### Bug Fixes
 

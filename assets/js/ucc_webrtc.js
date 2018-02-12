@@ -14,9 +14,11 @@ require('./device_manager');
     }
   }
   UccChat.on_connect(function(ucc_chat, socket) {
-    console.log('webrtc on_connect');
-    WebRTC.init(ucc_chat.socket, ucc_chat.ucxchat.user_id,
-      ucc_chat.ucxchat.username);
+    if (UccChat.ucxchat.webrtc_enabled) {
+      console.log('webrtc on_connect');
+      WebRTC.init(ucc_chat.socket, ucc_chat.ucxchat.user_id,
+        ucc_chat.ucxchat.username);
+    }
   });
 
   let WebRTC = {

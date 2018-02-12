@@ -64,7 +64,7 @@ defmodule UccChatWeb.UserChannel.Notifier do
     message = payload.message
 
     mention = !!Enum.find(message.mentions, & &1.user_id == user.id)
-    mention_or_direct = mention or channel.type == 2
+    mention_or_direct = mention or channel.type == 2 or channel.nway
 
     if sound = Settings.get_new_message_sound(user, channel.id, mention_or_direct) do
       client.notify_audio(socket, sound)
