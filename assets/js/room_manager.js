@@ -494,7 +494,7 @@ class RoomManager {
     this.bind_history_manager_scroll_event();
 
     $(window).on('focus', () => {
-      if (debug) { console.log('room_manager focus') }
+      // if (debug) { console.log('room_manager focus') }
       this.clear_unread();
       this.has_focus = true;
       if (UccChat.systemchan) {
@@ -505,7 +505,7 @@ class RoomManager {
       this.has_focus = false;
       if (UccChat.systemchan) {
         UccChat.systemchan.push('state:blur');
-        if (debug) { console.log('room_manager blur'); }
+        // if (debug) { console.log('room_manager blur'); }
       }
     })
 
