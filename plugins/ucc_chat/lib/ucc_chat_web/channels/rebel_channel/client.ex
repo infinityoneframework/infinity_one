@@ -4,6 +4,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   import UcxUccWeb.Utils
   import Rebel.{Core, Query}, warn: false
 
+  alias Rebel.SweetAlert
   alias UccChatWeb.ClientView
   alias UccChat.{SideNavService}
   alias UcxUccWeb.Query
@@ -28,6 +29,8 @@ defmodule UccChatWeb.RebelChannel.Client do
       {:error, error} = res ->
         Logger.error "Problem with broadcast_js #{js}, error: #{inspect error}"
         res
+      socket ->
+        socket
     end
   end
 
@@ -45,25 +48,17 @@ defmodule UccChatWeb.RebelChannel.Client do
     socket
     |> page_loading
     |> async_js("$('#{elem}').next().after('#{ClientView.loading_animation}')")
-    socket
   end
 
   def stop_loading_animation(socket) do
     socket
     |> remove_page_loading()
     |> delete(from: ".loading-animation")
-    socket
   end
 
   def set_ucxchat_room(socket, room, display_name, _route \\ "channels") do
     async_js(socket, "window.UccChat.ucxchat.room = '#{room}'; " <>
       "window.UccChat.ucxchat.display_name = '#{display_name}'")
-    |> case do
-      {:ok, _} ->
-        socket
-      {:error, error} ->
-        raise "set_ucxchat_room error: #{inspect error}"
-    end
   end
 
   def push_history(socket, room, display_name, route \\ "channels") do
@@ -76,12 +71,6 @@ defmodule UccChatWeb.RebelChannel.Client do
     async_js(socket, "history.replaceState(history.state, " <>
       "window.UccChat.ucxchat.display_name, '/' + ucxchat.room_route " <>
       "+ '/' + window.UccChat.ucxchat.display_name)")
-    |> case do
-      {:ok, _} ->
-        socket
-      {:error, error} ->
-        raise "push_history error: #{inspect error}"
-    end
   end
 
   def replace_history(socket, room, display_name, route \\ "channels") do
@@ -99,7 +88,6 @@ defmodule UccChatWeb.RebelChannel.Client do
   def toastr!(socket, which, message) do
     Logger.info "toastr! has been been deprecated! Please use toastr/3 instead."
     toastr socket, which, message
-    socket
   end
 
   def toastr(socket, which, message) do
@@ -113,6 +101,10 @@ defmodule UccChatWeb.RebelChannel.Client do
 
   def set_room_icon(socket, room_name, icon_name) do
     do_broadcast_js socket, update_room_icon_js(room_name, icon_name)
+  end
+
+  def set_room_title(socket, channel_id, display_name) do
+    async_js socket, ~s/$('section[id="chat-window-#{channel_id}"] .room-title').text('#{display_name}')/
   end
 
   def update_room_icon_js(room_name, icon_name) do
@@ -144,7 +136,6 @@ defmodule UccChatWeb.RebelChannel.Client do
     socket
     |> Query.update(:html, set: Message.render_message_box(channel_id, user_id), on: ".room-container footer.footer")
     |> async_js("$('textarea.input-message').focus().autogrow();")
-    socket
   end
 
   def broadcast_message_box(socket, channel_id, user_id) do
@@ -153,7 +144,6 @@ defmodule UccChatWeb.RebelChannel.Client do
     socket
     |> update!(:html, set: html, on: ".room-container footer.footer")
     |> broadcast_js("$('textarea.input-message').autogrow();")
-    socket
   end
 
   def push_rooms_list_update(socket, channel_id, user_id) do
@@ -171,7 +161,6 @@ defmodule UccChatWeb.RebelChannel.Client do
 
   def scroll_bottom(socket, selector) do
     async_js socket, scroll_bottom_js(selector)
-    socket
   end
 
   def scroll_bottom_js(selector) do
@@ -210,6 +199,11 @@ defmodule UccChatWeb.RebelChannel.Client do
     end
   end
 
+
+  def update_flex_channel_name(socket, name) do
+    Query.update(socket, :text, set: name, on: ~s(.current-setting[data-edit="name"]))
+  end
+
   def set_caret_position_js(selector, start, finish) do
     """
     var elem = document.querySelector('#{selector}');
@@ -233,4 +227,34 @@ defmodule UccChatWeb.RebelChannel.Client do
     """
   end
 
+  @default_swal_model_opts [
+    showCancelButton: true, closeOnConfirm: false, closeOnCancel: true,
+    confirmButtonColor: "#DD6B55"
+  ]
+
+  @doc """
+  Show a SweetAlert modal box.
+  """
+  # @spec swal_model(Phoenix.Socket.t, String.t, String.t, String.t String.t || nil, Keword.t) :: Phoenix.Socket.t
+  def swal_model(socket, title, body, type, confirm_text, opts \\ []) do
+    {swal_opts, callbacks}  = Keyword.pop opts, :opts, []
+    swal_opts = Keyword.merge @default_swal_model_opts, swal_opts
+    swal_opts =
+      if confirm_text do
+        Keyword.merge [confirmButtonText: confirm_text] , swal_opts
+      else
+        swal_opts
+      end
+
+    SweetAlert.swal_modal socket, title, body, type, swal_opts, callbacks
+  end
+
+  @default_swal_opts [
+    timer: 3000, showConfirmButton: false
+  ]
+
+  def swal(socket, title, body, type, opts \\ []) do
+    opts = Keyword.merge @default_swal_opts, opts
+    SweetAlert.swal(socket, title, body, type, opts)
+  end
 end

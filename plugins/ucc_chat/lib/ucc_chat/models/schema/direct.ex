@@ -12,6 +12,8 @@ defmodule UccChat.Schema.Direct do
   end
 
   @fields ~w(user_id friend_id channel_id)a
+
+  def model, do: UccChat.Direct
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

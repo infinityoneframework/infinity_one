@@ -18,7 +18,7 @@ defmodule UccChat.SideNavService do
 
   def render_rooms_list(channel_id, user_id) do
     user = Helpers.get_user! user_id
-    channel = if channel_id, do: Channel.get(channel_id), else: nil
+    channel = if not (is_nil(channel_id) or channel_id == ""), do: Channel.get(channel_id), else: nil
 
     chatd = ChatDat.new(user, channel)
 

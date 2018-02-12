@@ -12,6 +12,8 @@ defmodule UccChat.Schema.Reaction do
     timestamps(type: :utc_datetime)
   end
 
+  def model, do: UccChat.Reaction
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

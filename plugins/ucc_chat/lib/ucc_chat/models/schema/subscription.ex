@@ -44,6 +44,8 @@ defmodule UccChat.Schema.Subscription do
   @fields ~w(channel_id user_id)a
   @all_fields @fields ++ ~w(last_read type open alert ls f unread hidden has_unread current_message)a
 
+  def model, do: UccChat.Subscription
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

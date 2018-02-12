@@ -15,6 +15,8 @@ defmodule UccChat.Schema.NotificationSetting do
     :audio, :desktop, :duration, :mobile, :email, :unread_alert, :audio_mode
   ]
 
+  def model, do: UccChat.NotificationSetting
+
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @fields)

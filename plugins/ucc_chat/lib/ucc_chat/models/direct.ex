@@ -11,4 +11,14 @@ defmodule UccChat.Direct do
       end
     end)
   end
+
+  def get(user_id, friend_id, channel_id, opts \\ []) do
+    preload = opts[:preload] || []
+    get_by user_id: user_id, friend_id: friend_id, channel_id: channel_id, preload: preload
+  end
+
+  def get_friend(user_id, channel_id, opts \\ []) do
+    preload = opts[:preload] || []
+    get_by user_id: user_id, channel_id: channel_id, preload: preload
+  end
 end

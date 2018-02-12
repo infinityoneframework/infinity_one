@@ -45,6 +45,8 @@ defmodule UccChat.Schema.Message do
   ]
   @required [:user_id]
 
+  def model, do: UccChat.Message
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

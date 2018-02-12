@@ -9,6 +9,8 @@ defmodule UccChat.Schema.AccountNotification do
   end
 
   @fields ~w(account_id notification_id)a
+
+  def model, do: UccChat.AccountNotification
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

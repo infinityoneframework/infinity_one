@@ -12,6 +12,8 @@ defmodule UccChat.Schema.PinnedMessage do
 
   @fields ~w(message_id channel_id)a
 
+  def model, do: UccChat.PinnedMessage
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

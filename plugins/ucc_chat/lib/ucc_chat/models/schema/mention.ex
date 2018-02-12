@@ -17,6 +17,8 @@ defmodule UccChat.Schema.Mention do
 
   @fields ~w(message_id channel_id)a
 
+  def model, do: UccChat.Mention
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

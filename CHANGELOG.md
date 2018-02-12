@@ -21,6 +21,7 @@
 * Add Config file updater
 * Add restart server feature
 * Moved the `Administration` menu link above `My Account`
+* [UCX-3782] Added creating new N-way channel when mentioning someone in a DM channel
 
 ### Bug Fixes
 
@@ -34,6 +35,10 @@
 * Fixed message timestamps
 * [UCX-3750] Fixed reaction tool tips
 * [UCX-3776] Fixed subscribing 3rd party in direct channel with @mention
+* [UCX-3588] Create room now properly loads the new room
+* [UCX-3673] Changing room name now updates all references now
+* [UCX-3715] Fixed device selection between handsfree and headset
+* [UCX-3663] Fixed ringing volume issues
 
 
 ## 1.0.0-alpha15 (2018-02-02)

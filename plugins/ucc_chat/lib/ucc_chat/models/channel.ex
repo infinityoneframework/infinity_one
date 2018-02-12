@@ -3,12 +3,45 @@ defmodule UccChat.Channel do
 
   import Ecto.Changeset
 
-  alias UcxUcc.{Accounts, Accounts.User, Repo}
+  alias UcxUcc.{Accounts, Accounts.User, Repo, UccPubSub}
   alias UccChat.{Mute, Subscription}
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
   alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
+
+  def update(%Ecto.Changeset{} = changeset) do
+    case super(changeset) do
+      {:ok, _} = ok ->
+        Enum.each Map.keys(changeset.changes), fn key ->
+          UccPubSub.broadcast "user:all", "channel:change:key", %{
+            key: key,
+            old_value: Map.get(changeset.data, key),
+            new_value: changeset.changes[key],
+            channel_id: changeset.data.id
+          }
+        end
+        ok
+      other ->
+        other
+    end
+  end
+
+  def update(other) do
+    Logger.warn "Should now be here other: " <> inspect(other)
+    super(other)
+  end
+
+  def delete(channel) do
+    case super(channel) do
+      {:ok, channel} = ok ->
+        UccPubSub.broadcast "user:all", "channel:deleted",
+          %{room_name: channel.name, channel_id: channel.id}
+        ok
+      error ->
+        error
+    end
+  end
 
   def changeset(user, params) do
     changeset %@schema{}, user, params
@@ -20,6 +53,19 @@ defmodule UccChat.Channel do
     |> validate_permission(user)
   end
 
+  def create_channel(name, user_id, params \\ %{}) do
+    params = Map.merge %{name: name, user_id: user_id, type: 0}, params
+
+    user = Accounts.get_user user_id, preloads: [:roles, user_roles: [:role]]
+
+    case UccChat.ChannelService.insert_channel user, params do
+      {:ok, _} = ok ->
+        # TODO: should we broadcast a notification here?
+        ok
+      error -> error
+    end
+  end
+
   def changeset_settings(struct, user, [{"private", value}]) do
     type = if value == true, do: 1, else: 0
     changeset(struct, user, %{type: type})
@@ -28,12 +74,6 @@ defmodule UccChat.Channel do
   def changeset_settings(struct, user, [{field, value}]) do
     changeset(struct, user, %{field => value})
   end
-
-  defdelegate changeset_delete(struct, params \\ %{}), to: @schema
-
-  defdelegate changeset_update(struct, params \\ %{}), to: @schema
-
-  defdelegate blocked_changeset(struct, blocked), to: @schema
 
   def validate_permission(%{changes: changes, data: data} = changeset, user) do
     # Logger.warn "validate_permission: changeset: #{inspect changeset}, type: #{inspect changeset.data.type}"
@@ -151,6 +191,33 @@ defmodule UccChat.Channel do
     |> @repo.all
   end
 
+  @doc """
+  Get the nway channel.
+
+  The nway channel is the channel with `nway` true, and has the exact
+  subscribers as the user id list provided.
+  """
+  def get_nway(user_ids_list) do
+    # TOTO: This is not optimum, but I gave up trying to do this with
+    #       Ecto. Would be nice to come back later and go this at the
+    #       date base level.
+    query =
+      from c in @schema,
+        join: s in SubscriptionSchema,
+        on: s.channel_id == c.id,
+        select: {c, s.user_id},
+        where: c.nway == true
+
+    with [{channel, _} | _] = results <- @repo.all(query),
+         ids <- Enum.map(results, & elem(&1, 1)) |> Enum.uniq,
+         true <- length(ids) == length(user_ids_list),
+         true <- Enum.all?(ids, & &1 in user_ids_list) do
+      channel
+    else
+      _ -> nil
+    end
+  end
+
   def get_channels_search(user_id, pattern, opts \\ %{})
   def get_channels_search(user_id, pattern, opts) do
     user_id
@@ -170,6 +237,7 @@ defmodule UccChat.Channel do
       |> Enum.map(& &1.channel_id)
     Enum.filter dataset, &  &1.id in joined
   end
+
   defp filter_joined(dataset, _, _), do: dataset
 
   defp get_search_where(query, %{types: types}) do
@@ -282,4 +350,8 @@ defmodule UccChat.Channel do
   def user_muted?(channel_id, user_id) do
     Mute.user_muted?(channel_id, user_id)
   end
+
+  defdelegate changeset_delete(struct, params \\ %{}), to: @schema
+  defdelegate changeset_update(struct, params \\ %{}), to: @schema
+  defdelegate blocked_changeset(struct, blocked), to: @schema
 end

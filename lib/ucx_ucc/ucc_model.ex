@@ -101,19 +101,16 @@ defmodule UccModel do
         end
       end
 
-      @spec create(Ecto.Changeset.t) :: {:ok, Struct.t} |
-                                        {:error, Ecto.Changeset.t}
-
+      @spec create(Ecto.Changeset.t | Keyword.t | Map.t) :: {:ok, Struct.t} |
+                                                            {:error, Ecto.Changeset.t}
       def create(changeset_or_attrs \\ %{})
 
       def create(%Ecto.Changeset{} = changeset) do
         @repo.insert changeset
       end
 
-      @spec create(Keyword.t) :: {:ok, Struct.t} |
-                                 {:error, Ecto.Changeset.t}
       def create(attrs) do
-        @repo.insert change(attrs)
+        create change(attrs)
       end
 
       def create!(changeset_or_attrs \\ %{})
@@ -125,46 +122,67 @@ defmodule UccModel do
 
       @spec create!(Keyword.t) :: Struct.t | no_return
       def create!(attrs) do
-        @repo.insert! change(attrs)
+        create! change(attrs)
+      end
+
+      @spec update(Ecto.Changeset.t) :: {:ok, Struct.t} |
+                                        {:error, Ecto.Changeset.t}
+      def update(%Ecto.Changeset{} = changeset) do
+        @repo.update changeset
       end
 
       @spec update(Struct.t, Keyword.t) :: {:ok, Struct.t} |
                                            {:error, Ecto.Changeset.t}
-      def update(%Ecto.Changeset{} = changeset) do
-        @repo.update changeset
-      end
       def update(%@schema{} = schema, attrs) do
-        @repo.update change(schema, attrs)
+        schema
+        |> change(attrs)
+        |> update
       end
 
-      @spec update!(Struct.t, Keyword.t) :: Struct.t | no_return
+      @spec update!(Ecto.Changeset.t) :: Struct.t | no_return
       def update!(%Ecto.Changeset{} = changeset) do
         @repo.update! changeset
       end
+
+      @spec update!(Struct.t, Keyword.t) :: Struct.t | no_return
       def update!(%@schema{} = schema, attrs) do
-        @repo.update! change(schema, attrs)
+        schema
+        |> change(attrs)
+        |> update!
       end
 
       @spec delete(Struct.t) :: {:ok, Struct.t} |
                                 {:error, Ecto.Changeset.t}
       def delete(%@schema{} = schema) do
-        @repo.delete change(schema)
+        delete change(schema)
+      end
+
+      @spec delete(Ecto.Changeset.t) :: {:ok, Struct.t} |
+                                        {:error, Ecto.Changeset.t}
+      def delete(%Ecto.Changeset{} = changeset) do
+        @repo.delete changeset
       end
 
       @spec delete(id) :: {:ok, Struct.t} |
                           {:error, Ecto.Changeset.t}
       def delete(id) do
-        @repo.delete get(id)
+        delete get(id)
       end
 
       @spec delete!(Struct.t) :: Struct.t | no_return
       def delete!(%@schema{} = schema) do
-        @repo.delete! change(schema)
+        delete! change(schema)
+      end
+
+      @spec delete!(Ecto.Changeset.t) :: {:ok, Struct.t} |
+                                        {:error, Ecto.Changeset.t}
+      def delete!(%Ecto.Changeset{} = changeset) do
+        @repo.delete! changeset
       end
 
       @spec delete!(id) :: Struct.t | no_return
       def delete!(id) do
-        @repo.delete! get(id)
+        delete! get(id)
       end
 
       # @spec delete_all() :: any
@@ -193,9 +211,10 @@ defmodule UccModel do
       end
 
       defoverridable [
-        delete: 1, delete!: 1, update: 2, update!: 2, create: 1, create!: 1,
-        get_by: 1, get_by!: 1, get: 2, get!: 2, list: 0, change: 2, change: 1,
-        delete_all: 0, preload_schema: 2
+        delete: 1, delete!: 1, update: 1, update: 2, update!: 1,
+        update!: 2, create: 1, create!: 1, get_by: 1, get_by!: 1,
+        get: 2, get!: 2, list: 0, change: 2, change: 1, delete_all: 0,
+        preload_schema: 2
       ]
     end
   end
