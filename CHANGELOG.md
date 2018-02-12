@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 1.0.0-alpha16 (2018-02-12)
+## 1.0.0-alpha16 (2018-02-13)
 
 ## Enhancements
 
@@ -22,6 +22,10 @@
 * Add restart server feature
 * Moved the `Administration` menu link above `My Account`
 * [UCX-3782] Added creating new N-way channel when mentioning someone in a DM channel
+* [UCX-3785] CRUD changes to your extension updates phone presence in real-time
+* Added some developer documentation
+* Add ExDoc and some docs layout structure in mix.exs
+* Presence overrides remain after logout and login
 
 ### Bug Fixes
 
@@ -44,6 +48,12 @@
 * [UCX-3778] Fixed headset microphone selecting the handsfree input device
 * [UCX-3782] Temporary fix for camera light coming on
   * Disable the WebRTC video channel when WebRTC is disabled in Admin.
+* [UCX-3691] Disable all WebRTC when WebRTC in accounts disabled
+  * Don't start the WebRTC channel
+  * Don't start the ClientSM or the UNISTIM socket with the UCx
+* [UCX-3783] Fix initial chat presence when first logging in
+* Fix initial phone presence when first logging in
+* [UCX-3786] Make phone presence change on active call work correctly.
 
 
 ## 1.0.0-alpha15 (2018-02-02)

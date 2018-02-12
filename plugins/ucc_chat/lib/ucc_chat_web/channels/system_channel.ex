@@ -5,7 +5,7 @@ defmodule UccChatWeb.SystemChannel do
   alias UcxUccWeb.Presence
   alias UccChatWeb.UserChannel
   alias UccChat.ServiceHelpers, as: Helpers
-  alias UcxUcc.UccPubSub
+  alias UcxUcc.{UccPubSub, Accounts}
 
   # import Ecto.Query
 
@@ -35,8 +35,11 @@ defmodule UccChatWeb.SystemChannel do
   end
 
   def leave(pid, user_id) do
+    user = Accounts.get_user user_id
+    if user.status in [nil, ""] do
+      UccChat.PresenceAgent.unload(user_id)
+    end
     UcxUccWeb.Presence.untrack(pid, CC.chan_system(), user_id)
-    UccChat.PresenceAgent.unload(user_id)
     UccPubSub.broadcast("user:" <> user_id, "user:leave")
     # Logger.warn ".......... leaving " <> inspect(user_id)
   end
@@ -111,12 +114,14 @@ defmodule UccChatWeb.SystemChannel do
     push socket, "presence_state", list
     user_id = socket.assigns.user_id
     user = Helpers.get_user!(user_id)
+    status =
+      if user.chat_status in [nil, ""], do: "online", else: user.chat_status
     {:ok, _} = Presence.track(socket, socket.assigns.user_id, %{
       # online_at: :os.system_time(:milli_seconds),
-      status: "online",
+      status: status,
       username: user.username
     })
-    update_status socket, "online"
+    update_status socket, status
     UccPubSub.subscribe "status:" <> user_id
     {:noreply, socket}
   end
@@ -142,7 +147,10 @@ defmodule UccChatWeb.SystemChannel do
 
   def terminate(_, socket) do
     assigns = socket.assigns
-    Presence.update socket, assigns.user_id,
-      %{status: "offline", username: assigns.username}
+    user = Accounts.get_user assigns.user_id
+    if user.chat_status in [nil, ""] do
+      Presence.update socket, assigns.user_id,
+        %{status: "offline", username: assigns.username}
+    end
   end
 end

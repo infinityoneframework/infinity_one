@@ -9,6 +9,8 @@ start
 /plugins/ucx_adapter
 /assets/**/mscs
 /priv/static.bak
+/doc
+
 
 .DS_Store
 

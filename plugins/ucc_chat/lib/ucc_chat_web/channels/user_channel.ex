@@ -812,6 +812,7 @@ defmodule UccChatWeb.UserChannel do
     subscribe_callback "user:" <> user_id, "call_state:change", {UcxPresenceWeb.Channel.Presence, :call_state_change}
     UccPubSub.subscribe "user:all", "channel:deleted"
     UccPubSub.subscribe "user:all", "channel:change:key"
+    UccPubSub.subscribe "user:all", "status:refresh"
 
     subscribe_callback "user:all", "status_message:update", :status_message_update
 
@@ -1024,6 +1025,42 @@ defmodule UccChatWeb.UserChannel do
   def handle_info({_, "channel:change:key", payload}, socket) do
     Logger.debug fn -> "unhandled channel:change:key payload: " <>
       inspect(payload)
+    end
+
+    {:noreply, socket}
+  end
+
+  def handle_info({"user:all", "status:refresh", %{user_id: id}},
+    %{assigns: %{user_id: id}} = socket) do
+
+    user =
+      id
+      |> Accounts.get_user()
+      |> UcxUcc.Hooks.preload_user(Accounts.default_user_preloads())
+
+    push_account_header(socket, user)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({"user:all", "status:refresh", payload}, socket) do
+    subscribed = socket.assigns.subscribed
+
+    case Enum.find(payload.friend_channel_names, & elem(&1, 0) in subscribed) do
+      {_, channel_id} ->
+
+        current_user =
+          socket.assigns.user_id
+          |> Accounts.get_user()
+          |> UcxUcc.Hooks.preload_user(Accounts.default_user_preloads())
+
+        room = ChannelService.get_side_nav_room current_user, channel_id
+
+        socket
+        |> update_side_nav_item(current_user, room)
+        |> update_messages_header_icons(room, socket.assigns[:channel_id] == channel_id)
+      _ ->
+        nil
     end
 
     {:noreply, socket}
@@ -1711,6 +1748,18 @@ defmodule UccChatWeb.UserChannel do
     user_id = sender["form"]["user[id]"]
     html = Phoenix.View.render_to_string FlexBarView, "add_phone_number_button.html", user: %{id: user_id}
     client.html socket, "fieldset.phone-numbers", html
+    socket
+  end
+
+  defp update_side_nav_item(socket, user, room) do
+    push_side_nav_item_link socket, user, room
+  end
+
+  defp update_messages_header_icons(socket, room, true) do
+    push_messages_header_icons(socket, %{active_room: room})
+  end
+
+  defp update_messages_header_icons(socket, _room, _) do
     socket
   end
 

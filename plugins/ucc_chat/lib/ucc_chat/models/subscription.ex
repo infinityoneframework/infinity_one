@@ -13,8 +13,8 @@ defmodule UccChat.Subscription do
   require Logger
 
   def last_channel?(%{type: 2}), do: false
-  def last_channel?(%{user_id: user_id}) do
-
+  def last_channel?(%{user_id: _user_id}) do
+    false
   end
 
   def delete(%Ecto.Changeset{} = changeset) do
