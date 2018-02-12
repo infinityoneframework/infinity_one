@@ -39,6 +39,7 @@
 * [UCX-3673] Changing room name now updates all references now
 * [UCX-3715] Fixed device selection between handsfree and headset
 * [UCX-3663] Fixed ringing volume issues
+* [UCX-3768] Fix default compact theme when theme is not set
 
 
 ## 1.0.0-alpha15 (2018-02-02)
