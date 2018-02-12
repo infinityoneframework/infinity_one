@@ -14,8 +14,11 @@
 * Moved the `Administration` menu link above `My Account`
 * Added creating new N-way channel when mentioning someone in a DM channel
 * Disable WebRTC channel when WebRTC disabled.
+* Presence overrides remain after logout and login
 
 ### Bug Fixes
+
+* Fix issue with presence not showing on initial login
 
 ## 0.2.4 (2018-02-08)
 
