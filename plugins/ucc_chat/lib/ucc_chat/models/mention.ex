@@ -81,8 +81,9 @@ defmodule UccChat.Mention do
             [mention | acc]
 
           {:nway, user} ->
-            unless Subscription.get(channel_id, user.id) || nway_renamed?(channel) do
-              name = channel.name <> nway_name_segment(user)
+            name = channel.name <> nway_name_segment(user)
+
+            unless Subscription.get(channel_id, user.id) || nway_renamed?(channel) || String.length(name) > 40 do
               Channel.update(channel, %{name: name})
             end
 

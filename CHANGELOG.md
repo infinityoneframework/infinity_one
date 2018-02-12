@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 1.0.0-alpha16 (2018-02-09)
+## 1.0.0-alpha16 (2018-02-12)
 
 ## Enhancements
 
@@ -41,6 +41,9 @@
 * [UCX-3663] Fixed ringing volume issues
 * [UCX-3768] Fix default compact theme when theme is not set
 * Remove the prod keyfile and certfile so we use the UCx's keys
+* [UCX-3778] Fixed headset microphone selecting the handsfree input device
+* [UCX-3782] Temporary fix for camera light coming on
+  * Disable the WebRTC video channel when WebRTC is disabled in Admin.
 
 
 ## 1.0.0-alpha15 (2018-02-02)

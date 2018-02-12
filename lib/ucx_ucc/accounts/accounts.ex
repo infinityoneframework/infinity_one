@@ -118,7 +118,7 @@ defmodule UcxUcc.Accounts do
 
   def username_by_user_id(id, opts \\ []) do
     {preload, _} = pop_user_preloads(opts)
-    case get_user id do
+    case get_user id, preload: preload do
       nil -> nil
       user -> user.username
     end

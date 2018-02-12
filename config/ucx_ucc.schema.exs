@@ -417,18 +417,18 @@ See the moduledoc for `Conform.Schema.Validator` for more details and examples.
       to: "ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.otp_app"
     ],
     "ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.keyfile": [
-      commented: false,
+      commented: true,
       datatype: :binary,
-      default: "priv/key.pem",
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.keyfile here.",
+      # default: "priv/key.pem",
+      doc: "Uncomment this line and enter https keyfile to user https.",
       hidden: false,
       to: "ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.keyfile"
     ],
     "ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.certfile": [
-      commented: false,
+      commented: true,
       datatype: :binary,
-      default: "priv/cert.pem",
-      doc: "Provide documentation for ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.certfile here.",
+      # default: "priv/cert.pem",
+      doc: "Uncomment this line and enter https certfile to use https.",
       hidden: false,
       to: "ucx_ucc.Elixir.UcxUccWeb.Endpoint.https.certfile"
     ],
