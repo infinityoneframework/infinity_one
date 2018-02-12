@@ -14,6 +14,8 @@ defmodule UccChat.Schema.StarredMessage do
 
   @fields ~w(user_id message_id channel_id)a
 
+  def model, do: UccChat.StarredMessage
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

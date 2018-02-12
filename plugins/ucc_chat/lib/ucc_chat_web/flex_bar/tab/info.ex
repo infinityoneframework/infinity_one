@@ -108,6 +108,18 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     {%{field => value}, socket}
   end
 
+  def flex_form_delete(socket, _sender, resource) do
+    # Logger.warn "resource: " <> inspect(resource)
+    resource
+    |> Channel.delete
+    |> case do
+      {:ok, _} ->
+        {:ok, socket}
+      error ->
+        error
+    end
+  end
+
   def translate_field("#channel_private"), do: :type
   def translate_field("#channel_" <> str), do: to_existing_atom(str)
 

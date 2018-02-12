@@ -92,6 +92,11 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
     end
   end
 
+  def flex_form_delete(socket, _sender, resource) do
+    Logger.warn "resource: " <> inspect(resource)
+    {:ok, socket}
+  end
+
   def translate_field("#channel_private"), do: :type
   def translate_field("#channel_" <> str), do: to_existing_atom(str)
 

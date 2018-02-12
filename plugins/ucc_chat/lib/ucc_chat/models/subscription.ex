@@ -4,10 +4,30 @@ defmodule UccChat.Subscription do
   """
   use UccModel, schema: UccChat.Schema.Subscription
 
+  alias Ecto.Changeset
+
   alias UccChat.Schema.Channel
   alias UccChat.ChannelService
+  alias UcxUcc.Accounts.User
 
   require Logger
+
+  def last_channel?(%{type: 2}), do: false
+  def last_channel?(%{user_id: user_id}) do
+
+  end
+
+  def delete(%Ecto.Changeset{} = changeset) do
+    if last_channel?(changeset.data) do
+      {:error, Changeset.add_error(changeset, :channel_id, "Cannot remove last channel")}
+    else
+      super(changeset)
+    end
+  end
+
+  def delete(other) do
+    super(other)
+  end
 
   def join_new(user_id, channel_id, opts \\ []) do
     with nil <- get_by(user_id: user_id, channel_id: channel_id),
@@ -220,6 +240,14 @@ defmodule UccChat.Subscription do
       nil -> :error
       sub -> __MODULE__.update(sub, %{has_unread: count})
     end
+  end
+
+  def usernames_by_channel_id(channel_id) do
+    @repo.all from s in @schema,
+      join: u in User,
+      on: s.user_id == u.id,
+      where: s.channel_id == ^channel_id,
+      select: u.username
   end
 
 end

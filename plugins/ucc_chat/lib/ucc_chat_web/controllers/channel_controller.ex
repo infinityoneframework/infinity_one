@@ -11,7 +11,7 @@ defmodule UccChatWeb.ChannelController do
 
   alias UccChat.{ChatDat}
   alias UccChat.{Message, Channel, ChannelService}
-  alias UcxUcc.{Accounts.User, Hooks}
+  alias UcxUcc.{Accounts.User, Hooks, Accounts}
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChat.Schema.Direct, as: DirectSchema
 
@@ -82,19 +82,19 @@ defmodule UccChatWeb.ChannelController do
     case Channel.get_by(name: name) do
       nil ->
         conn
-        |> put_flash(:error, "#{name} is an invalid channel name!")
+        |> put_flash(:error, gettext("%{name} is an invalid channel name!", name: name))
         |> redirect(to: "/")
       channel ->
         if channel.type in [0,1] do
           show(conn, channel)
         else
-          redirect(conn, do: "/")
+          redirect(conn, to: "/")
         end
     end
   end
 
   def direct(conn, %{"name" => name}) do
-    with friend when not is_nil(friend) <- UccChat.ServiceHelpers.get_user_by_name(name),
+    with friend when not is_nil(friend) <- Accounts.get_by_username(name, default_preload: true),
          user_id <- Coherence.current_user(conn) |> Map.get(:id),
          false <- friend.id == user_id do
 

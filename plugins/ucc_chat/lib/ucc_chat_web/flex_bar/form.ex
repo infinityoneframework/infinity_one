@@ -6,15 +6,14 @@ defmodule UccChatWeb.FlexBar.Form do
   import UccChatWeb.RebelChannel.Client
   import UcxUccWeb.Gettext
 
-  alias UccChatWeb.FlexBar.Helpers
-  alias UcxUcc.{TabBar, Repo}
+  alias UccChatWeb.{FlexBar.Helpers, SharedView}
+  alias UcxUcc.{TabBar}
   alias UccChat.ServiceHelpers
 
 
   def flex_form(socket, %{"form" => %{"flex-id" => tab_name}, "dataset" =>
     %{"edit" => control}} = sender) do
 
-    # Logger.debug "flex_form edit tab_name: #{tab_name}, control: #{control} sender: #{inspect sender}"
     tab = TabBar.get_button(tab_name)
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket
@@ -29,34 +28,29 @@ defmodule UccChatWeb.FlexBar.Form do
   # TODO: this it not implemented and should be removed later if we don't
   #       need it
   def flex_form_change(socket, _sender) do
-    # Logger.debug "sender: " <> inspect(sender)
     socket
   end
 
   def flex_form_submit(socket, _sender) do
     socket
   end
-  # def flex_form_save(socket, %{"event" => %{"type" => "click"}} = sender) do
-  #   # ignore this message since it will be handled by the change event
-  #   socket
-  # end
+
   def flex_form_save(socket, %{"form" => %{"flex-id" => tab_name} = form} = sender) do
     trace "flex_form_save", sender
-    # Logger.error "sender: " <> inspect(sender)
 
     tab = TabBar.get_button tab_name
-
-    # IO.inspect tab.opts[:model], label: "model"
-    # IO.inspect form, label: "form"
 
     {resource, prefix} = get_resource_and_prefix tab, form
 
     resource_params = ServiceHelpers.normalize_params(form)[prefix]
 
-    resource.__struct__
-    |> apply(:changeset, [resource, resource_params])
-    |> log_inspect(:debug, label: "changeset")
-    |> Repo.update()
+    changeset =
+      resource.__struct__
+      |> apply(:changeset, [resource, resource_params])
+      |> log_inspect(:debug, label: "changeset")
+
+    resource.__struct__.model()
+    |> apply(:update, [changeset])
     |> log_inspect(:debug, label: "after update")
     |> case do
       {:ok, resource} ->
@@ -97,12 +91,10 @@ defmodule UccChatWeb.FlexBar.Form do
     start_loading_animation(socket, id)
 
     val = !select(socket, prop: "checked", from: id)
-    Logger.debug "id: " <> inspect(id) <> ", val: " <> inspect(val)
     update socket, prop: "checked", set: val, on: id
 
     tab = TabBar.get_button(form["flex-id"])
 
-    # {_assigns, _resource_key, resource} = get_assigns_and_resource socket
     {resource, prefix} = get_resource_and_prefix tab, form
 
     case apply tab.module, :flex_form_toggle, [socket, sender, resource, id, val] do
@@ -119,17 +111,40 @@ defmodule UccChatWeb.FlexBar.Form do
     |> stop_loading_animation()
   end
 
+  def flex_form_delete(socket, sender) do
+    form = sender["form"]
+    tab = TabBar.get_button(form["flex-id"])
+    {resource, prefix} = get_resource_and_prefix(tab, form)
+
+    swal_model socket,
+      gettext("Are you sure you want to delete %{name}?", name: prefix),
+      ~g(This cannot be cannot be undone), "warning", ~g(Yes, delete it!),
+      confirm: fn _ ->
+        tab.module
+        |> apply(:flex_form_delete, [socket, sender, resource])
+        |> case do
+          {:ok, socket} ->
+            swal socket, ~g(Deleted!),
+              gettext("Your %{name} was deleted!", name: prefix),
+              "success"
+          {:error, changeset} ->
+            swal socket, ~g(Sorry!),
+              SharedView.format_errors(changeset),
+              "error"
+        end
+      end
+    socket
+  end
+
   def flex_form_select_change(socket, sender) do
     trace "flex_form_toggle", sender
-    # Logger.warn "..... #{inspect sender}"
+
     form = sender["form"]
 
     tab = TabBar.get_button(form["flex-id"])
     field = form_field sender["name"]
     value = sender["value"]
-    # Logger.warn inspect({form["flex-id"], field, value, tab})
 
-    # {_assigns, _resource_key, resource} = get_assigns_and_resource(socket)
     {resource, _prefix} = get_resource_and_prefix tab, form
 
     tab.module

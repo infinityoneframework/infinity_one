@@ -53,7 +53,7 @@ config :ucx_ucc, :ucc_tracer_modules, :all
 config :ucx_ucc, :ucc_tracer_level, :debug
 
 config :logger, :console,
-  level: :info,
+  level: :debug,
   # level: :error,
   format: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]

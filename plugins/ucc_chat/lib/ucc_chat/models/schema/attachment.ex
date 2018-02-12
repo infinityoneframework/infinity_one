@@ -20,6 +20,7 @@ defmodule UccChat.Schema.Attachment do
     timestamps(type: :utc_datetime)
   end
 
+  def model, do: UccChat.Attachment
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

@@ -81,7 +81,7 @@ defmodule UccChat.Mention do
             [mention | acc]
 
           {:nway, user} ->
-            unless Subscription.get channel_id, user.id do
+            unless Subscription.get(channel_id, user.id) || nway_renamed?(channel) do
               name = channel.name <> nway_name_segment(user)
               Channel.update(channel, %{name: name})
             end
@@ -96,6 +96,21 @@ defmodule UccChat.Mention do
         acc
       end
     end)
+  end
+
+  def nway_renamed?(channel) do
+    names =
+      channel.name
+      |> String.replace(~r/([A-Z])/, "_\\1")
+      |> String.split("_", trim: true)
+      |> Enum.map(&String.downcase/1)
+
+    subscribed_names =
+      channel.id
+      |> Subscription.usernames_by_channel_id()
+      |> Enum.map(&String.downcase/1)
+
+    names -- subscribed_names != []
   end
 
   defp get_nways(mentions) do
@@ -146,7 +161,7 @@ defmodule UccChat.Mention do
 
                 # create a system message indicating that a new channel
                 # has been created with the users
-                create_nway_system_message(message, names)
+                create_nway_system_message(message, channel.name, names)
                 {:ok, channel}
               error ->
                 error
@@ -220,7 +235,7 @@ defmodule UccChat.Mention do
     end
   end
 
-  defp create_nway_system_message(message, names) do
+  defp create_nway_system_message(message, room, names) do
     # we want this message to be posted after the message that creates
     # the new n-way channel. So, we'll spawn and sleep for a bit.
     spawn fn ->
@@ -240,9 +255,10 @@ defmodule UccChat.Mention do
       #       here in this lib.
       body =
         gettext(
-          "A new n-way private channel has been created" <>
+          "A new n-way private channel #%{room} has been created" <>
           " for %{names}, and %{name}",
-          names: other_names, name: first_name)
+          names: other_names, name: first_name, room: room)
+
 
       Message.create(%{
         channel_id: message.channel_id,

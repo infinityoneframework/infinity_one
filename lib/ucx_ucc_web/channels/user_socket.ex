@@ -71,7 +71,7 @@ defmodule UcxUccWeb.UserSocket do
   #     UcxUccWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(%{assigns: %{landing: true}} = socket), do: nil
+  def id(%{assigns: %{landing: true}}), do: nil
   def id(socket), do: "users_socket:#{socket.assigns.user_id}"
 
 end

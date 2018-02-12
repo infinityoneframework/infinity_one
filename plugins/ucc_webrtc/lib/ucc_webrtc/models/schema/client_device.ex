@@ -19,6 +19,7 @@ defmodule UccWebrtc.Schema.ClientDevice do
   @fields ~w(ip_addr user_id handsfree_input_id handsfree_output_id
     headset_input_id headset_output_id video_input_id)a
 
+  def model, do: UccWebrtc.ClientDevice
   @doc """
   Creates a changeset based on the `model` and `params`.
 

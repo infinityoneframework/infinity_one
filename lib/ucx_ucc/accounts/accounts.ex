@@ -5,8 +5,13 @@ defmodule UcxUcc.Accounts do
 
   # alias UcxUcc.Accounts.User
   alias UcxUcc.Accounts.{Role, UserRole, User, Account}
+  alias UcxUcc.Hooks
   require Logger
   # alias UcxUcc.Permissions.{Permission, PermissionRole}
+
+  @default_user_preload [:account, :roles, user_roles: :role]
+
+  def default_user_preloads, do: Hooks.user_preload(@default_user_preload)
 
   ##################
   # User
@@ -56,6 +61,14 @@ defmodule UcxUcc.Accounts do
     list_all_users_by_pattern(pattern, {:id, exclude}, count)
   end
 
+  defp pop_user_preloads(opts) do
+    if opts[:default_preload] do
+      {default_user_preloads(), Keyword.delete(opts, :default_preload)}
+    else
+      Keyword.pop(opts, :preload, [])
+    end
+  end
+
   @doc """
   Gets a single user.
 
@@ -72,19 +85,19 @@ defmodule UcxUcc.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
   def get_user!(id, opts) do
-    preload = opts[:preload] || []
+    {preload, _} = pop_user_preloads(opts)
     Repo.one! from u in User, where: u.id == ^id, preload: ^preload
   end
 
   def get_user(id), do: Repo.get(User, id)
 
   def get_user(id, opts) do
-    preload = opts[:preload] || []
+    {preload, _} = pop_user_preloads(opts)
     Repo.one from u in User, where: u.id == ^id, preload: ^preload
   end
 
   def get_by_user(opts) do
-    {preload, opts} = Keyword.pop(opts, :preload, [])
+    {preload, opts} = pop_user_preloads(opts)
     opts
     |> Enum.reduce(User, fn {k, v}, query ->
       where query, [q], field(q, ^k) == ^v
@@ -94,7 +107,7 @@ defmodule UcxUcc.Accounts do
   end
 
   def list_by_user(opts) do
-    {preload, opts} = Keyword.pop(opts, :preload, [])
+    {preload, opts} = pop_user_preloads(opts)
     opts
     |> Enum.reduce(User, fn {k, v}, query ->
       where query, [q], field(q, ^k) == ^v
@@ -103,7 +116,8 @@ defmodule UcxUcc.Accounts do
     |> Repo.all
   end
 
-  def username_by_user_id(id) do
+  def username_by_user_id(id, opts \\ []) do
+    {preload, _} = pop_user_preloads(opts)
     case get_user id do
       nil -> nil
       user -> user.username

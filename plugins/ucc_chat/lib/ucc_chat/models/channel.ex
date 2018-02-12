@@ -3,12 +3,45 @@ defmodule UccChat.Channel do
 
   import Ecto.Changeset
 
-  alias UcxUcc.{Accounts, Accounts.User, Repo}
+  alias UcxUcc.{Accounts, Accounts.User, Repo, UccPubSub}
   alias UccChat.{Mute, Subscription}
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
   alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
+
+  def update(%Ecto.Changeset{} = changeset) do
+    case super(changeset) do
+      {:ok, _} = ok ->
+        Enum.each Map.keys(changeset.changes), fn key ->
+          UccPubSub.broadcast "user:all", "channel:change:key", %{
+            key: key,
+            old_value: Map.get(changeset.data, key),
+            new_value: changeset.changes[key],
+            channel_id: changeset.data.id
+          }
+        end
+        ok
+      other ->
+        other
+    end
+  end
+
+  def update(other) do
+    Logger.warn "Should now be here other: " <> inspect(other)
+    super(other)
+  end
+
+  def delete(channel) do
+    case super(channel) do
+      {:ok, channel} = ok ->
+        UccPubSub.broadcast "user:all", "channel:deleted",
+          %{room_name: channel.name, channel_id: channel.id}
+        ok
+      error ->
+        error
+    end
+  end
 
   def changeset(user, params) do
     changeset %@schema{}, user, params

@@ -227,9 +227,12 @@ defmodule UccChatWeb.RoomChannel do
     chatd = get_chatd(payload)
     ar = chatd.active_room
 
+    Logger.error "update:name:change name: " <> inspect(ar.name) <> ", assigns: " <> inspect(socket.assigns)
+
     socket
     |> update_messages_header(chatd)
     |> Client.replace_history(ar.name, ar.display_name)
+    |> Query.update(:text, set: ar.name, on: ~s(.current-setting[data-edit="name"]))
 
     {:noreply, socket}
   end

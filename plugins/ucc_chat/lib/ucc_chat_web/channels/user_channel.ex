@@ -20,6 +20,7 @@ defmodule UccChatWeb.UserChannel do
     "webrtc:declined_video_call",
     "webrtc:leave",
     "get",
+    "get:assigns"
   ]
 
   use UccChatWeb.RebelChannel.Macros
@@ -44,7 +45,7 @@ defmodule UccChatWeb.UserChannel do
     SideNavService, ChannelService, InvitationService,
     UserService, EmojiService, Mention
   }
-  alias UccChatWeb.{RoomChannel, AccountView, UserSocket, MasterView, FlexBarView}
+  alias UccChatWeb.{RoomChannel, AccountView, MasterView, FlexBarView}
   alias Rebel.SweetAlert
   alias UccWebrtcWeb.WebrtcChannel
   alias UccChatWeb.RebelChannel.Client
@@ -53,6 +54,7 @@ defmodule UccChatWeb.UserChannel do
   alias UcxUcc.UccPubSub
   alias UcxUccWeb.Query
   alias UccChatWeb.UserChannel.Notifier
+  alias UccChatWeb.UserChannel.SideNav.Channels
 
   require UccChat.ChatConstants, as: CC
 
@@ -90,6 +92,14 @@ defmodule UccChatWeb.UserChannel do
   def user_state(user_id, state) do
     Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "user:state",
       %{state: state})
+  end
+
+  def get_assigns(username) do
+    user = Accounts.get_by_username username
+    Endpoint.broadcast(CC.chan_user() <> user.id, "get:assigns", %{pid: self()})
+    receive do
+      message -> message
+    end
   end
 
   @doc """
@@ -145,6 +155,11 @@ defmodule UccChatWeb.UserChannel do
     #   showCancelButton: true
     #   confirmButtonText: "Yes"
     #   cancelButtonText: "No"
+
+   def handle_out("get:assigns", %{pid: pid}, socket) do
+     send pid, socket.assigns
+     {:noreply, socket}
+   end
 
    def handle_out("webrtc:leave" = ev, payload, socket) do
      trace ev, payload
@@ -222,14 +237,14 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  def handle_out("room:join", msg, socket) do
+  def handle_out("room:join", %{room: room} = msg, socket) do
     trace "room:join", msg
+    channel = Channel.get_by(name: room)
 
-    %{room: room} = msg
-    user_id = socket.assigns.user_id
-    UserSocket.push_message_box(socket, socket.assigns.channel_id, user_id)
-    update_rooms_list(socket)
-    clear_unreads(room, socket)
+    socket
+    |> update_rooms_list()
+    |> Client.push_message_box(channel.id, socket.assigns.user_id)
+    # clear_unreads(room, socket)
     {:noreply, subscribe([room], socket)}
   end
 
@@ -793,6 +808,9 @@ defmodule UccChatWeb.UserChannel do
     # TODO: add Hooks for this
     # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     subscribe_callback "user:all", "callback", :user_all_event
+    UccPubSub.subscribe "user:all", "channel:deleted"
+    UccPubSub.subscribe "user:all", "channel:change:key"
+
     subscribe_callback "user:all", "status_message:update", :status_message_update
     {:noreply, socket}
   end
@@ -810,6 +828,8 @@ defmodule UccChatWeb.UserChannel do
     payload: payload}, socket) do
 
     trace event, payload
+
+    Logger.warn "deprecated room:update:name assigns: " <> inspect(socket.assigns)
 
     push socket, event, payload
     # socket.endpoint.unsubscribe(CC.chan_room <> payload[:old_name])
@@ -948,6 +968,64 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+  def handle_info({_, "channel:deleted", payload}, socket) do
+    socket =
+      if payload.room_name in socket.assigns.subscribed do
+        room = payload.room_name
+        socket = unsubscribe(socket, room)
+
+        if socket.assigns.room == room do
+          next_room =
+            socket.assigns.subscribed
+            |> Enum.reject(& &1 == room)
+            |> hd
+          socket
+          |> UccChatWeb.Client.close_flex_bar()
+          |> Channels.open_room(nil, next_room, next_room)
+        else
+          update_rooms_list(socket)
+        end
+      else
+        socket
+      end
+    {:noreply, socket}
+  end
+
+  def handle_info({_, "channel:change:key", %{key: :name} = payload}, socket) do
+    Logger.debug fn -> inspect(payload) end
+
+    assigns = socket.assigns
+
+    socket =
+      if payload.old_value in assigns.subscribed do
+        new_room = payload.new_value
+
+        if assigns.room == payload.old_value && assigns[:channel_id] do
+          socket
+          |> Client.set_room_title(assigns.channel_id, new_room)
+          |> Client.update_flex_channel_name(new_room)
+          |> Client.replace_history(new_room, new_room)
+          |> assign(:room, new_room)
+        else
+          socket
+        end
+        |> unsubscribe(payload.old_value)
+        |> subscribe(new_room)
+        |> update_rooms_list()
+      else
+        socket
+      end
+    {:noreply, socket}
+  end
+
+  def handle_info({_, "channel:change:key", payload}, socket) do
+    Logger.debug fn -> "unhandled channel:change:key payload: " <>
+      inspect(payload)
+    end
+
+    {:noreply, socket}
+  end
+
 
   def handle_info({:update_mention, _payload, _user_id} = ev, socket) do
     trace "upate_mention", ev
@@ -1015,7 +1093,7 @@ defmodule UccChatWeb.UserChannel do
   # Helpers
 
 
-  defp subscribe(channels, socket) do
+  defp subscribe(channels, %Phoenix.Socket{} = socket) when is_list(channels) do
     # trace inspect(channels), ""
     Enum.reduce channels, socket, fn channel, acc ->
       subscribed = acc.assigns[:subscribed]
@@ -1029,35 +1107,38 @@ defmodule UccChatWeb.UserChannel do
     end
   end
 
+  defp subscribe(%Phoenix.Socket{} = socket, room) do
+    assign(socket, :subscribed, [room | socket.assigns.subscribed])
+  end
+
+
   defp update_rooms_list(%{assigns: assigns} = socket) do
     trace "", inspect(assigns)
     html = SideNavService.render_rooms_list(assigns[:channel_id],
       assigns[:user_id])
-    Rebel.Query.update socket, :html, set: html, on: ".rooms-list"
-    socket
+    Rebel.Query.update! socket, :html, set: html, on: ".rooms-list"
   end
 
   defp clear_unreads(%{assigns: %{channel_id: ""}} = socket) do
     socket
   end
+
   defp clear_unreads(%{assigns: %{channel_id: channel_id}} = socket) do
-    # Logger.warn "clear_unreads/1: channel_id: #{inspect channel_id}, " <>
-    #   "socket.assigns.user_id: #{inspect socket.assigns.user_id}"
     channel_id
     |> Channel.get
     |> Map.get(:name)
     |> clear_unreads(socket)
   end
+
   defp clear_unreads(socket) do
     Logger.debug "clear_unreads/1: default"
     socket
   end
 
   defp clear_unreads(room, %{assigns: assigns} = socket) do
-    # Logger.warn "room: #{inspect room}, assigns: #{inspect assigns}"
     Subscription.set_has_unread(assigns.channel_id, assigns.user_id, false)
 
-    broadcast_js socket, """
+    async_js socket, """
       $('link-room-#{room}').removeClass('has-unread')
         .removeClass('has-alert');
       """ |> String.replace("\n", "")
@@ -1067,9 +1148,12 @@ defmodule UccChatWeb.UserChannel do
 
   defp update_has_unread(%{id: channel_id, name: room},
     %{assigns: assigns} = socket) do
+
     has_unread = ChannelService.get_has_unread(channel_id, assigns.user_id)
-    Logger.debug "has_unread: #{inspect has_unread}, channel_id: " <>
-      "#{inspect channel_id}, assigns: #{inspect assigns}"
+
+    Logger.debug fn -> "has_unread: #{inspect has_unread}, channel_id: " <>
+      "#{inspect channel_id}, assigns: #{inspect assigns}" end
+
     unless has_unread do
       Subscription.set_has_unread(channel_id, assigns.user_id, true)
 
@@ -1314,18 +1398,18 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def new_subscription(_event, payload, socket) do
-    channel_id = payload.channel_id
-    user_id = socket.assigns.user_id
-
+    trace "new_subscription", payload
     socket
-    |> update_rooms_list(user_id, channel_id)
-    |> update_messages_header(true)
+    |> update_rooms_list()
+    # |> update_rooms_list(user_id, channel_id)
+    # |> update_messages_header(true)
   end
 
   def delete_subscription(_event, payload, socket) do
     channel_id = payload.channel_id
     user_id = socket.assigns.user_id
     socket
+    |> UccChatWeb.Client.close_flex_bar()
     |> update_rooms_list(user_id, channel_id)
     |> update_message_box(user_id, channel_id)
     |> update_messages_header(false)
@@ -1619,6 +1703,10 @@ defmodule UccChatWeb.UserChannel do
     socket
   end
 
+  defp unsubscribe(socket, room) do
+    assign(socket, :subscribed, List.delete(socket.assigns.subscribed, room))
+  end
+
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
   defdelegate flex_tab_open(socket, sender), to: FlexTabChannel
   defdelegate flex_call(socket, sender), to: FlexTabChannel
@@ -1630,6 +1718,7 @@ defmodule UccChatWeb.UserChannel do
   defdelegate flex_form_cancel(socket, sender), to: Form
   defdelegate flex_form_toggle(socket, sender), to: Form
   defdelegate flex_form_select_change(socket, sender), to: Form
+  defdelegate flex_form_delete(socket, sender), to: Form
   defdelegate side_nav_search_click(socket, sender), to: __MODULE__.SideNav.Search, as: :search_click
   defdelegate side_nav_search_keydown(socket, sender), to: __MODULE__.SideNav.Search, as: :search_keydown
   defdelegate side_nav_search_blur(socket, sender), to: __MODULE__.SideNav.Search, as: :search_blur

@@ -122,6 +122,8 @@ class FileUpload {
         showCancelButton: true,
         closeOnConfirm: true,
         closeOnCancel: true,
+        className: "file-upload",
+        customClass: "file-upload",
         html: true
       },
       isConfirm =>  {

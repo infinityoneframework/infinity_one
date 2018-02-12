@@ -219,6 +219,11 @@ defmodule UccChatWeb.Client do
     socket
   end
 
+  def close_flex_bar(socket) do
+    Query.delete socket, class: "opened", from: "#flex-tabs.opened"
+    # async_js socket, "$('#flex-tabs"
+  end
+
   defdelegate broadcast!(socket, event, bindings), to: Phoenix.Channel
   defdelegate render_to_string(view, templ, bindings), to: Phoenix.View
   defdelegate insert_html(socket, selector, position, html), to: Rebel.Element

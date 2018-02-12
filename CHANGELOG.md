@@ -12,6 +12,7 @@
 * Add Config file updater
 * Add restart server feature
 * Moved the `Administration` menu link above `My Account`
+* Added creating new N-way channel when mentioning someone in a DM channel
 
 ### Bug Fixes
 
