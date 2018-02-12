@@ -30,7 +30,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
   ]
 
   def device_manager_init(socket, _payload) do
-    case exec_js(socket, "window.UcxUcc.DeviceManager.installed_devices") do
+    case exec_js(socket, "window.UccChat.DeviceManager.installed_devices") do
       {:ok, installed_devices} ->
         socket =
           socket
@@ -330,7 +330,7 @@ defmodule UccWebrtcWeb.WebrtcChannel do
       end)
       |> Enum.join(", ")
 
-    broadcast_js socket, "window.UcxUcc.DeviceManager.devices = {" <> str <> "}"
+    broadcast_js socket, "window.UccChat.DeviceManager.devices = {" <> str <> "}"
     socket
   end
 
