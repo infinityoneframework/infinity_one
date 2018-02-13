@@ -355,7 +355,7 @@ defmodule UccChat.ChannelService do
     end)
   end
 
-  defp side_nav_room(user, channel, channel_id, chat_mode) do
+  defp side_nav_room(user, channel, channel_id, _chat_mode) do
     [user_id: user.id, channel_id: channel.id, preload: [:channel]]
     |> Subscription.get_by()
     |> case do

@@ -1030,7 +1030,7 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
-  def handle_info({"user:all", "status:refresh", %{user_id: id} = payload},
+  def handle_info({"user:all", "status:refresh", %{user_id: id}},
     %{assigns: %{user_id: id}} = socket) do
 
     user =
@@ -1044,15 +1044,10 @@ defmodule UccChatWeb.UserChannel do
   end
 
   def handle_info({"user:all", "status:refresh", payload}, socket) do
-    user =
-      payload.user_id
-      |> Accounts.get_user()
-      |> UcxUcc.Hooks.preload_user(Accounts.default_user_preloads())
-
     subscribed = socket.assigns.subscribed
 
     case Enum.find(payload.friend_channel_names, & elem(&1, 0) in subscribed) do
-      {channel_name, channel_id} ->
+      {_, channel_id} ->
 
         current_user =
           socket.assigns.user_id

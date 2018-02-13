@@ -135,7 +135,7 @@ defmodule UccChatWeb.RebelChannel.Client do
     push_account_header(socket,  user)
   end
 
-  def push_side_nav_item_link(socket, user, room) do
+  def push_side_nav_item_link(socket, _user, room) do
     html = render_to_string SideNavView, "chat_room_item_link.html", room: room
 
     Query.update socket, :replaceWith, set: html,
