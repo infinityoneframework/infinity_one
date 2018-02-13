@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 1.0.0-alpha16 (2018-02-12)
+## 1.0.0-alpha16 (2018-02-13)
 
 ## Enhancements
 
@@ -25,6 +25,7 @@
 * [UCX-3785] CRUD changes to your extension updates phone presence in real-time
 * Added some developer documentation
 * Add ExDoc and some docs layout structure in mix.exs
+* Presence overrides remain after logout and login
 
 ### Bug Fixes
 
@@ -50,6 +51,8 @@
 * [UCX-3691] Disable all WebRTC when WebRTC in accounts disabled
   * Don't start the WebRTC channel
   * Don't start the ClientSM or the UNISTIM socket with the UCx
+* [UCX-3783] Fix initial chat presence when first logging in
+* Fix initial phone presence when first logging in
 
 
 ## 1.0.0-alpha15 (2018-02-02)
