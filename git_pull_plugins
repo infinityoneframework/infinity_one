@@ -1,0 +1,17 @@
+#!/bin/sh
+cd plugins/mscs
+echo ''
+echo 'plugins/mscs'
+git pull
+
+cd ../ucx_presence
+echo ''
+echo 'plugins/ucx_presence'
+git pull
+
+cd ../ucx_adapter
+echo ''
+echo 'plugins/ucx_adapter'
+git pull
+cd ../..
+
