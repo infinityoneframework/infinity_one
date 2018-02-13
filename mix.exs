@@ -8,6 +8,11 @@ defmodule UcxUcc.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      start_permanent: Mix.env == :prod,
+     docs: [
+      extras: ["README.md"],
+      main: "UcxUcc",
+      groups_for_modules: groups_for_modules()
+     ],
      dialyzer: [plt_add_apps: [:mix]],
      elixirc_paths: elixirc_paths(Mix.env),
      test_coverage: [tool: ExCoveralls],
@@ -107,7 +112,8 @@ defmodule UcxUcc.Mixfile do
       {:gen_smtp, "~> 0.12.0"},
       {:exprof, "~> 0.2.0"},
       # {:scrivener_ecto, path: "../scrivener_ecto"}
-      {:scrivener_ecto, github: "smpallen99/scrivener_ecto"}
+      {:scrivener_ecto, github: "smpallen99/scrivener_ecto"},
+      {:ex_doc, "~> 0.18", only: :dev},
 
     ] ++ plugin_deps()
   end
@@ -134,5 +140,36 @@ defmodule UcxUcc.Mixfile do
       {deps, _} = Code.eval_file fname
       acc ++ deps
     end)
+  end
+
+  defp groups_for_modules do
+    [
+      "Authentication": [ ~r/Coherence.*/ ],
+      "Chat Models & Contexts": [
+        UccChat.Attachment, UccChat.Channel, UccChat.Direct, UccChat.Emoji,
+        UccChat.Mention, UccChat.Message, UccChat.Mute, UccChat.Notification,
+        UccChat.NotificationSetting, UccChat.PinnedMessage, UccChat.Reaction,
+        UccChat.StarredMessage, UccChat.Subscription, ~r/UccChat.Schema.*/,
+        UccChat.Accounts, ~r/UccChat.Accounts\.*/
+      ],
+      "Chat Settings": [ ~r/UccChat.Settings*/ ],
+      "Chat Services": [ ~r/UccChat.*Service/ ],
+      "Chat": [
+        UccChat, UccChat.AppConfig, UccChat.Application, UccChat.ChannelMonitor,
+        UccChat.ChatConstants, UccChat.ChatDat, UccChat.Console, ~r/EmojiOne*/,
+        UccChat.Hooks, UccChat.MessageAgent, UccChat.PresenceAgent, UccChat.Robot,
+        UccChat.Shared, UccChat.SlashCommands, UccChat.TypingAgent,
+        UccChat.AccountNotification, ~r/UccChat.File.*/, ~r/UccChat.Robot.*/,
+        ~r"UccChatWeb.*"
+      ],
+      "UccAdmin": [ ~r/UccAdmin.*/ ],
+      "Ucc Dialer": [ ~r/UccDialer*/ ],
+      "Ucc Settings": [ ~r/UccSettings*/ ],
+      "Ucc Webrtc": [ ~r/UccWebrtc.*/ ],
+      "Ucc UI Flex Tab": [ ~r/UccUiFlexTab.*/ ],
+      "Mscs": [ ~r/Mscs.*/, Tn, ~r/Unistim.*/ ],
+      "Ucx Adapter": [ ~r/UcxAdapter.*/, ~r/Ucx.Cert.*/ ],
+      "Ucx Presence": [ ~r/UcxPresence.*/ ]
+    ]
   end
 end
