@@ -54,6 +54,7 @@
 * [UCX-3783] Fix initial chat presence when first logging in
 * Fix initial phone presence when first logging in
 * [UCX-3786] Make phone presence change on active call work correctly.
+* [UCX-3710] Make the Ring type programmable key play the correct tone
 
 
 ## 1.0.0-alpha15 (2018-02-02)
