@@ -53,6 +53,7 @@
   * Don't start the ClientSM or the UNISTIM socket with the UCx
 * [UCX-3783] Fix initial chat presence when first logging in
 * Fix initial phone presence when first logging in
+* [UCX-3786] Make phone presence change on active call work correctly.
 
 
 ## 1.0.0-alpha15 (2018-02-02)
