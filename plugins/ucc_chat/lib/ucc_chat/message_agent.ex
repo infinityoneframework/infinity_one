@@ -1,4 +1,7 @@
 defmodule UccChat.MessageAgent do
+  @moduledoc """
+  An Agent to handle fetching url previews in the background.
+  """
   @name __MODULE__
   # require Logger
 

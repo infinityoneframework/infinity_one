@@ -208,7 +208,9 @@ defmodule UccChatWeb.SharedView do
   end
 
   def messages_header_icons(chatd) do
-    Hooks.messages_header_icons [], chatd
+    content_tag :span, [class: "messages-header-icons"] do
+      Hooks.messages_header_icons [], chatd
+    end
   end
 
   def account_box_header(user) do

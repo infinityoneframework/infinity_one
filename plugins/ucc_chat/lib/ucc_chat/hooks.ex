@@ -1,4 +1,7 @@
 defmodule UccChat.Hooks do
+  @moduledoc """
+  A Hook implementation for the UccChat plugin.
+  """
   use Unbrella.Hooks, :add_hooks
   alias UcxUcc.Repo
 

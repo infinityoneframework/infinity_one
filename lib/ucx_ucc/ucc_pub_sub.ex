@@ -1,4 +1,8 @@
 defmodule UcxUcc.UccPubSub do
+  @moduledoc """
+  A light weight PubSub framework for UcxUcc
+
+  """
 
   use GenServer
 

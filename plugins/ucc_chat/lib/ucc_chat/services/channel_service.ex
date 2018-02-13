@@ -138,6 +138,7 @@ defmodule UccChat.ChannelService do
     Subscription.get_by_user_id user_id, opts
   end
 
+
   def insert_channel!(%{user_id: user_id} = params) do
     user_id
     |> Helpers.get_user!(preload: [:roles, user_roles: :role])
@@ -288,6 +289,12 @@ defmodule UccChat.ChannelService do
     }
   end
 
+  def get_side_nav_room(%User{id: _id} = user, channel_id) do
+    channel = get_channel channel_id
+    chat_mode = user.account.chat_mode
+    side_nav_room user, channel, channel_id, chat_mode
+  end
+
   defp channel_room(cc, id, _channel, channel_id) do
     chan = cc.channel
     open = chan.id == channel_id
@@ -346,6 +353,16 @@ defmodule UccChat.ChannelService do
     |> Enum.reject(fn %{channel_type: chan_type, hidden: hidden} ->
       chat_mode && (chan_type in [0,1]) or hidden
     end)
+  end
+
+  defp side_nav_room(user, channel, channel_id, chat_mode) do
+    [user_id: user.id, channel_id: channel.id, preload: [:channel]]
+    |> Subscription.get_by()
+    |> case do
+      nil -> nil
+      subscription ->
+        channel_room(subscription, user.id, channel, channel_id)
+    end
   end
 
   defp get_channel(nil), do: Channel.new

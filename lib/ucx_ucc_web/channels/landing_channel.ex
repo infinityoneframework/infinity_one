@@ -1,4 +1,8 @@
 defmodule UcxUccWeb.LandingChannel do
+  @moduledoc """
+  Channel for the Setup Landing Channel
+
+  """
   use UcxUccWeb, :channel
 
   use Rebel.Channel, name: "landing", controllers: [
