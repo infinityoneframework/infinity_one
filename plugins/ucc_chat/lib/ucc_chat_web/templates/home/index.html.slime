@@ -23,6 +23,7 @@ javascript:
   window.UccChat = {}
   window.user_token = '<%= Coherence.user_token(@conn) %>'
   window.ucxchat = {
+    mscs_enabled: <%= @chatd.user.webrtc_enabled %>,
     webrtc_enabled: <%= UccSettings.webrtc_enabled %>,
     room_route: '<%= @chatd.room_route %>',
     room: 'lobby', channel_id: undefined,

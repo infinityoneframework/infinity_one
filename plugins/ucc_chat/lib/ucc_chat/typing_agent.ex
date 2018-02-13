@@ -1,4 +1,7 @@
 defmodule UccChat.TypingAgent do
+  @moduledoc """
+  Handles the 'is typing' state of all users.
+  """
   @name __MODULE__
   # @audit_secs 120
 

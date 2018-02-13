@@ -1,0 +1,14 @@
+div(class="info status-#{@status} primary-background-color" data-status-name="#{get_user_name @user}")
+  = account_box_header @user
+  = if @user.username do
+    .thumb(data-status="#{@status}")
+      .avatar
+        .avatar-image(style="background-image: url(#{avatar_url @user});")
+    .data
+      h4
+        = get_user_name(@user)
+        span.status-message data-username="#{@user.username}"
+          = if message = user_status_message(@user.account) do
+            = message
+          - else
+            | &nbsp;

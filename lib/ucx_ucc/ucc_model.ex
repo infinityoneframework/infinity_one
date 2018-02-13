@@ -1,6 +1,7 @@
 defmodule UccModel do
   @moduledoc """
-  Model abstraction for UcxUcc
+  Model abstraction for UcxUcc.
+
   """
 
   defmacro __using__(opts) do
@@ -13,20 +14,35 @@ defmodule UccModel do
 
       import Ecto.Query, warn: false
 
+      @doc """
+      Create a default #{@schema} struct.
+      """
       @spec new() :: Struct.t
       def new, do: %@schema{}
 
+      @doc """
+      Create a #{@schema} with the provided options.
+      """
       @spec new(Keyword.t) :: Struct.t
       def new(opts), do: struct(new(), opts)
 
+      @doc """
+      Return the schema module.
+      """
       @spec schema() :: Module.t
       def schema, do: @schema
 
+      @doc """
+      Returns an `%Ecto.Changeset{}` for tracking #{@schema} changes.
+      """
       @spec change(Struct.t, Keyword.t) :: Ecto.Changeset.t
       def change(%@schema{} = schema, attrs) do
         @schema.changeset(schema, attrs)
       end
 
+      @doc """
+      Returns an `%Ecto.Changeset{}` for tracking #{@schema} changes.
+      """
       @spec change(Struct.t) :: Ecto.Changeset.t
       def change(%@schema{} = schema) do
         @schema.changeset(schema)
@@ -37,6 +53,14 @@ defmodule UccModel do
         @schema.changeset(%@schema{}, attrs)
       end
 
+
+      @doc """
+      Get a list of #{@schema}'s.
+
+      ## Options'
+
+      * `preload: list`
+      """
       @spec list(Keword.t) :: [Struct.t]
       def list(opts \\ []) do
         if preload = opts[:preload] do
@@ -48,6 +72,17 @@ defmodule UccModel do
         end
       end
 
+      @doc """
+      Get a list of #{@schema},s given a list of field value pairs.
+
+      ## Preload
+
+      Pass a list of preloads with the `:preload` key.
+
+      ## Examples
+
+          #{@schema}.list_by field1: value1, field2: field2, preload: [:association]
+      """
       @spec list_by(Keyword.t) :: List.t
       def list_by(opts) do
         {preload, opts} = Keyword.pop(opts, :preload, [])
@@ -60,6 +95,13 @@ defmodule UccModel do
         |> @repo.all
       end
 
+      @doc """
+      Get a single #{@schema}.
+
+      ## Preload
+
+      Pass a list of preloads with the `:preload` key.
+      """
       @spec get(id, Keyword.t) :: Struct.t
       def get(id, opts \\ []) do
         if preload = opts[:preload] do
@@ -157,39 +199,60 @@ defmodule UccModel do
         delete change(schema)
       end
 
+      @doc """
+      Delete the #{@schema} given by an `Ecto.Changeset`.
+      """
       @spec delete(Ecto.Changeset.t) :: {:ok, Struct.t} |
                                         {:error, Ecto.Changeset.t}
       def delete(%Ecto.Changeset{} = changeset) do
         @repo.delete changeset
       end
 
+      @doc """
+      Delete the #{@schema} given by an id.
+      """
       @spec delete(id) :: {:ok, Struct.t} |
                           {:error, Ecto.Changeset.t}
       def delete(id) do
         delete get(id)
       end
 
+      @doc """
+      Delete the #{@schema} given a the struct, or raise an exception.
+      """
       @spec delete!(Struct.t) :: Struct.t | no_return
       def delete!(%@schema{} = schema) do
         delete! change(schema)
       end
 
+      @doc """
+      Delete the #{@schema} given a changeset, or raise an exception.
+      """
       @spec delete!(Ecto.Changeset.t) :: {:ok, Struct.t} |
                                         {:error, Ecto.Changeset.t}
       def delete!(%Ecto.Changeset{} = changeset) do
         @repo.delete! changeset
       end
 
+      @doc """
+      Delete the given #{@schema} by id, or raise an exception.
+      """
       @spec delete!(id) :: Struct.t | no_return
       def delete!(id) do
         delete! get(id)
       end
 
+      @doc """
+      Delete all #{@schema}'s.
+      """
       # @spec delete_all() :: any
       def delete_all do
         @repo.delete_all @schema
       end
 
+      @doc """
+      Get the first #{@schema} ordered by creation date
+      """
       @spec first() :: Struct.t | nil
       def first do
         @schema
@@ -198,6 +261,9 @@ defmodule UccModel do
         |> @repo.one
       end
 
+      @doc """
+      Get the last #{@schema} ordered by creation date
+      """
       @spec last() :: Struct.t | nil
       def last do
         @schema
@@ -206,6 +272,9 @@ defmodule UccModel do
         |> @repo.one
       end
 
+      @doc """
+      Preload a #{@schema}.
+      """
       def preload_schema(schema, preload) do
         @repo.preload schema, preload
       end
