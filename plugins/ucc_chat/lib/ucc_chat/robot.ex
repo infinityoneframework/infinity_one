@@ -1,5 +1,11 @@
 Code.ensure_compiled UccChat.Robot.Adapters.UccChat
 defmodule UccChat.Robot do
+  @moduledoc """
+  The implementation of the UccChat chat bot.
+
+  A service that handles passing incoming messages to the registered
+  bots.
+  """
   use Hedwig.Robot, otp_app: :ucx_ucc
 
   alias UcxUcc.UccPubSub

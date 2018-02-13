@@ -5,10 +5,11 @@ defmodule UccChatWeb.RebelChannel.Client do
   import Rebel.{Core, Query}, warn: false
 
   alias Rebel.SweetAlert
-  alias UccChatWeb.ClientView
+  alias UccChatWeb.{ClientView, SharedView, SideNavView}
   alias UccChat.{SideNavService}
   alias UcxUccWeb.Query
   alias UccChatWeb.RoomChannel.Message
+  alias UcxUcc.Accounts
 
   require Logger
 
@@ -115,6 +116,40 @@ defmodule UccChatWeb.RebelChannel.Client do
       elem.className = elem.className.replace(/icon-([a-zA-Z\-_]+)/, 'icon-#{icon_name}');
     }
     """ |> String.replace("\n", "")
+  end
+
+  def push_account_header(socket, %{} = user) do
+    status = UccChat.PresenceAgent.get user.id
+
+    html = render_to_string SideNavView, "account_box_info.html",
+      status: status, user: user
+
+    Query.update socket, :replaceWith, set: html, on: ".side-nav .account-box > .info"
+  end
+
+  def push_account_header(socket, user_id) do
+    user =
+      user_id
+      |> Accounts.get_user()
+      |> UcxUcc.Hooks.preload_user(Accounts.default_user_preloads())
+    push_account_header(socket,  user)
+  end
+
+  def push_side_nav_item_link(socket, _user, room) do
+    html = render_to_string SideNavView, "chat_room_item_link.html", room: room
+
+    Query.update socket, :replaceWith, set: html,
+      on: ~s/.side-nav a.open-room[data-name="#{room.user.username}"]/
+  end
+
+  def push_messages_header_icons(socket, chatd) do
+    html =
+      chatd
+      |> SharedView.messages_header_icons()
+      |> Phoenix.HTML.safe_to_string()
+
+    Query.update socket, :replaceWith, set: html,
+      on: ~s/.messages-container .messages-header-icons/
   end
 
   def broadcast_room_visibility(socket, payload, false) do

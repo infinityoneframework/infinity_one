@@ -1,18 +1,5 @@
 .account-box(class="#{account_box_class()}" aria="Account" role="region")
-  div(class="info status-#{@chatd.status} primary-background-color" data-status-name="#{get_user_name @chatd.user}")
-    = account_box_header @chatd.user
-    = if @chatd.user.username do
-      .thumb(data-status="#{@chatd.status}")
-        .avatar
-          .avatar-image(style="background-image: url(#{avatar_url @chatd.user});")
-      .data
-        h4
-          = get_user_name(@chatd.user)
-          span.status-message data-username="#{@chatd.user.username}"
-            = if message = user_status_message(@chatd.user.account) do
-              = message
-            - else
-              | &nbsp;
+  = render "account_box_info.html", status: @chatd.status, user: @chatd.user
   nav.options.primary-background-color.animated-hidden
     .wrapper(rebel-channel="user")
       .status-message-box

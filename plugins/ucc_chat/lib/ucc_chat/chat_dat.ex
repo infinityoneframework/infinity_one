@@ -1,4 +1,11 @@
 defmodule UccChat.ChatDat do
+  @moduledoc """
+  The main data structure provided to many of the chat related templates.
+
+  Instead of passing a large number of bindings around, this module
+  provides a common struct containing the information required to render
+  the main chat app.
+  """
   alias UccChat.{Channel}
   alias UcxUcc.{Repo, Hooks, Accounts, Accounts.User}
   alias UccChat.Schema.Channel, as: ChannelSchema

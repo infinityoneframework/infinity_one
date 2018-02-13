@@ -1,4 +1,8 @@
 defmodule UccChat.SlashCommands do
+  @doc """
+  Handles the definition of commands available to the user by starting
+  a message with the `/` character.
+  """
   import Phoenix.HTML.Tag
   use UcxUccWeb.Gettext
 

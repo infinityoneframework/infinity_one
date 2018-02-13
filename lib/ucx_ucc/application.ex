@@ -1,8 +1,9 @@
 defmodule UcxUcc.Application do
   use Application
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
+  @doc """
+  Code to be run when the application starts.
+  """
   def start(type, args) do
     import Supervisor.Spec
 

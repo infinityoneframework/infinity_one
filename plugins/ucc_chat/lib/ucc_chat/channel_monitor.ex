@@ -1,4 +1,7 @@
 defmodule UccChat.ChannelMonitor do
+  @moduledoc """
+  Monitor Channels and calls the given function when the channel exits.
+  """
   use GenServer
 
   def monitor(server_name, pid, mfa) do
