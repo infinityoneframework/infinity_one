@@ -19,14 +19,19 @@ defmodule UccChatWeb.MessageView do
 
   require Logger
 
+  @doc """
+  Get the names of the people who reacted to a specific reaction.
+  """
   def get_reaction_people(reaction, user) do
     UccChat.ReactionService.get_reaction_people_names(reaction, user)
   end
 
+  @doc false
   def file_upload_allowed_media_types do
     ""
   end
 
+  @doc false
   def get_not_subscribed_templ(_mb) do
     %{}
   end
@@ -121,13 +126,17 @@ defmodule UccChatWeb.MessageView do
     false
   end
 
+  @doc false
   def emoji(_msg) do
     false
   end
 
   def get_username(msg), do: msg.user.username
+  @doc false
   def get_users_typing(_msg), do: []
+  @doc false
   def get_users_typing(_msg, _cmd), do: []
+  @doc false
   def alias?(_msg), do: false
   def role_tags(message) do
     if UccSettings.display_roles() do
@@ -138,21 +147,31 @@ defmodule UccChatWeb.MessageView do
       []
     end
   end
+  @doc false
   def is_bot(_msg), do: false
   def get_date_time(msg, user), do: format_date_time(msg, user)
   def get_time(msg, user), do: format_time(msg, user)
   def is_private(%{type: "p"}), do: true
   def is_private(_msg), do: false
+  @doc false
   def hide_cog(_msg), do: ""
+  @doc false
   def attachments(_msg), do: []
+  @doc false
   def hide_action_links(_msg), do: " hidden"
+  @doc false
   def action_links(_msg), do: []
+  @doc false
   def hide_reactions(msg) do
     if msg.reactions == [], do: " hidden", else: ""
   end
+  @doc false
   def reactions(_msg), do: []
+  @doc false
   def mark_user_reaction(_reaction), do: ""
+  @doc false
   def render_emoji(_emoji), do: ""
+  @doc false
   def has_oembed(_msg), do: false
   def edited(%{edited_id: edited_id} = msg, user) when not is_nil(edited_id) do
     %{
@@ -317,9 +336,11 @@ defmodule UccChatWeb.MessageView do
   def is_popup_open(%{open: true}), do: true
   def is_popup_open(_), do: false
 
+  @doc false
   def get_popup_cls(_chatd) do
     ""
   end
+  @doc false
   def get_loading(_chatd) do
     false
   end
@@ -397,6 +418,10 @@ defmodule UccChatWeb.MessageView do
   end
   defp html_escape(body, _), do: body
 
+  @doc """
+  Runs the configured message replacement patterns regex's against the
+  message body.
+  """
   def run_message_replacement_patterns(body, [_ | _] = patterns) do
     Enum.reduce(patterns, body, fn {re, sub}, body ->
       Regex.replace(re, body, sub)
@@ -411,6 +436,12 @@ defmodule UccChatWeb.MessageView do
     AutoLinker.link(body, Keyword.put(opts, :exclude_patterns, ["```"]))
   end
 
+  @doc """
+  Processes markdown in the message body.
+
+  Users the key `!md` to indicate text that should be run through the
+  markdown processor.
+  """
   def run_markdown(body, false, _), do: body
   def run_markdown(body, true, md_key) do
     case String.split(body, md_key) do
@@ -424,16 +455,28 @@ defmodule UccChatWeb.MessageView do
     end
   end
 
+  @doc """
+  Encodes mention links in the body text.
+  """
   def encode_mentions(body) do
     Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body,
       ~s'\\1<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
       ~s' data-fun="flex_user_open" class="mention-link" data-username="\\2">@\\2</a>'
   end
 
+  @doc """
+  Encodes room links.
+  """
   def encode_room_links(body) do
     Regex.replace ~r/(^|\s)#([\w]+)/, body, ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
   end
 
+  @doc """
+  Handles markup commands.
+
+  Parser the body looking for the `*bold text*`, `_italics text_`, and
+  `~strike text~`
+  """
   def message_formats(body, false) do
     body
     |> italic_formats()
@@ -449,6 +492,7 @@ defmodule UccChatWeb.MessageView do
       String.replace(body, ~r/_([^\<\>]+?)_/, "<i>\\1</i>")
     end
   end
+
   defp bold_formats(body) do
     if body =~ ~r/\<.*?\*.*?\*.*?\>|`|!md/ do
       body
@@ -456,6 +500,7 @@ defmodule UccChatWeb.MessageView do
       String.replace(body, ~r/\*([^\<\>]+?)\*/, "<strong>\\1</strong>")
     end
   end
+
   defp strike_formats(body) do
     if body =~ ~r/\<.*?~.*?~.*?\>|`|!md/ do
       body
@@ -468,8 +513,10 @@ defmodule UccChatWeb.MessageView do
   defp format_newlines(string, _, true), do: string
   defp format_newlines(string, false, _), do: String.replace(string, "\n", "\n<br />\n")
 
+  @doc """
+  Return the message cog action list item
+  """
   def message_cog_action_li(name, title, icon, extra \\ "") do
-    #{}"reaction-message", "Reactions", "people-plus")
     opts = [class: "#{name} #{extra} message-action",
       title: title, "data-id": name] ++ rebel_event(name)
 
@@ -484,6 +531,7 @@ defmodule UccChatWeb.MessageView do
   defp rebel_event("delete-message"), do: ["rebel-click": "message_action"]
   defp rebel_event(_), do: ["rebel-click": "message_action"]
 
+  @doc false
   def system_message(message) do
     messages = %{
       "You have been muted and cannot speak in this room" => ~g(You have been muted and cannot speak in this room),
