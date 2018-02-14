@@ -5,8 +5,10 @@
 ## Enhancements
 
 * Support Avatar upload and change
+* Changing view details in accounts settings automatically updates UI
 
 ### Bug Fixes
+
 
 ## 0.2.5 (2018-02-09)
 

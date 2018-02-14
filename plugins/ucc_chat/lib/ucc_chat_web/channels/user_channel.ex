@@ -778,6 +778,7 @@ defmodule UccChatWeb.UserChannel do
 
     subscribe_callback "user:all", "callback", :user_all_event
     subscribe_callback "user:all", "avatar:change", :user_all_event
+    subscribe_callback "user:all", "account:change", :user_all_event
     subscribe_callback "user:all", "status_message:update", :status_message_update
 
     {:noreply, socket}
@@ -1565,6 +1566,15 @@ defmodule UccChatWeb.UserChannel do
       Client.toastr socket, :success, ~g(Your Avatar had been updated!)
     end
     Client.update_user_avatar(socket, payload.username, payload.url)
+  end
+
+  def user_all_event("account:change", %{user_id: id} = payload, %{assigns: %{user_id: id}} = socket) do
+    Client.update_client_account_setting(socket, payload.field, payload.value)
+    socket
+  end
+
+  def user_all_event("account:change", _payload, socket) do
+    socket
   end
 
   def click_status(socket, sender) do

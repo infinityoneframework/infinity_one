@@ -5,6 +5,9 @@ defmodule UccChat.Accounts.Account do
 
   alias UcxUcc.Accounts.{User, Account}
   alias UccChat.Schema.{Notification, AccountNotification}
+  alias UcxUcc.UccPubSub
+
+  require Logger
 
   extend_schema UcxUcc.Accounts.Account do
     field :language, :string, default: "en"
@@ -55,6 +58,7 @@ defmodule UccChat.Accounts.Account do
     changeset
     |> cast(params, @fields)
     |> validate_required([])
+    |> prepare_changes(&prepare_notifications/1)
   end
 
   def get(user_id) do
@@ -63,6 +67,27 @@ defmodule UccChat.Accounts.Account do
       on: a.user_id == u.id,
       where: u.id == ^user_id,
       select: a
+  end
+
+  def prepare_notifications(changeset) do
+    changes = changeset.changes
+    changeset
+    |> notify_changes(:hide_avatars, changes[:hide_avatars])
+    |> notify_changes(:hide_usernames, changes[:hide_user_names])
+    |> notify_changes(:view_mode, changes[:view_mode])
+  end
+
+  def notify_changes(changeset, field, value) when not is_nil(value) do
+    UccPubSub.broadcast "user:all", "account:change", %{
+      user_id: changeset.data.user_id,
+      field: field,
+      value: value
+    }
+    changeset
+  end
+
+  def notify_changes(changeset, _, _) do
+    changeset
   end
 
 end

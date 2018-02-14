@@ -306,4 +306,34 @@ defmodule UccChatWeb.RebelChannel.Client do
     opts = Keyword.merge @default_swal_opts, opts
     SweetAlert.swal(socket, title, body, type, opts)
   end
+
+
+  def update_client_account_setting(socket, :view_mode, value) do
+    class =
+      case value do
+        1 -> ""
+        2 -> "cozy"
+        3 -> "compact"
+      end
+    class = "messages-box " <> class
+
+    async_js socket, ~s/$('.messages-container .messages-box').attr('class', '#{class}')/
+  end
+
+  def update_client_account_setting(socket, field, value) when field in ~w(hide_avatars hide_usernames)a do
+    class = account_settings_to_class field
+    cmd =
+      if value do
+        ~s/addClass('#{class}')/
+      else
+        ~s/removeClass('#{class}')/
+      end
+
+    async_js socket, ~s/$('.messages-container .wrapper').#{cmd}/
+
+  end
+
+  defp account_settings_to_class(:hide_usernames), do: "hide-usernames"
+  defp account_settings_to_class(:hide_avatars), do: "hide-avatars"
+
 end
