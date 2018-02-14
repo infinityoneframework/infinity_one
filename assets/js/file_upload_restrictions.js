@@ -2,7 +2,6 @@ console.log('loading file_upload_restrections');
 
 UccChat.fileUploadMediaWhiteList = function() {
   var mediaTypeWhiteList = chat_settings.accepted_media_types
-
   if (!mediaTypeWhiteList || mediaTypeWhiteList === '*') {
     return;
   }
@@ -11,9 +10,14 @@ UccChat.fileUploadMediaWhiteList = function() {
   });
 };
 
-UccChat.fileUploadIsValidContentType = function(type) {
+UccChat.fileUploadIsValidContentType = function(type, whiteList) {
   var list, wildCardGlob, wildcards;
-  list = UccChat.fileUploadMediaWhiteList();
+  if (whiteList) {
+    list = whiteList;
+  } else {
+    list = UccChat.fileUploadMediaWhiteList();
+  }
+  console.log('white list', list)
   if (!list || _.contains(list, type)) {
     return true;
   } else {

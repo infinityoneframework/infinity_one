@@ -8,19 +8,19 @@ section.page-container.page-home.page-static
     = form_for @user_changeset, "#", [id: "account-profile-form"], fn f ->
       .rocket-form
         fieldset
-          .input-line
+          .input-line.set-avatar
             label(for="avatar")= ~g"Avatar"
-            .avatar-full
-              = if url = user.avatar_url do
-                img src="#{url}"
-              - else
-                img src="#{avatar_url(user.username)}"
-            .avatar-initials
+            .avatar-full title="#{~g(Selected Avatar)}"
+              img src="#{avatar_url(user)}"
+            .avatar-initials title="#{~g(Select Initials)}"
               img src="#{avatar_url(user.username)}"
-            div.file style="position: relative;"
+            div.file style="position: relative;" title="#{~g(Upload file)}"
               i.icon-upload
               input(accept="" type="file")
-
+            div.dropzone.avatar-dropzone title="#{~g(Drop image here to upload)}"
+              span = ~g(Drop image to upload)
+            = hidden_input f, :avatar_url
+            = hidden_input f, :delete_avatar
 
           .input-line
             label(for="realname")= ~g"Name"

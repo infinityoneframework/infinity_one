@@ -1,4 +1,14 @@
 defmodule UccChatWeb.RebelChannel.Client do
+  @moduledoc """
+  Library to handle interaction with the client using the Rebel library.
+
+  This module contains a bunch of helper functions to abstract away the
+  details of client interaction. It is uses by a number of application
+  modules.
+
+  It contains some generic, and reusable functions, as will as some
+  very specialized ones.
+  """
   import Rebel.Query
   import Rebel.Core
   import UcxUccWeb.Utils
@@ -169,13 +179,9 @@ defmodule UccChatWeb.RebelChannel.Client do
   def push_rooms_list_update(socket, channel_id, user_id) do
     user = Accounts.get_user user_id
     html = SideNavService.render_rooms_list(channel_id, user_id)
-    # TODO: for testing purposes
-    Logger.info "username: " <> user.username
-    Logger.info html
 
     update socket, :html,
       set: html,
-      # set: SideNavService.render_rooms_list(channel_id, user_id),
       on: "aside.side-nav .rooms-list"
   end
 
@@ -183,6 +189,10 @@ defmodule UccChatWeb.RebelChannel.Client do
     update socket, :html,
       set: render_to_string(view, template, bindings),
       on: ".main-content"
+  end
+
+  def update_user_avatar(socket, username, url) do
+    async_js socket, ~s/$('.avatar[data-user="#{username}"] .avatar-image').css('background-image', 'url(#{url}');/
   end
 
   def scroll_bottom(socket, selector) do

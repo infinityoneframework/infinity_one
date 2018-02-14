@@ -146,6 +146,7 @@ defmodule UccChatWeb.SharedView do
     # ""
     Phoenix.HTML.Tag.tag :img, src: "https://robohash.org/#{username}.png?set=any&bgset=any&size=#{size}"
   end
+
   def get_avatar(msg) do
     # Logger.warn "get_avatar #{inspect msg}"
     # ""
@@ -175,8 +176,49 @@ defmodule UccChatWeb.SharedView do
     Subscription.subscribed?(channel_id, user_id)
   end
 
-  def avatar_url(username) do
+  def view_url(url) do
+    String.replace url, ~r/(.*?priv\/static)/, ""
+  end
+
+  @doc """
+  Get the avatar url for a given User.
+
+  Can be called with either a User struct or a username with the following
+  behaviour:
+
+  Called with:
+
+  * username - Fetches the default initials based avatar for the user's initials
+  * user struct - Doses the following
+    1. Uses the uploaded Avatar image if one exists
+    1. Uses the avatar_url field if its not empty
+    1. Fetches the default initials based avatar.
+  """
+  def avatar_url(user, size \\ :thumb)
+
+  def avatar_url(%{avatar: %{} = avatar} = user, size) do
+    {avatar, user}
+    |> UccChat.Avatar.url(size)
+    |> view_url
+  end
+
+  def avatar_url(%{avatar_url: url}, _) when not url in [nil, ""] do
+    url
+  end
+
+  def avatar_url(%{avatar: nil} = user, _) do
+    avatar_url user.username
+  end
+
+  def avatar_url(username, _) do
     UccChat.AvatarService.avatar_url username
+  end
+
+  def avatar_background_tags(user, type \\ :thumb) do
+    content_tag :div, [class: "avatar", "data-user": user.username] do
+      content_tag :div, [class: "avatar-image",
+        style: ~s/background-image: url(#{avatar_url(user, type)});/], do: ""
+    end
   end
 
   def user_details_thead_hook do

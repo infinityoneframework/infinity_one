@@ -25,7 +25,16 @@ $(document).ready(() => {
         $('.dropzone').removeClass('over')
       }
     })
-    .on('drop', '.dropzone', event => {
+    .on('drop', '.avatar-dropzone', event => {
+      // handle the avatar image file drop
+      if (chat_settings.allow_upload) {
+        let e = event.originalEvent || event
+        let files = e.dataTransfer.files || []
+        UccChat.fileUpload.handleAvatarUpload(files, obj)
+      }
+    })
+    .on('drop', '.dropzone:not(.avatar-dropzone)', event => {
+      // handle the attachment file drop
       if (chat_settings.allow_upload) {
         let e = event.originalEvent || event
         let files = e.dataTransfer.files || []

@@ -1,4 +1,25 @@
 defmodule UccChatWeb.UserChannel do
+  @moduledoc """
+  A channel responsible for handling most of the user based chat interactions.
+
+  Much of the communications between the client and the server is done with
+  this channel. When new messages are broadcast to users, they much be
+  individually rendered for the user so that timezone information and other
+  user based settings can be applied.
+
+  Interactions with features like opening panels, saving settings, editing
+  messages are all done for the user only. So, this is the channel that
+  handles those communications.
+
+  Unlike traditional AJAX based applications, UccChat uses the `Phoenix.Channel`
+  to handle asynchronous messaging instead of AJAX requests. After the
+  initial page load, almost all content is pushed from the Server to the
+  client over channels.
+
+  UcxUcc takes this one step further by handling client events on the server
+  and pushing out javascript over the channel for execution in the client. This
+  is accomplished with the `Rebel` library.
+  """
   use UccLogger
   use UccChatWeb, :channel
   use UcxUcc
@@ -119,30 +140,6 @@ defmodule UccChatWeb.UserChannel do
     conn_assigns[:current_user] |> Map.get(:id)
   end
 
-  ###############
-  # Outgoing Incoming Messages
-    #   if data.media?.video
-    #     icon = 'videocam'
-    #     title = "Direct video call from #{fromUsername}"
-    #   else
-    #     icon = 'phone'
-    #     title = "Direct audio call from #{fromUsername}"
-    # else
-    #   if data.media?.video
-    #     icon = 'videocam'
-    #     title = "Group video call from #{subscription.name}"
-    #   else
-    #     icon = 'phone'
-    #     title = "Group audio call from #{subscription.name}"
-
-    # swal
-    #   title: "<i class='icon-#{icon} alert-icon success-color'></i>#{title}"
-    #   text: "Do you want to accept?"
-    #   html: true
-    #   showCancelButton: true
-    #   confirmButtonText: "Yes"
-    #   cancelButtonText: "No"
-
    def handle_out("webrtc:leave" = ev, payload, socket) do
      trace ev, payload
      exec_js socket, ~s/$('.webrtc-video button.stop-call').click()/
@@ -152,38 +149,6 @@ defmodule UccChatWeb.UserChannel do
   def handle_out("webrtc:" <> event, payload, socket) do
     apply WebrtcChannel, String.to_atom(event), [payload, socket]
   end
-
-  # def handle_out("webrtc:incoming_video_call" = ev, payload, socket) do
-  #   trace ev, payload
-  #   trace ev, socket.assigns
-  #   title = "Direct video call from #{payload[:username]}"
-  #   icon = "videocam"
-  #   SweetAlert.swal_modal socket, ~s(<i class="icon-#{icon} alert-icon success-color"></i>#{title}), "Do you want to accept?", nil,
-  #     [html: true, showCancelButton: true, closeOnConfirm: true, closeOnCancel: true],
-  #     confirm: fn result ->
-  #       Logger.warn "sweet confirmed! #{inspect result}"
-  #       UcxUcc.Endpoint.broadcast "user:" <>  payload[:user_id], "webrtc:confirmed_video_call",
-  #         %{user_id: socket.assigns.user_id}
-  #     end,
-  #     cancel: fn result ->
-  #       UcxUcc.Endpoint.broadcast "user:" <>  payload[:user_id], "webrtc:declined_video_call",
-  #         %{user_id: socket.assigns.user_id}
-  #       Logger.warn "sweet canceled! result: #{inspect result}"
-  #     end
-
-  #   {:noreply, socket}
-  # end
-
-  # def handle_out(ev = "webrtc:confirmed_video_call", payload, socket) do
-  #   trace ev, payload
-
-  #   {:noreply, socket}
-  # end
-
-  # def handle_out(ev = "webrtc:declined_video_call", payload, socket) do
-  #   trace ev, payload
-  #   {:noreply, socket}
-  # end
 
   # Generic handler for retrieving internal information from a channel.
   # This is only for debugging purposes.
@@ -765,6 +730,7 @@ defmodule UccChatWeb.UserChannel do
     # TODO: add Hooks for this
     # subscribe_callback "phone:presence", "presence:change", :phone_presence_change
     subscribe_callback "user:all", "callback", :user_all_event
+    subscribe_callback "user:all", "avatar:change", :user_all_event
     {:noreply, socket}
   end
 
@@ -1229,11 +1195,17 @@ defmodule UccChatWeb.UserChannel do
     callback.(evt, payload, socket)
   end
 
+  def user_all_event("avatar:change", payload, socket) do
+    if payload.user_id == socket.assigns.user_id do
+      Client.toastr socket, :success, ~g(Your Avatar had been updated!)
+    end
+    Client.update_user_avatar(socket, payload.username, payload.url)
+  end
+
   def click_status(socket, sender) do
-    # Logger.error "Click Status #{inspect sender}"
     user_id = socket.assigns.user_id
     status = sender["dataset"]["status"] || ""
-    # Logger.error "handle status #{status}"
+
     UccPubSub.broadcast "status:" <> user_id, "set:" <> status, sender["dataset"]
     socket
   end

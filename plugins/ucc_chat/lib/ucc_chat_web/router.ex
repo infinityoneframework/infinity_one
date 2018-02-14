@@ -50,5 +50,6 @@ defmodule UccChatWeb.Router do
   scope "/", UccChatWeb do
     pipe_through :api
     post "/attachments/create", AttachmentController, :create
+    post "/avatars/create", AvatarController, :create
   end
 end

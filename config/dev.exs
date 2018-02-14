@@ -7,8 +7,8 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :ucx_ucc, UcxUccWeb.Endpoint,
-  http: [port: 4017],
-  https: [port: 4317,
+  http: [port: 4018],
+  https: [port: 4318,
     otp_app: :ucx_ucc,
     keyfile: "priv/key.pem",
     certfile: "priv/cert.pem"
@@ -40,7 +40,8 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
 config :ucx_ucc, UcxUccWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      # ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+      ~r{priv/static/.*(js|css|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/ucx_ucc/web/views/.*(ex)$},
       ~r{lib/ucx_ucc/web/templates/.*(eex|slim|slime)$},

@@ -210,6 +210,7 @@ class SideNav {
         .receive("ok", resp => {
           if (resp.success) {
             toastr.success(resp.success)
+            $('.flex-nav header').click();
           } else if (resp.error) {
             toastr.error(resp.error)
           }

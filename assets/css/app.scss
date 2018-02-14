@@ -320,17 +320,22 @@ footer.footer span.version {
 section.page-container.page-home {
   .content {
     .avatar-full {
-      height: 125px;
-      width: 125px;
+      // height: 125px;
+      // width: 125px;
       padding: 5px;
       display: inline-block;
       img {
-        height: 100%;
+        height: 125px;
+        width: 125px;
       }
     }
     .avatar-initials {
       display: inline-block;
       cursor: pointer;
+      img {
+        height: 50px;
+        width: 50px;
+      }
     }
     div.file {
       display: inline-block;
@@ -358,6 +363,39 @@ section.page-container.page-home {
         cursor: pointer;
       }
     }
+  }
+}
+.avatar-dropzone {
+  border: 1px dashed #ddd;
+  border-radius: 5px;
+  width: 40%;
+  margin-top: -30px;
+  height: 145px;
+  display: inline-block;
+  text-align: center;
+  z-index: 9999;
+
+  &.over {
+    border: 1px dashed #666;
+    background-color: #eee;
+    span {
+      color: #666;
+    }
+  }
+
+  span {
+    position: absolute;
+    width: 100%;
+    align-content: center;
+    left: 0;
+    top: 45%;
+    color: #ccc;
+  }
+}
+.avatar-initials,
+.avatar-full {
+  img {
+    border-radius: 5px;
   }
 }
 

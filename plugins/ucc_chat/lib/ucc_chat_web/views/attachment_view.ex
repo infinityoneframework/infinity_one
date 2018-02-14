@@ -36,9 +36,9 @@ defmodule UccChatWeb.AttachmentView do
     [media_type: :other, other_type: other]
   end
 
-  def view_url(url) do
-    String.replace url, ~r/(.*?priv\/static)/, ""
-  end
+  # def view_url(url) do
+  #   String.replace url, ~r/(.*?priv\/static)/, ""
+  # end
 
 end
 

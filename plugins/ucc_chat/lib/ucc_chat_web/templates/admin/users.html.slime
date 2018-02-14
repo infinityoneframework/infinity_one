@@ -36,9 +36,7 @@
                 tr.user-info.row-link(data-name="#{user.username}" data-id="admin_user_info" rebel-click="flex_tab_open")
                   td.border-component-color
                     div(class="user-image status-#{get_status(user)}" data-status-name="#{user.username}")
-                      .avatar
-                        - avatar = if user.avatar_url, do: user.avatar_url, else: avatar_url(user.username)
-                        .avatar-image(style="background-image:url(#{avatar});")
+                      = avatar_background_tags(user)
                   td.border-component-color= user.name
                   td.border-component-color= user.username
                   = user_details_body_hook user

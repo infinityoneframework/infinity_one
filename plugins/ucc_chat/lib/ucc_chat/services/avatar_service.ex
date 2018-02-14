@@ -48,6 +48,9 @@ defmodule UccChat.AvatarService do
     Enum.random @background_colors
   end
 
+  @doc """
+  Gets the path for a user's default initials based avatar.
+  """
   def avatar_url(username) do
     initials =
       username
@@ -57,6 +60,7 @@ defmodule UccChat.AvatarService do
   end
 
   # Can be run from iex to generate a list of files.
+  @doc false
   def gen_avatars do
     list = for ch <- ?a..?z, do: <<ch::8>>
     list = for ch1 <- list, ch2 <- list, do: ch1 <> ch2

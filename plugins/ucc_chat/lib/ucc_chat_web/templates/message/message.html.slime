@@ -1,29 +1,16 @@
 - username = get_username(@message)
-- avatar_url = @message.user |> Map.get(:avatar_url)
 - reactions = Enum.sort @message.reactions, &(&1.inserted_at < &2.inserted_at)
 = get_message_wrapper_opts(@message, @user)
   = if @message.avatar do
-    = if avatar = avatar_from_username(@message) do
-      button.thumb.user-card-message(data-username="#{username}" tabindex="1")
-        = avatar
-    - else
-      button.thumb.user-card-message(data-username="#{username}" tabindex="1")
-        .avatar
-          = if avatar_url do
-            .avatar-image(style="background-image:url(#{avatar_url});")
-          - else
-            .avatar-image(style="background-image:url(#{avatar_url(username)});")
+    button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+      = avatar_background_tags(@message.user)
   - else
     = if emoji = emoji(@message) do
       button.thumb.user-card-message(data-username="#{username}" tabindex="1")
         .avatar= emoji
     - else
       button.thumb.user-card-message(data-username="#{username}" tabindex="1")
-        .avatar
-          = if avatar_url do
-            .avatar-image(style="background-image:url(#{avatar_url});")
-          - else
-            .avatar-image(style="background-image:url(#{avatar_url(username)});")
+        = avatar_background_tags(@message.user)
   = if alias? = alias?(@message) do
     button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
       = alias?
@@ -43,11 +30,7 @@
       span.edited(title="edited at #{edited[:edit_time]} by #{edited[:edited_by]}")
         i.icon-edit(aria-label="Edited")
         button.thumb.thumb-small.user-card-message(data-username="#{edited[:edited_by]}" tabindex="1")
-          .avatar
-            = if url = @message.edited_by.avatar_url do
-              .avatar-image(style="background-image:url(#{url});")
-            - else
-              .avatar-image(style="background-image:url(#{avatar_url(@message.edited_by.username)});")
+          = avatar_background_tags(@message.edited_by)
     = if is_private(@message) do
       span.private= ~g(Only you can see this message)
     .message-cog-container(class="#{hide_cog(@message)}" rebel-click="message_cog_click")

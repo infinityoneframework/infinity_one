@@ -3,11 +3,7 @@
 div(class="#{cls} #{hidden}" data-username="#{@user.username}")
   .about.clearfix
     .thumb
-      .avatar
-        = if @user.avatar_url do
-          .avatar-image(style='background-image:url(#{@user.avatar_url});')
-        - else
-          .avatar-image(style='background-image:url(#{avatar_url(@user.username)});')
+      = avatar_background_tags(@user, :avatar)
     .info
       h3(title="#{@user.username}")
         i(class="status-#{@user.status}" data-status-name="#{@user.username}")
