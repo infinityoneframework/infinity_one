@@ -6,6 +6,7 @@
 
 * Support Avatar upload and change
 * Changing view details in accounts settings automatically updates UI
+* Converges UccConsole and UccChat.Console into UccConsole
 
 ### Bug Fixes
 
