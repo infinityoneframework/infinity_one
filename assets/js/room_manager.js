@@ -9,46 +9,46 @@ console.log('loading room_manager');
 
 const debug = true;
 const new_message_unread_time = 5000;
-const container = '.messages-box .wrapper ul'
-const wrapper = '.messages-box .wrapper'
+const container = '.messages-box .wrapper ul';
+const wrapper = '.messages-box .wrapper';
 
 window.UccChat.on_load(function(ucc_chat) {
-  ucc_chat.roomManager = new RoomManager(ucc_chat)
+  ucc_chat.roomManager = new RoomManager(ucc_chat);
 })
 
 class RoomManager {
   constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat
-    ucc_chat.scroll_to = this.scroll_to
-    this.badges = 0
-    this.register_events()
+    this.ucc_chat = ucc_chat;
+    ucc_chat.scroll_to = this.scroll_to;
+    this.badges = 0;
+    this.register_events();
     this.view_elem = $('.messages-box .wrapper')[0];
     if (this.view_elem) {
-      this.rect = this.view_elem.getBoundingClientRect()
-      this.focus = false
-      this.unread = this.ucc_chat.ucxchat.unread
-      this.unread_list = []
-      this.new_message_ref = undefined
-      this.at_bottom = true
-      this.new_message_button = false
-      this.unread_timer_ref = undefined
+      this.rect = this.view_elem.getBoundingClientRect();
+      this.focus = false;
+      this.unread = this.ucc_chat.ucxchat.unread;
+      this.unread_list = [];
+      this.new_message_ref = undefined;
+      this.at_bottom = true;
+      this.new_message_button = false;
+      this.unread_timer_ref = undefined;
     }
 
     // this.favico = new require("./favico").Favico({
     this.favico = Favico({
       position : 'up',
       animation : 'pop'
-      // animation : 'popFade'
-    })
+    });
 
-    this.title = document.title.replace(/\(.*?\)/, '')
-    this.set_badges()
+    this.title = document.title.replace(/\(.*?\)/, '');
+    this.set_badges();
+
     $('textarea.input-message').autogrow({
-      postGrowCallback: function() { this.resize }
-    })
+      postGrowCallback: function() { this.resize; }
+    });
   }
 
-  get roomHistoryManager() { return this.ucc_chat.roomHistoryManager }
+  get roomHistoryManager() { return this.ucc_chat.roomHistoryManager; }
 
   get bounding() { return this.rect; }
 
@@ -63,7 +63,32 @@ class RoomManager {
   get is_unread() { return this.unread; }
   set is_unread(val) { this.unread = val; }
 
-  get userchan() { return this.ucc_chat.userchan }
+  get userchan() { return this.ucc_chat.userchan; }
+
+  new_room() {
+    if (debug) { console.log('new_room', this); }
+    let ucxchat = this.ucc_chat.ucxchat;
+
+    // don't think we need this
+    // this.has_more_prev = $('.messages-box li.load-more').length > 0;
+    this.roomHistoryManager.new_room(ucxchat.room);
+    this.updateMentionsMarksOfRoom();
+
+    $('.messages-box .wrapper ul .body img.emojione').each((i, elem) => {
+      if ($(elem).closest('.body').text().trim() == "") {
+        $(elem).addClass('big');
+      }
+    })
+
+    this.ucc_chat.roomchan.on('room:open', resp => {
+    })
+  }
+
+  open_room(room, display_name, callback) {
+    if (debug) { console.log('open_room', this) }
+
+    cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
+  }
 
   render_room(resp) {
     if (debug) { console.log('render_room resp', resp) }
@@ -113,14 +138,6 @@ class RoomManager {
         $('aside .rooms-list').html(resp.side_nav_html)
       })
   }
-  new_message_scroll(user_id) {
-    let at_bottom = this.at_bottom
-    console.log('new_message_scroll', at_bottom);
-
-    if (at_bottom || user_id == ucxchat.user_id) {
-      UccUtils.scroll_bottom();
-    }
-  }
   // add_private(elem) {
   //   let username = elem.parent().attr('data-username')
   //   if (debug) { console.log('pvt-msg button clicked...', username) }
@@ -156,18 +173,18 @@ class RoomManager {
   }
   update_burger_alert() {
     if($('.rooms-list li.has-alert').length > 0) {
-      let count = 0
+      let count = 0;
       for (const has_unread of $('li.room-link span.unread')) {
-        count += parseInt($(has_unread).text())
+        count += parseInt($(has_unread).text());
       }
-      this.set_burger_unreads(count)
+      this.set_burger_unreads(count);
     } else {
-      this.clear_burger_unreads()
+      this.clear_burger_unreads();
     }
   }
   set_burger_unreads(count) {
     let value = '•'
-    if (count > 0) { value = count }
+    if (count > 0) { value = count; }
     let alert = `<div class="unread-burger-alert color-error-contrast background-error-color">${value}</div>`
     if ($('.burger .unread-burger-alert').length > 0) {
       $('.burger .unread-burger-alert').text(value)
@@ -215,7 +232,7 @@ class RoomManager {
   }
 
   count_unread() {
-    var count = 0
+    var count = 0;
     var p = this;
     this.unread_list.every(function(id) {
       if (p.is_visible($('#' + id))) {
@@ -333,37 +350,10 @@ class RoomManager {
   remove_unread_class() {
     if (this.has_first_unread()) {
       $('.first-unread').removeClass('first-unread first-unread-opaque')
-      this.push_channel('unread:clear')
+      // this.push_channel('unread:clear')
+      this.userchan.push('unread:clear')
       this.unread = false
     }
-  }
-
-  new_room() {
-    if (debug) { console.log('new_room', this)}
-    let ucxchat = this.ucc_chat.ucxchat
-    this.has_more = $('.messages-box li.load-more').length > 0
-    this.roomHistoryManager.new_room(ucxchat.room)
-    this.updateMentionsMarksOfRoom()
-
-    let html = $('.messages-box .wrapper ul').html()
-    $('.messages-box .wrapper ul').html(html)
-
-    $('.messages-box .wrapper ul .body img.emojione').each((i, elem) => {
-      if ($(elem).closest('.body').text().trim() == "") {
-        $(elem).addClass('big')
-      }
-    })
-
-    this.ucc_chat.roomchan.on('room:open', resp => {
-      UccUtils.page_loading()
-      $('.page-loading-container').html(UccUtils.loading_animation())
-      this.open_room(resp.room, resp.room)
-      if (resp.state) {
-        this.focus = true
-      } else {
-        this.focus = false
-      }
-    })
   }
 
   bind_history_manager_scroll_event() {
@@ -372,21 +362,30 @@ class RoomManager {
     }
     $('.messages-box .wrapper').bind('scroll', _.throttle((e) => {
       let at_bottom = e.currentTarget.scrollTop >= e.currentTarget.scrollHeight
-        - e.currentTarget.clientHeight - 80
+        - e.currentTarget.clientHeight - 5
       let roomHistoryManager = this.roomHistoryManager
+      let scrollDelta
+      if (this.last_scroll_pos) {
+        scrollDelta = e.currentTarget.scrollTop - this.last_scroll_pos;
+      } else {
+        scrollDelta = 0
+      }
 
       this.at_bottom = at_bottom
+
       if (at_bottom && this.new_message_button) {
         this.remove_new_message_button()
       }
-      if (!roomHistoryManager.isLoading && (roomHistoryManager.hasMore ||
-        roomHistoryManager.hasMoreNext)) {
+      if (!roomHistoryManager.isLoading && this.last_scroll_pos && (roomHistoryManager.hasMorePrev() ||
+        roomHistoryManager.hasMoreNext())) {
 
-        if (roomHistoryManager.hasMore && e.currentTarget.scrollTop == 0)
-          roomHistoryManager.getMore
-        else if (roomHistoryManager.hasMoreNext && at_bottom)
+        if (roomHistoryManager.hasMorePrev() && e.currentTarget.scrollTop == 0)
+          roomHistoryManager.getMorePrev
+        else if (roomHistoryManager.hasMoreNext() && at_bottom && scrollDelta >= 0)
           roomHistoryManager.getMoreNext
       }
+
+      this.last_scroll_pos = e.currentTarget.scrollTop;
       // console.log('scrolling.... unread', this.unread)
       if (this.unread) {
         if (debug) { console.log('scrolling unread') }
@@ -403,52 +402,52 @@ class RoomManager {
             clearTimeout(this.unread_timer_ref)
             this.unread_timer_ref = undefined
           }
-          let count = this.count_unread()
+          let count = this.count_unread();
           if ($('.first-unread').length > 0 && !$('.unread-bar').is(':visible')) {
             $('.unread-bar').show()
             if (debug) { console.log('show unread bar') }
           } else {
             if (debug) { console.log('else dont show unread bar') }
           }
-          $('.unread-cnt').html(count)
+          $('.unread-cnt').html(count);
           if (debug) { console.log('count', count) }
         }
       }
-    }, 200))
+    }, 50))
   }
 
   scroll_to(elem, offset = 0) {
-    let offst = offset
-    let msgbox = $('.messages-box .wrapper')
-    console.log('msgbox', msgbox, 'elem', elem)
-    let valof = msgbox.scrollTop().valueOf()
-    let offtop = msgbox.offset().top
-    let item_top = elem.offset().top
+    let offst = offset;
+    let msgbox = $('.messages-box .wrapper');
+    // console.log('msgbox', msgbox, 'elem', elem)
+    let valof = msgbox.scrollTop().valueOf();
+    let offtop = msgbox.offset().top;
+    let item_top = elem.offset().top;
     if (offset == 0) {
-      offst = -$(msgbox).height() + elem.height() - 5
+      offst = -$(msgbox).height() + elem.height() + 10;
     }
-    let val = msgbox.scrollTop().valueOf() + item_top - msgbox.offset().top + offst
-    $('.messages-box .wrapper').scrollTop(val)
+    let val = msgbox.scrollTop().valueOf() + item_top - msgbox.offset().top + offst;
+    $('.messages-box .wrapper').scrollTop(val);
   }
 
   clear_unread() {
     if (!this.unread_timer_ref) {
       this.unread_timer_ref = setTimeout(() => {
-        cc.delete_('/room/has_unread')
-        this.clear_navbar()
-        this.clear_unread_state()
-        $('.first-unread').addClass('first-unread-opaque')
-        this.set_badges()
+        cc.delete_('/room/has_unread');
+        this.clear_navbar();
+        this.clear_unread_state();
+        $('.first-unread').addClass('first-unread-opaque');
+        this.set_badges();
       }, 2000)
     }
   }
 
   clear_all_unreads() {
-    this.remove_new_message_button()
-    this.remove_unread_class()
-    this.clear_navbar()
-    this.clear_unread_state()
-    $('.first-unread').removeClass('first-unread first-unread-opaque')
+    this.remove_new_message_button();
+    this.remove_unread_class();
+    this.clear_navbar();
+    this.clear_unread_state();
+    $('.first-unread').removeClass('first-unread first-unread-opaque');
   }
 
   clear_unread_state() {
@@ -456,237 +455,97 @@ class RoomManager {
     this.unread_list = [];
 
     if (this.unread_timer_ref) {
-      clearTimeout(this.unread_timer_ref)
-      this.unread_timer_ref = undefined
+      clearTimeout(this.unread_timer_ref);
+      this.unread_timer_ref = undefined;
     }
   }
 
   clear_navbar() {
-    let parent = `a.open-room[data-room="${ucxchat.room}"]`
-    $(parent + ' span.unread').remove()
-    $('li.link-room-' + ucxchat.room).removeClass('has-alert').removeClass('has-unread')
+    let parent = `a.open-room[data-room="${ucxchat.room}"]`;
+    $(parent + ' span.unread').remove();
+    $('li.link-room-' + ucxchat.room).removeClass('has-alert').removeClass('has-unread');
   }
 
-
-  open_room(room, display_name, callback) {
-    if (debug) { console.log('open_room', this) }
-    console.log('open_room room', room, 'old_room', ucxchat.room)
-    console.log('open_room', $('.messages-container'))
-
-    cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
-      .receive("ok", resp => {
-        console.log('open_room ok', resp)
-        if (resp.redirect) {
-          console.log('location')
-          window.location = resp.redirect
-        } else {
-          this.render_room(resp)
-          this.bind_history_manager_scroll_event()
-        }
-        if (callback) { callback() }
-        if (debug) { console.log('open_room after callback', this) }
-        UccUtils.remove_page_loading()
-      })
-      .receive("error", resp => {
-        console.log('open_room error', resp)
-        UccUtils.remove_page_loading()
-      })
-  }
 
   get_unreads() {
-    let unread = 0
+    let unread = 0;
     $('span.unread').each(function(inx, unr) {
-      unread += parseInt($(unr).text())
+      unread += parseInt($(unr).text());
     })
-    return unread
+    return unread;
   }
 
   set_badges() {
-    let cnt = this.get_unreads()
+    let cnt = this.get_unreads();
     if (cnt != this.badges) {
-      this.badges = cnt
+      this.badges = cnt;
       if (cnt == 0) {
         // document.title = this.title
-        this.favico.reset()
+        this.favico.reset();
       } else {
         // document.title = `(${cnt}) ${this.title}`
-        this.favico.badge(this.badges)
+        this.favico.badge(this.badges);
       }
     }
-    this.update_burger_alert()
+    this.update_burger_alert();
   }
 
   register_events() {
-    this.bind_history_manager_scroll_event()
+    this.bind_history_manager_scroll_event();
 
     $(window).on('focus', () => {
       if (debug) { console.log('room_manager focus') }
-      this.clear_unread()
-      this.has_focus = true
+      this.clear_unread();
+      this.has_focus = true;
       if (UccChat.systemchan) {
-        UccChat.systemchan.push('state:focus')
+        UccChat.systemchan.push('state:focus');
       }
     })
     .on('blur', () => {
       this.has_focus = false;
       if (UccChat.systemchan) {
-        UccChat.systemchan.push('state:blur')
-        if (debug) { console.log('room_manager blur') }
+        UccChat.systemchan.push('state:blur');
+        if (debug) { console.log('room_manager blur'); }
       }
     })
 
     $('body').on('click', 'a.open-room', e => {
       e.preventDefault();
-      if (debug) { console.log('clicked a.open-room', e, $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
-      UccUtils.page_loading()
-      $('.page-loading-container').html(UccUtils.loading_animation())
-      this.open_room($(e.currentTarget).attr('data-room'), $(e.currentTarget).attr('data-name'))
+      if (debug) { console.log('clicked a.open-room', e,
+        $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
+      this.open_room($(e.currentTarget).attr('data-room'),
+        $(e.currentTarget).attr('data-name'));
     })
     .on('click', 'a.toggle-favorite', e => {
       if (debug) { console.log('click a.toggle-favorite') }
       e.preventDefault();
-      this.toggle_favorite()
+      this.toggle_favorite();
     })
     .on('click', '.phone-status', e => {
       e.preventDefault();
       e.stopPropagation();
       return false;
     })
-    // .on('click', '.button.pvt-msg', e => {
-    //   if (debug) { console.log('click .button.pvt-msg') }
-    //   e.preventDefault();
-    //   this.add_private($(e.currentTarget))
-    // })
-    // .on('click', 'button.set-owner', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   cc.put("/room/set-owner/" + username)
-    //     .receive("ok", resp => {
-    //     })
-    //     .receive("error", resp => {
-    //       toastr.error(resp.error)
-    //     })
-    // })
-    // .on('click', 'button.unset-owner', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   cc.put("/room/unset-owner/" + username)
-    //     .receive("ok", resp => {
-    //     })
-    //     .receive("error", resp => {
-    //       toastr.error(resp.error)
-    //     })
-    // })
-    // .on('click', 'button.set-moderator', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   cc.put("/room/set-moderator/" + username)
-    //     .receive("ok", resp => {
-    //       if (resp.redirect) {
-    //         if (debug) { console.log('location') }
-    //         window.location = resp.redirect
-    //       }
-    //     })
-    //     .receive("error", resp => {
-    //       toastr.error(resp.error)
-    //     })
-    // })
-    // .on('click', 'button.unset-moderator', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   cc.put("/room/unset-moderator/" + username)
-    //     .receive("ok", resp => {
-    //     })
-    //     .receive("error", resp => {
-    //       toastr.error(resp.error)
-    //     })
-    // })
-    // .on('click', 'button.unmute-user', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   cc.put("/room/unmute-user/" + username)
-    //     .receive("ok", resp => {
-    //     })
-    //     .receive("error", resp => {
-    //       toastr.error(resp.error)
-    //     })
-    // })
     .on('click', 'button.unblock-user', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
+      let username = $(e.currentTarget).parent().attr('data-username');
+      e.preventDefault();
       cc.put("/room/unblock-user/" + username)
         .receive("ok", resp => {
         })
         .receive("error", resp => {
-          toastr.error(resp.error)
+          toastr.error(resp.error);
         })
     })
     .on('click', 'button.block-user', e => {
-      let username = $(e.currentTarget).parent().attr('data-username')
-      e.preventDefault()
+      let username = $(e.currentTarget).parent().attr('data-username');
+      e.preventDefault();
       cc.put("/room/block-user/" + username)
         .receive("ok", resp => {
         })
         .receive("error", resp => {
-          toastr.error(resp.error)
+          toastr.error(resp.error);
         })
     })
-    // .on('click', 'button.mute-user', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   sweetAlert({
-    //     title: gettext.are_you_sure,
-    //     text: gettext.the_user_wont_able_type + ' ' + ucxchat.room,
-    //     type: "warning",
-    //     showCancelButton: true,
-    //     confirmButtonColor: "#DD6B55",
-    //     confirmButtonText: gettext.yes_mute_user,
-    //     closeOnConfirm: false
-    //   },
-    //   function(){
-    //     cc.put("/room/mute-user/" + username)
-    //       .receive("ok", resp => {
-    //         swal({
-    //             title: gettext.muted,
-    //             text: gettext.the_user_wont_able_type + ' ' + ucxchat.room,
-    //             type: 'success',
-    //             timer: 2000,
-    //             showConfirmButton: false,
-    //         })
-    //       })
-    //       .receive("error", resp => {
-    //         toastr.error(resp.error)
-    //       })
-    //   });
-    // })
-    // .on('click', 'button.remove-user', e => {
-    //   let username = $(e.currentTarget).parent().attr('data-username')
-    //   e.preventDefault()
-    //   sweetAlert({
-    //     title: gettext.are_you_sure,
-    //     text: gettext.the_user_will_be_removed_from + ' ' + ucxchat.room,
-    //     type: "warning",
-    //     showCancelButton: true,
-    //     confirmButtonColor: "#DD6B55",
-    //     confirmButtonText: "Yes, remove user!",
-    //     closeOnConfirm: false
-    //   },
-    //   function(){
-    //     cc.put("/room/remove-user/" + username)
-    //       .receive("ok", resp => {
-    //         swal({
-    //             title: gettext.removed,
-    //             text: gettext.the_user_was_remove_from + ' ' + ucxchat.room,
-    //             type: 'success',
-    //             timer: 2000,
-    //             showConfirmButton: false,
-    //         })
-    //       })
-    //       .receive("error", resp => {
-    //         toastr.error(resp.error)
-    //       })
-    //   });
-    // })
     .on('click', 'button.join', e => {
       cc.put("/room/join/" + ucxchat.username)
         .receive("ok", resp => {
@@ -697,8 +556,26 @@ class RoomManager {
     })
     .on('click', 'a.open-room i.hide-room', e => {
       e.preventDefault()
-      let room = $(e.currentTarget).closest('.open-room').data('room')
-      // console.log('cliecked open-room', room)
+      let room_elem = $(e.currentTarget).closest('.open-room');
+      let following_link = $(e.currentTarget).closest('.room-link').prev();
+      let room = room_elem.data('room');
+
+      if (following_link.length == 0) {
+        following_link = $('.room-link a.open-room')
+          .not(`[data-room="${room}"]`).parent().first();
+
+        if (following_link.length == 0) {
+          // don't allow them to hide the room
+          swal({
+              title: 'Sorry',
+              text: "Can't hide the last room",
+              type: 'error',
+              timer: 2500,
+              showConfirmButton: false,
+          });
+          return false;
+        }
+      }
       sweetAlert({
         title: gettext.are_you_sure,
         text: gettext.are_you_sure_you_want_to_hide_the_room + ' "' + room + '"?',
@@ -706,25 +583,23 @@ class RoomManager {
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
         confirmButtonText: gettext.yes_hide_it,
-        closeOnConfirm: false
+        closeOnConfirm: true
       },
       function(){
-        cc.put("/room/hide/" + room)
-          .receive("ok", resp => {
-            if (resp.redirect) {
-              console.log('location')
-              window.location = resp.redirect
-            }
+        let target_room = following_link.find('a.open-room');
+        cc.put("/room/hide/" + room, {
+          next_room: target_room.attr('data-room'),
+          next_room_display_name: target_room.attr('data-name')
           })
+          .receive("ok", resp => {})
           .receive("error", resp => {
-            toastr.error(resp.error)
+            toastr.error(resp.error);
           })
       });
-      return false
     })
     .on('click', 'a.open-room i.leave-room', e => {
-      e.preventDefault()
-      let room = $(e.currentTarget).closest('.open-room').data('room')
+      e.preventDefault();
+      let room = $(e.currentTarget).closest('.open-room').data('room');
       sweetAlert({
         title: gettext.are_you_sure,
         text: gettext.are_you_sure_leave_the_room + ' "' + room + '"?',
@@ -743,116 +618,79 @@ class RoomManager {
                 type: 'success',
                 timer: 500,
                 showConfirmButton: false,
-            })
+            });
           })
           .receive("error", resp => {
-            toastr.error(resp.error)
+            toastr.error(resp.error);
           })
       });
-      return false
+      return false;
     })
     .on('click', '.mention-link[data-channel]', (e) => {
-      e.preventDefault()
-      let target = $(e.currentTarget)
-      let room = target.data('channel')
-      this.open_room(room, room)
-      return false
+      e.preventDefault();
+      let target = $(e.currentTarget);
+      let room = target.data('channel');
+      this.open_room(room, room);
+      return false;
     })
     .on('click', 'button.jump-to', () => {
-      if (debug) { console.log('jumpto', $('.first-unread').offset().top) }
+      if (debug) { console.log('jumpto', $('.first-unread').offset().top); }
       this.hide_unread_bar();
-      this.unread = false
-      let msgbox = $('.messages-box .wrapper')
-      let valof = msgbox.scrollTop().valueOf()
-      let first_top = $('.first-unread').offset().top
-      let offtop = msgbox.offset().top
-      let val = msgbox.scrollTop().valueOf() + $('.first-unread').offset().top - msgbox.offset().top
-      if (debug) { console.log('going to scroll to', valof, first_top, offtop, val) }
+      this.unread = false;
+      let msgbox = $('.messages-box .wrapper');
+      let valof = msgbox.scrollTop().valueOf();
+      let first_top = $('.first-unread').offset().top;
+      let offtop = msgbox.offset().top;
+      let val = msgbox.scrollTop().valueOf() + $('.first-unread').offset().top - msgbox.offset().top;
+      if (debug) { console.log('going to scroll to', valof, first_top, offtop, val); }
+
       $('.messages-box .wrapper').animate({
         scrollTop: val
       }, 1000);
     })
     .on('click', 'button.mark-read', () => {
+      // TODO: This should load the last page and scroll to the bottom of it
       this.remove_unread_class();
       this.hide_unread_bar();
 
-      let mypanel = $('.messages-box .wrapper')
+      let myPanel = $('.messages-box .wrapper')
       let val = myPanel[0].scrollHeight - myPanel.height();
+
       $('.messages-box .wrapper').animate({
         scrollTop: val
       }, 1000);
       setTimeout(() => {
-        this.message_box_focus()
-      }, 1000)
+        this.message_box_focus();
+      }, 1000);
     })
     .on('click', 'li.jump-to-message', e => {
-      if (debug) { console.log('jump-to-message') }
-      e.preventDefault()
-      let ct = e.currentTarget
-      let ts = $(ct).closest('li.message').data('timestamp')
-      let target = $('.messages-box li[data-timestamp="' + ts + '"]')
+      if (debug) { console.log('jump-to-message'); }
+      e.preventDefault();
+      let ct = e.currentTarget;
+      let ts = $(ct).closest('li.message').data('timestamp');
+      let target = $('.messages-box li[data-timestamp="' + ts + '"]');
+
       if (target.offset()) {
-        scroll_to(target, -400)
+        scroll_to(target, -400);
       } else {
-        ucx_chat.roomHistoryManager.getSurroundingMessages(ts)
+        ucx_chat.roomHistoryManager.getSurroundingMessages(ts);
       }
-      messageCog.close_cog($(ct))
-      this.message_box_focus()
+      messageCog.close_cog($(ct));
+      this.message_box_focus();
     })
     .on('click', '.jump-recent', e => {
-      console.log('jump-recent 1')
-      // messageCog.close_cog($(e.currentTarget))
-      // roomHistoryManager.getRecent()
-      UccUtils.scroll_bottom()
-      this.message_box_focus()
+      this.roomHistoryManager.getLastMessages();
+      this.message_box_focus();
+    })
+    .on('click', '.jump-previous', e => {
+      this.roomHistoryManager.getMorePrev;
+      this.message_box_focus();
     })
     .on('click', 'button.new-message', e => {
-      UccUtils.scroll_bottom()
-      this.message_box_focus()
+      UccUtils.scroll_bottom();
+      this.message_box_focus();
     })
   }
-
-  update_state(resp) {
-    this.has_more = resp.has_more
-    this.has_more_next = resp.has_more_next
-  }
-
-  // scroll() {
-    // if (!this.isloading && this.has_more) {
-    //     return
-    //   } else if (utils.is_scroll_bottom()) {
-    //     // console.log('reached the bottom')
-    //     if (this.has_more_next) {
-
-    //     } else {
-    //        $('.jump-recent').hasClass('not')
-    //     }
-    //     $('.jump-recent').addClass('not')
-    //   }
-    // }
-  //   if (this.unread) {
-  //      if (debug) { console.log('scrolling unread') }
-  //     if (this.is_first_unread_visible()) {
-  //       if (debug) { console.log('hiding unread_bar') }
-
-  //       if ($('.unread-bar').is(':visible')) {
-  //         this.hide_unread_bar()
-  //       }
-  //     } else {
-  //       let count = this.count_unread()
-  //       if (!$('.unread-bar').is(':visible')) {
-  //         $('.unread-bar').show()
-  //         if (debug) { console.log('show unread bar') }
-  //       } else {
-  //         if (debug) { console.log('else dont show unread bar') }
-  //       }
-  //       $('.unread-cnt').html(count)
-  //       if (debug) { console.log('count', count) }
-  //     }
-  //   } else {
-  //      // if (debug) { console.log('scrolling no unread') }
-  //   }
-  // }
 }
 
 export default RoomManager;

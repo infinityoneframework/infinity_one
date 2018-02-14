@@ -14,6 +14,7 @@ defmodule UcxUccWeb.UserSocket do
   channel CC.chan_system <> "*", UccChatWeb.SystemChannel  # "system:"
   channel CC.chan_webrtc <> "*", UccWebrtcWeb.WebrtcChannel
   channel CC.chan_client <> "*", MscsWeb.ClientChannel
+  channel "landing:*", UcxUccWeb.LandingChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -52,6 +53,11 @@ defmodule UcxUccWeb.UserSocket do
         end
     end
   end
+
+  def connect(%{"landing" => "true"} = params, socket) do
+    super params, assign(socket, :landing, true)
+  end
+
   def connect(params, socket), do: super(params, socket)
 
 
@@ -65,6 +71,7 @@ defmodule UcxUccWeb.UserSocket do
   #     UcxUccWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
+  def id(%{assigns: %{landing: true}}), do: nil
   def id(socket), do: "users_socket:#{socket.assigns.user_id}"
 
 end

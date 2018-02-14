@@ -1,0 +1,22 @@
+.information
+  h2 = ~g(Success)
+  p
+    = ~g(Your system is almost ready to use. )
+  p
+    = ~g(For email settings to take place you need to restart the service. )
+    = ~g(After logging in, visit the Administration section and select the )
+    strong = ~g(General)
+    = ~g( menu. You will find a )
+    strong = ~g(Restart Application)
+    = ~g( option. After about a minute, you can log back in and start inviting users as described below.)
+  p
+    = ~g(You can )
+    a(href="/") = ~g(Login Here)
+    = ~g( with your username )
+    strong = @username
+    = ~g( and start inviting users under the Administration section.)
+  p
+    = ~g(New users will automatically be subscribed to your )
+    a(href="/channels/#{@channel_name}") = "##{@channel_name}."
+
+  h2 = ~g(Welcome to UCxUCc!)

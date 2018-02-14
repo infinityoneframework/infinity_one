@@ -40,6 +40,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
   import Rebel.Query
   alias UcxUcc.TabBar
+  alias UcxUccWeb.Query
 
   require Logger
 
@@ -53,6 +54,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
 
       alias UcxUcc.TabBar
       alias TabBar.Ftab
+      alias UccUiFlexTabWeb.TabBarView
 
       require Logger
 
@@ -93,10 +95,31 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
             ] |> Enum.join(";")
 
             socket
-            |> update(:html, set: html, on: "section.flex-tab-main")
-            |> exec_js(js)
+            |> Query.update(:html, set: html, on: "section.flex-tab-main")
+            |> async_js(js)
 
             socket
+        end
+      end
+
+      @doc """
+      Refresh the currently open tab.
+
+      Use this function if you want to render the open tab. This can
+      be uses from a save of update callback to update some of the fields
+      on a form.
+      """
+      @spec refresh(socket, {id, id, tab, map}, args) :: socket
+      def refresh(socket, {user_id, channel_id, tab, sender}, args) do
+        case tab.template do
+          "" -> socket
+          templ ->
+
+            {args, socket} = args socket, {user_id, channel_id, nil, sender}, args
+
+            html = Phoenix.View.render_to_string(tab.view, templ, args)
+
+            Query.update(socket, :html, set: html, on: "section.flex-tab-main")
         end
       end
 
@@ -126,7 +149,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       """
       @spec close(socket, map) :: socket
       def close(socket, _sender) do
-        exec_js(socket, """
+        async_js(socket, """
           $('section.flex-tab').parent().removeClass('opened')
           $('.tab-button.active').removeClass('active')
           """)
@@ -141,6 +164,16 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       def args(socket, {_, _, _, _}, _), do: {[], socket}
 
       @doc """
+      Update the tab bar provide the given groups.
+      """
+      @spec refresh_tab_bar(socket, [String.t]) :: socket
+      def refresh_tab_bar(socket, groups) do
+        update socket, :replaceWith,
+          set: Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: groups),
+          on: "#flex-tabs .flex-tab-bar"
+      end
+
+      @doc """
       Callback when a form has been successfully updated
 
       Override to implement the callback.
@@ -148,7 +181,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       @spec notify_update_success(socket, tab, map, map) :: socket
       def notify_update_success(socket, tab, _sender, _opts), do: socket
 
-      defoverridable [open: 3, close: 2, args: 3, notify_update_success: 4, on_change: 2]
+      defoverridable [open: 3, refresh: 3,close: 2, args: 3, notify_update_success: 4, on_change: 2, refresh_tab_bar: 2]
     end
   end
 
@@ -188,8 +221,7 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
   """
   @spec exec_update_fun(socket, map, String.t) :: socket
   def exec_update_fun(socket, sender, name) do
-    js = ~s/$('#{this(sender)}')[0].dataset['fun'] = '#{name}'/
-    exec_js socket, js
+    broadcast_js socket, ~s/$('#{this(sender)}')[0].dataset['fun'] = '#{name}'/
     socket
   end
 

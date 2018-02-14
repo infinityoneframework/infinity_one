@@ -1,59 +1,93 @@
 defmodule UccChatWeb.MessageView do
+  @moduledoc """
+  Helpers for rendering a message.
+
+  There are many functions in this module to support the complexity of
+  rendering messages.
+
+  Some of the message features have not yet been implemented. So there
+  are some constant return functions below that will need to be implemented
+  when we add the missing features.
+
+  TODO: This module is due for a major clean up.
+  """
   use UccChatWeb, :view
   import Phoenix.HTML.Tag, only: [content_tag: 2, content_tag: 3, tag: 1]
-  # import UccChat.AvatarService, only: [avatar_url: 1]
 
   alias UccChat.{Message, Subscription, AttachmentService}
   alias UccChat.ServiceHelpers, as: Helpers
 
   require Logger
 
+  @doc """
+  Get the names of the people who reacted to a specific reaction.
+  """
   def get_reaction_people(reaction, user) do
     UccChat.ReactionService.get_reaction_people_names(reaction, user)
   end
 
+  @doc false
   def file_upload_allowed_media_types do
     ""
   end
 
+  @doc false
   def get_not_subscribed_templ(_mb) do
     %{}
   end
 
+  @doc """
+  Get the message attributes for the main message li tag.
+
+  Each message is presented in the web page as a `li` tag with a large
+  number of attributes. They are calculated here and a single `<li ...>`
+  tag is returned. Note that only the open tag is returned. The template
+  contains a closing `</li>` tag.
+
+  This approach was taken because I was not sure how to do it otherwise.
+  However, I believe there is a better approach.
+  """
   def get_message_wrapper_opts(msg, user) do
     cls =
       ~w(get_sequential get_system get_t get_own get_is_temp get_chat_opts get_custom_class get_new_day)a
       |> Enum.reduce("message background-transparent-dark-hover", fn fun, acc ->
         acc <> apply(__MODULE__, fun, [msg, user])
       end)
+      # |> add_new_day(msg, user, opts)
     attrs =
       [
         id: msg.id,
         class: cls,
         "data-username": msg.user.username,
         "data-groupable": msg.is_groupable,
-        "data-date": format_date(msg.updated_at, user),
+        "data-date": format_date(msg.inserted_at, user),
         "data-timestamp": msg.timestamp,
         "rebel-channel": "room"
       ]
     Phoenix.HTML.Tag.tag(:li, attrs)
   end
-  def format_date(%{updated_at: dt}, user) do
+
+  def format_date(%{inserted_at: dt}, user) do
     Helpers.format_date tz_offset(dt, user)
   end
+
   def format_date(dt, user) do
     Helpers.format_date tz_offset(dt, user)
   end
+
   def format_timestamp(dt, _user) do
     Message.format_timestamp dt
   end
-  def format_time(%{updated_at: dt}, user) do
+
+  def format_time(%{inserted_at: dt}, user) do
     format_time dt, user
   end
+
   def format_time(dt, user) do
     Helpers.format_time tz_offset(dt, user)
   end
-  def format_date_time(%{updated_at: dt}, user) do
+
+  def format_date_time(%{inserted_at: dt}, user) do
     format_date_time dt, user
   end
 
@@ -63,23 +97,46 @@ defmodule UccChatWeb.MessageView do
     |> NaiveDateTime.from_erl!
     |> format_date_time(user)
   end
+
   def format_date_time(nil, _), do: ""
 
   def format_date_time(dt, user) do
     Helpers.format_date_time tz_offset(dt, user)
   end
 
-  defp tz_offset(dt, user) do
+  def format_edited_date_time(%{updated_at: dt}, user) do
+    format_date_time dt, user
+  end
+
+  def tz_offset(dt, user) do
     Timex.shift(dt, hours: user.tz_offset || 0)
   end
 
-  def avatar_from_username(_msg), do: false
+  def avatar_from_message(message) do
+    avatar = message.avatar
+    if is_binary(avatar) and String.length(avatar) > 0 do
+      avatar
+    else
+      false
+    end
+  end
+
+  def avatar_from_username(_message) do
+    Logger.warn "deprecated"
+    false
+  end
+
+  @doc false
   def emoji(_msg) do
     false
   end
+
   def get_username(msg), do: msg.user.username
+  @doc false
   def get_users_typing(_msg), do: []
+  @doc false
   def get_users_typing(_msg, _cmd), do: []
+  @doc false
   def alias?(_msg), do: false
   def role_tags(message) do
     if UccSettings.display_roles() do
@@ -90,36 +147,46 @@ defmodule UccChatWeb.MessageView do
       []
     end
   end
+  @doc false
   def is_bot(_msg), do: false
   def get_date_time(msg, user), do: format_date_time(msg, user)
   def get_time(msg, user), do: format_time(msg, user)
   def is_private(%{type: "p"}), do: true
   def is_private(_msg), do: false
+  @doc false
   def hide_cog(_msg), do: ""
+  @doc false
   def attachments(_msg), do: []
+  @doc false
   def hide_action_links(_msg), do: " hidden"
+  @doc false
   def action_links(_msg), do: []
+  @doc false
   def hide_reactions(msg) do
     if msg.reactions == [], do: " hidden", else: ""
   end
+  @doc false
   def reactions(_msg), do: []
+  @doc false
   def mark_user_reaction(_reaction), do: ""
+  @doc false
   def render_emoji(_emoji), do: ""
+  @doc false
   def has_oembed(_msg), do: false
   def edited(%{edited_id: edited_id} = msg, user) when not is_nil(edited_id) do
     %{
-      edit_time: format_date_time(msg, user),
+      edit_time: format_edited_date_time(msg, user),
       edited_by: msg.edited_by.username,
     }
   end
   def edited(_msg, _), do: false
-
 
   def get_new_day(%{new_day: true}, _), do: " new-day"
   def get_new_day(_, _), do: ""
   def get_sequential(%{sequential: true}, _), do: " sequential"
   def get_sequential(_, _), do: ""
   def get_system(%{system: true}, _), do: " system"
+  def get_system(%{type: "p"}, _), do: " system"
   def get_system(_, _), do: ""
   def get_t(%{t: t}, _), do: "#{t}"
   def get_t(_, _), do: ""
@@ -269,9 +336,11 @@ defmodule UccChatWeb.MessageView do
   def is_popup_open(%{open: true}), do: true
   def is_popup_open(_), do: false
 
+  @doc false
   def get_popup_cls(_chatd) do
     ""
   end
+  @doc false
   def get_loading(_chatd) do
     false
   end
@@ -328,14 +397,9 @@ defmodule UccChatWeb.MessageView do
     markdown? = md_key && String.contains?(body, md_key)
     quoted? = String.contains?(body, "```") && !markdown?
 
-    if message.system || markdown? do
-      body
-    else
-      body
-      |> Phoenix.HTML.html_escape
-      |> Phoenix.HTML.safe_to_string
-      |> autolink(markdown?)
-    end
+    body
+    |> html_escape(!message.system)
+    |> autolink()
     |> encode_mentions
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
@@ -347,6 +411,17 @@ defmodule UccChatWeb.MessageView do
     |> raw
   end
 
+  defp html_escape(body, true) do
+    body
+    |> Phoenix.HTML.html_escape
+    |> Phoenix.HTML.safe_to_string
+  end
+  defp html_escape(body, _), do: body
+
+  @doc """
+  Runs the configured message replacement patterns regex's against the
+  message body.
+  """
   def run_message_replacement_patterns(body, [_ | _] = patterns) do
     Enum.reduce(patterns, body, fn {re, sub}, body ->
       Regex.replace(re, body, sub)
@@ -355,11 +430,18 @@ defmodule UccChatWeb.MessageView do
 
   def run_message_replacement_patterns(body, _), do: body
 
-  defp autolink(body, false) do
-    AutoLinker.link(body, exclude_patterns: ["```"])
+  defp autolink(body, opts \\ [])
+  defp autolink(body, false), do: body
+  defp autolink(body, opts) do
+    AutoLinker.link(body, Keyword.put(opts, :exclude_patterns, ["```"]))
   end
-  defp autolink(body, _), do: body
 
+  @doc """
+  Processes markdown in the message body.
+
+  Users the key `!md` to indicate text that should be run through the
+  markdown processor.
+  """
   def run_markdown(body, false, _), do: body
   def run_markdown(body, true, md_key) do
     case String.split(body, md_key) do
@@ -373,16 +455,28 @@ defmodule UccChatWeb.MessageView do
     end
   end
 
+  @doc """
+  Encodes mention links in the body text.
+  """
   def encode_mentions(body) do
-    Regex.replace ~r/(^|\s)@([\w]+)/, body,
+    Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body,
       ~s'\\1<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
       ~s' data-fun="flex_user_open" class="mention-link" data-username="\\2">@\\2</a>'
   end
 
+  @doc """
+  Encodes room links.
+  """
   def encode_room_links(body) do
     Regex.replace ~r/(^|\s)#([\w]+)/, body, ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
   end
 
+  @doc """
+  Handles markup commands.
+
+  Parser the body looking for the `*bold text*`, `_italics text_`, and
+  `~strike text~`
+  """
   def message_formats(body, false) do
     body
     |> italic_formats()
@@ -392,24 +486,26 @@ defmodule UccChatWeb.MessageView do
   def message_formats(body, _), do: body
 
   defp italic_formats(body) do
-    if body =~ ~r/\<.*?_.*?_.*?\>/ do
+    if body =~ ~r/(\<.*?_.*?_.*?\>)|`|!md/ do
       body
     else
-      String.replace(body, ~r/_(.+?)_/, "<i>\\1</i>")
+      String.replace(body, ~r/_([^\<\>]+?)_/, "<i>\\1</i>")
     end
   end
+
   defp bold_formats(body) do
-    if body =~ ~r/\<.*?\*.*?\*.*?\>/ do
+    if body =~ ~r/\<.*?\*.*?\*.*?\>|`|!md/ do
       body
     else
-      String.replace(body, ~r/\*(.+?)\*/, "<strong>\\1</strong>")
+      String.replace(body, ~r/\*([^\<\>]+?)\*/, "<strong>\\1</strong>")
     end
   end
+
   defp strike_formats(body) do
-    if body =~ ~r/\<.*?~.*?~.*?\>/ do
+    if body =~ ~r/\<.*?~.*?~.*?\>|`|!md/ do
       body
     else
-      String.replace(body, ~r/\~(.+?)\~/, "<strike>\\1</strike>")
+      String.replace(body, ~r/\~([^\<\>]+?)\~/, "<strike>\\1</strike>")
     end
   end
 
@@ -417,8 +513,10 @@ defmodule UccChatWeb.MessageView do
   defp format_newlines(string, _, true), do: string
   defp format_newlines(string, false, _), do: String.replace(string, "\n", "\n<br />\n")
 
+  @doc """
+  Return the message cog action list item
+  """
   def message_cog_action_li(name, title, icon, extra \\ "") do
-    #{}"reaction-message", "Reactions", "people-plus")
     opts = [class: "#{name} #{extra} message-action",
       title: title, "data-id": name] ++ rebel_event(name)
 
@@ -432,4 +530,14 @@ defmodule UccChatWeb.MessageView do
   defp rebel_event("reaction-message"), do: ["rebel-click": "reaction_open"]
   defp rebel_event("delete-message"), do: ["rebel-click": "message_action"]
   defp rebel_event(_), do: ["rebel-click": "message_action"]
+
+  @doc false
+  def system_message(message) do
+    messages = %{
+      "You have been muted and cannot speak in this room" => ~g(You have been muted and cannot speak in this room),
+      "You are not authorized to create a message" => ~g(You are not authorized to create a message),
+    }
+    messages[message] || ~g(Invalid Message Lookup)
+  end
+
 end

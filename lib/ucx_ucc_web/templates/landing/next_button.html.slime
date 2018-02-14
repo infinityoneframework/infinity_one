@@ -1,0 +1,3 @@
+button.button.next tabindex="#{@tab_inx}" rebel-click="click_next"
+  = ~g(Next)
+  i.icon-angle-double-right

@@ -8,6 +8,7 @@ defmodule UcxUccWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UcxUcc.Plugs.Setup
     plug Coherence.Authentication.Session
   end
 
@@ -17,6 +18,7 @@ defmodule UcxUccWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug UcxUcc.Plugs.Setup
     plug Coherence.Authentication.Session, protected: true
   end
 
@@ -26,6 +28,7 @@ defmodule UcxUccWeb.Router do
 
   scope "/", UcxUccWeb  do
     pipe_through :browser
+    get "/landing", LandingController, :index
     coherence_routes()
   end
 
@@ -43,6 +46,14 @@ defmodule UcxUccWeb.Router do
     get "/", ChannelController, :page
     get "/phone", MasterController, :phone
   end
+
+  # The following is a prototype of an API implementation. It is basically
+  # working, without authentication. Need updates in Coherence to get it
+  # working
+  # scope "/api/v1", UcxUccWeb.API do
+  #   pipe_through :api
+  #   post "/login", SessionController, :create
+  # end
 
   # forward "/admin", UccAdminWeb.Router
   # TODO: get unbrella working for this

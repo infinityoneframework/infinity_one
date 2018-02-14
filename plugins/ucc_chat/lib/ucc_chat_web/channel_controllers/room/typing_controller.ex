@@ -2,7 +2,8 @@ defmodule UccChatWeb.TypingChannelController do
   use UccChatWeb, :channel_controller
 
   # import UccChat.ChannelController
-  alias UccChat.{TypingAgent, MessageService}
+  alias UccChat.{TypingAgent}
+  alias UccChatWeb.RoomChannel.Channel
 
   require Logger
 
@@ -13,7 +14,7 @@ defmodule UccChatWeb.TypingChannelController do
     username: username, room: room}} = socket, _params) do
     # Logger.warn "#{@module_name} create params: #{inspect params}, socket: #{inspect socket}"
     TypingAgent.start_typing(channel_id, user_id, username)
-    MessageService.update_typing(channel_id, room)
+    Channel.update_typing(channel_id, room)
     {:noreply, socket}
   end
 

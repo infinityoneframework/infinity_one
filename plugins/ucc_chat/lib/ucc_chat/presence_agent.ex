@@ -165,6 +165,7 @@ defmodule UccChat.PresenceAgent do
       |> Repo.one
       |> case do
         nil    -> "online"
+        ""     -> "online"
         status -> {:override, status}
       end
 

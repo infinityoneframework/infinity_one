@@ -14,6 +14,7 @@
       background-color: #fcfcfc;
       padding: 0 4px 0 2px;
       color: #aaaaaa;
+      margin-bottom: 2px;
 
       .reaction-emoji {
         .emoji,
@@ -51,7 +52,7 @@
         transition: opacity 0.2s ease;
 
         html.rtl & {
-          margin-right: 10px;
+          margin-right: 2px;
           margin-left: 0;
         }
       }

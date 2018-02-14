@@ -317,6 +317,261 @@ footer.footer span.version {
   font-size: 10px;
 }
 
+.room-link {
+  .status-message {
+    font-size: x-small;
+    vertical-align: top;
+    padding-left: 8px;
+    text-overflow: ellipsis;
+  }
+  &.active .status-message {
+    color: white;
+    font-weight: bold;
+  }
+}
+
+#layout_content_home_body {
+  height: 200px;
+}
+
+aside.side-nav nav.options {
+  .status-message-box {
+    padding-left: 14px;
+    padding-right: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #888;
+    margin-top: 10px;
+    position: relative;
+
+    .select-arrow {
+      right: 12px;
+      i {
+        color: rgba(255,255,255,0.3);
+      }
+    }
+    select {
+      option[value="__clear__"] { color: red; }
+      option[value="__new__"] { color: green; }
+      // option[value="__edit__"] {
+      //   &:before {
+      //     content:'\e958';
+      //     font-family: "fontello";
+      //     font-style: normal;
+      //     font-weight: normal;
+      //     speak: none;
+      //     display: inline-block;
+      //     text-decoration: inherit;
+      //     width: 1em;
+      //     margin-right: .2em;
+      //     text-align: center;
+      //     font-variant: normal;
+      //     text-transform: none;
+      //     line-height: 1em;
+      //     margin-left: .2em;
+      //     -webkit-font-smoothing: antialiased;
+      //   }
+      // }
+      option[selected="selected"] {
+        font-style: italic;
+      }
+      option {
+        color: #666;
+        background-color: #f3f2f2;
+      }
+    }
+
+    &:before {
+      content: 'Status Message';
+      position: absolute;
+      right: 12px;
+      top: -20px;
+      color: rgba(255,255,255,0.3);
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border-width: 1px;
+      background-color: rgba(255,255,255,0.1);
+      &:focus {
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+    .status-message-edit {
+      margin: -8px -8px -3px -8px;
+      padding: 8px 8px 5px 8px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+
+      .control-list {
+        max-height: 230px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .header-bar {
+        color: #eee;
+        position: relative;
+        margin-bottom: 5px;
+        background-color: #555;
+        padding: 5px 8px;
+        border-radius: 5px;
+        .title {
+          cursor: auto;
+        }
+        .btn {
+          position: absolute;
+          top: 4px;
+          right: 1px;
+          cursor: pointer;
+          i {
+            color: #ddd;
+          }
+        }
+      }
+    }
+    .status-message-edit-ctrl {
+      position: relative;
+      input {
+        margin-bottom: 3px;
+        padding-right: 75px;
+      }
+      .buttons {
+        // position: absolute;
+        // border-radius: 0 4px 4px 0;
+        // top: 2px;
+        right: 2px !important;
+        .button {
+          i.danger-color-light {
+            color: #F44336 !important;
+          }
+          // padding: 0px;
+          // display: inline-block;
+          // background-color: #6c6c6c;
+          // width: 22px;
+          // height: 31px;
+          // border-width: 0;
+          // // // &.save {
+          // //   border-radius: 0 5px 5px 0;
+          // }
+        }
+      }
+    }
+    .status-message-edit-ctrl,
+    .status-message-input {
+      .buttons {
+        position: absolute;
+        border-radius: 0 4px 4px 0;
+        top: 2px;
+        right: 14px;
+        .button {
+          padding: 0px;
+          display: inline-block;
+          background-color: #6c6c6c;
+          width: 22px;
+          height: 31px;
+          border-width: 0;
+          &.save {
+            border-radius: 0 5px 5px 0;
+          }
+          &[disabled] i {
+            color: rgba(255,255,255,0.3) !important;
+          }
+          i.success-color {
+            color: #4dff4d;
+          }
+        }
+      }
+    }
+  }
+}
+.avatar-dropzone {
+  border: 1px dashed #ddd;
+  border-radius: 5px;
+  width: 40%;
+  margin-top: -30px;
+  height: 145px;
+  display: inline-block;
+  text-align: center;
+  z-index: 9999;
+
+  &.over {
+    border: 1px dashed #666;
+    background-color: #eee;
+    span {
+      color: #666;
+    }
+  }
+
+  span {
+    position: absolute;
+    width: 100%;
+    align-content: center;
+    left: 0;
+    top: 45%;
+    color: #ccc;
+  }
+}
+.avatar-initials,
+.avatar-full {
+  img {
+    border-radius: 5px;
+  }
+}
+
+.account-box {
+  .status-message {
+    display: block;
+    font-size: x-small;
+    color: #a6d256;
+  }
+}
+.room-topic.status-message {
+  color: #5a7920;
+}
+
+.side-nav {
+  .-autocomplete-list {
+    background-color: #999;
+    opacity: .9;
+    z-index: 1000;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-top: 3px;
+    .-autocomplete-item {
+      border-top: 1px solid #ccc;
+      &:first-child {
+        border: none;
+      }
+    }
+  }
+  ul.selected-users {
+    li {
+      border-radius: 3px !important;
+    }
+  }
+
+  .rooms-list {
+    &.search {
+      h3,
+      .empty,
+      .more {
+        display: none;
+      }
+      .opt {
+        display: none;
+      }
+      li.room-link.active {
+        background-color: inherit !important;
+      }
+      .search-empty {
+        padding-top: 15px;
+        padding-left: 5px;
+        font-weight: bold;
+      }
+    }
+  }
+}
 section.page-container.page-home {
   .content {
     .avatar-full {
@@ -365,37 +620,36 @@ section.page-container.page-home {
     }
   }
 }
-.avatar-dropzone {
-  border: 1px dashed #ddd;
-  border-radius: 5px;
-  width: 40%;
-  margin-top: -30px;
-  height: 145px;
-  display: inline-block;
-  text-align: center;
-  z-index: 9999;
 
-  &.over {
-    border: 1px dashed #666;
-    background-color: #eee;
-    span {
-      color: #666;
+@media only screen and (max-height: 560px) {
+  .sweet-alert.showSweetAlert.visible.file-upload {
+    font-family: inherit;
+    h2 {
+      font-size: 22px;
+      font-weight: 500;
+      margin: 10px 0;
+    }
+    p {
+      input {
+        font-size: 14px;
+        border-color: #e6e6e6;
+        color: #444;
+        border-radius: 5px;
+        padding: 2px 8px;
+        height: 35px;
+        line-height: normal;
+        margin-top: 5px;
+        margin-bottom: 0px;
+      }
+    }
+    .sa-button-container {
+      button {
+        margin: 10px 5px 0 5px;
+      }
     }
   }
-
-  span {
-    position: absolute;
-    width: 100%;
-    align-content: center;
-    left: 0;
-    top: 45%;
-    color: #ccc;
-  }
-}
-.avatar-initials,
-.avatar-full {
-  img {
-    border-radius: 5px;
-  }
 }
 
+// ::-webkit-scrollbar {
+//   z-index: 8000;
+// }

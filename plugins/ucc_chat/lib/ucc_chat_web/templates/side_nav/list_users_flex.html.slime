@@ -35,7 +35,7 @@ header.primary-background-color
     ul
       = for user <- @users do
         li
-          a.direct-link(href="/direct/#{user.username}")
+          a.direct-link data-direct="#{user.username}" rebel-click="side_nav_open_direct"
             i.icon-at(class="status-#{user.status}" data-status-name="#{user.username}")
             = user_list_item_hook user
             = user.username

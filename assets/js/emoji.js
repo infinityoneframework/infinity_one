@@ -192,17 +192,20 @@ class ChatEmoji {
 
 $(document).ready(() => {
   window.chat_emoji = new ChatEmoji();
-  Rebel.additional_payloads.push(function(sender, event) {
-    var textarea = document.querySelector('textarea.input-message');
-    if (textarea && sender && sender.getAttribute('rebel-handler') == 'emoji_select') {
-      return {
-        caret: UccUtils.getCaretPosition(textarea),
-        content: textarea.value
+
+  if (window.Rebel) {
+    Rebel.additional_payloads.push(function(sender, event) {
+      var textarea = document.querySelector('textarea.input-message');
+      if (textarea && sender && sender.getAttribute('rebel-handler') == 'emoji_select') {
+        return {
+          caret: UccUtils.getCaretPosition(textarea),
+          content: textarea.value
+        }
+      } else {
+        return {};
       }
-    } else {
-      return {};
-    }
-  });
+    });
+  }
 })
 
 export default ChatEmoji

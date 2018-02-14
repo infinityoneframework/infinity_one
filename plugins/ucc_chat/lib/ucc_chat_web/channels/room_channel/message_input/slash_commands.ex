@@ -22,7 +22,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
 
   def handle_select(_buffer, selected, context) when selected in [nil, ""] do
     context.client.close_popup context.socket
-    context.client.send_js context.socket, """
+    context.client.async_js context.socket, """
       var te = document.querySelector('#{@message_box}');
       te.value = '';
       te.focus();
@@ -30,9 +30,14 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands do
   end
 
   def handle_select(_buffer, selected, context) do
-    context.client.send_js context.socket, """
+    value =
+      selected
+      |> Slash.special_text
+      |> Kernel.<>(" ")
+      |> Poison.encode!
+    context.client.async_js context.socket, """
       var te = document.querySelector('#{@message_box}');
-      te.value = '#{Slash.special_text selected} ';
+      te.value = #{value};
       te.focus();
       """
   end

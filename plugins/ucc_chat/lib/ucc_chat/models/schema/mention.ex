@@ -15,14 +15,16 @@ defmodule UccChat.Schema.Mention do
     timestamps(type: :utc_datetime)
   end
 
-  @fields ~w(user_id message_id channel_id)a
+  @fields ~w(message_id channel_id)a
+
+  def model, do: UccChat.Mention
 
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, @fields ++ [:unread, :all, :name])
+    |> cast(params, @fields ++ [:user_id, :unread, :all, :name])
     |> validate_required(@fields)
   end
 

@@ -1,0 +1,9 @@
+table.statistics-table.secondary-background-color
+  tbody
+    = for {type, name, value} <- summary_fields(@results) do
+      tr.admin-table-row
+        = if type == :title do
+          th.secondary-background-color.border-component-color.title colspan="2" = name
+        - else
+          th.content-background-color.border-component-color = name
+          td.border-component-color = value

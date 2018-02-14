@@ -37,7 +37,6 @@ defmodule UcxUccWeb.LayoutView do
         token: ~s("#{token}"),
         ip_address: ~s("#{ip_address}")
       ]
-
   end
 
   def get_ipaddress(conn) do

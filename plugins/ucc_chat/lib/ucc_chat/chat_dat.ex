@@ -1,14 +1,22 @@
 defmodule UccChat.ChatDat do
-  alias UccChat.{Channel, MessageService}
-  alias UcxUcc.{Repo, Hooks, Accounts.User}
+  @moduledoc """
+  The main data structure provided to many of the chat related templates.
+
+  Instead of passing a large number of bindings around, this module
+  provides a common struct containing the information required to render
+  the main chat app.
+  """
+  alias UccChat.{Channel}
+  alias UcxUcc.{Repo, Hooks, Accounts, Accounts.User}
   alias UccChat.Schema.Channel, as: ChannelSchema
+  alias UccChatWeb.RoomChannel.Message
 
   require Logger
 
   defstruct user: nil, room_types: [], settings: %{}, rooms: [],
             channel: nil, messages: nil, room_map: %{}, active_room: %{},
             status: "offline", room_route: "channels", messages_info: %{},
-            previews: []
+            previews: [], search_empty: false
 
   def new(user, channel, messages \\ [])
   def new(%User{roles: %Ecto.Association.NotLoaded{}} = user,
@@ -17,15 +25,13 @@ defmodule UccChat.ChatDat do
     |> Repo.preload([:roles, user_roles: :role])
     |> new(channel, messages)
   end
+
   def new(%User{} = user, %ChannelSchema{} = channel, messages) do
     user = Hooks.preload_user user, []
-    %{room_types: room_types, rooms: rooms, room_map: room_map,
-      active_room: ar} =
-        UccChat.ChannelService.get_side_nav(user, channel.id)
+    %{room_types: room_types, rooms: rooms, room_map: room_map, active_room: ar} =
+      UccChat.ChannelService.get_side_nav(user, channel.id)
 
-    previews = MessageService.message_previews(user.id, messages)
-    # Logger.warn "message previews: #{inspect previews}"
-
+    previews = Message.message_previews(user.id, messages)
     status = UccChat.PresenceAgent.get user.id
 
     %__MODULE__{
@@ -41,6 +47,8 @@ defmodule UccChat.ChatDat do
       previews: previews
     }
   end
+
+  def new(%User{} = user, nil, _), do: new(user)
 
   def new(%User{} = user, channel_id, messages) do
     channel = Channel.get(channel_id)
@@ -67,14 +75,41 @@ defmodule UccChat.ChatDat do
     }
   end
 
+  def new_search(user, match, channel_id, opts \\ [])
+  def new_search(%{} = user, match, channel_id, opts) do
+    %{room_types: room_types, rooms: rooms, room_map: room_map,
+      active_room: _ar, search_empty: empty} =
+        UccChat.ChannelService.get_side_nav_search(user, match, channel_id, opts)
+
+    status = UccChat.PresenceAgent.get user.id
+    %__MODULE__{
+      status: status,
+      user: user,
+      room_types: room_types,
+      rooms: rooms,
+      room_map: room_map,
+      channel: nil,
+      messages: [],
+      active_room: 0,
+      room_route: "home",
+      search_empty: empty,
+    }
+  end
+
+  def new_search(user_id, match, channel_id, opts) do
+    user_id
+    |> Accounts.get_user
+    |> new_search(match, channel_id, opts)
+  end
+
   def get_messages_info(chatd) do
     get_messages_info(chatd, chatd.user)
   end
+
   def get_messages_info(chatd, user) do
     case chatd.channel do
       %ChannelSchema{id: id} ->
-        value = MessageService.get_messages_info(chatd.messages, id, user)
-        # Logger.warn "chatd value: value: #{inspect value}"
+        value = Message.get_messages_info(chatd.messages, id, user)
         set(chatd, :messages_info, value)
       _ ->
         chatd

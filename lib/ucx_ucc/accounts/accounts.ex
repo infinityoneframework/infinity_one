@@ -5,8 +5,13 @@ defmodule UcxUcc.Accounts do
 
   # alias UcxUcc.Accounts.User
   alias UcxUcc.Accounts.{Role, UserRole, User, Account}
+  alias UcxUcc.Hooks
   require Logger
   # alias UcxUcc.Permissions.{Permission, PermissionRole}
+
+  @default_user_preload [:account, :roles, user_roles: :role]
+
+  def default_user_preloads, do: Hooks.user_preload(@default_user_preload)
 
   ##################
   # User
@@ -40,16 +45,28 @@ defmodule UcxUcc.Accounts do
     |> Repo.all
   end
 
-  def list_all_users_by_pattern(pattern, exclude, count) do
+  def list_all_users_by_pattern(pattern, {column, exclude}, count) do
+    pattern = String.downcase(pattern)
     User
-    |> where([c], like(c.username, ^pattern) and not c.id in ^exclude)
+    |> where([c], like(fragment("LOWER(?)", c.username), ^pattern) and not field(c, ^column) in ^exclude)
     |> join(:left, [c], r in assoc(c, :roles))
     |> where([c, r], not(r.name == "bot" and r.scope == "global"))
     |> preload([c, r], [roles: c])
-    |> select([c], c)
     |> order_by([c], asc: c.username)
     |> limit(^count)
     |> Repo.all
+  end
+
+  def list_all_users_by_pattern(pattern, exclude, count) do
+    list_all_users_by_pattern(pattern, {:id, exclude}, count)
+  end
+
+  defp pop_user_preloads(opts) do
+    if opts[:default_preload] do
+      {default_user_preloads(), Keyword.delete(opts, :default_preload)}
+    else
+      Keyword.pop(opts, :preload, [])
+    end
   end
 
   @doc """
@@ -68,19 +85,19 @@ defmodule UcxUcc.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
   def get_user!(id, opts) do
-    preload = opts[:preload] || []
+    {preload, _} = pop_user_preloads(opts)
     Repo.one! from u in User, where: u.id == ^id, preload: ^preload
   end
 
   def get_user(id), do: Repo.get(User, id)
 
   def get_user(id, opts) do
-    preload = opts[:preload] || []
+    {preload, _} = pop_user_preloads(opts)
     Repo.one from u in User, where: u.id == ^id, preload: ^preload
   end
 
   def get_by_user(opts) do
-    {preload, opts} = Keyword.pop(opts, :preload, [])
+    {preload, opts} = pop_user_preloads(opts)
     opts
     |> Enum.reduce(User, fn {k, v}, query ->
       where query, [q], field(q, ^k) == ^v
@@ -90,7 +107,7 @@ defmodule UcxUcc.Accounts do
   end
 
   def list_by_user(opts) do
-    {preload, opts} = Keyword.pop(opts, :preload, [])
+    {preload, opts} = pop_user_preloads(opts)
     opts
     |> Enum.reduce(User, fn {k, v}, query ->
       where query, [q], field(q, ^k) == ^v
@@ -99,11 +116,16 @@ defmodule UcxUcc.Accounts do
     |> Repo.all
   end
 
-  def username_by_user_id(id) do
-    case get_user id do
+  def username_by_user_id(id, opts \\ []) do
+    {preload, _} = pop_user_preloads(opts)
+    case get_user id, preload: preload do
       nil -> nil
       user -> user.username
     end
+  end
+
+  def get_by_username(username, opts \\ []) do
+    get_by_user [{:username, username} | opts]
   end
 
   @doc """
@@ -506,6 +528,32 @@ defmodule UcxUcc.Accounts do
 
   """
   def get_account!(id), do: Repo.get!(Account, id)
+
+  @doc """
+  Gets an account by one or more fields
+  """
+  def get_by_account(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(Account, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.one
+  end
+
+  @doc """
+  Gets a list of accounts by one or more fields.
+  """
+  def list_by_accounts(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload, [])
+    opts
+    |> Enum.reduce(Account, fn {k, v}, query ->
+      where query, [q], field(q, ^k) == ^v
+    end)
+    |> preload(^preload)
+    |> Repo.all
+  end
 
   @doc """
   Creates an account.

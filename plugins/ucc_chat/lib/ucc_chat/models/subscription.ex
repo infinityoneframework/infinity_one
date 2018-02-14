@@ -1,7 +1,74 @@
 defmodule UccChat.Subscription do
+  @moduledoc """
+  Context module for the Subscription Schema.
+  """
   use UccModel, schema: UccChat.Schema.Subscription
 
+  alias Ecto.Changeset
+
   alias UccChat.Schema.Channel
+  alias UccChat.ChannelService
+  alias UcxUcc.Accounts.User
+
+  require Logger
+
+  def last_channel?(%{type: 2}), do: false
+  def last_channel?(%{user_id: _user_id}) do
+    false
+  end
+
+  def delete(%Ecto.Changeset{} = changeset) do
+    if last_channel?(changeset.data) do
+      {:error, Changeset.add_error(changeset, :channel_id, "Cannot remove last channel")}
+    else
+      super(changeset)
+    end
+  end
+
+  def delete(other) do
+    super(other)
+  end
+
+  def join_new(user_id, channel_id, opts \\ []) do
+    with nil <- get_by(user_id: user_id, channel_id: channel_id),
+         {:ok, subs} <-ChannelService.join_channel(channel_id, user_id) do
+      subs
+    else
+      {:error, _} = error -> error
+      subs -> subs
+    end
+    |> case do
+      {:error, _} = error -> error
+      subs ->
+        if opts[:unread] do
+          __MODULE__.update(subs, %{unread: subs.unread + 1})
+        else
+          {:ok, subs}
+        end
+    end
+  end
+
+  def update(channel_id, user_id, params) do
+    case get(channel_id, user_id) do
+      nil ->
+        {:error, :not_found}
+      sub ->
+        __MODULE__.update(sub, params)
+    end
+  end
+
+  def update(%@schema{} = schema, params) do
+    super(schema, params)
+  end
+
+  def update(%{channel_id: channel_id, user_id: user_id}, params) do
+     __MODULE__.update(channel_id, user_id, params)
+  end
+
+  def update_direct_notices(_type, _channel_id, _user_id) do
+    Logger.warn "deprecated"
+    nil
+  end
 
   def get_all_for_channel(channel_id) do
     from c in @schema, where: c.channel_id == ^channel_id
@@ -11,10 +78,22 @@ defmodule UccChat.Subscription do
     @repo.one @schema.get_by_room room, user_id
   end
 
-  def get(channel_id, user_id, opts \\ []) do
+  def get(channel_id, user_id, opts \\ [])
+
+  def get(channel_id, user_id, opts) when is_list(opts) do
     preload = opts[:preload] || []
-    from c in @schema, where: c.channel_id == ^channel_id and c.user_id == ^user_id,
+    @repo.one from c in @schema, where: c.channel_id == ^channel_id and c.user_id == ^user_id,
       preload: ^preload
+  end
+
+  def get(channel_id, user_id, field) when is_atom(field) do
+    channel_id
+    |> get(user_id)
+    |> case do
+      nil   -> %{}
+      other -> other
+    end
+    |> Map.get(field)
   end
 
   def get_by_channel_id_and_not_user_id(channel_id, user_id, opts \\ []) do
@@ -64,6 +143,24 @@ defmodule UccChat.Subscription do
     |> @repo.all
   end
 
+  def fuzzy_search(text, user_id, opts \\ []) do
+    text
+    |> String.to_charlist
+    |> Enum.intersperse("%")
+    |> to_string
+    |> search(user_id, opts)
+  end
+
+  def search(text, user_id, _opts \\ []) do
+    # preload = Keyword.put_new opts[:preload] || [], :channel
+    match = "%" <> String.downcase(text) <> "%"
+    (from s in @schema,
+      join: c in Channel, on: s.channel_id == c.id,
+      where: s.user_id == ^user_id and like(fragment("LOWER(?)", c.name), ^match),
+      select: s, preload: [:channel])
+    |> @repo.all
+  end
+
   def update_all_hidden(channel_id, state) do
     @schema
     |> where([s], s.channel_id == ^channel_id)
@@ -87,4 +184,70 @@ defmodule UccChat.Subscription do
       _  -> true
     end
   end
+
+  def get_unread(channel_id, user_id) do
+    case get_by channel_id: channel_id, user_id: user_id do
+      %{unread: unread} -> unread
+      _ -> 0
+    end
+  end
+
+  def clear_unread(channel_id, user_id) do
+    channel_id
+    |> set_unread(user_id, 0)
+    |> set_has_unread(false)
+  end
+
+  def set_unread({:ok, subscription}, count) do
+    __MODULE__.update(subscription, %{unread: count})
+  end
+
+  def set_unread(error, _count) do
+    error
+  end
+
+  def set_unread(channel_id, user_id, 1) do
+    channel_id
+    |> set_has_unread(user_id, true)
+    |> set_unread(1)
+  end
+
+  def set_unread(channel_id, user_id, count) do
+    [channel_id: channel_id, user_id: user_id]
+    |> get_by
+    |> case do
+      nil -> :error
+      sub -> __MODULE__.update(sub, %{unread: count})
+    end
+  end
+
+  def set_has_unread({:ok, subscription}, value) do
+    __MODULE__.update(subscription, %{has_unread: value})
+  end
+
+  def set_has_unread(error, _value) do
+    error
+  end
+
+  def set_has_unread(channel_id, user_id, false) do
+    clear_unread(channel_id, user_id)
+  end
+
+  def set_has_unread(channel_id, user_id, count) do
+    [channel_id: channel_id, user_id: user_id]
+    |> get_by
+    |> case do
+      nil -> :error
+      sub -> __MODULE__.update(sub, %{has_unread: count})
+    end
+  end
+
+  def usernames_by_channel_id(channel_id) do
+    @repo.all from s in @schema,
+      join: u in User,
+      on: s.user_id == u.id,
+      where: s.channel_id == ^channel_id,
+      select: u.username
+  end
+
 end

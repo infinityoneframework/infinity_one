@@ -12,6 +12,9 @@ defmodule UccChat.Schema.Mute do
   end
 
   @fields ~w(user_id channel_id)a
+
+  def model, do: UccChat.Mute
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

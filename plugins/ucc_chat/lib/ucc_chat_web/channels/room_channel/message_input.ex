@@ -2,18 +2,28 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   use UccLogger
   use UccChatWeb.RoomChannel.Constants
 
-  # alias UccChatWeb.RoomChannel.KeyStore
   alias UccChatWeb.RoomChannel.MessageInput.{SpecialKeys, Buffer}
-  # alias UccChatWeb.RoomChannel.Message
-  alias UccChatWeb.RoomChannel.MessageInput.Buffer
+  alias UccChatWeb.RoomChannel.{Message, Channel}
   alias UccChatWeb.Client
-  alias UccChat.MessageService
 
   def message_keydown(socket, sender) do
     key = sender["event"]["key"]
     unless key in @ignore_keys do
       handle_keydown(socket, sender, key)
     end
+    socket
+  end
+
+  def message_send(socket, _sender, client \\ Client) do
+    Logger.warn "deprecated"
+
+    body = socket |> client.get_message_box_value |> String.trim_trailing
+    if client.editing_message?(socket) do
+      Message.update_message(socket, body, client)
+    else
+      Message.new_message(socket, body, client)
+    end
+    Channel.stop_typing socket
     socket
   end
 
@@ -27,7 +37,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
 
   def typing_notification(%{sender: sender} = context) do
     if sender["value"] == "" do
-      MessageService.start_typing context.socket
+      Channel.start_typing context.socket
     end
     context
   end
@@ -43,6 +53,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     }
     |> Buffer.add_buffer_state(sender, key)
     |> set_app(sender)
+    |> set_message_box_buttions(key, client)
     |> logit1
   end
 
@@ -60,6 +71,22 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
   end
 
   defp trace_data(context) do
+    context
+  end
+
+  defp set_message_box_buttions(context, key, client) do
+    socket = context.socket
+    sender = context.sender
+    len = sender["text_len"]
+    dirty = sender["class"] =~ "dirty"
+    cond do
+      dirty and (len == 0 or (len == 1 and client.get_message_box_value(socket) == "")) ->
+        client.set_inputbox_buttons(socket, false)
+      not dirty and not (key == @bs and len == 0) ->
+        client.set_inputbox_buttons(socket, true)
+      true ->
+        nil
+    end
     context
   end
 
@@ -157,8 +184,8 @@ defmodule UccChatWeb.RoomChannel.MessageInput do
     |> check_and_close(Map.put(context, :app, module))
   end
 
-  def send_js(context, js) do
-    context.client.send_js context.socket, js
+  def broadcast_js(context, js) do
+    context.client.broadcast_js context.socket, js
     context
   end
 

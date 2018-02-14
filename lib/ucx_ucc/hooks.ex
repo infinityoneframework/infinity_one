@@ -66,4 +66,7 @@ defmodule UcxUcc.Hooks do
 
   defhook :register_admin_pages, 1
   defhook :build_sidenav_room, 1
+  defhook :landing_update , 1, doc: """
+    Notify the settings when user completes the Landing wizard.
+    """
 end

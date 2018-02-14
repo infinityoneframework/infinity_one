@@ -90,7 +90,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
 
     socket
     |> super({user_id, channel_id, tab, sender}, nil)
-    |> exec_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
+    |> broadcast_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
 
     socket
   end
@@ -127,7 +127,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   end
 
   defp exec_update_showing_count(socket) do
-    exec_js(socket,
+    broadcast_js(socket,
       "$('.showing-cnt').text($('.list-view ul.lines li').length)")
     socket
   end
@@ -187,9 +187,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   #   end
   # end
 
-  def set_mute(socket, sender) do
+  def set_mute(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
-    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
     channel_id = socket.assigns.channel_id
     current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
@@ -204,9 +204,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def unset_mute(socket, sender) do
+  def unset_mute(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
-    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
     channel_id = socket.assigns.channel_id
     current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
@@ -221,9 +221,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def set_owner(socket, sender) do
+  def set_owner(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
-    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
     channel_id = socket.assigns.channel_id
     current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
@@ -238,9 +238,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def unset_owner(socket, sender) do
+  def unset_owner(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
-    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
     channel_id = socket.assigns.channel_id
     current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
@@ -255,9 +255,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def set_moderator(socket, sender) do
+  def set_moderator(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
-    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
     channel_id = socket.assigns.channel_id
     current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
@@ -272,9 +272,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     socket
   end
 
-  def unset_moderator(socket, sender) do
+  def unset_moderator(socket, _sender) do
     username = select socket, data: "username", from: ".user-view[data-username]"
-    Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
+    # Logger.warn "username: #{inspect username}, sender: #{inspect sender}"
     user = UcxUcc.Accounts.get_by_user username: username
     channel_id = socket.assigns.channel_id
     current_user = UcxUcc.Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
@@ -328,7 +328,6 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
         ]
     socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
       "update:flex-button", %{username: user.username, html: html, button: "mute-unmute"}
-    socket
   end
 
 end

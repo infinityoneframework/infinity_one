@@ -7,11 +7,11 @@ $(document).ready(() => {
     let message_id = $(e.currentTarget).closest('li.message').attr('id')
     select(emoji, message_id)
   })
-  .on('click', '.reactions li.add-reaction', e => {
-    console.log('reaction e', $(e.currentTarget).offset())
-    // let message_id = $(e.currentTarget).closest('li.message').attr('id')
-    // chat_emoji.open_reactions(e.currentTarget, message_id)
-  })
+  // .on('click', '.reactions li.add-reaction', e => {
+  //   // console.log('reaction e', $(e.currentTarget).offset())
+  //   // let message_id = $(e.currentTarget).closest('li.message').attr('id')
+  //   // chat_emoji.open_reactions(e.currentTarget, message_id)
+  // })
   .on('mouseenter','.reactions > li:not(.add-reaction)', (event) => {
     event.preventDefault()
     event.stopPropagation();
@@ -26,6 +26,7 @@ $(document).ready(() => {
 })
 
 export function select(emoji, message_id) {
+  UccChat.tooltip.hide();
   chat_emoji.update_recent(emoji)
   UccChat.userchan.push('reaction:select', {reaction: emoji, message_id: message_id})
 }

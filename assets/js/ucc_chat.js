@@ -75,7 +75,6 @@ window.UccChat = {
   socket: undefined,
   typing: false,
   ucxchat: window.ucxchat,
-  // scroll_to: roomManager.scroll_to,
   onLine: true,
   loads: [],
   connects: [],
@@ -87,19 +86,6 @@ window.UccChat = {
   on_connect: function(f) {
     this.connects.push(f)
   },
-  // start_channels: function() {
-  //   console.warn('running the channel timeout funs', window.Rebel.channels.user.channel )
-  //   this.start_system_channel()
-  //   this.userchan = window.Rebel.channels.user.channel
-  //   this.start_user_chan()
-  //   this.start_room_channel(typing)
-
-  //   // TODO: Make this discoverable
-  //   // window.ucc_webrtc.start_channel(socket)
-
-  //   // device.set_webrtc(ucc_webrtc)
-  //   // device.enumerateDevices()
-  // },
   message_preview: function(msg) {
     setTimeout(() => {
       let bottom = UccUtils.is_scroll_bottom()
@@ -181,72 +167,6 @@ window.UccChat = {
     $('body').on('submit', '.message-form', e => {
       if (this.debug) { console.log('message-form submit', e) }
     })
-    .on('keydown', '.message-form-text', e => {
-      // console.log('keydown', e)
-    })
-    //   let event = new jQuery.Event('user:input')
-    //   switch(e.keyCode) {
-    //     case 38: // up arrow
-    //     case 40: // down arrow
-    //     case 9:  // TAB
-    //       event.keyCode = e.keyCode
-    //       $("body").trigger(event)
-    //       return false
-    //     case 8:  // BS
-    //       event.keyCode = e.keyCode
-    //       $("body").trigger(event)
-    //     default:
-    //       return true
-    //   }
-    // })
-    .on('keypress', '.message-form-text', e => {
-      // if (this.debug) { console.log('message-form-text keypress', e) }
-      // console.log('keypress', e)
-    })
-    //   if (e.keyCode == 13 && e.shiftKey) {
-    //     return true
-    //   }
-    //   if(e.keyCode == 13) {
-    //     if (this.messagePopup.handle_enter()) {
-    //       // console.log('return ', $('.message-form-text').hasClass('editing'))
-    //       if ($('.message-form-text').hasClass('editing')) {
-    //         // console.log('editing submit...', $('li.message.editing').attr('id'))
-    //         this.Messages.send_message({update: $('li.message.editing').attr('id'), value: $('.message-form-text').val()})
-    //       } else {
-    //         this.Messages.send_message($('.message-form-text').val())
-    //       }
-    //     }
-    //     this.typing.clear()
-    //     return false
-    //   } //else if (e.keyCode == 64) {
-    //   //   message_popup.open_users()
-    //   //   return true
-    //   // }
-
-    //   let event = new jQuery.Event('user:input')
-    //   event.keyCode = e.keyCode
-    //   $("body").trigger(event)
-
-    //   this.typing.start_typing()
-    //   return true
-    // })
-    // .on('keypress', 'input', e => {
-    //   console.log('keypress input', e.keyCode);
-    //   // return false;
-    //   // e.preventDefault();
-    //   // if (e.KeyCode == 13) {
-    //   //   UccChat.chan_user.push('')
-    //   // }
-    // })
-    // .on('change', 'form', e => {
-    //   console.log('keypress form',  e.target, e);
-    //   // return false;
-    //   // e.preventDefault();
-    //   // if (e.KeyCode == 13) {
-    //   //   UccChat.chan_user.push('')
-    //   // }
-    // })
-
 
     this.navMenu.setup()
 
@@ -268,7 +188,6 @@ require('./file_upload')
 require('./menu')
 require('./message_popup')
 require('./message_cog')
-require('./message_input')
 require('./utils')
 require('./chat_dropzone')
 require('./typing')
@@ -280,6 +199,3 @@ require('./chan_room')
 require('./messages')
 
 import * as cc from "./chat_channel"
-// import * as sweet from "./sweetalert.min"
-// import * as device from './device_manager'
-// import Typing from "./typing"

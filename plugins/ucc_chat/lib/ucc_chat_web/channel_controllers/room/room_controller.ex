@@ -1,22 +1,19 @@
 defmodule UccChatWeb.RoomChannelController do
   use UccChatWeb, :channel_controller
 
-  alias UccChat.ChannelService
-  # alias UcxUcc.Accounts.User
+  alias UccChat.{ChannelService, Subscription}
   alias UccChat.ServiceHelpers, as: Helpers
+  alias UccChatWeb.RebelChannel.Client
+  # alias UcxUccWeb.Query
+  # alias UccChatWeb.ClientView
+  alias UccChatWeb.UserChannel.SideNav.Channels
+
   require Logger
 
-  def show(%{assigns: assigns} = socket, params) do
-    Logger.debug "room channel_controller params: #{inspect params}, socket.assigns: #{inspect socket.assigns}"
-    reply =
-      if assigns.room == "lobby" do
-        %{redirect: ChannelService.room_redirect(params["room_id"], params["display_name"])}
-      else
-        resp = ChannelService.open_room(assigns[:user_id], params["room_id"],
-          assigns[:room], params["display_name"])
-        resp
-      end
-    {:reply, {:ok, reply}, socket}
+  def show(%{assigns: _assigns} = socket, params) do
+    Channels.open_room socket, params["room"], params["room_id"],
+      params["display_name"]
+    {:noreply, socket}
   end
 
   def favorite(socket, _param) do
@@ -34,14 +31,15 @@ defmodule UccChatWeb.RoomChannelController do
   end
 
   def hide(%{assigns: assigns} = socket, params) do
-    resp = case ChannelService.channel_command(socket, :hide, params["room"],
+    case ChannelService.channel_command(socket, :hide, params["room"],
       assigns[:user_id], assigns[:channel_id]) do
       {:ok, _} ->
-        {:ok, %{redirect: "/"}}
+        Channels.open_room(socket, params["room"], params["next_room"],
+          params["next_room_display_name"])
       {:error, error} ->
-        {:error, %{error: error}}
+        Client.toastr(socket, :error, error)
     end
-    {:reply, resp, socket}
+    {:noreply, socket}
   end
 
   def leave(%{assigns: assigns} = socket, params) do
@@ -63,13 +61,13 @@ defmodule UccChatWeb.RoomChannelController do
 
   def clear_has_unread(%{assigns: assigns} = socket, _params) do
     if assigns[:channel_id] do
-      ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, false)
+      Subscription.set_has_unread(assigns.channel_id, assigns.user_id, false)
     end
     {:noreply, socket}
   end
 
   def set_has_unread(%{assigns: assigns} = socket, _params) do
-    ChannelService.set_has_unread(assigns.channel_id, assigns.user_id, true)
+    Subscription.set_has_unread(assigns.channel_id, assigns.user_id, true)
     {:noreply, socket}
   end
 

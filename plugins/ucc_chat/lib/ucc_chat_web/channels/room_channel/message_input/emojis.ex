@@ -24,10 +24,15 @@ defmodule UccChatWeb.RoomChannel.MessageInput.Emojis do
 
   def handle_select(buffer, selected, context) do
     if selected != "" do
-      buffer = Regex.replace ~r/:(:[^\s]*:)/, buffer, "\\1"
-      context.client.send_js context.socket, """
+      buffer =
+        ~r/:(:[^\s]*:)/
+        |> Regex.replace(buffer, "\\1")
+        |> Kernel.<>(" ")
+        |> Poison.encode!()
+
+      context.client.async_js context.socket, """
         var te = document.querySelector('#{@message_box}');
-        te.value = '#{buffer} ';
+        te.value = #{buffer};
         te.focus();
         """
     end

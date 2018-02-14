@@ -3,12 +3,45 @@ defmodule UccChat.Channel do
 
   import Ecto.Changeset
 
-  alias UcxUcc.{Accounts, Accounts.User,  Repo}
-  alias UccChat.Subscription
+  alias UcxUcc.{Accounts, Accounts.User, Repo, UccPubSub}
+  alias UccChat.{Mute, Subscription}
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
   alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
+
+  def update(%Ecto.Changeset{} = changeset) do
+    case super(changeset) do
+      {:ok, _} = ok ->
+        Enum.each Map.keys(changeset.changes), fn key ->
+          UccPubSub.broadcast "user:all", "channel:change:key", %{
+            key: key,
+            old_value: Map.get(changeset.data, key),
+            new_value: changeset.changes[key],
+            channel_id: changeset.data.id
+          }
+        end
+        ok
+      other ->
+        other
+    end
+  end
+
+  def update(other) do
+    Logger.warn "Should now be here other: " <> inspect(other)
+    super(other)
+  end
+
+  def delete(channel) do
+    case super(channel) do
+      {:ok, channel} = ok ->
+        UccPubSub.broadcast "user:all", "channel:deleted",
+          %{room_name: channel.name, channel_id: channel.id}
+        ok
+      error ->
+        error
+    end
+  end
 
   def changeset(user, params) do
     changeset %@schema{}, user, params
@@ -20,6 +53,19 @@ defmodule UccChat.Channel do
     |> validate_permission(user)
   end
 
+  def create_channel(name, user_id, params \\ %{}) do
+    params = Map.merge %{name: name, user_id: user_id, type: 0}, params
+
+    user = Accounts.get_user user_id, preloads: [:roles, user_roles: [:role]]
+
+    case UccChat.ChannelService.insert_channel user, params do
+      {:ok, _} = ok ->
+        # TODO: should we broadcast a notification here?
+        ok
+      error -> error
+    end
+  end
+
   def changeset_settings(struct, user, [{"private", value}]) do
     type = if value == true, do: 1, else: 0
     changeset(struct, user, %{type: type})
@@ -28,12 +74,6 @@ defmodule UccChat.Channel do
   def changeset_settings(struct, user, [{field, value}]) do
     changeset(struct, user, %{field => value})
   end
-
-  defdelegate changeset_delete(struct, params \\ %{}), to: @schema
-
-  defdelegate changeset_update(struct, params \\ %{}), to: @schema
-
-  defdelegate blocked_changeset(struct, blocked), to: @schema
 
   def validate_permission(%{changes: changes, data: data} = changeset, user) do
     # Logger.warn "validate_permission: changeset: #{inspect changeset}, type: #{inspect changeset.data.type}"
@@ -115,14 +155,19 @@ defmodule UccChat.Channel do
   # privates that I'm subscribed too
   # and all channels I own
   def get_all_channels(%User{id: user_id} = user) do
+    query =
+      from c in @schema,
+      left_join: s in SubscriptionSchema,
+      on: s.channel_id == c.id and s.user_id == ^user_id,
+      preload: [:subscriptions]
     cond do
       Accounts.has_role?(user, "admin") ->
-        from c in @schema, where: c.type == 0 or c.type == 1, preload: [:subscriptions]
+        where query, [c], c.type in [0, 1]
       Accounts.has_role?(user, "user") ->
-        from c in @schema,
-          left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
-          where: c.type == 0 or (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
-      true -> from c in @schema, where: false
+        where query, [c, s], c.type == 0 or
+          (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
+      true ->
+        where query, [c], false
     end
   end
 
@@ -132,7 +177,11 @@ defmodule UccChat.Channel do
     |> get_all_channels
   end
 
-  def get_channels_by_pattern(user_id, pattern, count \\ 5) do
+  def get_channels_by_pattern(user_id, pattern, count \\ 5)
+  def get_channels_by_pattern(%{id: id}, pattern, count) do
+    get_channels_by_pattern(id, pattern, count)
+  end
+  def get_channels_by_pattern(user_id, pattern, count) do
     user_id
     |> get_authorized_channels
     |> where([c], like(c.name, ^pattern))
@@ -141,6 +190,82 @@ defmodule UccChat.Channel do
     |> select([c], {c.id, c.name})
     |> @repo.all
   end
+
+  @doc """
+  Get the nway channel.
+
+  The nway channel is the channel with `nway` true, and has the exact
+  subscribers as the user id list provided.
+  """
+  def get_nway(user_ids_list) do
+    # TOTO: This is not optimum, but I gave up trying to do this with
+    #       Ecto. Would be nice to come back later and go this at the
+    #       date base level.
+    query =
+      from c in @schema,
+        join: s in SubscriptionSchema,
+        on: s.channel_id == c.id,
+        select: {c, s.user_id},
+        where: c.nway == true
+
+    with [{channel, _} | _] = results <- @repo.all(query),
+         ids <- Enum.map(results, & elem(&1, 1)) |> Enum.uniq,
+         true <- length(ids) == length(user_ids_list),
+         true <- Enum.all?(ids, & &1 in user_ids_list) do
+      channel
+    else
+      _ -> nil
+    end
+  end
+
+  def get_channels_search(user_id, pattern, opts \\ %{})
+  def get_channels_search(user_id, pattern, opts) do
+    user_id
+    |> get_authorized_channels
+    |> where([c], like(fragment("LOWER(?)", c.name), ^pattern))
+    |> get_search_where(opts)
+    |> get_search_order_by(opts)
+    |> @repo.all
+    |> filter_joined(opts, user_id)
+    |> sort_by(opts)
+  end
+
+  defp filter_joined(dataset, %{joined: true}, user_id) do
+    joined =
+      [user_id: user_id]
+      |> UccChat.Subscription.list_by()
+      |> Enum.map(& &1.channel_id)
+    Enum.filter dataset, &  &1.id in joined
+  end
+
+  defp filter_joined(dataset, _, _), do: dataset
+
+  defp get_search_where(query, %{types: types}) do
+    where(query, [c], c.type in ^types)
+  end
+  defp get_search_where(query, _), do: query
+
+  defp get_search_order_by(query, %{order_by: :msgs}) do
+    preload query, [:messages]
+  end
+  defp get_search_order_by(query, %{order_by: :last_seen}), do: query
+
+  defp get_search_order_by(query, %{order_by: order_by}) do
+    order_by query, asc: ^order_by
+  end
+  defp get_search_order_by(query, _), do: query
+
+  defp sort_by(dataset, %{order_by: :msgs} = opts) do
+    op = if opts[:order] == :asc, do: &Kernel.</2, else: &Kernel.>/2
+    dataset
+    |> Enum.map(& {length(&1.messages), &1})
+    |> Enum.sort(& op.(elem(&1, 0), elem(&2, 0)))
+    |> Enum.map(& elem(&1, 1))
+  end
+  defp sort_by(dataset, %{order_by: :last_seen}) do
+    dataset
+  end
+  defp sort_by(dataset, _), do: dataset
 
   def room_route(channel) do
     case channel.type do
@@ -171,7 +296,7 @@ defmodule UccChat.Channel do
   end
 
   def archive(%ChannelSchema{archived: true} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     changeset =
       channel
       |> changeset(get_user!(user_id), %{archived: true})
@@ -180,7 +305,7 @@ defmodule UccChat.Channel do
   end
 
   def archive(%ChannelSchema{id: id} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     channel
     |> changeset(get_user!(user_id), %{archived: true})
     |> update
@@ -195,7 +320,7 @@ defmodule UccChat.Channel do
   end
 
   def unarchive(%ChannelSchema{archived: false} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     changeset =
       channel
       |> changeset(get_user!(user_id), %{archived: false})
@@ -204,7 +329,7 @@ defmodule UccChat.Channel do
   end
 
   def unarchive(%ChannelSchema{id: id} = channel, user_id) do
-    Logger.error ""
+    Logger.debug ""
     channel
     |> changeset(get_user!(user_id), %{archived: false})
     |> update
@@ -222,4 +347,11 @@ defmodule UccChat.Channel do
     Accounts.get_user! user_id, preload: [:roles, user_roles: :role]
   end
 
+  def user_muted?(channel_id, user_id) do
+    Mute.user_muted?(channel_id, user_id)
+  end
+
+  defdelegate changeset_delete(struct, params \\ %{}), to: @schema
+  defdelegate changeset_update(struct, params \\ %{}), to: @schema
+  defdelegate blocked_changeset(struct, blocked), to: @schema
 end

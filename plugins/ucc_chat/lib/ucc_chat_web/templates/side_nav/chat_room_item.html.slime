@@ -1,14 +1,3 @@
 li(class="room-link #{chat_room_item_li_class(@room)}")
-  a.open-room(href="#" title="#{@room[:name]}" data-room="#{@room[:name]}" data-name="#{@room[:display_name]}")
-    = if @room[:unread] do
-      span.unread= @room[:unread]
-    i(class="#{get_room_icon_class(@room)}" aria-label="" data-status-name="#{@room[:display_name]}")
-    = nav_room_item_icons @room
+  = render "chat_room_item_link.html", room: @room
 
-    span(class="name #{@room[:archived]}")
-      = @room[:display_name]
-
-    span.opt
-      i.icon-eye-off.hide-room(title="Hide room" aria-label="Hide room")
-      = if @room[:can_leave] do
-        i.icon-logout.leave-room(title="Leave room" aria-label="Leave room")

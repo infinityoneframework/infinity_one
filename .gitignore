@@ -7,7 +7,7 @@ start
 /plugins/mscs
 /plugins/ucx_presence
 /plugins/ucx_adapter
-/assets/js/mscs
+/assets/**/mscs
 /priv/static.bak
 /doc
 

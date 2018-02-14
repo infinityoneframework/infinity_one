@@ -9,6 +9,8 @@ defmodule UccChat.File do
 
   @versions [:original, :poster]
 
+  # TODO: This needs to be changed so only subscribers to the channel can
+  #       read the attachments
   @acl :public_read
 
   # To add a thumbnail version:
@@ -16,28 +18,32 @@ defmodule UccChat.File do
 
   # Whitelist file extensions:
   def validate({file, _}) do
-    ~w(.jpg .jpeg .gif .png .txt .text .doc .pdf .wav .mp3 .mp4 .mov .m4a .xls) |> Enum.member?(Path.extname(file.file_name))
+    # TODO: This needs to changed to pull from Settings.
+    ~w(.jpg .jpeg .gif .png .txt .text .doc .pdf .wav .mp3 .mp4 .mov .m4a .xls)
+    |> Enum.member?(Path.extname(file.file_name) |> String.downcase)
   end
 
   def transform(:poster, {_, %{type: "video" <> _}}) do
     {:ffmpeg, fn(input, output) ->
       "-i #{input} -f image2 -ss 00:00:01.00 -vframes 1 -vf scale=-1:200 #{output}" end, :jpg}
   end
+
   def transform(:poster, {_, %{type: "image" <> _}} = _params) do
-    # IO.inspect params, label: "transform other1: " <> inspect(params)
     {:convert, "-strip -resize @80000 -format png", :png}
   end
+
   def transform(:poster, _params) do
-    # IO.inspect params, label: "transform other2: " <> inspect(params)
-    {:convert, "-strip -resize @80000 -format png", :png}
+    :noaction
   end
 
   def filename(:poster, _params) do
     :poster
   end
+
   def filename(_version, {_, %{file_name: file_name}}) do
     String.replace(file_name, ~r(\.[^/.]+$), "")
   end
+
   def filename(_version, %{file_name: file_name}) do
     file_name
   end
@@ -50,13 +56,8 @@ defmodule UccChat.File do
 
   def storage_dir(_version, {_file, scope}) do
     storage_dir(scope)
-    # Logger.warn "storage dir file: #{inspect file}, scope: #{inspect scope}"
-    # Logger.warn "version: #{inspect version}"
-    # "priv/static/uploads/#{scope.message_id}"
-
-    # # "priv/uploads/#{scope.channel_id}"
-    # # "/priv/uploads"
   end
+
   def storage_dir(scope) do
     path = "priv/static/uploads/#{scope.message_id}"
     if UcxUcc.env == :prod do

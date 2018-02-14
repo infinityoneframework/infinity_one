@@ -34,7 +34,7 @@ class Admin {
     $('body')
       .on('click', 'button.discard', function() {
         // admin.disable_save_button()
-        $('a.admin-link[data-link="info"]').click()
+        $('a.admin-link[data-id="admin_info"]').click()
       })
       .on('change', '.admin-settings form input', function(e) {
         let target = e.currentTarget
@@ -42,7 +42,15 @@ class Admin {
         let reset = `<button text='Reset' data-setting="${target.getAttribute('name')}" class="reset-setting button danger">${reset_i}</button>`
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })
+      .on('change', '.admin-settings form select', function(e) {
+        admin.enable_save_button()
+        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      })
       .on('keyup keypress paste', '.admin-settings form input', function(e) {
+        admin.enable_save_button()
+        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      })
+      .on('keyup keypress paste', '.admin-settings form textarea', function(e) {
         admin.enable_save_button()
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })
@@ -79,7 +87,7 @@ class Admin {
           .addClass('section-collapsed')
       })
       .on('click', '.admin-settings button.save', function(e) {
-        console.log('saving form....', $('form').data('id'))
+        //console.log('saving form....', $('form').data('id'))
         e.preventDefault()
         UccChat.userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
           .receive("ok", resp => {
@@ -93,7 +101,7 @@ class Admin {
       })
       .on('click', 'button.refresh', function(e) {
         let page = $(this).closest('section').data('page')
-        $('a.admin-link[data-link="' + page + '"]').click()
+        $('a.admin-link[data-id="' + page + '"]').click()
       })
       .on('click', 'section.admin .list-view.channel-settings span[data-edit]', (e) => {
         let channel_id = $(e.currentTarget).closest('[data-id]').data('id')

@@ -1,0 +1,121 @@
+aside.side-nav.primary-background-color.color-tertiary-font-color
+  header.header
+    = render "header.html"
+  div.rooms-list
+    ul
+      li.active data-step="1" rebel-click="menu_click"
+        a href="#"
+          i.icon
+          span.name = step1()
+      li.separator
+        i.icon.icon-angle-double-down
+      li.disabled data-step="2" rebel-click="menu_click"
+        a href=""
+          i.icon
+          span.name = step2()
+      li.separator
+        i.icon.icon-angle-double-down
+      li.disabled data-step="3" rebel-click="menu_click"
+        a href=""
+          i.icon
+          span.name = step3()
+      li.separator
+        i.icon.icon-angle-double-down
+      li.disabled data-step="4" rebel-click="menu_click"
+        a href=""
+          i.icon
+          span.name = step4()
+      li.separator
+        i.icon.icon-angle-double-down
+      li.disabled data-step="5" rebel-click="menu_click"
+        a href=""
+          i.icon
+          span.name = step5()
+      li.separator
+        i.icon.icon-angle-double-down
+      li.disabled.success data-step="6"
+        a href=""
+          i.icon
+          span.name = step6()
+  footer.footer
+    = render "footer.html"
+    span.version= ~g(Version: ) <> UcxUcc.version()
+.wrapper
+  .main-content.content-background-color.color-primary-font-color.color-info-font-color
+    header
+      h2 = ~g(Installation Wizard)
+    .content
+      .information
+        p = main_instructions()
+
+      form action="#" method="#" onSubmit="return false"
+        section.steps
+          article.open data-step="1"
+            h3 = gettext("Step 1 - %{name}", name: step1())
+            .content
+              = step1_instructions()
+              .form-line
+                label for="host_name" = ~g(Host Name or IP Address)
+                input#host_name type="text" name="host_name" tabindex="1" value="#{host(@conn)}"
+              .controls
+                = next_button(2)
+
+          article data-step="2"
+            h3 = gettext("Step 2 - %{name}", name: step2())
+            .content
+              = step2_instructions()
+              .form-line
+                label for="admin_name" = ~g(Name)
+                input#admin_name type="text" name="admin[name]" tabindex="3"
+              .form-line
+                label for="admin_username" = ~g(Username)
+                input#admin_username type="text" name="admin[username]" tabindex="4"
+              .form-line
+                label for="admin_email" = ~g(Email Address)
+                input#admin_email type="email" name="admin[email]" tabindex="5"
+              .form-line
+                label for="admin_password" = ~g(Password)
+                input#admin_password type="password" name="admin[password]" tabindex="6"
+              .form-line
+                label for="admin_password_confirmation" = ~g(Confirm Password)
+                input#admin_password_confirmation type="password" name="admin[password_confirmation]" tabindex="7"
+              .controls
+                = prev_button(9)
+                = next_button(8)
+
+          article data-step="3"
+            h3 = gettext("Step 3 - %{name}", name: step3())
+            .content
+              = step3_instructions()
+              .form-line
+                label for="default_channel" = ~g(Channel Name)
+                input#default_channel_name type="text" name="default_channel[name]" tabindex="10" value="#{~g(general)}"
+              .controls
+                = prev_button(12)
+                = next_button(11)
+
+          article data-step="4"
+            h3 = gettext("Step 4 - %{name}", name: step4())
+            .content
+              = step4_instructions()
+              .form-line
+                label for="email_from_name" = ~g(From Name)
+                input#email_from_name type="text" name="email_from[name]" tabindex="13"
+              .form-line
+                label for="email_from_email" = ~g(From Email Address  )
+                input#email_from_email type="email" name="email_from[email]" tabindex="14"
+              .controls
+                = prev_button(16)
+                = summary_button(15)
+
+          article data-step="5"
+            h3 = gettext("Step 5 - %{name}", name: step5())
+            .content
+              p = ~g(Please review your data and press Submit if everything lookes ok.)
+              p.landing-summary
+              .controls
+                = prev_button(18)
+                button.button.next.submit tabindex="17" rebel-click="click_submit"
+                  = ~g(Submit)
+                  i.icon.icon-ok
+

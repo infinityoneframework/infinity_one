@@ -11,7 +11,7 @@ defmodule UccChatWeb.ChannelController do
 
   alias UccChat.{ChatDat}
   alias UccChat.{Message, Channel, ChannelService}
-  alias UcxUcc.{Accounts.User, Hooks}
+  alias UcxUcc.{Accounts.User, Hooks, Accounts}
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChat.Schema.Direct, as: DirectSchema
 
@@ -65,11 +65,11 @@ defmodule UccChatWeb.ChannelController do
 
     UccChat.PresenceAgent.load user.id
 
-    messages = Message.get_room_messages(channel.id, user)
+    page = Message.get_room_messages(channel.id, user)
 
     chatd =
       user
-      |> ChatDat.new(channel, messages)
+      |> ChatDat.new(channel, page)
       |> ChatDat.get_messages_info
 
     conn
@@ -82,27 +82,28 @@ defmodule UccChatWeb.ChannelController do
     case Channel.get_by(name: name) do
       nil ->
         conn
-        |> put_flash(:error, "#{name} is an invalid channel name!")
+        |> put_flash(:error, gettext("%{name} is an invalid channel name!", name: name))
         |> redirect(to: "/")
       channel ->
         if channel.type in [0,1] do
           show(conn, channel)
         else
-          redirect(conn, do: "/")
+          redirect(conn, to: "/")
         end
     end
   end
 
   def direct(conn, %{"name" => name}) do
-    with user when not is_nil(user) <- UccChat.ServiceHelpers.get_user_by_name(name),
-         user_id <- Coherence.current_user(conn) |> IO.inspect(label: "curr user") |> Map.get(:id),
-         false <- user.id == user_id do
+    with friend when not is_nil(friend) <- Accounts.get_by_username(name, default_preload: true),
+         user_id <- Coherence.current_user(conn) |> Map.get(:id),
+         false <- friend.id == user_id do
 
-      case get_direct(user_id, name) do
+      case get_direct(user_id, friend.id) do
         nil ->
+          # IO.inspect {user_id, name}
           # create the direct and redirect
-          ChannelService.add_direct(name, user_id, nil) |> IO.inspect(label: "direct")
-          direct = get_direct(user_id, name) |> IO.inspect(label: "direct 1")
+          ChannelService.add_direct(friend, user_id, nil) #  |> IO.inspect(label: "direct")
+          direct = get_direct(user_id, friend.id) #|> IO.inspect(label: "direct 1")
           show(conn, direct.channel)
         direct ->
           show(conn, direct.channel)
@@ -112,9 +113,10 @@ defmodule UccChatWeb.ChannelController do
     end
   end
 
-  defp get_direct(user_id, name) do
+  def get_direct(user_id, friend_id) do
     (from d in DirectSchema,
-      where: d.user_id == ^user_id and like(d.users, ^"%#{name}%"),
+      # where: d.user_id == ^user_id and like(d.users, ^"#{name}__%") or like(d.users, ^"%__#{name}")),
+      where: d.user_id == ^user_id and d.friend_id == ^friend_id,
       preload: [:channel])
     |> Repo.one
   end

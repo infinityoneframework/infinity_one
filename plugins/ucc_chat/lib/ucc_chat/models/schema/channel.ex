@@ -19,6 +19,7 @@ defmodule UccChat.Schema.Channel do
     field :default, :boolean, default: false
     field :description, :string
     field :private, :boolean, virtual: true
+    field :nway, :boolean, default: false
 
     has_many :subscriptions, Subscription, on_delete: :delete_all
     has_many :users, through: [:subscriptions, :user], on_delete: :nilify_all
@@ -32,8 +33,9 @@ defmodule UccChat.Schema.Channel do
     timestamps(type: :utc_datetime)
   end
 
-  @fields ~w(archived name type topic read_only blocked default user_id description active)a
+  @fields ~w(archived name type topic read_only blocked default user_id description active nway)a
 
+  def model, do: UccChat.Channel
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
@@ -41,6 +43,7 @@ defmodule UccChat.Schema.Channel do
     params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
+    |> unique_constraint(:name)
     |> validate(params)
   end
 
@@ -55,6 +58,7 @@ defmodule UccChat.Schema.Channel do
     params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
+    |> unique_constraint(:name)
     |> validate(params)
   end
 

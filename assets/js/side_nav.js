@@ -1,6 +1,8 @@
 import * as cc from './chat_channel'
 console.log('loading side_nav');
 
+var debug = false;
+
 UccChat.on_load(function(ucc_chat) {
   ucc_chat.sideNav = new SideNav(ucc_chat)
 })
@@ -18,20 +20,12 @@ class SideNav {
   get navMenu() { return this.ucc_chat.navMenu }
   get notifier() { return this.ucc_chat.notifier }
 
-  // more_channels() {
-  //   // console.log('cliecked more channels')
-  //   this.userchan.push('side_nav:more_channels')
-  //     .receive("ok", resp => {
-  //        $('.flex-nav section').html(resp.html).parent().removeClass('animated-hidden')
-  //        $('.arrow').toggleClass('close', 'bottom')
-  //     })
-  // }
   more_users() {
-    // console.log('cliecked more channels')
     this.userchan.push('side_nav:more_users')
       .receive("ok", resp => {
          $('.flex-nav section').html(resp.html).parent().removeClass('animated-hidden')
          $('.arrow').toggleClass('close', 'bottom')
+         Rebel.set_event_handlers('.flex-nav section')
       })
   }
   channel_link_click(elem) {
@@ -87,10 +81,23 @@ class SideNav {
 
     this.bind_scroll_event()
     $('body')
+    .on('keyup', '.status-message-edit-ctrl input', e => {
+      let current = $(e.currentTarget);
+      current.parent().children().find('[disabled]').removeAttr('disabled');
+    })
+    .on('keydown', '.status-message-edit-ctrl input', e => {
+      if (e.key == "Enter") {
+        let current = $(e.currentTarget);
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(function() {
+          current.parent().children().find('button.save').click();
+        }, 100);
+      }
+    })
     .on('click', 'button.test-notifications', e => {
       e.preventDefault()
       this.notifier.desktop('Desktop Notification Test', 'This is a desktop notification.', {duration: 5})
-      // console.log('test notifications')
       return false
     })
     .on('change', '#account_new_room_notification', e => {
@@ -136,29 +143,23 @@ class SideNav {
       $('.main-content-cache').html($('.main-content').html())
       this.userchan.push('side_nav:open', {page: $(e.currentTarget).attr('id')})
         .receive("ok", resp => {
-          console.log('resp', resp)
           $('.flex-nav section').html(resp.html)
-          console.log('resp from side_nav:open')
           this.navMenu.open()
           $('.flex-nav .wrapper ul li').first().addClass('active');
         })
       $('div.flex-nav').removeClass('animated-hidden')
       this.set_nav_top_icon('close')
     })
-    // .on('click', 'nav.options button.status', (e) =>  {
-    //   e.preventDefault()
-    //   this.systemchan.push('status:set:' + $(e.currentTarget).data('status'), {})
-    // })
     .on('click', '.flex-nav header', (e) => {
-      console.log('.flex-nav header click', e)
+      if (debug) { console.log('.flex-nav header click', e); }
       e.preventDefault()
       this.userchan.push('side_nav:close', {})
       // console.log('.flex-nav header clicked')
       $('div.flex-nav').addClass('animated-hidden')
       this.set_nav_top_icon('bottom')
-      console.log('going to restore cache')
+      if (debug) { console.log('going to restore cache'); }
       if ($('.main-content-cache').html() != '') {
-        console.log('restoring cache now!')
+        if (debug) { console.log('restoring cache now!'); }
         $('.main-content').html($('.main-content-cache').html())
         $('.main-content-cache').html('')
         this.roomHistoryManager.restore_cached_room()
@@ -167,7 +168,7 @@ class SideNav {
       SideNav.hide_account_box_menu()
     })
     .on('click', '.account-link', e => {
-      console.log('account link click')
+      if (debug) { console.log('account link click'); }
       e.preventDefault()
       $('.flex-nav .wrapper li').removeClass('active');
       $(e.currentTarget).parent().addClass('active');
@@ -187,12 +188,6 @@ class SideNav {
         })
       return false;
     })
-    // .on('click', '.admin-link', e => {
-    //   console.log('admin link click')
-    //   e.preventDefault()
-    //   this.userchan.push('admin_link:click:' + $(e.currentTarget).data('link'), {})
-    //   navMenu.close()
-    // })
     .on('submit', '#account-preferences-form', e => {
       e.preventDefault()
       this.userchan.push('account:preferences:save', $(e.currentTarget).serializeArray())
@@ -228,34 +223,32 @@ class SideNav {
           }
         })
     })
-    // .on('click', 'button.more-channels', e =>  {
-    //   e.preventDefault()
-    //   this.more_channels()
-    //   return false
-    // })
     .on('click', 'button.more-users', e =>  {
       e.preventDefault()
       this.more_users()
       return false
     })
     .on('click', 'a.channel-link', e => {
-      console.log('a.channel-link click', e)
+      if (debug) { console.log('a.channel-link click', e); }
       e.preventDefault()
       this.channel_link_click($(e.currentTarget))
       return false
     })
-    // $('button.status').on('click', function(e) {
-    //   console.log('clicked status change', $(this).data('status'))
-    // })
+    .on('click', '.status-message-box', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    })
   }
+
   static show_account_box_menu() {
-    console.log('show_account_box_menu')
+    if (debug) { console.log('show_account_box_menu'); }
     $('.account-box').addClass('active')
     $('.account-box nav.options').removeClass('animated-hidden')
   }
 
   static hide_account_box_menu() {
-    console.log('hide_account_box_menu')
+    if (debug) { console.log('hide_account_box_menu'); }
     $('.account-box').removeClass('active')
     $('.account-box nav.options').addClass('animated-hidden')
   }

@@ -60,6 +60,16 @@ defmodule UccChatWeb.SharedView do
   def get_ftab_open_class(nil), do: ""
   def get_ftab_open_class(_), do: "opened"
 
+  def get_desktop_notifications_for do
+    default = UccChat.NotificationSetting.get_system_name()
+    [
+      {gettext("Default (%{default}}", default: default), "system_default"},
+      {~g(All messages), "all"},
+      {~g(Mentions), "mentions"},
+      {~g(Nothing), "none"}
+    ]
+  end
+
   def get_room_notification_sounds do
     [
       {~g"None", "none"},
@@ -162,7 +172,7 @@ defmodule UccChatWeb.SharedView do
   def has_role?(user, role, scope), do: Accounts.has_role?(user, role, scope)
   def has_role?(user, role), do: Accounts.has_role?(user, role)
 
-  def user_muted?(%{} = user, channel_id), do: UccChat.ChannelService.user_muted?(user.id, channel_id)
+  def user_muted?(%{} = user, channel_id), do: UccChat.Channel.user_muted?(user.id, channel_id)
 
   def content_home_title do
     "test"
@@ -238,15 +248,104 @@ defmodule UccChatWeb.SharedView do
   end
 
   def messages_header_icons(chatd) do
-    Hooks.messages_header_icons [], chatd
+    content_tag :span, [class: "messages-header-icons"] do
+      Hooks.messages_header_icons [], chatd
+    end
   end
 
   def account_box_header(user) do
-    Hooks.account_box_header [], user
+    Hooks.account_box_header([], user)
   end
 
   def nav_option_buttons do
     Hooks.nav_option_buttons []
+  end
+
+  def format_errors(changeset, opts \\ [])
+  def format_errors(changeset, opts) when is_list(opts) do
+    separator = opts[:separator] || ": "
+    formatter = opts[:formatter] || &default_error_formatter/2
+    format_errors(changeset, formatter, separator)
+  end
+
+  def format_errors(changeset, separator) when is_binary(separator) do
+    format_errors(changeset, &default_error_formatter/2, separator)
+  end
+
+  def format_errors(changeset, formatter) when is_function(formatter) do
+    format_errors(changeset, formatter, ": ")
+  end
+
+  def format_errors(%Ecto.Changeset{errors: errors}, formatter, separator) do
+    errors
+    |> Enum.map(fn {field, {error, _}} -> {to_string(field), error} end)
+    |> formatter.(separator)
+  end
+
+  def format_errors(term, _, _), do: to_string(term)
+
+  def default_error_formatter(list, sep) do
+    list
+    |> Enum.map(fn {a, b} -> [a, sep, b] end)
+    |> Enum.join("\n")
+  end
+
+  def size_string_kb(size, rnd \\ 2)
+
+  def size_string_kb(size, rnd) when size < 1024 do
+    float_to_string(size, rnd) <> "KB"
+  end
+
+  def size_string_kb(size, rnd) when size < 1024 * 1024 do
+    float_to_string(size / 1024, rnd) <> "MB"
+  end
+
+  def size_string_kb(size, rnd) when size < 1024 * 1024 * 1024 do
+    float_to_string(size / 1024 / 1024, rnd) <> "GB"
+  end
+
+  def size_string_kb(size, rnd) when size < 1024 * 1024 * 1024 * 1024 do
+    float_to_string(size / 1024 / 1024 / 1024, rnd) <> "TB"
+  end
+
+  def size_string_kb(size, rnd) when size < 1024 * 1024 * 1024 * 1024 * 1024 do
+    float_to_string(size / 1024 / 1024 / 1024 / 1024, rnd) <> "PB"
+  end
+
+  def size_string_kb(size, rnd) do
+    float_to_string(size / 1024 / 1024 / 1024 / 1024 / 1024 / 1024, rnd) <> "EB"
+  end
+
+  # def float_to_string(size, rnd)
+
+  def float_to_string(size, rnd) when is_float(size) do
+    size |> Float.round(rnd) |> to_string
+  end
+
+  def float_to_string(size, _rnd) do
+    to_string size
+  end
+
+  def get_available_capacity(settings) do
+    case UccChat.Settings.FileUpload.get_disk_usage(settings) do
+      {:ok, %{available: available}} -> size_string_kb(available)
+      _ -> ~g(error)
+    end
+  end
+
+  def get_uploads_size(settings) do
+    case UccChat.Settings.FileUpload.get_uploads_size(settings) do
+      {:ok, size} -> size_string_kb(size)
+      _ -> ~g(error)
+    end
+  end
+
+  def get_uploads_used_percent(settings) do
+    case UccChat.Settings.FileUpload.get_disk_usage(settings) do
+      {:ok, %{percent: percent}} ->
+        percent |> Float.round(1) |> to_string() |> Kernel.<>("%")
+      _ -> ~g(error)
+    end
   end
 
   defmacro gt(text, opts \\ []) do

@@ -79,7 +79,7 @@ config :coherence, UcxUccWeb.Coherence.Mailer,
 
 config :slime, :keep_lines, true
 
-config :auto_linker, opts: [phone: true]
+config :auto_linker, opts: [phone: true, markdown: true]
 
 config :distillery,
   no_warn_missing: [
