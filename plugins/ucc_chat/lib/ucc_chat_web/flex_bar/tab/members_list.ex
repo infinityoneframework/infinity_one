@@ -197,9 +197,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       {:ok, _} ->
         user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
         update_mute_unmute_button socket, channel_id, user, current_user
-        Client.toastr! socket, :success, ~g"User muted"
+        Client.toastr socket, :success, ~g"User muted"
       {:error, message} ->
-        Client.toastr! socket, :error, message
+        Client.toastr socket, :error, message
     end
     socket
   end
@@ -214,9 +214,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       {:ok, _} ->
         user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
         update_mute_unmute_button socket, channel_id, user, current_user
-        Client.toastr! socket, :success, ~g(User unmuted)
+        Client.toastr socket, :success, ~g(User unmuted)
       {:error, message} ->
-        Client.toastr! socket, :error, message
+        Client.toastr socket, :error, message
     end
     socket
   end
@@ -231,9 +231,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       {:ok, _} ->
         user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
         update_set_remove_owner_button socket, channel_id, user, current_user
-        Client.toastr! socket, :success, ~g"Set user as owner"
+        Client.toastr socket, :success, ~g"Set user as owner"
       {:error, message} ->
-        Client.toastr! socket, :error, message
+        Client.toastr socket, :error, message
     end
     socket
   end
@@ -248,9 +248,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       {:ok, _} ->
         user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
         update_set_remove_owner_button socket, channel_id, user, current_user
-        Client.toastr! socket, :success, ~g(Removed user as owner)
+        Client.toastr socket, :success, ~g(Removed user as owner)
       {:error, message} ->
-        Client.toastr! socket, :error, message
+        Client.toastr socket, :error, message
     end
     socket
   end
@@ -265,9 +265,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       {:ok, _} ->
         user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
         update_set_remove_moderator_button socket, channel_id, user, current_user
-        Client.toastr! socket, :success, ~g(Set user as moderator)
+        Client.toastr socket, :success, ~g(Set user as moderator)
       {:error, message} ->
-        Client.toastr! socket, :error, message
+        Client.toastr socket, :error, message
     end
     socket
   end
@@ -282,9 +282,9 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
       {:ok, _} ->
         user = UcxUcc.Accounts.get_user(user.id, preload: [:roles, user_roles: :role])
         update_set_remove_moderator_button socket, channel_id, user, current_user
-        Client.toastr! socket, :success, ~g(Set user as moderator)
+        Client.toastr socket, :success, ~g(Set user as moderator)
       {:error, message} ->
-        Client.toastr! socket, :error, message
+        Client.toastr socket, :error, message
     end
     socket
   end

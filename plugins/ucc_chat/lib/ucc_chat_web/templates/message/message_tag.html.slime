@@ -1,0 +1,1 @@
+span.role-tag.background-info-font-color(data-role="#{@tag}")= @tag

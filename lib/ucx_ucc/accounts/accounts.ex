@@ -475,7 +475,9 @@ defmodule UcxUcc.Accounts do
 
   """
   def delete_user_role(%UserRole{} = user_role) do
-    Repo.delete(user_role)
+    user_role
+    |> change_user_role
+    |> Repo.delete
   end
 
   @doc """

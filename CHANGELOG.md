@@ -17,6 +17,7 @@
 * Support Allow username changes in profile page
 * Support Allow email change in in profile page
 * Support Allow password change in profile page
+* Update message role tabs when a role is added/removed for a user
 
 ### Bug Fixes
 

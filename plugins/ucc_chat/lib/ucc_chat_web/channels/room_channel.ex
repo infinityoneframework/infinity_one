@@ -144,6 +144,8 @@ defmodule UccChatWeb.RoomChannel do
     Process.send_after self(), :broadcast_user_join, 20
     UccPubSub.subscribe "message:*", "channel:" <> channel.id
     UccPubSub.subscribe "message:*", "user_id:" <> socket.assigns.user_id
+    UccPubSub.subscribe "role:*", "channel:" <> channel.id
+    UccPubSub.subscribe "role:*", "channel:global"
 
     push socket, "join", %{status: "connected"}
 
@@ -169,6 +171,11 @@ defmodule UccChatWeb.RoomChannel do
   def handle_info(:broadcast_user_join, socket) do
     broadcast! socket, "user:entered", %{user_id: socket.assigns[:user_id],
       channel_id: socket.assigns[:channel_id]}
+    {:noreply, socket}
+  end
+
+  def handle_info({"role:" <> action, _, payload}, socket) do
+    Client.update_users_role(socket, action, payload.username, payload.role)
     {:noreply, socket}
   end
 
@@ -328,7 +335,7 @@ defmodule UccChatWeb.RoomChannel do
   def terminate(_reason, %{assigns: assigns}) do
     Logger.debug "terminate: " <> inspect({assigns[:user_id], assigns[:self]})
     KeyStore.delete {assigns[:user_id], assigns[:self]}
-    UccPubSub.unsubscribe "message:*", "channel:*"
+    UccPubSub.unsubscribe "*", "channel:*"
     UccPubSub.unsubscribe "message:*", "user_id:*"
     :ok
   end

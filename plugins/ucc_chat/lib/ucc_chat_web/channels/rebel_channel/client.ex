@@ -336,4 +336,25 @@ defmodule UccChatWeb.RebelChannel.Client do
   defp account_settings_to_class(:hide_usernames), do: "hide-usernames"
   defp account_settings_to_class(:hide_avatars), do: "hide-avatars"
 
+  @doc """
+  Update message role tags for a given user.
+
+  Handles adding and remove message role tags for the given username.
+  """
+  def update_users_role(socket, "delete", username, role) do
+    broadcast_js(socket, ~s/$('.messages-box li.message[data-username="#{username}"] .role-tag[data-role="#{role}"]').remove()/)
+    socket
+  end
+
+  def update_users_role(socket, "insert", username, role) do
+    html = render_to_string(UccChatWeb.MessageView, "message_tag.html", tag: role) |> Poison.encode!
+    async_js(socket, ~s/$('.messages-box li.message[data-username="#{username}"] .info').prepend(#{html})/)
+    socket
+  end
+
+  def update_users_role(socket, action, username, role) do
+    Logger.warn "unsupported action: #{inspect action} for user: #{inspect username}, role: #{inspect role}"
+    socket
+  end
+
 end
