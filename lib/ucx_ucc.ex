@@ -2,9 +2,12 @@ defmodule UcxUcc do
 
   @env Mix.env()
   @version UcxUcc.Mixfile.project[:version]
+  @brandname Application.get_env :ucx_ucc, :brand_name, "UcxUcc"
 
   def env, do: @env
   def version, do: @version
+
+  def brandname, do: @brandname
 
   defmacro __using__(_) do
     quote do

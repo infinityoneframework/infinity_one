@@ -40,6 +40,7 @@ config :ucx_ucc, :generators,
 
 config :ucx_ucc, :settings_modules, [
   UcxUcc.Settings.General,
+  UcxUcc.Settings.Accounts,
   UccChat.Settings.ChatGeneral,
   UccChat.Settings.FileUpload,
   UccChat.Settings.Layout,

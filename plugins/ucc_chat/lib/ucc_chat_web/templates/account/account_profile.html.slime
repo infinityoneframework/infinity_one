@@ -26,16 +26,14 @@ section.page-container.page-home.page-static
             label(for="realname")= ~g"Name"
             div
               = text_input f, :name
-              / -# %input(type="text" name="realname" id="realname" value="#{@user.name}")
           .input-line
             label(for="username")= ~g"Username"
             div
-            = if allow_username_change() do
-              = text_input f, :username
-              -# %input(type="text" name="username" id="username" value="#{@user.username}")
-            - else
-              = text_input f, :username, title: ~g"username Change Disabled", readonly: "readonly"
-              -# %input(type="text" name="username" id="username" value="#{@user.username}" readonly="readonly" title="username Change Disabled")
+              = if allow_username_change() do
+                = text_input f, :username
+              - else
+                = text_input f, :username, title: ~g"username Change Disabled", readonly: "readonly", disabled: true
+                .input-description = input_description(:username)
           .input-line
             label(for="email")= ~g"Email"
             div
@@ -44,10 +42,9 @@ section.page-container.page-home.page-static
                 i.icon-ok.success-color(title="#{~g(Email verified)}")
             = if allow_email_change() do
               = text_input f, :email, type: :email
-              / -# %input(type="email" name="email" id="email" value="#{@user.email}")
             - else
-              = text_input f, :email, type: :email, title: ~g"emailChangeDisabled", readonly: :readonly
-              / -# %input(type="email" name="email" id="email" value="#{@user.email}" readonly="readonly" title="emailChangeDisabled")
+              = text_input f, :email, type: :email, title: ~g"emailChangeDisabled", readonly: :readonly, disabled: true
+              .input-description = input_description(:email)
             = unless email_verified() do
               .text-right
                 button.button#resend-verification-email= ~g"Resend verification email"
@@ -57,14 +54,13 @@ section.page-container.page-home.page-static
               = if allow_password_change() do
                 = text_input f, :password, type: :password
               - else
-                = text_input f, :password, type: :password, disabled: true, readonly: :readonly, title: ~g"passwordChangeDisabled", placeholder: "passwordChangeDisabled"
-          .input-line
-            label(for="password_confirmation")= ~g(Password Confirmation)
-            div
-              = if allow_password_change() do
+                = text_input f, :password, type: :password, disabled: true, readonly: :readonly, title: ~g"passwordChangeDisabled", placeholder: "Password change disabled"
+                .input-description = input_description(:password)
+          = if allow_password_change() do
+            .input-line
+              label(for="password_confirmation")= ~g(Password Confirmation)
+              div
                 = text_input f, :password_confirmation, type: :password
-              - else
-                = text_input f, :password_confirmatin, type: :password, disabled: true, readonly: :readonly, title: ~g"passwordChangeDisabled", placeholder: "passwordChangeDisabled"
         fieldset
           / - #{{> customFieldsForm hideFromForm=false formData=customFields}}
         .submit
@@ -72,8 +68,6 @@ section.page-container.page-home.page-static
             i.icon-send
             span= ~g"Save changes"
         = if allow_delete_own_account() do
-          / TODO: I'm not sure this works. I had to use a different approach
-          /       for the accounts phone page
           .delete-account.text-right(style="margin-top: 2px;")
             button.button.danger.delete
               i.icon-trash

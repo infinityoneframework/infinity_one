@@ -8,8 +8,8 @@ header
       li
         a.account-link(data-link="preferences")= ~g(Preferences)
       li
-        / - #{{#if allowUserProfileChange}}
-        a.account-link(data-link="profile")= ~g(Profile)
+        = if UccSettings.allow_user_profile_change do
+          a.account-link(data-link="profile")= ~g(Profile)
       li
         a.account-link(data-link="phone")= ~g(Phone)
       = unless defer do

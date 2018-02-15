@@ -26,4 +26,5 @@ defmodule UccAdminWeb.AdminView do
   defp do_render_flex_item(_, _page, _user) do
     ""
   end
+
 end

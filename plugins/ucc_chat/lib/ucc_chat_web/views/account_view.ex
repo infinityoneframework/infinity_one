@@ -1,11 +1,19 @@
 defmodule UccChatWeb.AccountView do
   use UccChatWeb, :view
 
-  def allow_delete_own_account, do: true
-  def allow_password_change, do: true
-  def allow_email_change, do: true
+  def allow_delete_own_account do
+    UccSettings.allow_users_delete_own_account
+  end
+  def allow_password_change do
+    UccSettings.allow_password_change
+  end
+  def allow_email_change do
+    UccSettings.allow_email_change
+  end
   def email_verified, do: true
-  def allow_username_change, do: true
+  def allow_username_change do
+    UccSettings.allow_username_change
+  end
 
   def desktop_notification_duration, do: true
   def desktop_notification_disabled, do: false

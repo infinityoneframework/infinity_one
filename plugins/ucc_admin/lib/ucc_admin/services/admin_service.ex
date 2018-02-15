@@ -10,12 +10,31 @@ defmodule UccAdmin.AdminService do
   alias UccChat.Settings, as: ChatSettings
   alias ChatSettings.{FileUpload, Layout}
   alias ChatSettings.ChatGeneral
-  alias UcxUcc.Settings.General
+  alias UcxUcc.Settings.{General, Accounts}
   alias UcxUcc.{Permissions, Hooks}
   alias UcxUcc.Accounts.{User, UserRole, Role}
   alias UccWebrtc.Settings.Webrtc
   alias UccChatWeb.AdminView, as: ChatAdminView
   alias UccAdminWeb.FlexBarView
+
+  def handle_in("save:accounts", params, socket) do
+    params =
+      params
+      |> Helpers.normalize_form_params
+      |> Map.get("accounts")
+
+    resp =
+      Accounts.get
+      |> Accounts.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"Accounts settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating accounts: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
+    {:reply, resp, socket}
+  end
 
   def handle_in("save:general", params, socket) do
     params =

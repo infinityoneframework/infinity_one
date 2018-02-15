@@ -3,7 +3,7 @@ defmodule UccChatWeb.Admin do
   alias Phoenix.HTML.Tag
 
   @pages [
-    Info, Rooms, Users, Permissions, Search, General, ChatGeneral,
+    Info, Rooms, Users, Permissions, Search, Accounts, General, ChatGeneral,
     Message, Layout, FileUpload, PhoneNumbers
   ] |> Enum.map(&Module.concat([__MODULE__, Page, &1]))
 

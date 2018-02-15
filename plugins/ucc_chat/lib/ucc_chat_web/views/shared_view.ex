@@ -348,6 +348,10 @@ defmodule UccChatWeb.SharedView do
     end
   end
 
+  def input_description(field) do
+    gettext("Your %{brand} administrator had disabled the changing of %{field}", brand: UcxUcc.brandname, field: field)
+  end
+
   defmacro gt(text, opts \\ []) do
     quote do
       gettext(unquote(text), unquote(opts))
