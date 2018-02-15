@@ -44,7 +44,7 @@ defmodule UcxUcc.Accounts.UserRole do
   defp prepare_notify(%{action: :insert} = changeset) do
     role = Accounts.get_role! changeset.changes.role_id
 
-    if UccSettings.display_roles() and notify_role?(role.name) do
+    if UccSettings.display_roles() && notify_role?(role.name) do
       user = Accounts.get_user changeset.changes.user_id
       scope = changeset.changes[:scope] || "global"
 

@@ -540,4 +540,8 @@ defmodule UccChatWeb.MessageView do
     messages[message] || ~g(Invalid Message Lookup)
   end
 
+  def pinning_allowed?(opts, config) do
+    UccSettings.allow_message_pinning(config) &&
+      has_permission? opts[:user], "pin-message", opts[:channel_id]
+  end
 end

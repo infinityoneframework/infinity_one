@@ -21,4 +21,13 @@ defmodule UcxUcc.Accounts.Role do
     |> cast(attrs, [:name, :scope, :description])
     |> validate_required([:name])
   end
+
+  def default_roles, do: [
+    admin: :global,
+    moderator: :rooms,
+    owner: :rooms,
+    user: :global,
+    bot: :global,
+    guest: :global
+  ]
 end

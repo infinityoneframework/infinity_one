@@ -20,66 +20,9 @@ Repo.delete_all Role
 Repo.delete_all Account
 Repo.delete_all User
 
-default_permissions = [
-    %{name: "access-permissions",            roles: ["admin"] },
-    %{name: "add-oauth-service",             roles: ["admin"] },
-    %{name: "add-user-to-joined-room",       roles: ["admin", "owner", "moderator"] },
-    %{name: "add-user-to-any-c-room",        roles: ["admin"] },
-    %{name: "add-user-to-any-p-room",        roles: [] },
-    %{name: "archive-room",                  roles: ["admin", "owner"] },
-    %{name: "assign-admin-role",             roles: ["admin"] },
-    %{name: "ban-user",                      roles: ["admin", "owner", "moderator"] },
-    %{name: "bulk-create-c",                 roles: ["admin"] },
-    %{name: "bulk-register-user",            roles: ["admin"] },
-    %{name: "create-c",                      roles: ["admin", "user", "bot"] },
-    %{name: "create-d",                      roles: ["admin", "user", "bot"] },
-    %{name: "create-p",                      roles: ["admin", "user", "bot"] },
-    %{name: "create-user",                   roles: ["admin"] },
-    %{name: "clean-channel-history",         roles: ["admin"] },
-    %{name: "delete-c",                      roles: ["admin"] },
-    %{name: "delete-d",                      roles: ["admin"] },
-    %{name: "delete-message",                roles: ["admin", "owner", "moderator"] },
-    %{name: "delete-p",                      roles: ["admin"] },
-    %{name: "delete-user",                   roles: ["admin"] },
-    %{name: "edit-message",                  roles: ["admin", "owner", "moderator"] },
-    %{name: "edit-other-user-active-status", roles: ["admin"] },
-    %{name: "edit-other-user-info",          roles: ["admin"] },
-    %{name: "edit-other-user-password",      roles: ["admin"] },
-    %{name: "edit-privileged-setting",       roles: ["admin"] },
-    %{name: "edit-room",                     roles: ["admin", "owner", "moderator"] },
-    %{name: "manage-assets",                 roles: ["admin"] },
-    %{name: "manage-emoji",                  roles: ["admin"] },
-    %{name: "manage-integrations",           roles: ["admin"] },
-    %{name: "manage-own-integrations",       roles: ["admin", "bot"] },
-    %{name: "manage-oauth-apps",             roles: ["admin"] },
-    %{name: "mention-all",                   roles: ["admin", "owner", "moderator", "user"] },
-    %{name: "mute-user",                     roles: ["admin", "owner", "moderator"] },
-    %{name: "remove-user",                   roles: ["admin", "owner", "moderator"] },
-    %{name: "run-import",                    roles: ["admin"] },
-    %{name: "run-migration",                 roles: ["admin"] },
-    %{name: "set-moderator",                 roles: ["admin", "owner"] },
-    %{name: "set-owner",                     roles: ["admin", "owner"] },
-    %{name: "unarchive-room",                roles: ["admin"] },
-    %{name: "view-c-room",                   roles: ["admin", "user", "bot"] },
-    %{name: "view-d-room",                   roles: ["admin", "user", "bot"] },
-    %{name: "view-full-other-user-info",     roles: ["admin"] },
-    %{name: "view-history",                  roles: ["admin", "user"] },
-    %{name: "view-joined-room",              roles: ["guest", "bot"] },
-    %{name: "view-join-code",                roles: ["admin"] },
-    %{name: "view-logs",                     roles: ["admin"] },
-    %{name: "view-other-user-channels",      roles: ["admin"] },
-    %{name: "view-p-room",                   roles: ["admin", "user"] },
-    %{name: "view-privileged-setting",       roles: ["admin"] },
-    %{name: "view-room-administration",      roles: ["admin"] },
-    %{name: "view-message-administration",   roles: ["admin"] },
-    %{name: "view-statistics",               roles: ["admin"] },
-    %{name: "view-user-administration",      roles: ["admin"] },
-    %{name: "preview-c-room",                roles: ["admin", "user"] }
-  ]
-
 IO.puts "Creating Roles"
 roles =
-  [admin: :global, moderator: :rooms, owner: :rooms, user: :global, bot: :global, guest: :global]
+  UcxUcc.Accounts.Role.default_roles()
   |> Enum.map(fn {role, scope} ->
     %{name: to_string(role), scope: to_string(scope)}
     |> Accounts.create_role()
@@ -119,13 +62,20 @@ create_user = fn name, email, password, admin ->
 
   Accounts.create_user_role(%{user_id: user.id, role_id: role_id})
   Accounts.create_account(%{user_id: user.id})
-  user
+  Accounts.get_user user.id, default_preload: true
+end
+
+insert_channel! = fn params ->
+  ch = Channel.create! params
+  {:ok, _} = Accounts.create_user_role %{user_id: ch.user_id, role_id: roles["owner"]}
+  ch
 end
 
 IO.puts "Creating Permissions"
 # build the permissions
 roles_list = roles
-default_permissions
+
+UcxUcc.Permissions.default_permissions()
 |> Enum.each(fn %{name: name, roles: roles} ->
   {:ok, permission} = Permissions.create_permission(%{name: name})
   roles
@@ -156,13 +106,13 @@ users =
 
 IO.puts "Creating Channels"
 
-ch1 = ChannelService.insert_channel!(%{name: "general", user_id: u1.id, default: true})
-ch2 = ChannelService.insert_channel!(%{name: "support", user_id: u2.id})
+ch1 = insert_channel!.(%{name: "general", user_id: u1.id, default: true})
+ch2 = insert_channel!.(%{name: "support", user_id: u2.id})
 
 channels =
   ~w(Research Marketing HR Accounting Shipping Sales) ++ ["UCxWebUser", "UCxChat", "BigRoom"]
   |> Enum.map(fn name ->
-    ChannelService.insert_channel!(%{name: name, user_id: u1.id})
+    insert_channel!.(%{name: name, user_id: u1.id})
   end)
 
 IO.puts "Creating Subscriptions"
@@ -185,7 +135,7 @@ chan_parts = ~w(biz sales tech foo home work product pbx phone iphone galaxy and
 for i <- 1..50 do
   name = Enum.random(chan_parts) <> to_string(i) <> Enum.random(chan_parts)
   user = Enum.random(users)
-  ChannelService.insert_channel!(%{name: name, user_id: user.id})
+  insert_channel!.(%{name: name, user_id: user.id})
 end
 
 add_messages = true
@@ -259,7 +209,7 @@ IO.puts "Creating Settings"
 
 UccSettings.init_all()
 
-IO.puts "Setting phone numbers"
+IO.puts "Setting phone number labels"
 
 [_work, _home, _mobile] =
   ~w(Work Home Mobile)

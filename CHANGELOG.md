@@ -7,7 +7,6 @@
 * Support Avatar upload and change
 * Changing view details in accounts settings automatically updates UI
 * Converges UccConsole and UccChat.Console into UccConsole
-
 * Added new Accounts section in Admin
 * Remove register link from login page by admin option
 * Remove forget password link from login page by admin option
@@ -18,6 +17,8 @@
 * Support Allow email change in in profile page
 * Support Allow password change in profile page
 * Update message role tabs when a role is added/removed for a user
+* Added new pin-message permission
+* Check permissions for pinning messages
 
 ### Bug Fixes
 

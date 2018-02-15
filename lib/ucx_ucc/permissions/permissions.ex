@@ -380,4 +380,101 @@ defmodule UcxUcc.Permissions do
   defp reply(reply, state), do: {:reply, reply, state}
   defp reply({reply, state}), do: {:reply, reply, state}
 
+
+  @doc """
+  Find any permission in `default_permissions/0` missing and add them.
+
+  Adds any new permissions that have been added in new version updates
+  and add them to the database.
+  """
+  def add_missing_permissions do
+    defaults = default_permissions()
+    all_names = Enum.map defaults, & &1.name
+    current_names = Enum.map list_permissions(), & &1.name
+    defaults_roles = for perm <- defaults, into: %{}, do: {perm.name, perm.roles}
+
+    # lookup hash to get the role_id from its name
+    roles_map =
+      Accounts.list_roles()
+      |> Enum.map(& {&1.name, &1.id})
+      |> Enum.into(%{})
+
+    all_names
+    |> Enum.reduce([], fn name, acc ->
+      if name in current_names, do: acc, else: [name | acc]
+    end)
+    |> Enum.map(fn name ->
+      # mapping the missing permission names here
+
+      {:ok, permission} = create_permission(%{name: name})
+
+      defaults_roles[name]
+      |> Enum.each(fn role_name ->
+        create_permission_role(%{permission_id: permission.id, role_id: roles_map[role_name]})
+      end)
+      name
+    end)
+  end
+
+  @doc """
+  List of all the permissions and their default values.
+  """
+  def default_permissions, do: [
+    %{name: "access-permissions",            roles: ["admin"] },
+    %{name: "add-oauth-service",             roles: ["admin"] },
+    %{name: "add-user-to-joined-room",       roles: ["admin", "owner", "moderator"] },
+    %{name: "add-user-to-any-c-room",        roles: ["admin"] },
+    %{name: "add-user-to-any-p-room",        roles: [] },
+    %{name: "archive-room",                  roles: ["admin", "owner"] },
+    %{name: "assign-admin-role",             roles: ["admin"] },
+    %{name: "ban-user",                      roles: ["admin", "owner", "moderator"] },
+    %{name: "bulk-create-c",                 roles: ["admin"] },
+    %{name: "bulk-register-user",            roles: ["admin"] },
+    %{name: "create-c",                      roles: ["admin", "user", "bot"] },
+    %{name: "create-d",                      roles: ["admin", "user", "bot"] },
+    %{name: "create-p",                      roles: ["admin", "user", "bot"] },
+    %{name: "create-user",                   roles: ["admin"] },
+    %{name: "clean-channel-history",         roles: ["admin"] },
+    %{name: "delete-c",                      roles: ["admin"] },
+    %{name: "delete-d",                      roles: ["admin"] },
+    %{name: "delete-message",                roles: ["admin", "owner", "moderator"] },
+    %{name: "delete-p",                      roles: ["admin"] },
+    %{name: "delete-user",                   roles: ["admin"] },
+    %{name: "edit-message",                  roles: ["admin", "owner", "moderator"] },
+    %{name: "edit-other-user-active-status", roles: ["admin"] },
+    %{name: "edit-other-user-info",          roles: ["admin"] },
+    %{name: "edit-other-user-password",      roles: ["admin"] },
+    %{name: "edit-privileged-setting",       roles: ["admin"] },
+    %{name: "edit-room",                     roles: ["admin", "owner", "moderator"] },
+    %{name: "manage-assets",                 roles: ["admin"] },
+    %{name: "manage-emoji",                  roles: ["admin"] },
+    %{name: "manage-integrations",           roles: ["admin"] },
+    %{name: "manage-own-integrations",       roles: ["admin", "bot"] },
+    %{name: "manage-oauth-apps",             roles: ["admin"] },
+    %{name: "mention-all",                   roles: ["admin", "owner", "moderator", "user"] },
+    %{name: "mute-user",                     roles: ["admin", "owner", "moderator"] },
+    %{name: "pin-message",                   roles: ["admin", "owner", "moderator"] },
+    %{name: "remove-user",                   roles: ["admin", "owner", "moderator"] },
+    %{name: "run-import",                    roles: ["admin"] },
+    %{name: "run-migration",                 roles: ["admin"] },
+    %{name: "set-moderator",                 roles: ["admin", "owner"] },
+    %{name: "set-owner",                     roles: ["admin", "owner"] },
+    %{name: "unarchive-room",                roles: ["admin"] },
+    %{name: "view-c-room",                   roles: ["admin", "user", "bot"] },
+    %{name: "view-d-room",                   roles: ["admin", "user", "bot"] },
+    %{name: "view-full-other-user-info",     roles: ["admin"] },
+    %{name: "view-history",                  roles: ["admin", "user"] },
+    %{name: "view-joined-room",              roles: ["guest", "bot"] },
+    %{name: "view-join-code",                roles: ["admin"] },
+    %{name: "view-logs",                     roles: ["admin"] },
+    %{name: "view-other-user-channels",      roles: ["admin"] },
+    %{name: "view-p-room",                   roles: ["admin", "user"] },
+    %{name: "view-privileged-setting",       roles: ["admin"] },
+    %{name: "view-room-administration",      roles: ["admin"] },
+    %{name: "view-message-administration",   roles: ["admin"] },
+    %{name: "view-statistics",               roles: ["admin"] },
+    %{name: "view-user-administration",      roles: ["admin"] },
+    %{name: "preview-c-room",                roles: ["admin", "user"] }
+  ]
+
 end

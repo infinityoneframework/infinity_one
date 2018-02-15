@@ -16,9 +16,9 @@
         = message_cog_action_li("unstar-message", ~g("Remove Star"), "star")
       - else
         = message_cog_action_li("star-message", ~g("Star Message"), "star-empty")
-    = if UccSettings.allow_message_pinning config do
-      = if @opts[:pinned] do
-        = message_cog_action_li("unpin-message", ~g("Remove Pin"), "pin rotate-45")
-      - else
-        = message_cog_action_li("pin-message", ~g("Pin Message"), "pin")
+      = if pinning_allowed? @opts, config do
+        = if @opts[:pinned] do
+          = message_cog_action_li("unpin-message", ~g("Remove Pin"), "pin rotate-45")
+        - else
+          = message_cog_action_li("pin-message", ~g("Pin Message"), "pin")
     = message_cog_action_li("reaction-message", ~g("Reactions"), "people-plus")

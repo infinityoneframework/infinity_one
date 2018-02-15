@@ -55,11 +55,15 @@ defmodule UccSettings.Settings do
       Gets all the fields from the database.
       """
       def get do
-        @repo.one from c in @schema, limit: 1
+        (@repo.one from c in @schema, limit: 1) || %{}
       end
 
       def get(name) do
         Map.get get(), name
+      end
+
+      def get(nil, _name) do
+        nil
       end
 
       def get(config, name) do

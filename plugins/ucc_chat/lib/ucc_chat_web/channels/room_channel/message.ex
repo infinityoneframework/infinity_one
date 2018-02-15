@@ -8,6 +8,7 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   import UcxUccWeb.Gettext
   import UcxUccWeb.Utils
+  import UcxUcc.Permissions, only: [has_permission?: 3]
 
   alias UcxUcc.{Accounts, Repo}
   alias UccChat.{Channel, Message, StarredMessage, PinnedMessage, Subscription}
@@ -181,18 +182,29 @@ defmodule UccChatWeb.RoomChannel.Message do
 
   def message_action(socket, Utils.dataset("id", "pin-message") = sender, client) do
     assigns = socket.assigns
-    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
-    PinnedMessage.create!  %{message_id: message_id,
-      user_id: assigns.user_id, channel_id: assigns.channel_id}
-    close_cog socket, sender, client
-    client.broadcast! socket, "update:pinned", %{}
+    user = Accounts.get_user assigns.user_id, default_preload: true
+    if has_permission? user, "pin-message", assigns.channel_id do
+      message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+      PinnedMessage.create!  %{message_id: message_id,
+        user_id: assigns.user_id, channel_id: assigns.channel_id}
+      close_cog socket, sender, client
+      client.broadcast! socket, "update:pinned", %{}
+    else
+      client.toastr socket, :error, ~g(Unauthorized)
+    end
   end
 
   def message_action(socket, Utils.dataset("id", "unpin-message") = sender, client) do
-    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
-    PinnedMessage.delete! PinnedMessage.get_by(message_id: message_id)
-    close_cog socket, sender, client
-    client.broadcast! socket, "update:pinned", %{}
+    assigns = socket.assigns
+    user = Accounts.get_user assigns.user_id, default_preload: true
+    if has_permission? user, "pin-message", assigns.channel_id do
+      message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
+      PinnedMessage.delete! PinnedMessage.get_by(message_id: message_id)
+      close_cog socket, sender, client
+      client.broadcast! socket, "update:pinned", %{}
+    else
+      client.toastr socket, :error, ~g(Unauthorized)
+    end
   end
 
   def message_action(socket, Utils.dataset("id", "edit-message") = sender, client) do

@@ -140,7 +140,7 @@ defmodule UccChat.ChannelService do
 
   def insert_channel!(%{user_id: user_id} = params) do
     user_id
-    |> Helpers.get_user!(preload: [:roles, user_roles: :role])
+    |> Accounts.get_user(default_preload: true)
     |> insert_channel!(params)
   end
 
@@ -152,8 +152,9 @@ defmodule UccChat.ChannelService do
   end
 
   def insert_channel(%{user_id: user_id} = params) do
-    user = Helpers.get_user!(user_id, preload: [:roles, user_roles: :role])
-    insert_channel(user, params)
+    user_id
+    |> Accounts.get_user(default_preload: true)
+    |> insert_channel(params)
   end
 
   def insert_channel(user, params) do

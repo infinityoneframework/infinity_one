@@ -8,13 +8,21 @@ defmodule UccChatWeb.RoomChannel.MessageCog do
   alias UccChatWeb.Client
   alias UccChat.{StarredMessage, PinnedMessage}
   alias UccChatWeb.{MessageView, FlexBarView}
+  alias UcxUcc.Accounts
 
   def message_cog_click(socket, sender, client \\ Client) do
     assigns = socket.assigns
     message_id = client.closest socket, this(sender), "li.message", :id
     star_count = StarredMessage.count(assigns.user_id, message_id, assigns.channel_id)
     pin_count = PinnedMessage.count(message_id)
-    opts = [starred: star_count > 0, pinned: pin_count > 0]
+    user = Accounts.get_user socket.assigns.user_id, default_preload: true
+
+    opts = [
+      starred: star_count > 0,
+      pinned: pin_count > 0,
+      user: user,
+      channel_id: assigns.channel_id
+    ]
 
     html =
       MessageView

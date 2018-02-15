@@ -52,6 +52,7 @@ default_permissions = [
     %{name: "manage-oauth-apps",             roles: ["admin"] },
     %{name: "mention-all",                   roles: ["admin", "owner", "moderator", "user"] },
     %{name: "mute-user",                     roles: ["admin", "owner", "moderator"] },
+    %{name: "pin-message",                   roles: ["admin", "owner", "moderator"] },
     %{name: "remove-user",                   roles: ["admin", "owner", "moderator"] },
     %{name: "run-import",                    roles: ["admin"] },
     %{name: "run-migration",                 roles: ["admin"] },
@@ -117,7 +118,7 @@ create_user = fn name, email, password, admin ->
 
   Accounts.create_user_role(%{user_id: user.id, role_id: role_id})
   Accounts.create_account(%{user_id: user.id})
-  user
+  Accounts.get_user user.id, default_preload: true
 end
 
 IO.puts "Creating Permissions"
@@ -148,7 +149,7 @@ IO.puts "Creating Settings"
 
 UccSettings.init_all()
 
-IO.puts "Setting phone numbers"
+IO.puts "Setting phone number labels"
 
 ~w(Work Home Mobile)
 |> Enum.map(fn label ->

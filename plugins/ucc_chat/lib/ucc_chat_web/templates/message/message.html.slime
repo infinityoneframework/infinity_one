@@ -32,8 +32,10 @@
           = avatar_background_tags(@message.edited_by)
     = if is_private(@message) do
       span.private= ~g(Only you can see this message)
+
     .message-cog-container(class="#{hide_cog(@message)}" rebel-click="message_cog_click")
       i.icon-cog.message-cog(aria-label="Actions")
+
   - info = get_info_class(@message)
   .body.color-primary-font-color(class="#{info}" dir="auto")
     / TODO: Remove this, its for testing only
