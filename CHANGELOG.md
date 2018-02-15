@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+* Fix permissions checks for room-edit
 
 ## 0.2.5 (2018-02-09)
 

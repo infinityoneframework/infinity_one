@@ -7,7 +7,7 @@ defmodule UccChatWeb.FlexBar.Form do
   import UcxUccWeb.Gettext
 
   alias UccChatWeb.{FlexBar.Helpers, SharedView}
-  alias UcxUcc.{TabBar}
+  alias UcxUcc.{TabBar, Accounts}
   alias UccChat.ServiceHelpers
 
 
@@ -44,19 +44,31 @@ defmodule UccChatWeb.FlexBar.Form do
 
     resource_params = ServiceHelpers.normalize_params(form)[prefix]
 
+    {module, changeset_params} =
+      cond do
+        function_exported? resource.__struct__.model(), :changeset, 3 ->
+          user = Accounts.get_user(socket.assigns.user_id, default_preload: true)
+          {resource.__struct__.model(), [resource, user, resource_params]}
+        function_exported? resource.__struct__.model(), :changeset, 2 ->
+          {resource.__struct__.model(), [resource, resource_params]}
+        true ->
+          {resource.__struct__, [resource, resource_params]}
+      end
+      # |> log_inspect(:debug, label: "{module, changeset}")
+
     changeset =
-      resource.__struct__
-      |> apply(:changeset, [resource, resource_params])
-      |> log_inspect(:debug, label: "changeset")
+      module
+      |> apply(:changeset, changeset_params)
+      # |> log_inspect(:debug, label: "changeset")
 
     resource.__struct__.model()
     |> apply(:update, [changeset])
-    |> log_inspect(:debug, label: "after update")
+    # |> log_inspect(:debug, label: "after update")
     |> case do
       {:ok, resource} ->
         socket
         |> flex_form_cancel(sender)
-        |> toastr!(:success, gettext("%{prefix} updated successfully",
+        |> toastr(:success, gettext("%{prefix} updated successfully",
           prefix: prefix))
         |> notify_update_success(tab, sender,
           %{resource: resource, resource_params: resource_params})
@@ -94,6 +106,8 @@ defmodule UccChatWeb.FlexBar.Form do
     update socket, prop: "checked", set: val, on: id
 
     tab = TabBar.get_button(form["flex-id"])
+
+    # Logger.warn "tab: " <> inspect(tab)
 
     {resource, prefix} = get_resource_and_prefix tab, form
 
@@ -145,6 +159,7 @@ defmodule UccChatWeb.FlexBar.Form do
     field = form_field sender["name"]
     value = sender["value"]
 
+    # Logger.warn "tab: " <> inspect(tab)
     {resource, _prefix} = get_resource_and_prefix tab, form
 
     tab.module

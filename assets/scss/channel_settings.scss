@@ -12,7 +12,10 @@
       margin-bottom: 5px;
       font-size: 14px;
     }
-
+    .setting-block.read-only label,
+    .setting-block.read-only .current-setting {
+      cursor: initial !important;
+    }
     .current-setting {
       font-size: 14px;
       width: calc(100% - 38px);

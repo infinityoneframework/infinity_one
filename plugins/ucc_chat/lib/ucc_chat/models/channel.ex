@@ -2,13 +2,22 @@ defmodule UccChat.Channel do
   use UccModel, schema: UccChat.Schema.Channel
 
   import Ecto.Changeset
+  import UcxUccWeb.Gettext
 
-  alias UcxUcc.{Accounts, Accounts.User, Repo, UccPubSub}
+  alias UcxUcc.{Accounts, Permissions, Accounts.User, Repo, UccPubSub}
   alias UccChat.{Mute, Subscription}
   alias UccChat.Schema.Subscription, as: SubscriptionSchema
   alias UccChat.Schema.Channel, as: ChannelSchema
 
   require Logger
+
+
+  def update(channel, user, params) do
+    # Logger.warn "update params: " <> inspect(params)
+    channel
+    |> changeset(user, params)
+    |> update
+  end
 
   def update(%Ecto.Changeset{} = changeset) do
     case super(changeset) do
@@ -28,8 +37,19 @@ defmodule UccChat.Channel do
   end
 
   def update(other) do
-    Logger.warn "Should now be here other: " <> inspect(other)
+    # Logger.warn "Should now be here other: " <> inspect(other)
     super(other)
+  end
+
+  def delete(channel, user) do
+    if can_delete? channel, user do
+      delete(channel)
+    else
+      {:error,
+        channel
+        |> __MODULE__.change()
+        |> Ecto.Changeset.add_error(:roles, ~g(Unauthorized))}
+    end
   end
 
   def delete(channel) do
@@ -41,6 +61,10 @@ defmodule UccChat.Channel do
       error ->
         error
     end
+  end
+
+  defp can_delete?(channel, user) do
+    Permissions.has_permission? user, "delete-" <> Permissions.room_type(channel.type)
   end
 
   def changeset(user, params) do
@@ -78,17 +102,39 @@ defmodule UccChat.Channel do
   def validate_permission(%{changes: changes, data: data} = changeset, user) do
     # Logger.warn "validate_permission: changeset: #{inspect changeset}, type: #{inspect changeset.data.type}"
     cond do
-      changes[:type] != nil -> has_permission?(user, changes)
-      true -> has_permission?(user, data)
+      changes[:type] != nil -> has_permission?(user, data, changes)
+      true -> has_permission?(user, data, changes)
     end
     |> case do
       true -> changeset
       _ ->
-        add_error(changeset, :user, "permission denied")
+        add_error(changeset, :user, ~g"Unauthorized")
     end
   end
 
-  def has_permission?(_, _), do: true
+  def has_permission?(_user, _changes) do
+    # Logger.warn "changes: " <> inspect(changes)
+    true
+  end
+
+  def has_permission?(user, data, changes) do
+    # Logger.warn "changes: " <> inspect(changes)
+    changes
+    |> Enum.all?(fn {field, value} ->
+      has_permission?(user, data, field, value)
+    end)
+  end
+
+  defp has_permission?(user, %{id: channel_id, type: _type}, _field, _value) do
+    # Logger.warn "{field, value}: " <> inspect({field, value})
+    # permission = type_permission("edit", type)
+    Permissions.has_permission?(user, "edit-room", channel_id)
+    # false
+  end
+
+  defp has_permission?(_user, %{id: _channel_id}, _field, _value) do
+    false
+  end
   # defp has_permission?(user, %{type: 1}), do: Permissions.has_permission?(user, "create-p")
   # defp has_permission?(user, %{type: 2}), do: Permissions.has_permission?(user, "create-d")
   # defp has_permission?(user, _), do: Permissions.has_permission?(user, "create-c")
@@ -344,11 +390,19 @@ defmodule UccChat.Channel do
   end
 
   defp get_user!(user_id) do
-    Accounts.get_user! user_id, preload: [:roles, user_roles: :role]
+    Accounts.get_user! user_id, default_preload: true
   end
 
   def user_muted?(channel_id, user_id) do
     Mute.user_muted?(channel_id, user_id)
+  end
+
+  def type_permission(0), do: "c"
+  def type_permission(1), do: "p"
+  def type_permission(2), do: "d"
+
+  def type_permission(perm, type) do
+    perm <> "-" <> type_permission(type)
   end
 
   defdelegate changeset_delete(struct, params \\ %{}), to: @schema

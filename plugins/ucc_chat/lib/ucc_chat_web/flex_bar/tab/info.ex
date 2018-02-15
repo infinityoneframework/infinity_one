@@ -3,8 +3,7 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   use UccLogger
 
   alias UccChat.Channel
-  alias UcxUcc.TabBar.Tab
-  alias UcxUcc.UccPubSub
+  alias UcxUcc.{UccPubSub, Accounts, TabBar.Tab, Permissions}
 
   @spec add_buttons() :: no_return
   def add_buttons do
@@ -27,22 +26,13 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   def args(socket, {user_id, channel_id, _, _,}, params) do
     current_user = Helpers.get_user! user_id
     channel = Channel.get!(channel_id) |> set_private()
-    changeset = Channel.change channel
-    editing = to_existing_atom(params["editing"])
-
-    # assigns =
-    #   socket
-    #   |> Rebel.get_assigns()
-    #   |> Map.put(:channel, channel)
-    #   |> Map.put(:resource_key, :channel)
-
-    # Rebel.put_assigns(socket, assigns)
 
     {[
       channel: settings_form_fields(channel, user_id),
       current_user: current_user,
-      changeset: changeset,
-      editing: editing,
+      changeset: Channel.change(channel),
+      editing: to_existing_atom(params["editing"]),
+      read_only: not Permissions.has_permission?(current_user, "edit-room", channel.id),
       channel_type: channel.type], socket}
   end
 
@@ -94,8 +84,9 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   def flex_form_toggle(socket, _sender, resource, id, val) do
     trace "flex_form_toggle", socket.assigns, inspect({id, val, resource})
     {params, socket} = set_toggle_field socket, id, val
+    user = Accounts.get_user socket.assigns.user_id, default_preload: true
 
-    case Channel.update resource, params do
+    case Channel.update resource, user, params do
       {:ok, _} -> {:ok, socket}
       {:error, changeset} -> {:error, changeset, socket}
     end
@@ -110,8 +101,9 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
 
   def flex_form_delete(socket, _sender, resource) do
     # Logger.warn "resource: " <> inspect(resource)
+    user = Accounts.get_user socket.assigns.user_id, default_preload: true
     resource
-    |> Channel.delete
+    |> Channel.delete(user)
     |> case do
       {:ok, _} ->
         {:ok, socket}
