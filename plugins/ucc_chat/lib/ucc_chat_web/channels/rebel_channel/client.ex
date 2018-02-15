@@ -248,6 +248,12 @@ defmodule UccChatWeb.RebelChannel.Client do
     end
   end
 
+  def open_flex_tab(socket) do
+    case exec_js socket, ~s/$('#flex-tabs.opened .flex-tab').attr('data-tab')/ do
+      {:ok, result} -> result
+      {:error, _} -> nil
+    end
+  end
 
   def update_flex_channel_name(socket, name) do
     Query.update(socket, :text, set: name, on: ~s(.current-setting[data-edit="name"]))
@@ -357,4 +363,27 @@ defmodule UccChatWeb.RebelChannel.Client do
     socket
   end
 
+  def update_pin(socket, _action, channel_id) do
+    tab_name = "pinned-messages"
+    if open_flex_tab(socket) == tab_name do
+      UccUiFlexTab.FlexTabChannel.refresh_open(socket, tab_name)
+    end
+    socket
+  end
+
+  def update_star(socket, _action, _channel_id) do
+    tab_name = "starred-messages"
+    if open_flex_tab(socket) == tab_name do
+      UccUiFlexTab.FlexTabChannel.refresh_open(socket, tab_name)
+    end
+    socket
+  end
+
+  def update_mention(socket, _action, _channel_id) do
+    tab_name = "mentions"
+    if open_flex_tab(socket) == tab_name do
+      UccUiFlexTab.FlexTabChannel.refresh_open(socket, tab_name)
+    end
+    socket
+  end
 end

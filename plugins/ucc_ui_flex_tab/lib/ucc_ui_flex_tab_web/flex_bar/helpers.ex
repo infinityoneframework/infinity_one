@@ -260,5 +260,14 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
     |> notify_on_change(socket, sender)
     socket
   end
+
+  def refresh(socket, id) do
+    assigns = socket.assigns
+    tab = TabBar.get_button! id
+    if (module = tab.module) && (channel_id = assigns[:channel_id]) do
+      apply module, :refresh, [socket, {assigns.user_id, channel_id, tab, %{}}, []]
+    end
+    socket
+  end
 end
 

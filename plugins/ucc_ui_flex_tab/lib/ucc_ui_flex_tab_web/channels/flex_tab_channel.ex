@@ -12,7 +12,7 @@ defmodule UccUiFlexTab.FlexTabChannel do
 
   alias UcxUcc.TabBar
   alias TabBar.Ftab
-  alias UccUiFlexTabWeb.TabBarView
+  alias UccUiFlexTabWeb.{TabBarView, FlexBar.Helpers}
 
   @type socket :: Phoenix.Socket.t
   @type sender :: Map.t
@@ -108,6 +108,10 @@ defmodule UccUiFlexTab.FlexTabChannel do
              %{module: mod} when is_atom(mod) <- TabBar.get_button(tab_name),
           do: apply(mod, :close, [socket, %{}])
     end)
+  end
+
+  def refresh_open(socket, tab_id) do
+    Helpers.refresh(socket, tab_id)
   end
 
   @spec flex_close(socket, sender) :: socket

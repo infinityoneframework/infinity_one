@@ -19,6 +19,7 @@
 * Update message role tabs when a role is added/removed for a user
 * Added new pin-message permission
 * Check permissions for pinning messages
+* Update open flex panel when starred, pinned, and mentions are added or removed
 
 ### Bug Fixes
 

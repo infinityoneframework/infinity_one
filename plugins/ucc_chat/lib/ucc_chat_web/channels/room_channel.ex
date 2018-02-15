@@ -146,6 +146,9 @@ defmodule UccChatWeb.RoomChannel do
     UccPubSub.subscribe "message:*", "user_id:" <> socket.assigns.user_id
     UccPubSub.subscribe "role:*", "channel:" <> channel.id
     UccPubSub.subscribe "role:*", "channel:global"
+    UccPubSub.subscribe "pin:*", "channel:" <> channel.id
+    UccPubSub.subscribe "star:*", "channel:" <> channel.id
+    UccPubSub.subscribe "mention:*", "channel:" <> channel.id
 
     push socket, "join", %{status: "connected"}
 
@@ -178,6 +181,22 @@ defmodule UccChatWeb.RoomChannel do
     Client.update_users_role(socket, action, payload.username, payload.role)
     {:noreply, socket}
   end
+
+  def handle_info({"pin:" <> action, _, payload}, socket) do
+    Client.update_pin(socket, action, payload.channel_id)
+    {:noreply, socket}
+  end
+
+  def handle_info({"star:" <> action, _, payload}, socket) do
+    Client.update_star(socket, action, payload.channel_id)
+    {:noreply, socket}
+  end
+
+  def handle_info({"mention:" <> action, _, payload}, socket) do
+    Client.update_mention(socket, action, payload.channel_id)
+    {:noreply, socket}
+  end
+
 
   def handle_info({:EXIT, _, :normal}, socket) do
     {:noreply, socket}
