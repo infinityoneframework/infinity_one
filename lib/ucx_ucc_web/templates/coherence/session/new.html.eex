@@ -1,3 +1,6 @@
+<% registration? = UccSettings.registraton_form == "Public" %>
+<% remember_me? = UccSettings.allow_remember_me %>
+<% reset? = UccSettings.password_reset %>
 <br \>
 <style>
   body {
@@ -46,7 +49,7 @@
       </div>
     </div>
 
-    <%= if @remember do %>
+    <%= if @remember and remember_me? do %>
       <div class="input-line">
         <label for="remember">Remember Me?
           <input type="checkbox"  name="remember" id="remember">
@@ -59,12 +62,16 @@
   <div class="submit">
     <button data-loading-text="<%= ~g(Please wait...) %>" class="button primary login"><span><%= ~g(Login) %></span></button>
   </div>
-  <div>
-    <button type="button" class="register"><%= ~g(Register a new account) %></button>
-  </div>
-  <div>
-    <button type="button" class="forgot-password"><%= ~g(Forgot your password) %></button>
-  </div>
+  <%= if registration? do %>
+    <div>
+      <button type="button" class="register"><%= ~g(Register a new account) %></button>
+    </div>
+  <% end %>
+  <%= if reset? do %>
+    <div>
+      <button type="button" class="forgot-password"><%= ~g(Forgot your password) %></button>
+    </div>
+  <% end %>
 <% end %>
 
 <div class="login-terms">
@@ -78,11 +85,15 @@
 <script>
   $(document).ready(function() {
     $('#tz-offset').val(`${new Date().getTimezoneOffset() / -60}`)
-    $('body').on('click', 'button.register', function(e) {
-      window.location = "/registrations/new"
-    })
-    $('body').on('click', 'button.forgot-password', function(e) {
-      window.location = '/passwords/new'
-    })
+    <%= if registration? do %>
+      $('body').on('click', 'button.register', function(e) {
+        window.location = "/registrations/new"
+      })
+    <% end %>
+    <%= if reset? do %>
+      $('body').on('click', 'button.forgot-password', function(e) {
+        window.location = '/passwords/new'
+      })
+    <% end %>
   })
 </script>

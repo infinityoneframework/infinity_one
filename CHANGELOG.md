@@ -8,6 +8,16 @@
 * Changing view details in accounts settings automatically updates UI
 * Converges UccConsole and UccChat.Console into UccConsole
 
+* Added new Accounts section in Admin
+* Remove register link from login page by admin option
+* Remove forget password link from login page by admin option
+* Remove remember me link from login page by adamin option
+* Support Allow users delete own account
+* Support Allow user profile change
+* Support Allow username changes in profile page
+* Support Allow email change in in profile page
+* Support Allow password change in profile page
+
 ### Bug Fixes
 
 * Fix permissions checks for room-edit
