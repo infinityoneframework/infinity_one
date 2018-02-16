@@ -63,9 +63,9 @@ defmodule UcxUccWeb.LandingView do
 
   def step4_instructions do
     content_tag :p do
-      ~g(You need to configure the name and email address to be uses when the
-         application sends user invitation, registration, confimation, and
-         passwor reset emails.)
+      ~g(You need to configure the name and email address to be used when the
+         application sends a user invitation, registration, confimation, and
+         password reset emails.)
     end
   end
 
