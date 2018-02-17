@@ -42,7 +42,7 @@
     / -# body = to_string(@message.timestamp) <> " " <> to_string(@message.body)
     / -#message = struct(@message, body: body)
     / =#format_message_body(message, @message_opts)
-    = format_message_body(@message, @message_opts)
+    = format_message_body(@message, @user, @message_opts)
     = for attachment <- @message.attachments  do
       = render UccChatWeb.AttachmentView, "attachment.html", attachment: UccChatWeb.AttachmentView.get_attachment(attachment)
     - previews = @previews

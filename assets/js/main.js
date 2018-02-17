@@ -8,12 +8,12 @@
       ucc_chat.roomManager.updateMentionsMarksOfRoom()
     },
     update_mentions: function(ucc_chat, id) {
-      let username = ucc_chat.ucxchat.username;
-      let selector = `.mention-link[data-username="${username}"]`
-      if (id)
-        selector = '#' + id + ' ' + selector
+      // let username = ucc_chat.ucxchat.username;
+      // let selector = `.mention-link[data-username="${username}"]`
+      // if (id)
+      //   selector = '#' + id + ' ' + selector
 
-      $(selector).addClass('mention-link-me background-primary-action-color')
+      // $(selector).addClass('mention-link-me background-primary-action-color')
     }
   }
 

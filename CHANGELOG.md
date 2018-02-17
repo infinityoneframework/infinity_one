@@ -20,10 +20,20 @@
 * Added new pin-message permission
 * Check permissions for pinning messages
 * Update open flex panel when starred, pinned, and mentions are added or removed
+* Fix @here and @ll mentions.
+* Add @all! mention to alert all logged in users
+* Add new caution announcement
+* Include @all, @all!, and @here in search patterns
+* Add new permissions to the database on startup
+* Add new @all! permission
+* Enforce new @all, @here, and @all! permissions
 
 ### Bug Fixes
 
 * Fix permissions checks for room-edit
+* Fix issue having multiple subscriptions open for the same user
+* Fix tagging own mentions in flex panel
+* Fix exception when clicking on a mention for an invalid user.
 
 ## 0.2.5 (2018-02-09)
 

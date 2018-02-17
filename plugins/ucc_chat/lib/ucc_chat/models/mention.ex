@@ -5,8 +5,9 @@ defmodule UccChat.Mention do
   #       how else to do it right now.
   import UcxUccWeb.Gettext
 
+  import UcxUcc.Permissions, only: [has_permission?: 3]
+
   alias UccChat.{Subscription, Channel, Direct, Message}
-  alias UccChatWeb.UserChannel
   alias UcxUcc.Accounts
 
   require Logger
@@ -27,7 +28,7 @@ defmodule UccChat.Mention do
 
   def parse(nil), do: []
   def parse(body) do
-    ~r/(?:^|[\s\!:,\?])(?:@)([\.a-zA-Z0-9_-]+)/
+    ~r/(?:^|[\s\!:,\?])(?:@)([\.a-zA-Z0-9_-]+\!?)/
     |> Regex.scan(body)
     |> Enum.map(&Enum.at(&1, 1))
   end
@@ -48,7 +49,7 @@ defmodule UccChat.Mention do
   def create_many(mentions, %{id: message_id, user_id: owner_id, channel_id: channel_id, body: body}) do
     Enum.reduce(mentions, [], fn username, acc ->
       user = Accounts.get_by_username(username)
-      if username in ~w(all all! here) or user do
+      if username in @all_names or user do
         channel = Channel.get(channel_id)
 
         channel_type =
@@ -185,8 +186,29 @@ defmodule UccChat.Mention do
     end
   end
 
-  def do_create(name, user, message_id, channel_id, body) do
-    {all, nm} = if name in @all_names, do: {true, name}, else: {false, nil}
+  def do_create(name, _user, message_id, channel_id, _body) when name in @all_names do
+    poster =
+      message_id
+      |> Message.get_user_id()
+      |> Accounts.get_user(default_preload: true)
+
+    attrs = %{all: true, name: name, message_id: message_id, channel_id: channel_id}
+
+    poster
+    |> mention_all_users(name, channel_id)
+    |> Enum.map(fn user ->
+      attrs
+      |> Map.put(:user_id, user.id)
+      |> create
+      |> case do
+        {:ok, mention} -> mention
+        error          -> error
+      end
+    end)
+  end
+
+  def do_create(_name, user, message_id, channel_id, _body) do
+    {all, nm, user} = {false, nil, user}
     user_id = Map.get(user, :id)
     %{
       user_id: user_id,
@@ -198,7 +220,6 @@ defmodule UccChat.Mention do
     |> create
     |> case do
       {:ok, mention} ->
-        UserChannel.notify_mention(mention, body)
         if user_id do
           Subscription.join_new(user_id, channel_id, unread: true)
         end
@@ -266,6 +287,40 @@ defmodule UccChat.Mention do
         body: body,
         system: true
       })
+    end
+  end
+
+  defp mention_all_users(poster, name, channel_id) do
+    preload = [:roles, user_roles: :role]
+    max = UccSettings.max_members_disable_notifications()
+
+    case name do
+      "all" ->
+        if has_permission?(poster, "mention-all", channel_id) && Subscription.count(channel_id) <= max do
+          Subscription.get_all_users_for_channel(channel_id, preload: preload)
+        else
+          []
+        end
+      "here" ->
+        if has_permission?(poster, "mention-here", channel_id) && Subscription.open_count(channel_id) <= max do
+          Subscription.get_all_users_for_channel(channel_id, open: true, preload: preload)
+        else
+          []
+        end
+      "all!" ->
+        if has_permission?(poster, "mention-all!", channel_id) && Subscription.open_count(channel_id) <= max do
+          UccChat.ChannelMonitor.get_users()
+          |> Enum.map(fn user_id ->
+            user = Accounts.get_user user_id
+            if open_subscription = Subscription.get_by(user_id: user.id, open: true, preload: [:channel]) do
+              struct(user, open_id: open_subscription.channel.id)
+            else
+              user
+            end
+          end)
+        end
+      true ->
+        []
     end
   end
 end

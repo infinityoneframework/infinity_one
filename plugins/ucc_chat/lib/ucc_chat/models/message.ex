@@ -26,7 +26,7 @@ defmodule UccChat.Message do
   alias UccChat.{Attachment, Channel, AppConfig, Mention, Subscription}
   alias UccChat.ServiceHelpers, as: Helpers
   alias Ecto.Multi
-  alias UcxUcc.{UccPubSub}
+  alias UcxUcc.{UccPubSub, Accounts}
 
   require Logger
 
@@ -483,6 +483,26 @@ defmodule UccChat.Message do
     |> @repo.one
   end
 
+  @doc """
+  Get the user_id for a message.
+
+  Gets the user_id given a message id.
+  """
+  def get_user_id(message_id) when is_binary(message_id) do
+    @repo.one from m in @schema,
+      join: u in Accounts.User,
+      on: u.id == m.user_id,
+      where: m.id == ^message_id,
+      select: u.id
+
+    # @schema
+    # |> where([m], m.id == ^message_id)
+    # |> join(u in Accounts.User)
+    # |> on([m, u], m.user_id == u.id)
+    # |> select([m, u], u.id)
+    # |> @repo.one
+  end
+
   def get_user_ids(channel_id, user_id) do
     @schema
     |> where([m], m.channel_id == ^channel_id and m.user_id != ^user_id)
@@ -491,6 +511,7 @@ defmodule UccChat.Message do
     |> order_by([m], desc: m.inserted_at)
     |> @repo.all
   end
+
   def get_by_later(inserted_at, channel_id) do
     @schema
     |> where([m], m.channel_id == ^channel_id and m.inserted_at > ^inserted_at)

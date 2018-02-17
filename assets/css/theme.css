@@ -495,7 +495,7 @@ a:active,a:hover {
 
 .popup-item.selected {
     color: #fff;
-    background-color: #13679a
+    /*background-color: #13679a*/
 }
 
 .messages-box.selectable .selected {

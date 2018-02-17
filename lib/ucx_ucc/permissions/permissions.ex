@@ -25,7 +25,7 @@ defmodule UcxUcc.Permissions do
   end
 
   def initialize do
-    GenServer.cast @name, {:initialize, list_permissions()}
+    GenServer.cast @name, :initialize
   end
 
   def delete_all_objects do
@@ -74,8 +74,10 @@ defmodule UcxUcc.Permissions do
   #################
   # Casts
 
-  def handle_cast({:initialize, permissions}, state) do
-    Enum.reduce(permissions, state, fn %{name: permission, roles: roles}, acc ->
+  def handle_cast(:initialize, state) do
+    add_missing_permissions()
+
+    Enum.reduce(list_permissions(), state, fn %{name: permission, roles: roles}, acc ->
       roles = Enum.map(roles, &(&1.name))
       Enum.reduce(roles, put_in(acc, [:permissions, permission], roles), fn role, acc ->
         update_in(acc, [:roles, role], fn
@@ -146,17 +148,18 @@ defmodule UcxUcc.Permissions do
   end
 
   defp do_has_permission?(state, user, permission, scope) do
-    roles = state[:permissions][permission] || []
+    roles =
+      case state[:permissions][permission] do
+        nil ->
+          default_permission_roles(permission)
+        roles ->
+          roles
+      end
+
     Enum.any?(user.user_roles, fn %{role: role, scope: value} ->
       role.name in roles and (role.scope == "global" or value == scope)
     end)
   end
-  # defp do_has_permission?(state, user, permission, scope) do
-  #   roles = state[:permissions][permission] || []
-  #   Enum.any?(user.roles, fn %{name: name, scope: value} ->
-  #     name in roles and (value == "global" or value == scope)
-  #   end)
-  # end
 
   ##################
   # Permission
@@ -171,6 +174,7 @@ defmodule UcxUcc.Permissions do
 
   """
   def list_permissions do
+    # add_missing_permissions()
     Repo.all from p in Permission, preload: [:roles]
   end
 
@@ -389,8 +393,16 @@ defmodule UcxUcc.Permissions do
   """
   def add_missing_permissions do
     defaults = default_permissions()
-    all_names = Enum.map defaults, & &1.name
-    current_names = Enum.map list_permissions(), & &1.name
+    all_names = get_names(defaults)
+    current_names = get_names list_permissions()
+
+    do_add_missing_permissions defaults, all_names -- current_names
+  end
+
+  defp  do_add_missing_permissions(_, []), do: []
+
+  defp  do_add_missing_permissions(defaults, new_names) do
+    # create hash for the defaults by name
     defaults_roles = for perm <- defaults, into: %{}, do: {perm.name, perm.roles}
 
     # lookup hash to get the role_id from its name
@@ -399,13 +411,8 @@ defmodule UcxUcc.Permissions do
       |> Enum.map(& {&1.name, &1.id})
       |> Enum.into(%{})
 
-    all_names
-    |> Enum.reduce([], fn name, acc ->
-      if name in current_names, do: acc, else: [name | acc]
-    end)
-    |> Enum.map(fn name ->
+    Enum.map(new_names, fn name ->
       # mapping the missing permission names here
-
       {:ok, permission} = create_permission(%{name: name})
 
       defaults_roles[name]
@@ -414,6 +421,21 @@ defmodule UcxUcc.Permissions do
       end)
       name
     end)
+  end
+
+  defp get_names(list) do
+    Enum.map(list, & &1.name)
+  end
+
+  @doc """
+  Get the roles from the default permissions for a given permission name.
+
+  Returns the role name list if found, otherwise []
+  """
+  def default_permission_roles(name) do
+    default_permissions()
+    |> Enum.find(%{}, & &1.name == name)
+    |> Map.get(:name, [])
   end
 
   @doc """
@@ -446,14 +468,18 @@ defmodule UcxUcc.Permissions do
     %{name: "edit-other-user-password",      roles: ["admin"] },
     %{name: "edit-privileged-setting",       roles: ["admin"] },
     %{name: "edit-room",                     roles: ["admin", "owner", "moderator"] },
+    %{name: "invite-user",                   roles: ["admin", "user", "bot"] },
     %{name: "manage-assets",                 roles: ["admin"] },
     %{name: "manage-emoji",                  roles: ["admin"] },
     %{name: "manage-integrations",           roles: ["admin"] },
     %{name: "manage-own-integrations",       roles: ["admin", "bot"] },
     %{name: "manage-oauth-apps",             roles: ["admin"] },
     %{name: "mention-all",                   roles: ["admin", "owner", "moderator", "user"] },
+    %{name: "mention-here",                  roles: ["admin", "owner", "moderator", "user"] },
+    %{name: "mention-all!",                  roles: ["admin"] },
     %{name: "mute-user",                     roles: ["admin", "owner", "moderator"] },
     %{name: "pin-message",                   roles: ["admin", "owner", "moderator"] },
+    %{name: "preview-c-room",                roles: ["admin", "user"] },
     %{name: "remove-user",                   roles: ["admin", "owner", "moderator"] },
     %{name: "run-import",                    roles: ["admin"] },
     %{name: "run-migration",                 roles: ["admin"] },
@@ -474,7 +500,6 @@ defmodule UcxUcc.Permissions do
     %{name: "view-message-administration",   roles: ["admin"] },
     %{name: "view-statistics",               roles: ["admin"] },
     %{name: "view-user-administration",      roles: ["admin"] },
-    %{name: "preview-c-room",                roles: ["admin", "user"] }
   ]
 
 end

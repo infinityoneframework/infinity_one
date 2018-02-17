@@ -657,3 +657,57 @@ section.page-container.page-home {
 // ::-webkit-scrollbar {
 //   z-index: 8000;
 // }
+
+.fixed-title.announcement {
+  position: relative;
+  background-color: $primary-action-color;
+  margin-top: 0;
+  border: none;
+  color: #fff;
+  font-weight: 500;
+  height: 55px;
+  text-align: center;
+  font-size: 1.2em;
+  line-height: 55px;
+  display: block;
+  overflow: hidden;
+  z-index: 200;
+  border-top: 1px solid rgba(255,255,255,0.3);
+
+  &:first-of-type {
+    margin-top: 60px;
+    border-top: none;
+  }
+
+  &.caution {
+    background-color: rgb(244, 67, 54);
+    font-weight: bold;
+    font-size: 1.3em;
+  }
+
+  .cancel-button {
+    position: absolute;
+    text-align: center;
+    right: 5px;
+    top: 1px;
+    color: #eee;
+    height: 20px;
+    width: 20px;
+    line-height: initial !important;
+    border: none;
+
+    span {
+      display: inline-block;
+      // border: 1px solid #fff;
+      // border-radius: 50%;
+      background: none;
+      border: none;
+      i {
+        border: 1px solid #eee;
+        font-size: 12px;
+        border-radius: 50%;
+        font-weight: 400;
+      }
+    }
+  }
+}

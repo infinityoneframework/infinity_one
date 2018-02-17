@@ -6,9 +6,9 @@ defmodule UccChat.MessageService do
   alias Ecto.Multi
   alias UccChat.{
     Message, Mention, Subscription, ChatDat, Channel,
-    ChannelService, MessageAgent, AttachmentService
+    MessageAgent, AttachmentService
   }
-  alias UccChatWeb.{MessageView, UserChannel}
+  alias UccChatWeb.{MessageView}
   alias UccChat.ServiceHelpers, as: Helpers
   alias UcxUcc.Accounts
   # alias UccChat.Schema.Message, as: MessageSchema
@@ -329,35 +329,9 @@ defmodule UccChat.MessageService do
     create_mentions(mentions, message_id, channel_id, body)
   end
 
-  def create_mention({nil, _}, _, _, _) do
+  def create_mention({_, _}, _, _, _) do
     Logger.warn "deprecated"
     nil
-  end
-
-  def create_mention({mention, name}, message_id, channel_id, body) do
-    Logger.warn "deprecated"
-    {all, nm} = if name in ~w(all here), do: {true, name}, else: {false, nil}
-    %{
-      user_id: mention,
-      all: all,
-      name: nm,
-      message_id: message_id,
-      channel_id: channel_id
-    }
-    |> Mention.create!
-    |> UserChannel.notify_mention(body)
-
-    subs =
-      Subscription.get_by(user_id: mention, channel_id: channel_id)
-      |> case do
-        nil ->
-          {:ok, subs} = ChannelService.join_channel(channel_id, mention)
-          subs
-        subs ->
-          subs
-      end
-
-    Subscription.update!(subs, %{unread: subs.unread + 1})
   end
 
   def update_direct_notices(%{type: 2, id: id}, %{user_id: user_id}) do

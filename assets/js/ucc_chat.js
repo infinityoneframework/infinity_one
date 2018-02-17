@@ -155,8 +155,8 @@ window.UccChat = {
     if (message.data('username') != username){
       message.removeClass('own');
     }
-    message.find(`a.mention-link[data-username="${username}"]`)
-      .addClass('mention-link-me background-primary-action-color');
+    // message.find(`a.mention-link[data-username="${username}"]`)
+    //   .addClass('mention-link-me background-primary-action-color');
     message.find('pre code').each(function(i, block) {
         hljs.highlightBlock(block)
     });

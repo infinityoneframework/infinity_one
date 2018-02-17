@@ -15,7 +15,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   import Rebel.{Core, Query}, warn: false
 
   alias Rebel.SweetAlert
-  alias UccChatWeb.{ClientView, SharedView, SideNavView}
+  alias UccChatWeb.{ClientView, SharedView, SideNavView, MessageView}
   alias UccChat.{SideNavService}
   alias UcxUccWeb.Query
   alias UccChatWeb.RoomChannel.Message
@@ -363,7 +363,7 @@ defmodule UccChatWeb.RebelChannel.Client do
     socket
   end
 
-  def update_pin(socket, _action, channel_id) do
+  def update_pin(socket, _action, _channel_id) do
     tab_name = "pinned-messages"
     if open_flex_tab(socket) == tab_name do
       UccUiFlexTab.FlexTabChannel.refresh_open(socket, tab_name)
@@ -385,5 +385,23 @@ defmodule UccChatWeb.RebelChannel.Client do
       UccUiFlexTab.FlexTabChannel.refresh_open(socket, tab_name)
     end
     socket
+  end
+
+  def add_caution_announcement(socket, body) do
+    html =
+      MessageView
+      |> render_to_string("caution_announcement.html", text: body)
+      |> Poison.encode!
+
+    async_js socket, ~s/$('.messages-container header.fixed-title').after(#{html})/
+  end
+
+  def add_announcement(socket, body) do
+    html =
+      MessageView
+      |> render_to_string("announcement.html", text: body)
+      |> Poison.encode!
+
+    async_js socket, ~s/$('.messages-container header.fixed-title').after(#{html})/
   end
 end

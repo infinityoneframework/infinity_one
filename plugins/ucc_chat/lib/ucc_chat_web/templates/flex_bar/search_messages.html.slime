@@ -17,6 +17,6 @@
       .message-cog-container(class="#{UccChatWeb.MessageView.hide_cog(search[:message])}" rebel-click="flex_message_cog_click")
         i.icon-cog.message-cog(aria-label="#{~g(Actions)}")
     .body.color-primary-font-color(dir="auto")
-      = UccChatWeb.MessageView.format_message_body(search[:message], message_opts)
+      = UccChatWeb.MessageView.format_message_body(search[:message], search[:current_user], message_opts)
     ul.actionLinks.hidden
     ul.reactions.hidden

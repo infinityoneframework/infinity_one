@@ -79,26 +79,28 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
       @spec open(socket, {id, id, tab, map}, args) :: socket
       def open(socket, {user_id, channel_id, tab, sender}, args) do
         case tab.template do
-          "" -> socket
+          "" ->
+            socket
           templ ->
             handle_on_change(socket, sender)
 
-            {args, socket} = args socket, {user_id, channel_id, nil, sender}, args
+            case args socket, {user_id, channel_id, nil, sender}, args do
+              {args, socket} ->
+                html = Phoenix.View.render_to_string(tab.view, templ, args)
 
-            html = Phoenix.View.render_to_string(tab.view, templ, args)
+                js = [
+                  "$('section.flex-tab-main').parent().addClass('opened')",
+                  "$('.tab-button.active').removeClass('active')",
+                  set_tab_button_active_js(tab.id),
+                  add_name_to_section_js(tab.id)
+                ] |> Enum.join(";")
 
-            js = [
-              "$('section.flex-tab-main').parent().addClass('opened')",
-              "$('.tab-button.active').removeClass('active')",
-              set_tab_button_active_js(tab.id),
-              add_name_to_section_js(tab.id)
-            ] |> Enum.join(";")
-
-            socket
-            |> Query.update(:html, set: html, on: "section.flex-tab-main")
-            |> async_js(js)
-
-            socket
+                socket
+                |> Query.update(:html, set: html, on: "section.flex-tab-main")
+                |> async_js(js)
+              _ ->
+                socket
+            end
         end
       end
 
@@ -264,7 +266,9 @@ defmodule UccUiFlexTabWeb.FlexBar.Helpers do
   def refresh(socket, id) do
     assigns = socket.assigns
     tab = TabBar.get_button! id
-    if (module = tab.module) && (channel_id = assigns[:channel_id]) do
+    module = tab.module
+    channel_id = assigns[:channel_id]
+    if module && channel_id do
       apply module, :refresh, [socket, {assigns.user_id, channel_id, tab, %{}}, []]
     end
     socket

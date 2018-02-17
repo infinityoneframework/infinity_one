@@ -225,9 +225,14 @@ class RoomManager {
       let topOffset = $(item).offset().top + scrollTop
       let percent = 100 / totalHeight * topOffset
       if ($(item).hasClass('mention-link-all'))
-        ticksBar.append('<div class="tick background-attention-color" style="top: '+percent+'%;"></div>')
+        ticksBar.append('<div class="tick background-tertiary-attention-color" style="top: '+percent+'%;"></div>')
       else
         ticksBar.append('<div class="tick background-primary-action-color" style="top: '+percent+'%;"></div>')
+    })
+    $('.messages-box .mention-link-all').each((index, item) => {
+      let topOffset = $(item).offset().top + scrollTop
+      let percent = 100 / totalHeight * topOffset
+      ticksBar.append('<div class="tick background-tertiary-attention-color" style="top: '+percent+'%;"></div>')
     })
   }
 
@@ -689,6 +694,9 @@ class RoomManager {
     .on('click', 'button.new-message', e => {
       UccUtils.scroll_bottom();
       this.message_box_focus();
+    })
+    .on('click', '.announcement .cancel-button', e => {
+      $(e.currentTarget).parent().remove();
     })
   }
 }

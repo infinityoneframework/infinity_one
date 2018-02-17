@@ -78,6 +78,10 @@ $transparent-lightest: rgba(255, 255, 255, 0.6);
   background-color: $secondary-background-color;
 }
 
+.background-tertiary-action-color {
+  background-color: $tertiary-action-color;
+}
+
 .border-secondary-background-color {
   border-color: $secondary-background-color;
 }
@@ -144,6 +148,14 @@ $transparent-lightest: rgba(255, 255, 255, 0.6);
 
 .color-tertiary-font-color {
   color: $tertiary-font-color;
+}
+
+.tertiary-action-color {
+  color: $tertiary-action-color;
+}
+
+.background-tertiary-attention-color {
+  background-color: $tertiary-action-color;
 }
 
 .error-background {
@@ -583,7 +595,10 @@ aside.side-nav {
   }
 
   .mention-link {
-    &:not(.mention-link-me) {color: $primary-action-color !important; }
+    &:not(.mention-link-me),
+    &:not(.mention-link-all) {
+      color: $primary-action-color;
+    }
 
     &.mention-link-me {
       color: $primary-action-contrast;
@@ -592,6 +607,7 @@ aside.side-nav {
 
     &.mention-link-all {
       color: $primary-action-contrast;
+      background-color: $tertiary-action-color !important;
     }
   }
 

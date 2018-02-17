@@ -70,8 +70,51 @@ defmodule UccChat.Subscription do
     nil
   end
 
-  def get_all_for_channel(channel_id) do
-    from c in @schema, where: c.channel_id == ^channel_id
+  def get_all_for_channel(channel_id, opts \\ []) do
+    preload = opts[:preload] || []
+    @repo.all from c in @schema,
+      where: c.channel_id == ^channel_id,
+      preload: ^preload
+  end
+
+  @doc """
+  Get all the users for a given channel.
+
+  Returns a list of all users subscribed to the channel given its id,
+  with an option to scope the list by open or not open.
+
+  ## Opts
+
+  * :preload - The preload to be applied to the users list
+  * :open - (true | false) filter on open or not open
+  """
+  def get_all_users_for_channel(channel_id, opts \\ []) do
+    preload = opts[:preload] || []
+    (from s in @schema,
+      where: s.channel_id == ^channel_id,
+      join: u in User,
+      on: s.user_id == u.id,
+      select: u)
+    |> select_open(opts[:open])
+    |> @repo.all
+    |> @repo.preload(preload)
+  end
+
+  defp select_open(query, nil), do: query
+
+  defp select_open(query, open) do
+    where query, [s], s.open == ^open
+  end
+
+  @doc """
+  Get all the open subscriptions for a given channel.
+
+  """
+  def get_all_open_for_channel(channel_id, opts \\ []) do
+    preload = opts[:preload] || []
+    @repo.all from c in @schema,
+      where: c.open == true and c.channel_id == ^channel_id,
+      preload: ^preload
   end
 
   def get_by_room(room, user_id) when is_binary(room) do
@@ -112,6 +155,18 @@ defmodule UccChat.Subscription do
     |> where([c], c.user_id == ^user_id and c.channel_id == ^channel_id)
     |> preload(^preload)
     |> @repo.one!
+  end
+
+  def count(channel_id) do
+    @repo.one from s in @schema,
+      where: s.channel_id == ^channel_id,
+      select: count(s.id)
+  end
+
+  def open_count(channel_id) do
+    @repo.one from s in @schema,
+      where: s.open == true and s.channel_id == ^channel_id,
+      select: count(s.id)
   end
 
   def open_channel_count(user_id) when is_binary(user_id) do
@@ -249,5 +304,13 @@ defmodule UccChat.Subscription do
       where: s.channel_id == ^channel_id,
       select: u.username
   end
+
+  def close_opens(user_id) do
+    from(s in @schema,
+      where: s.user_id == ^user_id,
+      update: [set: [open: false]])
+    |> @repo.update_all([])
+  end
+
 
 end

@@ -22,7 +22,6 @@ defmodule UccChatWeb.UserChannel.Notifier do
   def new_message(payload, socket, client) do
     user_id = payload.user_id
     channel = payload.channel
-    # room = channel.name
 
     UccChatWeb.UserChannel.audit_open_rooms(socket)
 
@@ -30,6 +29,12 @@ defmodule UccChatWeb.UserChannel.Notifier do
     open = Map.get(subscription, :open)
     active_open = payload.user_state == "active" and open
     user = Accounts.get_user(user_id, preload: [:account])
+
+    all! = Enum.find(payload.message.mentions, & &1.user_id == user.id && &1.name == "all!")
+
+    unless is_nil all! do
+      UccChatWeb.RebelChannel.Client.add_caution_announcement(socket, payload.message.body)
+    end
 
     # IO.inspect {user.username, user.id, payload.message.user_id}, label: "new_message"
     cond do
@@ -94,57 +99,4 @@ defmodule UccChatWeb.UserChannel.Notifier do
 
     client.broadcast_js socket, "UccChat.roomManger.notification(#{payload});"
   end
-  # def handle_info({:update_mention, payload, user_id} = ev, socket) do
-  #   trace "upate_mention", ev
-
-  #   if UserService.open_channel_count(socket.assigns.user_id) > 1 do
-  #     opens = UserService.open_channels(socket.assigns.user_id)
-  #     Logger.error "found more than one open, room: " <>
-  #       "#{inspect socket.assigns.room}, opens: #{inspect opens}"
-  #   end
-
-  #   %{channel_id: channel_id, body: body} = payload
-  #   channel = Channel.get!(channel_id)
-
-  #   with sub <- Subscription.get_by(channel_id: channel_id,
-  #                   user_id: user_id),
-  #        open  <- Map.get(sub, :open),
-  #        false <- socket.assigns.user_state == "active" and open,
-  #        count <- ChannelService.get_unread(channel_id, user_id) do
-  #     push(socket, "room:mention", %{room: channel.name, unread: count})
-
-  #     if body do
-  #       body = Helpers.strip_tags body
-  #       user = Helpers.get_user user_id
-  #       lhandle_notifications socket, user, channel, %{body: body,
-  #         username: socket.assigns.username, mention: payload[:mention]}
-  #     end
-  #   end
-  #   {:noreply, socket}
-  # end
-
-  # def handle_info({:update_direct_message, payload, user_id} = ev, socket) do
-  #   trace "upate_direct_message", ev, socket.assigns.user_state
-
-  #   %{channel_id: channel_id, msg: msg} = payload
-  #   channel = Channel.get!(channel_id)
-
-  #   with [sub] <- Repo.all(Subscription.get(channel_id, user_id)),
-  #        # _ <- Logger.warn("update_direct_message unread: #{sub.unread}"),
-  #        open  <- Map.get(sub, :open),
-  #        # _ <- Logger.warn("open: #{inspect open}"),
-  #        false <- socket.assigns.user_state == "active" and open,
-  #        count <- ChannelService.get_unread(channel_id, user_id) do
-  #     push(socket, "room:mention", %{room: channel.name, unread: count})
-
-  #     # Logger.warn "msg: " <> inspect(msg)
-  #     if msg do
-  #       user = Helpers.get_user(user_id)
-  #       handle_notifications socket, user, channel,
-  #         update_in(msg, [:body], &Helpers.strip_tags/1)
-  #     end
-  #   end
-  #   {:noreply, socket}
-  # end
-
 end

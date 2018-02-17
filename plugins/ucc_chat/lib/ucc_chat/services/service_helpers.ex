@@ -47,7 +47,7 @@ defmodule UccChat.ServiceHelpers do
     User
     |> where([c], c.username == ^username)
     |> preload(^preload)
-    |> Repo.one!
+    |> Repo.one
   end
 
   def count(query) do

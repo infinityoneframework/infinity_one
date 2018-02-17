@@ -33,7 +33,7 @@ defmodule UcxUcc.Accounts do
     Repo.all from u in User, preload: ^preload
   end
 
-  def list_users_by_pattern(user_ids, pattern, count \\ 5) do
+  def list_users_by_pattern(user_ids, pattern, count \\ 8) do
     User
     |> where([c], like(c.username, ^pattern) and c.id in ^user_ids)
     |> join(:left, [c], r in assoc(c, :roles))

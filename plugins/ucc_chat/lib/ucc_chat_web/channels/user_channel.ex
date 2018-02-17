@@ -29,7 +29,6 @@ defmodule UccChatWeb.UserChannel do
   ], intercepts: [
     "room:join",
     "room:leave",
-    "room:mention",
     "user:state",
     "direct:new",
     "update:room-icon",
@@ -64,7 +63,7 @@ defmodule UccChatWeb.UserChannel do
   alias UccChat.{
     Subscription, ChannelService, Channel, Web.RoomChannel, Message,
     SideNavService, ChannelService, InvitationService,
-    UserService, EmojiService, Mention
+    UserService, EmojiService
   }
   alias UccChatWeb.{RoomChannel, AccountView, MasterView, FlexBarView}
   alias Rebel.SweetAlert
@@ -102,12 +101,6 @@ defmodule UccChatWeb.UserChannel do
   def leave_room(user_id, room) do
     Endpoint.broadcast!(CC.chan_user() <> "#{user_id}", "room:leave",
       %{room: room, user_id: user_id})
-  end
-
-  def notify_mention(%{user_id: user_id, channel_id: channel_id} = mention, body) do
-    mention = Mention.preload_schema mention, [message: :user]
-    Endpoint.broadcast(CC.chan_user() <> "#{user_id}", "room:mention",
-      %{channel_id: channel_id, user_id: user_id, body: body, mention: mention})
   end
 
   def user_state(user_id, state) do
@@ -223,11 +216,6 @@ defmodule UccChatWeb.UserChannel do
       List.delete(socket.assigns[:subscribed], room))}
   end
 
-  def handle_out("room:mention", msg, socket) do
-    push_room_mention(msg, socket)
-    {:noreply, socket}
-  end
-
   def handle_out("user:state", msg, socket) do
     {:noreply, handle_user_state(msg, socket)}
   end
@@ -260,13 +248,6 @@ defmodule UccChatWeb.UserChannel do
     push socket, "focus:change", %{state: true, msg: "active"}
     clear_unreads(socket)
     assign socket, :user_state, "active"
-  end
-
-  def push_room_mention(msg, socket) do
-    # %{channel_id: channel_id} = msg
-    Process.send_after self(),
-      {:update_mention, msg, socket.assigns.user_id}, 250
-    socket
   end
 
   def more_channels(socket, _sender, client \\ Client) do
@@ -1027,32 +1008,6 @@ defmodule UccChatWeb.UserChannel do
         nil
     end
 
-    {:noreply, socket}
-  end
-
-  def handle_info({:update_mention, _payload, _user_id} = ev, socket) do
-    trace "upate_mention", ev
-    Logger.warn "deprecated"
-
-    audit_open_rooms(socket)
-
-    # %{channel_id: channel_id, body: _body} = payload
-    # channel = Channel.get!(channel_id)
-
-    # with sub <- Subscription.get_by(channel_id: channel_id,
-    #                 user_id: user_id),
-    #      open  <- Map.get(sub, :open),
-    #      false <- socket.assigns.user_state == "active" and open,
-    #      count <- ChannelService.get_unread(channel_id, user_id) do
-    #   # push(socket, "room:mention", %{room: channel.name, unread: count})
-
-    #   # if body do
-    #   #   body = Helpers.strip_tags body
-    #   #   user = Helpers.get_user user_id
-    #   #   handle_notifications socket, user, channel, %{body: body,
-    #   #     username: socket.assigns.username, mention: payload[:mention]}
-    #   # end
-    # end
     {:noreply, socket}
   end
 

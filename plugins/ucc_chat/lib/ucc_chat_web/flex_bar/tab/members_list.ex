@@ -28,7 +28,7 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   def args(socket, {user_id, _channel_id, _, _}, opts) do
     current_user = Helpers.get_user!(user_id)
     channel_id = socket.assigns.channel_id
-    channel = Channel.get!(channel_id, preload: [users: [:roles, user_roles: :role]])
+    channel = Channel.get(channel_id, preload: [users: [:roles, user_roles: :role]])
 
     {user, user_mode} =
       case opts["username"] do
@@ -54,14 +54,18 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
   end
 
   def user_args(socket, user_id, channel_id, username) do
-    channel = Channel.get!(channel_id, preload: [users: [:roles, user_roles: :role]])
+    channel = Channel.get(channel_id, preload: [users: [:roles, user_roles: :role]])
     preload = UcxUcc.Hooks.user_preload [:roles, user_roles: :role]
-    {[
-      user: Helpers.get_user_by_name(username, preload: preload),
-      user_info: user_info(channel, user_mode: true, view_mode: true),
-      channel_id: channel_id,
-      current_user: Helpers.get_user!(user_id)
-    ], socket}
+    if user = Helpers.get_user_by_name(username, preload: preload) do
+      {[
+        user: user,
+        user_info: user_info(channel, user_mode: true, view_mode: true),
+        channel_id: channel_id,
+        current_user: Helpers.get_user(user_id)
+      ], socket}
+    else
+      nil
+    end
   end
 
   # this is needed since we are overriding below
@@ -78,21 +82,22 @@ defmodule UccChatWeb.FlexBar.Tab.MembersList do
     username = args["username"]
     channel_id = socket.assigns.channel_id
 
-    {args, socket} = user_args(socket, user_id, channel_id, username)
+    case user_args(socket, user_id, channel_id, username) do
+      {args, socket} ->
+        html =
+          View
+          |> Phoenix.View.render_to_string("user_card.html", args)
+          |> String.replace(~s('), ~s(\\'))
+          |> String.replace("\n", " ")
 
-    html =
-      View
-      |> Phoenix.View.render_to_string("user_card.html", args)
-      |> String.replace(~s('), ~s(\\'))
-      |> String.replace("\n", " ")
+        selector = ".flex-tab-container .user-view"
 
-    selector = ".flex-tab-container .user-view"
-
-    socket
-    |> super({user_id, channel_id, tab, sender}, nil)
-    |> broadcast_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
-
-    socket
+        socket
+        |> super({user_id, channel_id, tab, sender}, nil)
+        |> async_js(~s/$('#{selector}').replaceWith('#{html}'); Rebel.set_event_handlers('#{selector}')/)
+      _ ->
+        socket
+    end
   end
 
   def flex_show_all(socket, sender) do

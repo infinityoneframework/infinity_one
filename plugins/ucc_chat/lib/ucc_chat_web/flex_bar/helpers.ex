@@ -21,7 +21,7 @@ defmodule UccChatWeb.FlexBar.Helpers do
   alias UccChatWeb.MessageView
 
   def do_messages_args(collection, user_id, channel_id) do
-    user = Accounts.get_user user_id
+    user = Accounts.get_user user_id, default_preload: true
     collection
     |> Enum.reduce({nil, []}, fn m, {last_day, acc} ->
       day =
@@ -36,6 +36,7 @@ defmodule UccChatWeb.FlexBar.Helpers do
           username: m.message.user.username,
           user: m.message.user,
           own: m.message.user_id == user_id,
+          current_user: user,
           id: m.id,
           new_day: day != last_day,
           date: MessageView.format_date(m.message.inserted_at, user),

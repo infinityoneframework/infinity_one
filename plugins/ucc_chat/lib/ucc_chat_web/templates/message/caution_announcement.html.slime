@@ -1,0 +1,5 @@
+.fixed-title.announcement.caution
+  button.cancel-button
+    span
+      i.icon-cancel
+  = @text

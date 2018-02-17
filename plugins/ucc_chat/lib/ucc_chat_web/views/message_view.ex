@@ -389,7 +389,7 @@ defmodule UccChatWeb.MessageView do
   * Adding markup to quoted code
   * Processing built-in markup like ~strike~ formatting
   """
-  def format_message_body(message, opts \\ []) do
+  def format_message_body(message, user, opts \\ []) do
     body = message.body || ""
     md_key = Keyword.get(opts, :md_key, md_key())
     message_replacement_patterns = opts[:message_replacement_patterns] || compile_message_replacement_patterns()
@@ -400,7 +400,7 @@ defmodule UccChatWeb.MessageView do
     body
     |> html_escape(!message.system)
     |> autolink()
-    |> encode_mentions
+    |> encode_mentions(user)
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
     |> message_formats(markdown?)
@@ -458,17 +458,44 @@ defmodule UccChatWeb.MessageView do
   @doc """
   Encodes mention links in the body text.
   """
-  def encode_mentions(body) do
-    Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body,
-      ~s'\\1<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
-      ~s' data-fun="flex_user_open" class="mention-link" data-username="\\2">@\\2</a>'
+  def encode_mentions(body, user) do
+    body
+    |> encode_mark_alls()
+    |> encode_users(user.username)
+    |> encode_alls()
+  end
+
+  def encode_users(body, username) do
+    Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
+      x = String.replace(x, ~r/\s*@/, "")
+      ~s'#{y}<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
+      ~s' data-fun="flex_user_open" class="mention-link#{get_own_class(username, x)}" data-username="#{x}">@#{x}</a>'
+    end
+  end
+
+  defp get_own_class(username, username) do
+    " mention-link-me"
+  end
+
+  defp get_own_class(_, _) do
+    ""
+  end
+
+  def encode_mark_alls(body) do
+    Regex.replace ~r/(^|\s)@(all!|all|here)/, body, ~s'\\1@@\\2'
+  end
+
+  def encode_alls(body) do
+    Regex.replace ~r/(^|\s)@@(all!|all|here)/, body,
+      ~s'\\1<a href="#" class="mention-link mention-link-all">@\\2</a>'
   end
 
   @doc """
   Encodes room links.
   """
   def encode_room_links(body) do
-    Regex.replace ~r/(^|\s)#([\w]+)/, body, ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
+    Regex.replace ~r/(^|\s)#([\w]+)/, body,
+      ~s'\\1<a class="mention-link" data-channel="\\2">#\\2</a>'
   end
 
   @doc """

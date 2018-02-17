@@ -66,6 +66,7 @@ defmodule UccModel do
         if preload = opts[:preload] do
           @schema
           |> preload(^preload)
+          |> order_by(asc: :inserted_at)
           |> @repo.all
         else
           @repo.all @schema
@@ -92,6 +93,7 @@ defmodule UccModel do
           where(query, [b], field(b, ^k) == ^v)
         end)
         |> preload(^preload)
+        |> order_by(asc: :inserted_at)
         |> @repo.all
       end
 

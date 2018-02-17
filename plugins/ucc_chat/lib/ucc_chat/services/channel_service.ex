@@ -47,7 +47,13 @@ defmodule UccChat.ChannelService do
 
   def set_subscription_state(channel, user_id, state)
     when state in [true, false] do
-    attrs = if state == true, do: %{open: true, hidden: false}, else: %{open: state}
+    attrs =
+      if state == true do
+        Subscription.close_opens(user_id)
+        %{open: true, hidden: false}
+      else
+        %{open: false}
+      end
     case Subscription.get_by channel_id: channel, user_id: user_id do
       nil -> nil
       sub -> Subscription.update(sub, attrs)
@@ -56,7 +62,13 @@ defmodule UccChat.ChannelService do
 
   def set_subscription_state_room(name, user_id, state)
     when state in [true, false] do
-    attrs = if state == true, do: %{open: true, hidden: false}, else: %{open: state}
+    attrs =
+      if state == true do
+        Subscription.close_opens(user_id)
+        %{open: true, hidden: false}
+      else
+        %{open: state}
+      end
     case Subscription.get_by_room(name, user_id) do
       nil -> nil
       sub -> Subscription.update(sub, attrs)
@@ -824,9 +836,7 @@ defmodule UccChat.ChannelService do
     from_channel = channel_id
 
     from_channel
-    |> Subscription.get_all_for_channel
-    |> preload([:user])
-    |> Repo.all
+    |> Subscription.get_all_for_channel(preload: [:user])
     |> Enum.each(fn subs ->
       # TODO: check for errors here
       invite_user(subs.user.id, to_channel)
@@ -841,9 +851,7 @@ defmodule UccChat.ChannelService do
     to_channel = channel_id
 
     from_channel
-    |> Subscription.get_all_for_channel
-    |> preload([:user])
-    |> Repo.all
+    |> Subscription.get_all_for_channel(preload: [:user])
     |> Enum.each(fn subs ->
       # TODO: check for errors here
       invite_user(subs.user.id, to_channel)
