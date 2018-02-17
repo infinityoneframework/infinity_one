@@ -36,6 +36,18 @@ defmodule UcxUcc.Permissions do
     GenServer.call @name, :all
   end
 
+  def state do
+    GenServer.call @name, :state
+  end
+
+  def state(permission) do
+    GenServer.call @name, {:state, permission}
+  end
+
+  def state_role(role_name) do
+    GenServer.call @name, {:state_role, role_name}
+  end
+
   def has_permission?(user, permission, scope \\ nil) do
     GenServer.call @name, {:has_permission?, user, permission, scope}
   end
@@ -50,6 +62,24 @@ defmodule UcxUcc.Permissions do
 
   def remove_role_from_permission(permission, role) do
     GenServer.call @name, {:remove_role_from_permission, permission, role}
+  end
+
+  def toggle_role_on_permission(permission, role_name) when is_binary(permission) do
+    permission
+    |> get_permission_by_name
+    |> toggle_role_on_permission(role_name)
+  end
+
+  def toggle_role_on_permission(permission, role_name) do
+    if has_role? permission, role_name do
+      remove_role_from_permission permission, role_name
+    else
+      add_role_to_permission permission, role_name
+    end
+  end
+
+  def has_role?(permission, role_name) do
+    role_name in Enum.map(permission.roles, & &1.name)
   end
 
   def room_type(0), do: "c"
@@ -103,6 +133,18 @@ defmodule UcxUcc.Permissions do
     |> reply(state)
   end
 
+  def handle_call(:state, _, state) do
+    reply state, state
+  end
+
+  def handle_call({:state, permission}, _, state) do
+    reply state.permissions[permission], state
+  end
+
+  def handle_call({:state_role, role_name}, _, state) do
+    reply state.roles[role_name], state
+  end
+
   def handle_call({:has_permission?, user, permission, scope}, _, state) do
     state
     |> do_has_permission?(user, permission, scope)
@@ -115,7 +157,7 @@ defmodule UcxUcc.Permissions do
     |> reply(state)
   end
 
-  def handle_call({:add_roll_to_permission, permission, role}, state) do
+  def handle_call({:add_roll_to_permission, permission, role}, _, state) do
     case create_permission_role(permission, role) do
       {:ok, _}    -> {:ok, do_add_role_to_permission(state, permission, role)}
       {:error, _} -> {:error, state}
@@ -123,7 +165,7 @@ defmodule UcxUcc.Permissions do
     |> reply
   end
 
-  def handle_call({:remove_role_from_permission, permission, role}, state) do
+  def handle_call({:remove_role_from_permission, permission, role}, _, state) do
     with pr when not is_nil(pr) <- get_permission_role(permission, role),
          {:ok, _} <- delete_permission_role(pr) do
       {:ok, do_remove_role_from_permission(state, permission, role)}
@@ -137,14 +179,32 @@ defmodule UcxUcc.Permissions do
   #################
   # Private
 
+  defp do_add_role_to_permission(state, %{} = permission, role) do
+    do_add_role_to_permission(state, permission.name, role)
+  end
+  defp do_add_role_to_permission(state, permission, %{} = role) do
+    do_add_role_to_permission(state, permission, role.name)
+  end
   defp do_add_role_to_permission(state, permission, role) do
-    update_in state, [:roles, role], fn list ->
+    state
+    |> update_in([:roles, role], fn list ->
       if permission in list, do: list, else: [permission | list]
-    end
+    end)
+    |> update_in([:permissions, permission], fn list ->
+      if role in list, do: list, else: [role | list]
+    end)
   end
 
+  defp do_remove_role_from_permission(state, %{} = permission, role) do
+    do_remove_role_from_permission(state, permission.name, role)
+  end
+  defp do_remove_role_from_permission(state, permission, %{} = role) do
+    do_remove_role_from_permission(state, permission, role.name)
+  end
   defp do_remove_role_from_permission(state, permission, role) do
-    update_in state, [:roles, role], fn list -> List.delete list, permission end
+    state
+    |> update_in([:roles, role], fn list -> List.delete list, permission end)
+    |> update_in([:permissions, permission], fn list -> List.delete list, role end)
   end
 
   defp do_has_permission?(state, user, permission, scope) do
@@ -192,13 +252,16 @@ defmodule UcxUcc.Permissions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_permission!(id), do: Repo.get!(Permission, id)
+  def get_permission!(id) do
+    Repo.get!(Permission, id)
+  end
+
 
   @doc """
   Get a permission by its name.
   """
   def get_permission_by_name(permission) do
-    Repo.one from p in Permission, where: p.name == ^permission
+    Repo.one from p in Permission, where: p.name == ^permission, preload: [:roles]
   end
 
   @doc """
@@ -328,7 +391,7 @@ defmodule UcxUcc.Permissions do
   def create_permission_role(permission, role) when is_binary(role) do
     create_permission_role  permission, Accounts.get_role_by_name(role)
   end
-  def create_permission_role(permission, role) when is_binary(role) do
+  def create_permission_role(permission, role) do
     create_permission_role(%{permission_id: permission.id, role_id: role.id})
   end
 
@@ -374,7 +437,7 @@ defmodule UcxUcc.Permissions do
   def get_permission_role(permission, role) when is_binary(role) do
     get_permission_role permission, Accounts.get_role_by_name(role)
   end
-  def get_permission_role(permission, role) when is_binary(role) do
+  def get_permission_role(permission, role) do
     Repo.one from p in PermissionRole, where: p.permission_id == ^permission.id and
       p.role_id == ^role.id
   end

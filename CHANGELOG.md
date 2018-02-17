@@ -27,6 +27,7 @@
 * Add new permissions to the database on startup
 * Add new @all! permission
 * Enforce new @all, @here, and @all! permissions
+* Add support to change permissions in admin
 
 ### Bug Fixes
 

@@ -16,6 +16,7 @@ defmodule UccAdmin.AdminService do
   alias UccWebrtc.Settings.Webrtc
   alias UccChatWeb.AdminView, as: ChatAdminView
   alias UccAdminWeb.FlexBarView
+  alias UccChatWeb.RebelChannel.Client
 
   def handle_in("save:accounts", params, socket) do
     params =
@@ -286,6 +287,21 @@ defmodule UccAdmin.AdminService do
     {:reply, {:ok, %{html: html}}, socket}
   end
 
+  def handle_in("permissions:change:" <> change, params, socket) do
+    re = ~r/(?:perm\[)([^\]]+)(?:\]\[)([^\]]+)(?:\])/
+    with [_, role, permission_name] <- Regex.run(re, change),
+         permission <- Permissions.get_permission_by_name(permission_name),
+         false <- is_nil(permission) do
+      Permissions.toggle_role_on_permission(permission, role)
+      Client.toastr socket, :success, ~g(Permission changed)
+    else
+      error ->
+        Logger.warn "error: " <> inspect(error)
+        Client.toastr socket, :error, ~g(There was a problem with that action)
+    end
+    {:noreply, socket}
+  end
+
 
   # def handle_in(ev = "flex:row-info", params, socket) do
   #   debug ev, params
@@ -467,7 +483,6 @@ defmodule UccAdmin.AdminService do
   # end
 
   def send_invitation_emails(_current_user, emails) do
-    Logger.warn "emails: #{inspect emails}"
     Enum.reject(emails, fn email ->
       email
       |> String.trim
@@ -483,8 +498,7 @@ defmodule UccAdmin.AdminService do
           _ -> true
         end)
         |> case do
-          {[], list} = results ->
-            Logger.warn "results: #{inspect results}"
+          {[], list} ->
             {:ok, get_emails(list)}
           {errors, oks} ->
             %{errors: get_emails(errors) |> Enum.join("\n"), ok: get_emails(oks)}
