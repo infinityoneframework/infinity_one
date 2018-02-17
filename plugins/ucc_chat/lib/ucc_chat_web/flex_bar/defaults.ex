@@ -6,7 +6,8 @@ defmodule UccChatWeb.FlexBar.Defaults do
   # alias UcxUcc.TabBar
 
   def add_buttons do
-    [Search, StarredMessage, ImMode, RoomsMode, Mention, PinnedMessage,
+    # [Search, StarredMessage, ImMode, RoomsMode, Mention, PinnedMessage,
+    [Search, StarredMessage, RoomsMode, Mention, PinnedMessage,
      Notification, MembersList, Info, UserInfo, FilesList, RoomInfo]
     |> Enum.each(fn module ->
       UccChatWeb.FlexBar.Tab
