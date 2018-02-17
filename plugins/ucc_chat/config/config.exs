@@ -27,7 +27,7 @@ config :ucx_ucc, UccChat.Robot, [
   responders: [
     {Hedwig.Responders.Help, []},
     {Hedwig.Responders.Ping, []},
-    {UccChat.Robot.Responders.Hello, []},
+    # {UccChat.Robot.Responders.Hello, []},
 
     {HedwigSimpleResponders.Slogan, []},
     {HedwigSimpleResponders.ShipIt, %{ extra_squirrels: false }},
