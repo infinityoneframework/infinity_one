@@ -28,6 +28,7 @@
 * Add new @all! permission
 * Enforce new @all, @here, and @all! permissions
 * Add support to change permissions in admin
+* Support adding, removing and assigning roles
 
 ### Bug Fixes
 

@@ -1,4 +1,3 @@
-- defer = Application.get_env :ucx_chat, :defer, true
 section.page-container.page-home.page-static.page-static.page-list
   header.fixed-title.border-component-color
     = render UccChatWeb.MasterView, "burger.html"
@@ -7,8 +6,7 @@ section.page-container.page-home.page-static.page-static.page-list
   .content
     .permissions-manager
       = if has_permission? @user, "access-permissions" do
-        = unless defer do
-          a.button.primary.new-role(href="#admin-permissions-new")= ~g"New_role"
+        a.button.primary.new-role(href="#admin-permissions-new")= ~g"New_role"
         table.permission-grid.secondary-background-color(border="1")
           thead.content-background-color
             tr

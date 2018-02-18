@@ -1,0 +1,10 @@
+h2.border-component-color = ~g(Users in role)
+.user-roles-container data-scope="#{@scope}"
+  .user-roles
+    label = ~g(Add user)
+    input.search#user-roles-search type="text" data-id="#{@item.id}" placeholder="#{~g(Enter a username)}" autocomplete="off" style="width: 200px;" rebel-keydown="admin_user_roles"
+    .submit style="display: inline-block;"
+      button.button.primary.add rebel-click="admin_add_user_role" disabled="true" = ~g(Add)
+  div class="-autocomplete-container users hidden"
+  .list-user-roles style="margin-top: 20px;"
+    = render "permissions_user_roles.html", users: @item.users

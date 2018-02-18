@@ -1,0 +1,9 @@
+div class="-autocomplete-container users"
+  ul class="-autocomplete-list"
+    = for {user, inx} <- Enum.with_index(@users) do
+      - sel = if inx == 0, do: " selected", else: ""
+      li class="-autocomplete-item#{sel}" data-id="#{user.username}" rebel-click="admin_click_user_role_member"
+        i.icon-at(class="status-#{user.status}" data-status-name="#{user.username}")
+        = user.username
+        | -
+        strong = user.name

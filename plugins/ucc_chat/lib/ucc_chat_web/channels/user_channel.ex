@@ -1727,5 +1727,12 @@ defmodule UccChatWeb.UserChannel do
   defdelegateadmin :click_admin
   defdelegateadmin :admin_link
   defdelegateadmin :admin_flex
+  defdelegateadmin :admin_user_roles
+  defdelegateadmin :admin_add_user_role
+  defdelegateadmin :admin_user_role_remove
+  defdelegateadmin :admin_click_user_role_member
+  defdelegateadmin :admin_user_role_search_channel
+  defdelegateadmin :admin_click_scoped_room
+  defdelegateadmin :admin_autocomplete_mouseenter
 
 end

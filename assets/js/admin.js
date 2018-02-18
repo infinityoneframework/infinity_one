@@ -36,7 +36,7 @@ class Admin {
         // admin.disable_save_button()
         $('a.admin-link[data-id="admin_info"]').click()
       })
-      .on('change', '.admin-settings form input', function(e) {
+      .on('change', '.admin-settings form input:not(.search)', function(e) {
         let target = e.currentTarget
         admin.enable_save_button()
         let reset = `<button text='Reset' data-setting="${target.getAttribute('name')}" class="reset-setting button danger">${reset_i}</button>`
@@ -46,7 +46,7 @@ class Admin {
         admin.enable_save_button()
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })
-      .on('keyup keypress paste', '.admin-settings form input', function(e) {
+      .on('keyup keypress paste', '.admin-settings form input:not(.search)', function(e) {
         admin.enable_save_button()
         $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
       })
@@ -153,6 +153,35 @@ class Admin {
       .on('click', 'section.admin form.user button.cancel', e => {
         this.close_edit_form($('form.user').data('username'))
       })
+      .on('click', 'a.new-role', e => {
+        UccChat.userchan.push('admin:permissions:role:new', {})
+      })
+      .on('click', 'a[href="#admin-permissions-edit"]', e => {
+        let name = $(e.currentTarget).attr('name')
+        console.log('permissions edit', name)
+        UccChat.userchan.push('admin:permissions:role:edit', {name: name})
+      })
+      .on('click', '.admin-role.delete', e => {
+        let name = $(e.currentTarget).attr('data-name')
+        UccChat.userchan.push('admin:permissions:role:delete', {name: name})
+      })
+      .on('click', 'a[href="/admin/permissions"]', e => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        $('.admin-link[data-id="admin_permissions"]').click();
+        return false;
+      })
+      .on('mouseenter', '.-autocomplete-item', e => {
+        $('.-autocomplete-item').removeClass('selected');
+        $(e.currentTarget).addClass('selected');
+      })
+      .on('keydown', '#search-room', e => {
+        return this.handle_search_keys(e, 'rooms');
+      })
+      .on('keydown', '#user-roles-search', e => {
+        return this.handle_search_keys(e, 'users');
+      })
   }
 
   close_edit_form(name) {
@@ -194,6 +223,46 @@ class Admin {
       toastr.error(resp.error)
     } else if (resp.warning) {
       toastr.warning(resp.warning)
+    }
+  }
+
+  handle_search_keys(e, which) {
+    if (e.key == 'ArrowDown' || e.key == 'ArrowUp') {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let container = '.users';
+      if (which == 'rooms') {
+        container = '.rooms';
+      }
+
+      let current = $(`.-autocomplete-container${container} .-autocomplete-item.selected`);
+      let siblings = $(`.-autocomplete-container${container} .-autocomplete-item`);
+
+      let select = function(item) {
+        item.addClass('selected');
+      };
+
+      current.removeClass('selected');
+
+      if (e.key == "ArrowDown") {
+        let next = current.next();
+        if (next.length > 0) {
+          next.addClass('selected');
+        } else {
+          let first = siblings.first();
+          first.addClass('selected');
+        }
+      } else {
+        let prev = current.prev();
+        if (prev.length > 0) {
+          prev.addClass('selected');
+        } else {
+          let last = siblings.last();
+          last.addClass('selected')
+        }
+      }
+      return false;
     }
   }
 }

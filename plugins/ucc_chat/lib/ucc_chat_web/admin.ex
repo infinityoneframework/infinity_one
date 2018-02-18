@@ -4,7 +4,7 @@ defmodule UccChatWeb.Admin do
 
   @pages [
     Info, Rooms, Users, Permissions, Search, Accounts, General, ChatGeneral,
-    Message, Layout, FileUpload, PhoneNumbers
+    Message, Layout, FileUpload, PhoneNumbers, Role
   ] |> Enum.map(&Module.concat([__MODULE__, Page, &1]))
 
   def add_pages(list) do

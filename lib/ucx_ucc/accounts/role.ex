@@ -30,4 +30,8 @@ defmodule UcxUcc.Accounts.Role do
     bot: :global,
     guest: :global
   ]
+
+  def default_role_names do
+    Enum.map(default_roles(), & &1 |> elem(0) |> to_string)
+  end
 end

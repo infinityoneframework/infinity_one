@@ -1,1 +1,2 @@
-li= link @page.name, class: "admin-link", "rebel-click": "admin_link", "data-id": @page.id, to: "#"
+- style = if @page.opts[:visible] == false, do: "display: none;", else: ""
+li style="#{style}" = link @page.name, class: "admin-link", "rebel-click": "admin_link", "data-id": @page.id, to: "#"

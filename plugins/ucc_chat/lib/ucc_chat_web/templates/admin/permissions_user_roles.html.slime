@@ -1,0 +1,20 @@
+table.user-roles-list
+  thead
+    tr
+      th
+      th width="34%" = ~g(Name)
+      th width="34%" = ~g(Username)
+      th width="33%" = ~g(Email)
+      th
+  tbody
+    = for user <- @users do
+      tr data-username="#{user.username}"
+        td
+          div(class="user-image status-#{get_status(user)}" data-status-name="#{user.username}")
+            = avatar_background_tags(user)
+        td = user.name
+        td = user.username
+        td = user.email
+        td
+          button.remove title="#{~g(Remove role)}" rebel-click="admin_user_role_remove" data-username="#{user.username}"
+            i.icon-trash

@@ -6,7 +6,7 @@ defmodule UccAdmin.AdminService do
 
   alias UccChat.{Channel, UserService}
   alias UccChatWeb.FlexBarView
-  alias UccAdminWeb.{AdminView}
+  alias UccAdminWeb.{AdminView, AdminChannel}
   alias UccChat.Settings, as: ChatSettings
   alias ChatSettings.{FileUpload, Layout}
   alias ChatSettings.ChatGeneral
@@ -287,9 +287,21 @@ defmodule UccAdmin.AdminService do
     {:reply, {:ok, %{html: html}}, socket}
   end
 
-  def handle_in("permissions:change:" <> change, params, socket) do
+  def handle_in(ev = "save:admin-role", params, socket) do
+    debug ev, params
+    current_user = Helpers.get_user!(socket.assigns.user_id)
+
+    params
+    |> Helpers.normalize_form_params
+    |> create_or_update_role(current_user, socket)
+
+    {:noreply, socket}
+  end
+
+  def handle_in("permissions:change:" <> change, _params, socket) do
     re = ~r/(?:perm\[)([^\]]+)(?:\]\[)([^\]]+)(?:\])/
     with [_, role, permission_name] <- Regex.run(re, change),
+         {false, false} <- {is_nil(permission_name), is_nil(role)},
          permission <- Permissions.get_permission_by_name(permission_name),
          false <- is_nil(permission) do
       Permissions.toggle_role_on_permission(permission, role)
@@ -300,6 +312,60 @@ defmodule UccAdmin.AdminService do
         Client.toastr socket, :error, ~g(There was a problem with that action)
     end
     {:noreply, socket}
+  end
+
+  def handle_in("permissions:role:new", _params, socket) do
+    # Logger.warn "new role"
+    Rebel.Core.async_js socket, ~s/$('.admin-link[data-id="admin_role"]').click();/
+    {:noreply, socket}
+  end
+
+  def handle_in("permissions:role:edit", params, socket) do
+    # Logger.warn "new role params: " <> inspect(params)
+
+    AdminChannel.admin_link("admin_role", socket, Map.put(%{}, "edit-name", params["name"]))
+    # {:noreply, socket}
+  end
+
+  def handle_in("permissions:role:delete", params, socket) do
+    # Logger.warn "new role params: " <> inspect(params)
+    role_name = params["name"]
+    if role = UcxUcc.Accounts.get_by_role(name: role_name) do
+      changeset = UcxUcc.Accounts.change_role(role)
+
+      Client.swal_model socket, "Delete Role!", "Are you sure?", "warning", "Delete Role!",
+        confirm: fn _ ->
+          case UcxUcc.Accounts.delete_role changeset do
+            {:ok, _} ->
+              Client.swal socket, ~g(Role Deleted!), gettext("The %{role} has been successfully deleted", role: role.name), "success"
+              Rebel.Core.async_js socket, ~s/$('.admin-link[data-id="admin_permissions"]').click();/
+          end
+        end
+    end
+    {:noreply, socket}
+  end
+
+  def create_or_update_role(%{"role" => %{"id" => id}} = params, _current_user, socket) do
+    role = UcxUcc.Accounts.get_role!(id)
+
+    case UcxUcc.Accounts.update_role role, params["role"] do
+      {:ok, role} ->
+        Client.toastr socket, :success, ~s(Role updated successfully)
+        AdminChannel.admin_link("admin_role", socket, Map.put(%{}, "edit-name", role.name))
+      {:error, changeset} ->
+        Logger.warn "errors: " <> inspect(changeset.errors)
+        Client.toastr socket, :error, ~s(Problem creating Role)
+    end
+  end
+
+  def create_or_update_role(params, _current_user, socket) do
+    case UcxUcc.Accounts.create_role params["role"] do
+      {:ok, role} ->
+        Client.toastr socket, :success, ~s(Role created successfully)
+        AdminChannel.admin_link("admin_role", socket, Map.put(%{}, "edit-name", role.name))
+      {:error, _} ->
+        Client.toastr socket, :error, ~s(Problem creating Role)
+    end
   end
 
 

@@ -1,0 +1,8 @@
+div class="-autocomplete-container rooms"
+  ul class="-autocomplete-list"
+    = for {room, inx} <- Enum.with_index(@rooms) do
+      - sel = if inx == 0, do: " selected", else: ""
+      li class="-autocomplete-item#{sel}" data-id="#{room.name}" rebel-click="admin_click_scoped_room"
+        div rebel-event="mouseenter" rebel-handler="admin_autocomplete_mouseenter"
+          i.icon-hash
+          = room.name

@@ -12,7 +12,6 @@ defmodule UccChatWeb.RebelChannel.Client do
   import Rebel.Query
   import Rebel.Core
   import UcxUccWeb.Utils
-  import Rebel.{Core, Query}, warn: false
 
   alias Rebel.SweetAlert
   alias UccChatWeb.{ClientView, SharedView, SideNavView, MessageView}
@@ -404,4 +403,5 @@ defmodule UccChatWeb.RebelChannel.Client do
 
     async_js socket, ~s/$('.messages-container header.fixed-title').after(#{html})/
   end
+
 end

@@ -48,7 +48,9 @@ defmodule UcxUcc.Accounts do
   def list_all_users_by_pattern(pattern, {column, exclude}, count) do
     pattern = String.downcase(pattern)
     User
-    |> where([c], like(fragment("LOWER(?)", c.username), ^pattern) and not field(c, ^column) in ^exclude)
+    |> where([c], like(fragment("LOWER(?) or LOWER(?) or LOWER(?)",
+      c.username, c.name, c.email), ^pattern) and
+      not field(c, ^column) in ^exclude)
     |> join(:left, [c], r in assoc(c, :roles))
     |> where([c, r], not(r.name == "bot" and r.scope == "global"))
     |> preload([c, r], [roles: c])
@@ -59,6 +61,29 @@ defmodule UcxUcc.Accounts do
 
   def list_all_users_by_pattern(pattern, exclude, count) do
     list_all_users_by_pattern(pattern, {:id, exclude}, count)
+  end
+
+  def list_users_without_role_by_pattern(pattern, role_id, opts \\ []) do
+    pattern = String.downcase(pattern)
+    count = opts[:count] || 8
+    scope = opts[:scope]
+    User
+    |> where([c], like(fragment("LOWER(?) or LOWER(?) or LOWER(?)",
+      c.username, c.name, c.email), ^pattern))
+    |> do_list_users_without_role_by_pattern_join(role_id, scope)
+    |> where([c,r], is_nil(r.id))
+    |> where([c], not like(c.username, "bot%"))
+    |> select([c], %{id: c.id, username: c.username, email: c.email, name: c.name})
+    |> order_by([c], asc: c.username)
+    |> limit(^count)
+    |> Repo.all
+  end
+
+  defp do_list_users_without_role_by_pattern_join(query, role_id, nil) do
+    join(query, :left, [c], r in UserRole, r.role_id == ^role_id and r.user_id == c.id)
+  end
+  defp do_list_users_without_role_by_pattern_join(query, role_id, scope) do
+    join(query, :left, [c], r in UserRole, r.role_id == ^role_id and r.user_id == c.id and r.scope == ^scope)
   end
 
   defp pop_user_preloads(opts) do
@@ -226,12 +251,13 @@ defmodule UcxUcc.Accounts do
     User.changeset(%User{}, params)
   end
 
-  def add_role_to_user(%User{} = user, %Role{} = role) do
-    create_user_role %{user_id: user.id, role_id: role.id}
+  def add_role_to_user(user, role, scope \\ nil)
+  def add_role_to_user(%User{} = user, %Role{} = role, scope) do
+    create_user_role %{user_id: user.id, role_id: role.id, scope: scope}
   end
 
-  def add_role_to_user(%User{} = user, role_name) do
-    add_role_to_user user, get_role_by_name(role_name)
+  def add_role_to_user(%User{} = user, role_name, scope) do
+    add_role_to_user user, get_role_by_name(role_name), scope
   end
 
   ##################
@@ -265,6 +291,16 @@ defmodule UcxUcc.Accounts do
 
   """
   def get_role!(id), do: Repo.get!(Role, id)
+
+  def get_by_role(opts) do
+    if preload = opts[:preload] do
+      Role
+      |> Repo.get_by(Keyword.delete(opts, :preload))
+      |> Repo.preload(preload)
+    else
+      Repo.get_by Role, opts
+    end
+  end
 
   @doc """
   Creates a role.
@@ -318,6 +354,10 @@ defmodule UcxUcc.Accounts do
     Repo.delete(role)
   end
 
+  def delete_role(%Ecto.Changeset{} = changeset) do
+    Repo.delete(changeset)
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking role changes.
 
@@ -329,6 +369,10 @@ defmodule UcxUcc.Accounts do
   """
   def change_role(%Role{} = role) do
     Role.changeset(role, %{})
+  end
+
+  def change_role do
+    change_role %Role{}
   end
 
   @doc """
@@ -353,8 +397,9 @@ defmodule UcxUcc.Accounts do
   @doc """
   Returns a role by role name
   """
-  def get_role_by_name(role) do
-    Repo.one from r in Role, where: r.name == ^role
+  def get_role_by_name(role, opts \\ []) do
+    preload = opts[:preload] || []
+    Repo.one from r in Role, where: r.name == ^role, preload: ^preload
   end
 
   def set_users_role(%{} = user, role_name, scope) do
@@ -395,6 +440,53 @@ defmodule UcxUcc.Accounts do
   end
 
   @doc """
+  Get the list of user roles for a given opts.
+
+  Opts must at least contain the `role_id'. If the role is global scope,
+  no further options are required. However, if the rooms scope is not global,
+  then the scope attribute must be provided.
+  """
+  def list_by_user_roles(opts) do
+    opts
+    |> list_by_user_roles_query
+    |> Repo.all
+  end
+
+  def list_by_user_roles_query(opts) do
+    {preload, opts} = Keyword.pop(opts, :preload)
+
+    opts
+    |> Enum.reduce(UserRole, fn {k, v}, query ->
+      where(query, [b], field(b, ^k) == ^v)
+    end)
+    |> do_preload(preload)
+    |> order_by(asc: :inserted_at)
+  end
+
+  defp do_preload(query, nil), do: query
+  defp do_preload(query, preload), do: preload(query, ^preload)
+
+  def count_user_roles(role, scope \\ nil)
+
+  def count_user_roles(%{id: role_id, scope: "global"}, nil) do
+    Repo.one from ur in UserRole,
+      where: ur.role_id == ^role_id,
+      select: count(ur.id)
+  end
+
+  def count_user_roles(%{id: role_id, scope: "rooms"}, scope) when not is_nil(scope) do
+    Repo.one from ur in UserRole,
+      where: ur.role_id == ^role_id and ur.scope == ^scope,
+      select: count(ur.id)
+  end
+
+  def list_user_roles_user_select(field, opts) do
+    opts
+    |> list_by_user_roles_query
+    |> select([ur], field(ur, ^field))
+    |> Repo.all
+  end
+  @doc """
   Gets a single user_role.
 
   Raises `Ecto.NoResultsError` if the UserRole does not exist.
@@ -425,6 +517,26 @@ defmodule UcxUcc.Accounts do
     get_by_user_role user_id: user_id, role_id: role_id, scope: scope
   end
 
+  def get_role_by_name_with_users(role_name, scope \\ nil)
+
+  def get_role_by_name_with_users(role_name, nil) do
+    get_role_by_name role_name, preload: [:users]
+  end
+
+  def get_role_by_name_with_users(role_name, scope) do
+    role = get_role_by_name role_name
+    users = get_role_by_name_users role, scope
+    Map.put(role, :users, users)
+  end
+
+  def get_role_by_name_users(%{} = role, scope) do
+    Repo.all from ur in UserRole,
+      join: u in User, on: ur.user_id == u.id,
+      where: ur.role_id == ^role.id and ur.scope == ^scope,
+      order_by: [asc: u.username],
+      select: u
+  end
+
   @doc """
   Creates a user_role.
 
@@ -438,6 +550,15 @@ defmodule UcxUcc.Accounts do
 
   """
   def create_user_role(attrs \\ %{}) do
+    # if scope = attrs[:scope] do
+    #   if list_by_user_roles(user_id: attrs[:user_id], role_id: attrs[:role_id], scope: scope) != [] do
+    #     raise "Attempting to add duplication user role " <> inspect(attrs)
+    #   end
+    # else
+    #   if list_by_user_roles(user_id: attrs[:user_id], role_id: attrs[:role_id]) != [] do
+    #     raise "Attempting to add duplication user role " <> inspect(attrs)
+    #   end
+    # end
     %UserRole{}
     |> UserRole.changeset(attrs)
     |> Repo.insert()

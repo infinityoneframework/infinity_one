@@ -14,6 +14,7 @@ defmodule UcxUcc.Permissions do
   alias UcxUcc.{Accounts, Permissions, Repo}
   alias Permissions.{Permission, PermissionRole}
   # alias Accounts.{User, Role}
+  require Logger
 
   @name __MODULE__
 
@@ -174,6 +175,11 @@ defmodule UcxUcc.Permissions do
         {:error, state}
     end
     |> reply
+  end
+
+  def handle_info({"accounts", "role:new", _payload}, state) do
+    # Logger.warn "payload: " <> inspect(payload)
+    noreply state
   end
 
   #################
@@ -363,6 +369,20 @@ defmodule UcxUcc.Permissions do
   """
   def list_permission_roles do
     Repo.all(PermissionRole)
+  end
+
+  def change_permission_roles(attrs \\ %{})
+
+  def change_permission_roles(%PermissionRole{} = pr) do
+    change_permission_roles pr, %{}
+  end
+
+  def change_permission_roles(attrs) do
+    change_permission_roles %PermissionRole{}, attrs
+  end
+
+  def change_permission_roles(pr, attrs) do
+    PermissionRole.changeset(pr, attrs)
   end
 
   @doc """
@@ -564,5 +584,51 @@ defmodule UcxUcc.Permissions do
     %{name: "view-statistics",               roles: ["admin"] },
     %{name: "view-user-administration",      roles: ["admin"] },
   ]
+
+  def show_permission_list do
+    [
+      "access-permissions",
+      "add-user-to-joined-room",
+      "add-user-to-any-c-room",
+      "add-user-to-any-p-room",
+      "archive-room",
+      "assign-admin-role",
+      "ban-user",
+      "bulk-register-user",
+      "create-c",
+      "create-d",
+      "create-p",
+      "create-user",
+      "clean-channel-history",
+      "delete-c",
+      "delete-d",
+      "delete-message",
+      "delete-p",
+      "delete-user",
+      "edit-message",
+      "edit-other-user-info",
+      "edit-other-user-password",
+      "edit-room",
+      "invite-user",
+      "mention-all",
+      "mention-here",
+      "mention-all!",
+      "mute-user",
+      "pin-message",
+      "preview-c-room",
+      "set-moderator",
+      "set-owner",
+      "unarchive-room",
+      "view-c-room",
+      "view-history",
+      "view-joined-room",
+      "view-other-user-channels",
+      "view-p-room",
+      "view-room-administration",
+      "view-message-administration",
+      "view-statistics",
+      "view-user-administration",
+    ]
+  end
 
 end

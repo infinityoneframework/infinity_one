@@ -237,6 +237,16 @@ defmodule UccChat.Channel do
     |> @repo.all
   end
 
+  def get_all_channels_by_pattern(pattern, count \\ 8) do
+    @schema
+    |> where([c], like(fragment("LOWER(?)", c.name), ^pattern))
+    |> where([c], c.type in [0, 1])
+    |> order_by([c], asc: c.name)
+    |> limit(^count)
+    |> select([c], %{id: c.id, name: c.name})
+    |> @repo.all
+  end
+
   @doc """
   Get the nway channel.
 

@@ -22,7 +22,8 @@ defmodule UccChatWeb.Admin.Page.Permissions do
     user = Repo.preload user, preload
 
     roles = Repo.all Role
-    permissions = Permissions.all
+    filter_on = Permissions.show_permission_list()
+    permissions = Permissions.all |> Enum.filter(& elem(&1, 0) in filter_on)
 
     {[
       user: user,
