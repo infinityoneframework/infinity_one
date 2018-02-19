@@ -237,8 +237,9 @@ defmodule UccChat.Mention do
   def update_many(mentions, %{id: message_id, channel_id: channel_id, body: body}) do
     existing = list_by(message_id: message_id, preload: [:user])
     existing_names =
-      Enum.map(existing, fn mention ->
-        if mention.user_id, do: mention.user.username, else: mention.name
+      Enum.map(existing, fn
+        %{all: true} = mention -> mention.name
+        mention -> mention.user.username
       end)
 
     adds = mentions -- existing_names
@@ -251,8 +252,18 @@ defmodule UccChat.Mention do
 
     Enum.each subs, fn name ->
       existing
-      |> Enum.find(& &1.user_id == name or &1.name == name)
-      |> delete
+      |> Enum.find(fn
+        %{all: true, name: ^name} -> true
+        %{all: true} -> false
+        %{user: %{username: ^name}} -> true
+        _ -> false
+      end)
+      |> case do
+        nil ->
+          {:ok, :ok}
+        sub ->
+          delete sub
+      end
     end
   end
 
@@ -279,7 +290,6 @@ defmodule UccChat.Mention do
           "A new n-way private channel #%{room} has been created" <>
           " for %{names}, and %{name}",
           names: other_names, name: first_name, room: room)
-
 
       Message.create(%{
         channel_id: message.channel_id,

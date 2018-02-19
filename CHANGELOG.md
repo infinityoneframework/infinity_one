@@ -1,6 +1,6 @@
 # UcxUcc Changelog
 
-## 0.2.6 (2018-02-xx)
+## 0.2.6 (2018-02-19)
 
 ## Enhancements
 
@@ -29,6 +29,7 @@
 * Enforce new @all, @here, and @all! permissions
 * Add support to change permissions in admin
 * Support adding, removing and assigning roles
+* Fix update mentions regression
 
 ### Bug Fixes
 
