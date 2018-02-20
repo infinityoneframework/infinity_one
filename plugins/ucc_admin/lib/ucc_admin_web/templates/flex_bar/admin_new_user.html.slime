@@ -1,0 +1,6 @@
+.content
+  = render "flex_close_button.html"
+  .user-view
+    - bindings = [user_info: @user_info, user: @user, current_user: @current_user, changeset: @changeset]
+    = UccChatWeb.FlexBarView.render "user_edit.html", bindings
+

@@ -10,7 +10,7 @@
         h3= user.name
       - else
         h3= ~g(Add User)
-      = if Map.get(@changeset.data, :extensions) do
+      = if user && Map.get(@changeset.data, :extensions) do
         ul.list.clearfix(style="margin-bottom: -20px; margin-top: 20px;")
           li.boolean
             label
@@ -18,10 +18,14 @@
               .input.checkbox.toggle(rebel-click="delegate" data-module="MscsWeb.UserChannel" data-fun="toggle_webrtc_enabled" data-id="user_webrtc_enabled" style="display: inline-block; top: 8px;")
                 = UccChatWeb.FlexBarView.toggle_tag f, "user", %{name: :webrtc_enabled}, "rebel-change": "delegate", "data-module": "MscsWeb.UserChannel", "data-fun": "toggle_webrtc_enabled_change"
                 label(for="")
-    - form_opts = [class: "edit-form user", autocomplete: :off, "data-username": user.username]
+    - form_opts = [class: "edit-form user", autocomplete: :off, "data-username": @changeset.data.username]
     = form_for @changeset, "#", form_opts, fn f ->
-      input(type="hidden" name="flex-id" value="admin_user_info")
-      input(type="hidden" name="user[id]" value="#{user.id}")
+      = if user do
+          input(type="hidden" name="flex-id" value="admin_user_info")
+          input(type="hidden" name="user[id]" value="#{@changeset.data.id}")
+      - else
+          input(type="hidden" name="flex-id" value="admin_add_user")
+
       .input-line
         = label f, :name, ~g(Name)
         = text_input f, :name, autocomplete: :off
@@ -31,45 +35,53 @@
       .input-line
         =label :email, ~g(Email)
         = text_input f, :email, autocomplete: :off, type: :email
-      fieldset.phone-numbers
-        = if user.phone_numbers == [] do
-          = render "add_phone_number_button.html", user: user
-        - else
-          legend= ~g(Phone Numbers)
-          = inputs_for f, :phone_numbers, [], fn fp ->
-            .input-line
-              = label fp, :number, ~g(Number)
-              = text_input fp, :number, type: :tel, pattern: "\\d{2,11}"
-            .input-line
-              = label fp, :label, ~g(Label)
-              div
-                div.select-arrow
-                  i.icon-down-open.secondary-font-color
-                = select fp, :label_id, labels
-            .input-line
-              button.button.danger#remove-phone-number(rebel-click="delete_phone_number" data-number-id="#{fp.data.id}" title="#{~g(Delete)}")
-                i.icon-trash
-                = ~g"Delete"
+      - if user do
+        fieldset.phone-numbers
+          = if user.phone_numbers == [] do
+            = render "add_phone_number_button.html", user: user
+          - else
+            legend= ~g(Phone Numbers)
+            = inputs_for f, :phone_numbers, [], fn fp ->
+              .input-line
+                = label fp, :number, ~g(Number)
+                = text_input fp, :number, type: :tel, pattern: "\\d{2,11}"
+              .input-line
+                = label fp, :label, ~g(Label)
+                div
+                  div.select-arrow
+                    i.icon-down-open.secondary-font-color
+                  = select fp, :label_id, labels
+              .input-line
+                button.button.danger#remove-phone-number(rebel-click="delete_phone_number" data-number-id="#{fp.data.id}" title="#{~g(Delete)}")
+                  i.icon-trash
+                  = ~g"Delete"
 
       = if has_permission? @current_user, "edit-other-user-password" do
         .input-line
           = label f, :password, ~g(Password)
           = password_input f, :password, autocomplete: :off
           button#randomPassword.button= ~g(Random)
+          button#showPassword.button style="display: none;" = ~g(Show Pswd)
+          button#hidePassword.button style="display: none;" = ~g(Hide Pswd)
+        / = unless @user_info[:admin] do
         .input-line
           = label f, :password_confirmation, ~g(Password confirmation)
           = password_input f, :password_confirmation, autocomplete: :off
       = unless user do
         .input-line
           label(for="role")= ~g(Role)
-          select#role
+          = select f, :roles, list_role_names(), selected: "user"
         .input-line
-          label(for="joinDefaultChannels")
-            input#joinDefaultChannels(type="checkbox" value="1" checked="true")
+          = label f, :join_default_channels do
+            = checkbox f, :join_default_channels, value: true
             = ~g(Join default channels)
         .input-line
-          label(for="sendWelcomeEmail")
-            input#sendWelcomeEmail(type="checkbox" value="1" checked="true")
+          = label f, :confirm_account do
+            = checkbox f, :confirm_account, value: false
+            = ~g(Confirmed?)
+        .input-line
+          = label f, :send_welcome_email do
+            = checkbox f, :send_welcome_email, value: true
             = ~g(Send welcome email)
       nav
         button.button.button-block.cancel(type="button" rebel-click="flex_form_cancel")

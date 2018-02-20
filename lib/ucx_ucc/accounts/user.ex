@@ -9,6 +9,8 @@ defmodule UcxUcc.Accounts.User do
   alias UcxUcc.UccPubSub
   alias UcxUcc.Accounts
 
+  require Logger
+
   @mod __MODULE__
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -27,6 +29,10 @@ defmodule UcxUcc.Accounts.User do
     field :uri, :string
     field :active, :boolean
     field :delete_avatar, :boolean, default: false, virtual: true
+    field :join_default_channels, :boolean, virtual: true
+    field :send_welcome_email, :boolean, virtual: true
+    field :confirm_account, :boolean, virtual: true
+    field :role, :string, virtual: true
 
     has_many :user_roles, UcxUcc.Accounts.UserRole
     has_many :roles, through: [:user_roles, :role]
@@ -38,17 +44,29 @@ defmodule UcxUcc.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
-  @all_params ~w(name email username tz_offset alias tag_line uri active avatar_url delete_avatar)a
+  @all_params ~w(name email username tz_offset alias tag_line uri active
+                 avatar_url delete_avatar join_default_channels
+                 send_welcome_email confirm_account role)a
   @required  ~w(name email username)a
 
   def changeset(model, params \\ %{}) do
     # TODO: Not sure how to do this elegantly, but this hack works for removing
     #       existing phone numbers
+
     params =
       if params["phone_numbers"] == [""] do
         Map.put(params, "phone_numbers", [])
       else
         params
+      end
+
+    params =
+      case {model, Map.keys(params)} do
+        {%{id: id}, _} when not is_nil(id) -> params
+        {_, [key | _]} when is_atom(key) ->
+          Map.put(params, :account, params[:account] || %{})
+        _ ->
+          Map.put(params, "account", params["account"] || %{})
       end
 
     model
@@ -64,6 +82,8 @@ defmodule UcxUcc.Accounts.User do
     |> unique_constraint(:email)
     |> validate_coherence(params)
     |> plugin_changesets(params, __MODULE__)
+    |> prepare_changes(&prepare_confirmation/1)
+    |> prepare_changes(&perpare_welcome_email/1)
     |> prepare_changes(&prepare_avatar/1)
   end
 
@@ -71,6 +91,16 @@ defmodule UcxUcc.Accounts.User do
     model
     |> cast(params, ~w(password password_confirmation reset_password_token reset_password_sent_at))
     |> validate_coherence_password_reset(params)
+  end
+
+  def perpare_welcome_email(%{valid?: true, action: :insert, changes: %{send_welcome_email: true}} = changeset) do
+    url = UcxUccWeb.Router.Helpers.url UcxUccWeb.Endpoint
+    Coherence.Controller.send_user_email(:welcome, changeset.changes, url)
+    changeset
+  end
+
+  def perpare_welcome_email(changeset) do
+    changeset
   end
 
   def prepare_avatar(%{valid?: true, changes: %{delete_avatar: true}} = changeset) do
@@ -87,6 +117,39 @@ defmodule UcxUcc.Accounts.User do
   end
 
   def prepare_avatar(changeset) do
+    changeset
+  end
+
+  def prepare_confirmation(%{action: action} = changeset) when action != :insert do
+    changeset
+  end
+
+  def prepare_confirmation(%{valid?: true, changes: %{confirm_account: false}} = changeset) do
+    if UcxUcc.Settings.Accounts.require_account_confirmation do
+      UcxUccWeb.Coherence.InvitationController.send_confirmation(changeset)
+    else
+      changeset
+      |> put_change(:confirm_account, true)
+      |> prepare_confirmation()
+    end
+  end
+
+  def prepare_confirmation(%{valid?: true, changes: %{confirm_account: true}} = changeset) do
+    changeset
+    |> put_change(:confirmed_at, Ecto.DateTime.utc)
+    |> put_change(:confirmation_token, nil)
+  end
+
+  def prepare_confirmation(%{valid?: true} = changeset) do
+    if UcxUcc.Settings.Accounts.require_account_confirmation do
+      changeset
+    else
+      changeset
+      |> put_change(:confirm_account, true)
+      |> prepare_confirmation()
+    end
+  end
+  def prepare_confirmation(changeset) do
     changeset
   end
 

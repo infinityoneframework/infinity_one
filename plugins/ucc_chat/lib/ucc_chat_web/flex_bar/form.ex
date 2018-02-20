@@ -43,27 +43,32 @@ defmodule UccChatWeb.FlexBar.Form do
     {resource, prefix} = get_resource_and_prefix tab, form
 
     resource_params = ServiceHelpers.normalize_params(form)[prefix]
-
+    model_exported? = function_exported? resource.__struct__, :model, 0
     {module, changeset_params} =
       cond do
-        function_exported? resource.__struct__.model(), :changeset, 3 ->
+        model_exported? and function_exported?(resource.__struct__.model(), :changeset, 3) ->
           user = Accounts.get_user(socket.assigns.user_id, default_preload: true)
           {resource.__struct__.model(), [resource, user, resource_params]}
-        function_exported? resource.__struct__.model(), :changeset, 2 ->
+
+        model_exported? and function_exported?(resource.__struct__.model(), :changeset, 2) ->
           {resource.__struct__.model(), [resource, resource_params]}
+
         true ->
           {resource.__struct__, [resource, resource_params]}
       end
-      # |> log_inspect(:debug, label: "{module, changeset}")
 
     changeset =
       module
       |> apply(:changeset, changeset_params)
-      # |> log_inspect(:debug, label: "changeset")
 
-    resource.__struct__.model()
-    |> apply(:update, [changeset])
-    # |> log_inspect(:debug, label: "after update")
+    {changeset_module, changeset_fun} =
+      cond do
+        tuple = tab.opts[:changeset] -> tuple
+        true -> {module, :change}
+      end
+
+    changeset_module
+    |> apply(changeset_fun, [changeset])
     |> case do
       {:ok, resource} ->
         socket
@@ -75,8 +80,9 @@ defmodule UccChatWeb.FlexBar.Form do
       {:error, changeset} ->
         _ = changeset
         trace "error", changeset
-        toastr!(socket, :error, gettext("Problem updating %{prefix}",
-          prefix: prefix))
+        errors = SharedView.format_errors changeset
+        toastr!(socket, :error, gettext("%{prefix} errors %{errors}",
+          prefix: prefix, errors: errors))
     end
   end
 
@@ -118,9 +124,10 @@ defmodule UccChatWeb.FlexBar.Form do
           model: prefix))
           # model: sender["form"]["flex-id"]))
         |> notify_update_success(tab, sender, %{resource: resource, toggle: id, value: val})
-      {:error, _changeset, socket} ->
-        toastr!(socket, :error, gettext("Error updating %{model}",
-          model: prefix))
+      {:error, changeset, socket} ->
+        errors = SharedView.format_errors changeset
+        toastr!(socket, :error, gettext("Error updating %{model}: %{errors}",
+          model: prefix, errors: errors))
     end
     |> stop_loading_animation()
   end
@@ -191,7 +198,6 @@ defmodule UccChatWeb.FlexBar.Form do
   defp get_resource_and_prefix(tab, form) do
     prefix = tab.opts[:prefix]
     id = form["#{prefix}[id]"]
-    # Logger.warn "prefix: " <> inspect(prefix) <> ", id: " <> inspect(id) <> ", form: " <> inspect(form)
 
     model =
       case tab.opts[:get] do

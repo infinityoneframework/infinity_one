@@ -1,6 +1,8 @@
 defmodule UccChatWeb.FlexBarView do
   use UccChatWeb, :view
   import UccAdminWeb.View.Utils, warn: false
+
+  alias UcxUcc.Accounts
   # import Phoenix.HTML.Tag, only: [content_tag: 3, content_tag: 2]
   # import UccChat.AvatarService, only: [avatar_url: 1]
   # "Showing: <b>1<b>, Online: 1, Total: 1 users"
@@ -146,6 +148,10 @@ defmodule UccChatWeb.FlexBarView do
 
   def show_webrtc?(_user, _user_info) do
     UccSettings.webrtc_enabled()
+  end
+
+  def list_role_names do
+    Accounts.list_role_names("global")
   end
               #   = radio_tag(settings, :desktop, id, text)
               # %label

@@ -75,6 +75,8 @@ IO.puts "Creating Permissions"
 # build the permissions
 roles_list = roles
 
+Repo.delete_all UcxUcc.Permissions.Permission
+
 UcxUcc.Permissions.default_permissions()
 |> Enum.each(fn %{name: name, roles: roles} ->
   {:ok, permission} = Permissions.create_permission(%{name: name})

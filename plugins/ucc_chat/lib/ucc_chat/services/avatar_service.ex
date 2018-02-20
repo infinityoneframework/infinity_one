@@ -51,6 +51,10 @@ defmodule UccChat.AvatarService do
   @doc """
   Gets the path for a user's default initials based avatar.
   """
+  def avatar_url(nil) do
+    ""
+  end
+
   def avatar_url(username) do
     initials =
       username

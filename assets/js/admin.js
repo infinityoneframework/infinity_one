@@ -116,19 +116,45 @@ class Admin {
         let channel_id = $(e.currentTarget).closest('[data-id]').data('id')
         this.userchan_push('cancel', {channel_id: channel_id})
       })
+      .on('click', '#showPassword', e => {
+        let prefix = "";
+        if ($('#user_password').length > 0) {
+          prefix = "user_";
+        }
+        let password_name = `#${prefix}password`
+        let password_confirmation_name = `#${prefix}password_confirmation`
+        $(e.currentTarget).hide();
+        $('#hidePassword').show();
+        $(password_name).attr('type','text');
+        $(password_confirmation_name).attr('type','text');
+      })
+      .on('click', '#hidePassword', e => {
+        let prefix = "";
+        if ($('#user_password').length > 0) {
+          prefix = "user_";
+        }
+        let password_name = `#${prefix}password`
+        let password_confirmation_name = `#${prefix}password_confirmation`
+        $(e.currentTarget).hide();
+        $('#showPassword').show();
+        $(password_name).attr('type','password');
+        $(password_confirmation_name).attr('type','password');
+      })
       .on('click', '#randomPassword', e => {
         let new_password = UccChat.randomString(12)
+        let prefix = "";
+        if ($('#user_password').length > 0) {
+          prefix = "user_";
+        }
+        let password_name = `#${prefix}password`
+        let password_confirmation_name = `#${prefix}password_confirmation`
+
         e.preventDefault()
         e.stopPropagation()
-        if ($(e.currentTarget).hasClass('hide')) {
-          $(e.currentTarget).removeClass('hide').text('Random')
-          $('#password').attr('type','password')
-          $('#password_confirmation').attr('type','password')
-        } else {
-          $('#password').attr('type','text').val(new_password)
-          $('#password_confirmation').attr('type','text').val(new_password)
-          $(e.currentTarget).text('Hide Pswd').addClass('hide')
-        }
+        $(password_name).attr('type', 'password').val(new_password)
+        $(password_confirmation_name).attr('type', 'password').val(new_password)
+        $('#showPassword').show();
+        $('#hidePassword').hide();
       })
       .on('click', 'section.admin form.user button.save', e => {
         UccChat.userchan.push('admin:save:user', $('form.user').serializeArray())

@@ -18,6 +18,7 @@ defmodule UcxUccWeb.Coherence.InvitationController do
   alias Coherence.{Config, Messages}
   alias UcxUcc.Coherence.Schemas
   alias UcxUcc.Accounts
+  alias Accounts.User
 
   require Logger
 
@@ -152,5 +153,43 @@ defmodule UcxUccWeb.Coherence.InvitationController do
           put_flash conn, :info, Messages.backend().invitation_sent()
       end
     redirect_to(conn, :invitation_resend, params)
+  end
+
+  def send_confirmation(%Ecto.Changeset{valid?: true} = changeset) do
+    token = random_string 48
+    url = UcxUccWeb.Router.Helpers.confirmation_url(UcxUccWeb.Endpoint, :edit, token)
+    dt = Ecto.DateTime.utc
+
+    if Config.mailer? do
+      result = Coherence.Controller.send_user_email(:confirmation, changeset.changes, url)
+      Logger.debug inspect(result)
+      changeset
+      |> put_change(:confirmation_token, token)
+      |> put_change(:confirmation_sent_at, dt)
+    else
+      add_error(changeset, :email,  Messages.backend().mailer_require)
+    end
+  end
+
+  def send_confirmation(%Ecto.Changeset{} = changeset) do
+    changeset
+  end
+
+  def send_confirmation(user) do
+    token = random_string 48
+    url = UcxUccWeb.Router.Helpers.confirmation_url(UcxUccWeb.Endpoint, :edit, token)
+    Logger.debug "confirmation email url: #{inspect url}"
+    dt = Ecto.DateTime.utc
+    user
+    |> User.changeset(%{confirmation_token: token,
+      confirmation_sent_at: dt,
+      current_password: user.password})
+    |> Config.repo.update!
+
+    if Config.mailer?() do
+      {:ok, Coherence.Controller.send_user_email(:confirmation, user, url)}
+    else
+      {:error, Messages.backend().mailer_require}
+    end
   end
 end

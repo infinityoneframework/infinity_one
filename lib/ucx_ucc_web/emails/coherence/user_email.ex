@@ -37,6 +37,15 @@ defmodule UcxUccWeb.Coherence.UserEmail do
     |> render_body("invitation.html", %{url: url, name: first_name(invitation.name)})
   end
 
+  def welcome(user, url \\ UcxUccWeb.Router.Helpers.url(UcxUccWeb.Endpoint)) do
+    %Email{}
+    |> from(from_email())
+    |> to(user_email(user))
+    |> add_reply_to()
+    |> subject(dgettext("coherence", "%{site_name} - Welcome to UcxUcc", site_name: site_name()))
+    |> render_body("welcome.html", %{url: url, name: first_name(user.name)})
+  end
+
   def unlock(user, url) do
     %Email{}
     |> from(from_email())

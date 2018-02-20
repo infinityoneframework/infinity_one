@@ -1,5 +1,17 @@
 # UcxUcc Changelog
 
+## 0.3.0 (2018-02-xx)
+
+## Enhancements
+
+* Implement admin add user
+* Random password does not show by default. Added separate Show button
+
+### Bug Fixes
+
+* Fix admin edit user
+* Fix Random password feature
+
 ## 0.2.6 (2018-02-19)
 
 ## Enhancements

@@ -165,33 +165,16 @@ defmodule UcxUcc.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
-    {account_key, subs_key} =
-      case Map.keys(attrs) do
-        [k | _] when is_atom(k) ->
-          {:account, :subscriptions}
-        _ ->
-          {"account", "subscriptions"}
-      end
-    subs =
-      true
-      |> UccChat.Channel.list_by_default()
-      |> Enum.map(& %{channel_id: &1.id})
-    attrs =
-      attrs
-      |> Map.put(subs_key, subs)
-      |> put_account(account_key)
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
+  def create_user(attrs_or_changeset \\ %{})
+
+  def create_user(%Ecto.Changeset{} = changeset) do
+    Repo.insert(changeset)
   end
 
-  defp put_account(attrs, key) do
-    if attrs[key] do
-      attrs
-    else
-      Map.put attrs, key, %{}
-    end
+  def create_user(attrs) do
+    %User{}
+    |> User.changeset(attrs)
+    |> create_user
   end
 
   @doc """
@@ -274,6 +257,19 @@ defmodule UcxUcc.Accounts do
   """
   def list_roles do
     Repo.all(Role)
+  end
+
+  def list_role_names do
+    Repo.all from r in Role,
+      select: r.name,
+      order_by: [asc: r.name]
+  end
+
+  def list_role_names(scope) do
+    Repo.all from r in Role,
+      where: r.scope == ^scope,
+      select: r.name,
+      order_by: [asc: r.name]
   end
 
   @doc """

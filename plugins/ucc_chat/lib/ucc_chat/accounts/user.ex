@@ -3,6 +3,8 @@ defmodule UccChat.Accounts.User do
 
   alias UccChat.Schema.{Message, Subscription, Channel, StarredMessage}
 
+  require Logger
+
   Code.ensure_compiled(Subscription)
   Code.ensure_compiled(Channel)
   Code.ensure_compiled(Message)
@@ -28,9 +30,29 @@ defmodule UccChat.Accounts.User do
   Builds a changeset based on the `struct` and `params`.
   """
   def changeset(changeset, params \\ %{}) do
+
+    key =
+      case Map.keys params do
+        [key | _] when is_atom(key) -> :subscriptions
+        _ -> "subscriptions"
+      end
+
+    params =
+      if changeset.data.id || changeset.changes[:join_default_channels] == false do
+        params
+      else
+        Map.put(params, key, get_default_subs())
+      end
+
     changeset
     |> cast(params, @fields)
     |> validate_required([])
     |> cast_assoc(:subscriptions)
+  end
+
+  def get_default_subs do
+    true
+    |> UccChat.Channel.list_by_default()
+    |> Enum.map(& %{channel_id: &1.id})
   end
 end

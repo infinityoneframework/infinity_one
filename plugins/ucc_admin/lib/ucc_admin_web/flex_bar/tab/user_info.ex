@@ -26,7 +26,8 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
       [
         model: Accounts.User,
         get: {Accounts, :get_user, [[preload: [phone_numbers: [:label]]]]},
-        prefix: "user"
+        prefix: "user",
+        changeset: {Accounts, :update_user}
       ])
   end
 
