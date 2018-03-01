@@ -10,7 +10,7 @@
         = hidden_input f, :id
         ul.list.clearfix
           = for field <- @channel do
-            = if field[:name] != :password do
+            = if field[:visible] do
               = flex_form_line(f, field, @editing, @channel_type)
 
         = if has_permission? @current_user, "delete-" <> Permissions.room_type(@channel_type) do

@@ -79,15 +79,17 @@ defmodule UccChatWeb.FlexBar.Helpers do
 
   def settings_form_fields(channel, user_id) do
     user = Helpers.get_user! user_id
+    admin = Permissions.has_role? user, "admin"
     disabled = !Permissions.has_permission?(user, "edit-room", channel.id)
     [
-      %{name: :name, label: ~g"Name", type: :text, value: channel.name, read_only: disabled},
-      %{name: :topic, label: ~g"Topic", type: :text, ltype: :markdown, value: channel.topic, read_only: disabled},
-      %{name: :description, label: ~g"Description", type: :text, value: channel.description, read_only: disabled},
-      %{name: :private, label: ~g"Private", type: :boolean, value: channel.type == 1, read_only: disabled},
-      %{name: :read_only, label: ~g"Read only", type: :boolean, value: channel.read_only, read_only: disabled},
-      %{name: :archived, label: ~g"Archived", type: :boolean, value: channel.archived, read_only: disabled},
-      %{name: :password, label: ~g"Password", type: :text, value: "", read_only: true},
+      %{name: :name, label: ~g"Name", type: :text, value: channel.name, read_only: disabled, visible: true},
+      %{name: :topic, label: ~g"Topic", type: :text, ltype: :markdown, value: channel.topic, read_only: disabled, visible: true},
+      %{name: :description, label: ~g"Description", type: :text, value: channel.description, read_only: disabled, visible: true},
+      %{name: :private, label: ~g"Private", type: :boolean, value: channel.type == 1, read_only: disabled, visible: true},
+      %{name: :read_only, label: ~g"Read only", type: :boolean, value: channel.read_only, read_only: disabled, visible: true},
+      %{name: :archived, label: ~g"Archived", type: :boolean, value: channel.archived, read_only: disabled, visible: true},
+      %{name: :default, label: ~g"Default", type: :boolean, value: channel.default, read_only: disabled, visible: admin},
+      %{name: :password, label: ~g"Password", type: :text, value: "", read_only: true, visible: false},
     ]
   end
 

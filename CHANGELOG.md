@@ -1,11 +1,12 @@
 # UcxUcc Changelog
 
-## 0.3.0 (2018-02-xx)
+## 0.3.0 (2018-01-01)
 
 ## Enhancements
 
 * Implement admin add user
 * Random password does not show by default. Added separate Show button
+* Added the ability for administrators to set/remove channel default setting
 
 ### Bug Fixes
 
