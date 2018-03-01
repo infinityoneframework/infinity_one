@@ -49,9 +49,8 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     trace "notify_update_success", opts.resource_params
 
     field =
-      opts.resource_params
-      |> Enum.reject(fn {k, v} -> v == "on" or k == "id" end)
-      |> Enum.map(fn {k, v} -> {to_existing_atom(k), v} end)
+      opts.changes
+      |> Map.to_list
       |> hd
 
     params = %{channel_id: opts.resource.id, field: field}
@@ -100,7 +99,6 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
   end
 
   def flex_form_delete(socket, _sender, resource) do
-    # Logger.warn "resource: " <> inspect(resource)
     user = Accounts.get_user socket.assigns.user_id, default_preload: true
     resource
     |> Channel.delete(user)

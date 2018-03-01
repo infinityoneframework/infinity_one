@@ -11,6 +11,7 @@
 
 * Fix admin edit user
 * Fix Random password feature
+* Fixed Exceptions updating room settings
 
 ## 0.2.6 (2018-02-19)
 

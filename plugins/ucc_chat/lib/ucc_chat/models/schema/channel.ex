@@ -40,7 +40,6 @@ defmodule UccChat.Schema.Channel do
   Builds a changeset based on the `struct` and `params`.
   """
   def changeset(struct, params \\ %{}) do
-    params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
     |> unique_constraint(:name)
@@ -48,14 +47,12 @@ defmodule UccChat.Schema.Channel do
   end
 
   def changeset_delete(struct, params \\ %{}) do
-    params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
     |> validate
   end
 
   def changeset_update(struct, params \\ %{}) do
-    params = remove_on_booleans(params)
     struct
     |> cast(params, @fields)
     |> unique_constraint(:name)
@@ -69,7 +66,6 @@ defmodule UccChat.Schema.Channel do
   end
 
   def validate(changeset, params \\ %{}) do
-    params = remove_on_booleans(params)
     changeset
     |> validate_required([:name, :user_id])
     |> validate_format(:name, ~r/^[a-z0-9\.\-_]+$/i)
@@ -88,13 +84,4 @@ defmodule UccChat.Schema.Channel do
   defp translate_private("true"), do: 1
   defp translate_private(_), do: 0
 
-  defp remove_on_booleans(params) do
-    Enum.reduce ~w(archived private read_only), params, fn field, params ->
-      if params[field] == "on" do
-        Map.delete params, field
-      else
-        params
-      end
-    end
-  end
 end

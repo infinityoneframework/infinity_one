@@ -1437,6 +1437,8 @@ defmodule UccChatWeb.UserChannel do
   defp do_room_update(socket, {:archived, value}, user_id, channel_id) do
     trace "do_room_update", {:archive, value}
 
+    value = to_atom(value)
+
     room_name = socket.assigns.room
     RoomChannel.broadcast_message_box(room_name, channel_id, user_id)
     update_room_visibility socket, channel_id, room_name, not value
@@ -1691,6 +1693,9 @@ defmodule UccChatWeb.UserChannel do
   defp unsubscribe(socket, room) do
     assign(socket, :subscribed, List.delete(socket.assigns.subscribed, room))
   end
+
+  defp to_atom(value) when is_atom(value), do: value
+  defp to_atom(value) when is_binary(value), do: String.to_existing_atom(value)
 
   defdelegate flex_tab_click(socket, sender), to: FlexTabChannel
   defdelegate flex_tab_open(socket, sender), to: FlexTabChannel

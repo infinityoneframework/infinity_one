@@ -192,14 +192,24 @@ defmodule UcxUcc.Accounts do
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
-    |> Repo.update()
+    |> update_user()
   end
 
   def update_user!(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
-    |> Repo.update!()
+    |> update_user!()
   end
+
+
+  def update_user(%Ecto.Changeset{} = changeset) do
+    Repo.update changeset
+  end
+
+  def update_user!(%Ecto.Changeset{} = changeset) do
+    Repo.update! changeset
+  end
+
 
   @doc """
   Deletes a User.

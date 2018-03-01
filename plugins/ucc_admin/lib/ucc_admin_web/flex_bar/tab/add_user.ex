@@ -49,7 +49,7 @@ defmodule UccAdminWeb.FlexBar.Tab.AddUser do
     %Accounts.User{}
   end
 
-  def notify_update_success(socket, tab, sender, opts) do
+  def notify_update_success(socket, _tab, sender, _opts) do
     role = Accounts.get_role_by_name sender["form"]["user[roles]"]
     user = Accounts.get_by_username sender["form"]["user[username]"]
     Accounts.create_user_role %{user_id: user.id, role_id: role.id}

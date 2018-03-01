@@ -43,32 +43,33 @@ defmodule UccChatWeb.FlexBar.Form do
     {resource, prefix} = get_resource_and_prefix tab, form
 
     resource_params = ServiceHelpers.normalize_params(form)[prefix]
-    model_exported? = function_exported? resource.__struct__, :model, 0
-    {module, changeset_params} =
+    model_exported? = function_exported?(resource.__struct__, :model, 0)
+    {module, changeset_params, changeset_fun} =
       cond do
         model_exported? and function_exported?(resource.__struct__.model(), :changeset, 3) ->
           user = Accounts.get_user(socket.assigns.user_id, default_preload: true)
-          {resource.__struct__.model(), [resource, user, resource_params]}
+          {resource.__struct__.model(), [resource, user, resource_params], :changeset}
 
         model_exported? and function_exported?(resource.__struct__.model(), :changeset, 2) ->
-          {resource.__struct__.model(), [resource, resource_params]}
+          {resource.__struct__.model(), [resource, resource_params], :changeset}
+
+        model_exported? and function_exported?(resource.__struct__.model(), :change, 2) ->
+          {resource.__struct__.model(), [resource, resource_params], :changeset}
 
         true ->
-          {resource.__struct__, [resource, resource_params]}
+          {resource.__struct__, [resource, resource_params], :changeset}
       end
 
-    changeset =
-      module
-      |> apply(:changeset, changeset_params)
+    changeset = apply(module, changeset_fun, changeset_params)
 
-    {changeset_module, changeset_fun} =
+    {changeset_module, action_fun} =
       cond do
         tuple = tab.opts[:changeset] -> tuple
-        true -> {module, :change}
+        true -> {module, :update}
       end
 
     changeset_module
-    |> apply(changeset_fun, [changeset])
+    |> apply(action_fun, [changeset])
     |> case do
       {:ok, resource} ->
         socket
@@ -76,7 +77,7 @@ defmodule UccChatWeb.FlexBar.Form do
         |> toastr(:success, gettext("%{prefix} updated successfully",
           prefix: prefix))
         |> notify_update_success(tab, sender,
-          %{resource: resource, resource_params: resource_params})
+          %{resource: resource, resource_params: resource_params, changes: changeset.changes})
       {:error, changeset} ->
         _ = changeset
         trace "error", changeset
@@ -113,16 +114,12 @@ defmodule UccChatWeb.FlexBar.Form do
 
     tab = TabBar.get_button(form["flex-id"])
 
-    # Logger.warn "tab: " <> inspect(tab)
-
     {resource, prefix} = get_resource_and_prefix tab, form
 
     case apply tab.module, :flex_form_toggle, [socket, sender, resource, id, val] do
       {:ok, socket} ->
         socket
-        |> toastr!(:success, gettext("Successfully updated %{model}",
-          model: prefix))
-          # model: sender["form"]["flex-id"]))
+        |> toastr(:success, gettext("Successfully updated %{model}", model: prefix))
         |> notify_update_success(tab, sender, %{resource: resource, toggle: id, value: val})
       {:error, changeset, socket} ->
         errors = SharedView.format_errors changeset
@@ -166,7 +163,6 @@ defmodule UccChatWeb.FlexBar.Form do
     field = form_field sender["name"]
     value = sender["value"]
 
-    # Logger.warn "tab: " <> inspect(tab)
     {resource, _prefix} = get_resource_and_prefix tab, form
 
     tab.module
@@ -174,13 +170,11 @@ defmodule UccChatWeb.FlexBar.Form do
     |> case do
       {:ok, socket} ->
         socket
-        |> toastr!(:success, gettext("Successfully updated %{model}",
-          model: field))
+        |> toastr(:success, gettext("Successfully updated %{model}", model: field))
         |> notify_update_success(tab, sender, %{resource: resource,
           field: field, value: value})
       {:error, _changeset, socket} ->
-        toastr!(socket, :error, gettext("Error updating %{model}",
-          model: field))
+        toastr(socket, :error, gettext("Error updating %{model}", model: field))
     end
   end
 
