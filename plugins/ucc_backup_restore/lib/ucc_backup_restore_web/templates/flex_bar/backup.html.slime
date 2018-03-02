@@ -1,0 +1,53 @@
+.content.channel-settings.backup
+  = render UccUiFlexTabWeb.FlexBarView, "flex_close_button.html"
+  .list-view.channel-settings
+    .title
+      h2= ~g"Backup"
+    - rebel_opts = ["rebel-change": "flex_form_save", class: "backup"]
+    = form_for @changeset, "#", rebel_opts, fn f ->
+      input(type="hidden" name="flex-id" value="admin_backup")
+      h4 = ~g(Include the following in the backup:)
+      br
+      br
+      ul.list.clearfix
+        = if @opts.database do
+          li.boolean
+            label = ~g(Database)
+            .setting-block
+              .input.checkbox.toggle
+                = radio_button f, :database, "1", class: "editing", checked: true
+                = label f, :database, ""
+        = if @opts.configuration do
+          li.boolean
+            label = ~g(Configuration)
+            .setting-block
+              .input.checkbox.toggle
+                = radio_button f, :configuration, "1", class: "editing", checked: true
+                = label f, :configuration, ""
+        = if @opts.avatars do
+          li.boolean
+            label = ~g(Avatars)
+            .setting-block
+              .input.checkbox.toggle
+                = radio_button f, :avatars, "1", class: "editing", checked: true
+                = label f, :avatars, ""
+        = if @opts.sounds do
+          li.boolean
+            label = ~g(Sounds)
+            .setting-block
+              .input.checkbox.toggle
+                = radio_button f, :sounds, "1", class: "editing", checked: true
+                = label f, :sounds, ""
+        = if @opts.attachments do
+          li.boolean
+            label = ~g(Attachment files)
+            .setting-block
+              .input.checkbox.toggle
+                = radio_button f, :attachments, "1", class: "editing", checked: true
+                = label f, :attachments, ""
+      nav
+        button.button.button-block.cancel(type="button" rebel-click="flex_form_cancel")
+          span= ~g(Cancel)
+        button.button.button-block.primary.save(rebel-click="flex_form_save")
+          span= ~g(Create Backup)
+

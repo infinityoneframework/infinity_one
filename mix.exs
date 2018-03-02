@@ -114,6 +114,7 @@ defmodule UcxUcc.Mixfile do
       # {:scrivener_ecto, path: "../scrivener_ecto"}
       {:scrivener_ecto, github: "smpallen99/scrivener_ecto"},
       {:ex_doc, "~> 0.18", only: :dev},
+      {:briefly, "~> 0.3"},
 
     ] ++ plugin_deps()
   end

@@ -711,3 +711,31 @@ section.page-container.page-home {
     }
   }
 }
+
+.flex-tab-container {
+  .flex-tab-bar {
+    .tab-button[data-id="admin_restore"] {
+      display: none;
+    }
+  }
+}
+.flex-tab-container.opened {
+  section[data-tab="admin_restore"] + .flex-tab-bar {
+    .tab-button[data-id="admin_restore"] {
+      display: block;
+    }
+  }
+}
+
+.notice {
+  padding: 8px;
+  border-width: 1px;
+  border-style: solid;
+
+  &.danger {
+    border-color: #ebccd1;
+    background-color: #f2dede;
+    color: #a94442;
+  }
+}
+

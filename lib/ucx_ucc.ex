@@ -3,9 +3,11 @@ defmodule UcxUcc do
   @env Mix.env()
   @version UcxUcc.Mixfile.project[:version]
   @brandname Application.get_env :ucx_ucc, :brand_name, "UcxUcc"
+  @name UcxUcc.Mixfile.project[:app]
 
   def env, do: @env
   def version, do: @version
+  def name, do: @name
 
   def brandname, do: @brandname
 

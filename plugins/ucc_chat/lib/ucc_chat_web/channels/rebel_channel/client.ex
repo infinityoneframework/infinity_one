@@ -57,13 +57,24 @@ defmodule UccChatWeb.RebelChannel.Client do
   def start_loading_animation(socket, elem) do
     socket
     |> page_loading
-    |> async_js("$('#{elem}').next().after('#{ClientView.loading_animation}')")
+    |> async_js("$('#{elem}').next().after('#{loading_animation()}')")
+  end
+
+  def prepend_loading_animation(socket, selector, colors \\ :default) do
+    socket
+    |> page_loading()
+    |> async_js("$('#{selector}').prepend('#{loading_animation(colors)}')")
   end
 
   def stop_loading_animation(socket) do
     socket
     |> remove_page_loading()
     |> delete(from: ".loading-animation")
+    socket
+  end
+
+  def loading_animation(class \\ :default) do
+    ClientView.loading_animation(class)
   end
 
   def set_ucxchat_room(socket, room, display_name, _route \\ "channels") do
@@ -290,7 +301,7 @@ defmodule UccChatWeb.RebelChannel.Client do
   Show a SweetAlert modal box.
   """
   # @spec swal_model(Phoenix.Socket.t, String.t, String.t, String.t String.t || nil, Keword.t) :: Phoenix.Socket.t
-  def swal_model(socket, title, body, type, confirm_text, opts \\ []) do
+  def swal_modal(socket, title, body, type, confirm_text, opts \\ []) do
     {swal_opts, callbacks}  = Keyword.pop opts, :opts, []
     swal_opts = Keyword.merge @default_swal_model_opts, swal_opts
     swal_opts =
@@ -404,4 +415,14 @@ defmodule UccChatWeb.RebelChannel.Client do
     async_js socket, ~s/$('.messages-container header.fixed-title').after(#{html})/
   end
 
+  def download_cert(socket, path, name) do
+    link = """
+      var link = document.createElement('a');
+      link.download = '#{name}';
+      link.href = '#{path}';
+      link.target = '_blank';
+      link.click();
+      """ |> String.replace("\n", "")
+    async_js(socket, link)
+  end
 end

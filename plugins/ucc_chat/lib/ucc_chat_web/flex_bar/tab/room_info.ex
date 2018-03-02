@@ -25,7 +25,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
   defp set_active_js(sender), do: """
    $('.flex-tab-main-content tr').removeClass('active');
    $('#{this(sender)}').addClass('active');
-    """ |> String.replace("\n", "")
+   """ |> String.replace("\n", "")
 
   def args(socket, {user_id, _channel_id, _, sender}, _params) do
     Logger.debug "sender: " <> inspect(sender)

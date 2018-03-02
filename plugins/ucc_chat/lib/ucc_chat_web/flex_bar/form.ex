@@ -35,11 +35,19 @@ defmodule UccChatWeb.FlexBar.Form do
     socket
   end
 
-  def flex_form_save(socket, %{"form" => %{"flex-id" => tab_name} = form} = sender) do
+  def flex_form_save(socket, %{"form" => %{"flex-id" => tab_name}} = sender) do
     trace "flex_form_save", sender
 
     tab = TabBar.get_button tab_name
 
+    if function_exported?(tab.module, :flex_form_save, 2) do
+      apply(tab.module, :flex_form_save, [socket, sender])
+    else
+      flex_form_save(socket, sender, tab)
+    end
+  end
+
+  defp flex_form_save(socket, %{"form" => form} = sender, tab) do
     {resource, prefix} = get_resource_and_prefix tab, form
 
     resource_params = ServiceHelpers.normalize_params(form)[prefix]
@@ -91,6 +99,15 @@ defmodule UccChatWeb.FlexBar.Form do
     trace "flex_form_cancel", sender
     _ = sender
     tab = TabBar.get_button(tab_name)
+
+    if function_exported?(tab.module, :flex_form_cancel, 2) do
+      apply(tab.module, :flex_form_cancel, [socket, sender])
+    else
+      flex_form_cancel(socket, sender, tab)
+    end
+  end
+
+  defp flex_form_cancel(socket, sender, tab) do
     user_id = socket.assigns.user_id
     channel_id = Helpers.get_channel_id socket
 
@@ -134,7 +151,7 @@ defmodule UccChatWeb.FlexBar.Form do
     tab = TabBar.get_button(form["flex-id"])
     {resource, prefix} = get_resource_and_prefix(tab, form)
 
-    swal_model socket,
+    swal_modal socket,
       gettext("Are you sure you want to delete %{name}?", name: prefix),
       ~g(This cannot be cannot be undone), "warning", ~g(Yes, delete it!),
       confirm: fn _ ->

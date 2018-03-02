@@ -208,6 +208,33 @@ class Admin {
       .on('keydown', '#user-roles-search', e => {
         return this.handle_search_keys(e, 'users');
       })
+      .on('click', 'form.backup .input.toggle', e => {
+        var input = $(e.currentTarget).find('input');
+        if (input.prop('checked')) {
+          input.prop('checked', false);
+        } else {
+          input.prop('checked', true);
+        }
+      })
+      .on('change', '#backups-change-all', e => {
+        var checked = $(e.currentTarget).prop('checked');
+        var list = $('section.page-container input.check');
+        for (var i = 0; i < list.length; i++) {
+          $(list[i]).prop('checked', checked);
+        }
+        this.enable_disable_batch_delete();
+      })
+      .on('change', 'section.page-container input.check', e => {
+        this.enable_disable_batch_delete();
+      })
+  }
+
+  enable_disable_batch_delete() {
+    if ($('section.page-container input.check:checked').length > 0) {
+       $('#batch-delete').removeAttr('disabled')
+    } else {
+       $('#batch-delete').attr('disabled', true)
+    }
   }
 
   close_edit_form(name) {
