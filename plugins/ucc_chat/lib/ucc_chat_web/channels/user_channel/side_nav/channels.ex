@@ -163,14 +163,16 @@ defmodule UccChatWeb.UserChannel.SideNav.Channels do
   end
 
   defp open_create_channel(socket) do
-    html = render_to_string(SideNavView, "create_combined_flex.html", [])
+    user = Accounts.get_user(socket.assigns.user_id, default_preload: true)
+    html = render_to_string(SideNavView, "create_combined_flex.html", user: user)
     socket
     |> Query.update(:html, set: html, on: ".flex-nav.create-channel section")
     |> Query.delete(class: "animated-hidden", on: ".flex-nav.create-channel")
   end
 
   defp close_create_channel(socket) do
-    html = render_to_string(SideNavView, "create_combined_flex.html", [])
+    user = Accounts.get_user(socket.assigns.user_id, default_preload: true)
+    html = render_to_string(SideNavView, "create_combined_flex.html", user: user)
     socket
     |> Query.update(:html, set: html, on: ".flex-nav.create-channel section")
     |> Query.insert(:class, set: "animated-hidden", on: ".flex-nav.create-channel")

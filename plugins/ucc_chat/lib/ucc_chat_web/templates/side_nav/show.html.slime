@@ -17,7 +17,7 @@ aside.side-nav.primary-background-color.color-tertiary-font-color(role="navigati
       i.icon-down-big
     .flex-nav.create-channel.primary-background-color.animated-hidden
       section
-        = render "create_combined_flex.html"
+        = render "create_combined_flex.html", user: @chatd.user
         / = #render @side_nav[:flex_template], conn: @conn, flex_data: @side_nav[:flex_data]
     span.arrow.bottom
   footer.footer

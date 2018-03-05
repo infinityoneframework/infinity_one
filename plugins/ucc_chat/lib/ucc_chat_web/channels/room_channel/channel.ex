@@ -11,11 +11,22 @@ defmodule UccChatWeb.RoomChannel.Channel do
   require UccChat.ChatConstants, as: CC
 
   def join(%{} = channel, user_id) do
-    case create_subscription channel, user_id do
-      {:ok, message} ->
-        user = Accounts.get_user user_id
-        notify_user_join(channel.id, user)
-        {:ok, message}
+    user = Accounts.get_user(user_id, default_preload: true)
+    permission =
+      case channel.type do
+        0 -> "view-c-room"
+        1 -> "view-p-room"
+        2 -> "view-d-room"
+      end
+
+    with true <- Permissions.has_permission?(user, permission),
+         {:ok, message} <- create_subscription(channel, user_id) do
+      user = Accounts.get_user user_id
+      notify_user_join(channel.id, user)
+      {:ok, message}
+    else
+      false ->
+        {:error, ~g(Permission denied)}
       error ->
         error
     end

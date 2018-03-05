@@ -49,12 +49,12 @@ defmodule UccChat.SideNavService do
           d.friend_id == ^(user.id),
         left_join: s in SubscriptionSchema, on: s.user_id == ^user_id and
           s.channel_id == d.channel_id,
-        # left_join: c in Channel, on: c.id == d.channel_id,
         where: u.id != ^user_id,
         order_by: [asc: u.username],
         preload: ^preload,
         select: {u, s})
       |> Enum.reject(fn {user, _} -> Accounts.has_role?(user, "bot") || user.active != true end)
+      |> filter_guest(user)
       |> UcxUcc.Hooks.process_user_subscription
       |> Enum.map(fn
         {user, nil} ->
@@ -65,6 +65,18 @@ defmodule UccChat.SideNavService do
             status: UccChat.PresenceAgent.get(user.id))
       end)
     {user, users}
+  end
+
+  defp filter_guest(list, user) do
+    cond do
+      Accounts.has_role?(user, "admin") or Accounts.has_role?(user, "user") ->
+        list
+
+      Accounts.has_role?(user, "guest") ->
+        Enum.reject(list, fn {_, s} -> is_nil(s) end)
+
+      true -> []
+    end
   end
 
 end

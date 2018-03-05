@@ -630,31 +630,34 @@ defmodule UccChat.ChannelService do
 
   defp do_add_direct(name, user_orig, friend, _channel_id) do
     # create the channel
-    {:ok, channel} = insert_channel(%{user_id: user_orig.id, name: name,
-      type: room_type(:direct)})
+    case insert_channel(%{user_id: user_orig.id, name: name, type: room_type(:direct)}) do
+    {:ok, channel} ->
+      # Create the cc's, and the directs one for each user
+      user_ids = %{
+        user_orig.id => friend.id,
+        friend.id => user_orig.id
+      }
 
-    # Create the cc's, and the directs one for each user
-    user_ids = %{
-      user_orig.id => friend.id,
-      friend.id => user_orig.id
-    }
+      for user <- [user_orig, friend] do
+        Subscription.create!(%{
+          channel_id: channel.id,
+          user_id: user.id,
+          type: room_type(:direct)
+        })
+        Direct.create!(%{
+          friend_id: user_ids[user.id],
+          user_id: user.id,
+          channel_id: channel.id
+        })
+      end
 
-    for user <- [user_orig, friend] do
-      Subscription.create!(%{
-        channel_id: channel.id,
-        user_id: user.id,
-        type: room_type(:direct)
-      })
-      Direct.create!(%{
-        friend_id: user_ids[user.id],
-        user_id: user.id,
-        channel_id: channel.id
-      })
+      UcxUccWeb.Endpoint.broadcast! CC.chan_user() <> to_string(friend.id),
+        "direct:new", %{room: channel.name}
+      channel
+
+    error ->
+      error
     end
-
-    UcxUccWeb.Endpoint.broadcast! CC.chan_user() <> to_string(friend.id),
-      "direct:new", %{room: channel.name}
-    channel
   end
 
   ###################
@@ -742,13 +745,22 @@ defmodule UccChat.ChannelService do
   def channel_command(_socket, :join, %ChannelSchema{} = channel, user_id,
     _channel_id) do
 
-    case add_user_to_channel(channel, user_id) do
-      {:ok, _subs} ->
-        {:ok,
-          gettext("You have joined the #%{name} channel.", name: channel.name)}
+    user = Accounts.get_user(user_id, default_preload: true)
+    permission =
+      case channel.type do
+        0 -> "view-c-room"
+        1 -> "view-p-room"
+        2 -> "view-d-room"
+      end
+    with true <- Permissions.has_permission?(user, permission),
+         {:ok, _subs} <- add_user_to_channel(channel, user_id) do
+      {:ok, gettext("You have joined the #%{name} channel.", name: channel.name)}
+    else
       {:error, _} ->
         {:error,
           gettext("Problem joining #%{name} channel.", name: channel.name)}
+      false ->
+        {:error, ~g(Permission denied)}
     end
   end
 

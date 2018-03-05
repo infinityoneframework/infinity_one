@@ -7,7 +7,7 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   alias UccChat.{ChannelService, Channel, Subscription}
   # alias UccChatWeb.MessageView
   alias UccChatWeb.Client
-  alias UcxUcc.Accounts
+  alias UcxUcc.{Accounts, Permissions}
   alias Accounts.User
   alias UccChat.NotifierService, as: Notifier
   alias UccChatWeb.RoomChannel
@@ -158,13 +158,18 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   def run_command("invite", args, _sender, socket, client) do
     if user = get_user args, socket, client do
       current_user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
-      case ChannelService.invite_user user, socket.assigns.channel_id, current_user.id do
-        {:ok, _} ->
-          client.toastr socket, :success, ~g(User added successfully)
+      with true <- Permissions.has_permission?(current_user, "invite-user"),
+           {:ok, _} <- ChannelService.invite_user(user, socket.assigns.channel_id, current_user.id) do
+        client.toastr socket, :success, ~g(User added successfully)
+      else
+        false ->
+          permission_denied(socket, client)
+
         {:error, changeset} ->
           Logger.warn "invite failed #{inspect changeset.errors}"
           client.toastr socket, :error, sorry_message()
-        nil ->
+
+        _ ->
           nil
       end
     end
@@ -298,12 +303,16 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   defp archive_channel(%{id: id} = channel, _sender, socket, client) do
     user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
-    case Channel.update channel, %{archived: true} do
-      {:ok, _} ->
-        Subscription.update_all_hidden(id, true)
-        Notifier.notify_action(socket, :archive, channel, user)
-        socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:state_change", %{change: "archive", channel_id: id}
-        socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:update:list", %{}
+    with true <- Permissions.has_permission?(user, "archive-room", id),
+         {:ok, _} <- Channel.update(channel, %{archived: true}) do
+      Subscription.update_all_hidden(id, true)
+      Notifier.notify_action(socket, :archive, channel, user)
+      socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:state_change", %{change: "archive", channel_id: id}
+      socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:update:list", %{}
+    else
+      false ->
+        permission_denied(socket, client)
+
       {:error, changeset} ->
         Logger.warn "error archiving channel #{inspect changeset.errors}"
         client.toastr socket, :error, ~g(Problem archiving channel)
@@ -316,12 +325,16 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   defp unarchive_channel(%{id: id} = channel, _sender, socket, client) do
     user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
-    case Channel.update channel, %{archived: false} do
-      {:ok, _} ->
-        Subscription.update_all_hidden(id, false)
-        Notifier.notify_action(socket, :unarchive, channel, user)
-        socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:state_change", %{change: "unarchive", channel_id: id}
-        socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:update:list", %{}
+    with true <- Permissions.has_permission?(user, "archive-room", id),
+         {:ok, _} <- Channel.update(channel, %{archived: false}) do
+      Subscription.update_all_hidden(id, false)
+      Notifier.notify_action(socket, :unarchive, channel, user)
+      socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:state_change", %{change: "unarchive", channel_id: id}
+      socket.endpoint.broadcast! CC.chan_room <> channel.name, "room:update:list", %{}
+    else
+      false ->
+        permission_denied(socket, client)
+
       {:error, changeset} ->
         Logger.warn "error unarchiving channel #{inspect changeset.errors}"
         client.toastr socket, :error, ~g(Problem unarchiving channel)
@@ -337,14 +350,18 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   end
 
   defp invite_all(from_channel_id, to_channel_id, socket, client) do
-    from_channel_id
-    |> Subscription.get_by_channel_id_and_not_user_id(socket.assigns.user_id, preload: [:user])
-    |> Enum.each(fn subs ->
-      # TODO: check for errors here
-      ChannelService.invite_user(subs.user.id, to_channel_id)
-    end)
-
-    client.toastr socket, :success, ~g"The users have been added."
+    user = Accounts.get_user socket.assigns.user_id, preload: [:roles, user_roles: :role]
+    if Permissions.has_permission?(user, "invite-user") do
+      from_channel_id
+      |> Subscription.get_by_channel_id_and_not_user_id(socket.assigns.user_id, preload: [:user])
+      |> Enum.each(fn subs ->
+        # TODO: check for errors here
+        ChannelService.invite_user(subs.user.id, to_channel_id)
+      end)
+      client.toastr socket, :success, ~g"The users have been added."
+    else
+      permission_denied(socket, client)
+    end
   end
 
   def invite_user(current_user, channel_id, user_id \\ [], opts \\ [])
@@ -371,6 +388,10 @@ defmodule UccChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
         client.toastr socket, :error,
           gettext("Problem dialing, %{number}. Contact your system administrator.", number: number)
     end
+  end
+
+  defp permission_denied(socket, client) do
+    client.toastr(socket, :error, ~g(Permission denied))
   end
 
 

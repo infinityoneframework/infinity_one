@@ -10,8 +10,8 @@ defmodule UccChatWeb.ChannelController do
   require Logger
 
   alias UccChat.{ChatDat}
-  alias UccChat.{Message, Channel, ChannelService}
-  alias UcxUcc.{Accounts.User, Hooks, Accounts}
+  alias UccChat.{Message, Channel, Subscription, ChannelService}
+  alias UcxUcc.{Accounts.User, Hooks, Accounts, Permissions}
   alias UccChat.Schema.Channel, as: ChannelSchema
   alias UccChat.Schema.Direct, as: DirectSchema
 
@@ -57,12 +57,7 @@ defmodule UccChatWeb.ChannelController do
     end
   end
 
-  def show(conn, %ChannelSchema{} = channel) do
-    user =
-      conn
-      |> Coherence.current_user
-      |> Hooks.preload_user([:account])
-
+  defp do_show(conn, channel, user) do
     UccChat.PresenceAgent.load user.id
 
     page = Message.get_room_messages(channel.id, user)
@@ -76,6 +71,36 @@ defmodule UccChatWeb.ChannelController do
     |> put_view(UccChatWeb.MasterView)
     |> put_layout({UcxUccWeb.LayoutView, "app.html"})
     |> render("main.html", chatd: chatd)
+  end
+
+  defp permission_denied(conn) do
+    conn
+    |> put_flash(:error, ~g(Permission denied))
+    |> redirect(to: "/")
+  end
+
+  def show(conn, %ChannelSchema{} = channel) do
+    user =
+      conn
+      |> Coherence.current_user
+      |> Hooks.preload_user([:account, :roles, user_roles: :role])
+
+    permission = if channel.type == 0, do: "view-c-room", else: "view-p-room"
+
+    case Subscription.get_by user_id: user.id, channel_id: channel.id do
+      nil ->
+        if Permissions.has_permission?(user, permission) do
+          do_show(conn, channel, user)
+        else
+          permission_denied(conn)
+        end
+      _ ->
+        if Permissions.has_at_least_one_permission?(user, ["view-joined-room", permission]) do
+          do_show(conn, channel, user)
+        else
+          permission_denied(conn)
+        end
+    end
   end
 
   def show(conn, %{"name" => name}) do

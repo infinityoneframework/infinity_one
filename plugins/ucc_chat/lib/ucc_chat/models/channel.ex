@@ -188,11 +188,19 @@ defmodule UccChat.Channel do
     cond do
       Accounts.has_role?(user, "admin") ->
         from c in @schema, where: c.type == 0 or c.type == 1
+
       Accounts.has_role?(user, "user") ->
         from c in @schema,
           left_join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
           where: (c.type == 0 or (c.type == 1 and not is_nil(s.id))) and (not s.hidden or c.user_id == ^user_id)
-      true -> from c in @schema, where: false
+
+      Accounts.has_role?(user, "guest") ->
+        from c in @schema,
+          join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
+          where: c.type == 0 or c.type == 1
+
+      true ->
+        from c in @schema, where: false
     end
   end
 
@@ -212,6 +220,10 @@ defmodule UccChat.Channel do
       Accounts.has_role?(user, "user") ->
         where query, [c, s], c.type == 0 or
           (c.type == 1 and s.user_id == ^user_id) or c.user_id == ^user_id
+      Accounts.has_role?(user, "guest") ->
+        from c in @schema,
+          join: s in SubscriptionSchema, on: s.channel_id == c.id and s.user_id == ^user_id,
+          where: c.type == 0 or c.type == 1
       true ->
         where query, [c], false
     end

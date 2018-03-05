@@ -1,5 +1,14 @@
 # UcxUcc Changelog
 
+## 0.3.1 (2018-01-05)
+
+## Enhancements
+
+### Bug Fixes
+
+* Enforce many permissions for guest accounts
+
+
 ## 0.3.0 (2018-01-01)
 
 ## Enhancements
