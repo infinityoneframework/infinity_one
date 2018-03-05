@@ -195,14 +195,14 @@ defmodule UccChatWeb.Client do
   end
 
   def desktop_notify(socket, name, body, message, duration) do
-    name = inspect name
+    title = ~s/"Message from @#{name}"/
     body = Poison.encode! body
     id = inspect message.id
     channel_id = inspect message.channel_id
     channel_name = inspect message.channel.name
 
     async_js socket, """
-      UccChat.notifier.desktop(#{name}, #{body}, {
+      UccChat.notifier.desktop(#{title}, #{body}, {
         duration: #{duration},
         onclick: function(event) {
           UccChat.userchan.push("notification:click",

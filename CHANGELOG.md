@@ -1,5 +1,21 @@
 # UcxUcc Changelog
 
+## 0.3.2 (2018-01-xx)
+
+## Enhancements
+
+* Show alerts and notifications immediately on browser blur
+* Reduce clear unreads times from 2000 to 1000 msec.
+* Moved message_agent from Agent to GenServer
+* Changed desktop notification title to 'Message from @username'
+
+### Bug Fixes
+
+* Off-line users now see alerts generated while off-line when logging back in
+* Fixed hiding unread-bar when last message not visible on browser focus.
+* Close open subscriptions when logging out or closing browser.
+
+
 ## 0.3.1 (2018-01-05)
 
 ## Enhancements

@@ -6,8 +6,10 @@ defmodule UccChat.Schema.Message do
 
   import Ecto.Changeset
 
-  alias UcxUcc.Accounts.User
+  alias UcxUcc.{Accounts.User, UccPubSub}
   alias UccChat.Schema.{Mention, Channel, Reaction, Attachment, StarredMessage}
+
+  require Logger
 
   schema "messages" do
     field :body, :string
@@ -56,6 +58,7 @@ defmodule UccChat.Schema.Message do
     |> validate_required(@required)
     |> add_timestamp
     |> prepare_changes(&delete_attachment_files/1)
+    |> prepare_changes(&update_subscriptions/1)
   end
 
   @doc """
@@ -71,6 +74,30 @@ defmodule UccChat.Schema.Message do
   def add_timestamp(changeset) do
     changeset
   end
+
+  defp update_subscriptions(%{action: :insert, changes: changes} = changeset) do
+    UccPubSub.broadcast "subscription:update", "message:insert",
+      %{
+        channel_id: changes.channel_id,
+        user_id: changes.user_id,
+        type: changes[:type]
+      }
+
+    changeset
+  end
+
+  defp update_subscriptions(%{action: :update, changes: changes, data: data} = changeset) do
+    UccPubSub.broadcast "subscription:update", "message:insert",
+      %{
+        channel_id: data.channel_id,
+        user_id: data.user_id,
+        type: data.type,
+        edited_id: changes[:edited_id]
+      }
+    changeset
+  end
+
+  defp update_subscriptions(%{} = changeset), do: changeset
 
   # Handle deleting the uploads folder containing the attachments for
   # the given deleted message

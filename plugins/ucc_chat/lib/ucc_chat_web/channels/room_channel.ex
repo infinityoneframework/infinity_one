@@ -139,7 +139,7 @@ defmodule UccChatWeb.RoomChannel do
   def handle_info({:after_join, room, msg}, socket) do
     :erlang.process_flag(:trap_exit, true)
     trace room, msg
-    # Logger.warn "msg: " <> inspect(msg) <> ", user_id: " <> inspect(socket.assigns[:user_id])
+
     channel = Channel.get_by!(name: room)
     Process.send_after self(), :broadcast_user_join, 20
     UccPubSub.subscribe "message:*", "channel:" <> channel.id
@@ -156,6 +156,8 @@ defmodule UccChatWeb.RoomChannel do
       socket
       |> assign(:self, self())
       |> assign(:channel_id, channel.id)
+
+    Subscription.open(channel.id, socket.assigns.user_id)
 
     {:noreply, socket}
   end

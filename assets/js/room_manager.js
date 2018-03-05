@@ -199,7 +199,7 @@ class RoomManager {
   notification(resp) {
     if (!resp.badges_only) {
       if (resp.body) {
-        notifier.desktop('@' + resp.username, resp.body, {duration: resp.duration})
+        notifier.desktop('Message from @' + resp.username, resp.body, {duration: resp.duration})
       }
       if (resp.sound) {
         notifier.audio(resp.sound)
@@ -397,11 +397,12 @@ class RoomManager {
 
         if (this.is_first_unread_visible()) {
           if (debug) { console.log('hiding unread_bar') }
-            if ($('.unread-bar').is(':visible')) {
-              this.hide_unread_bar()
-              this.clear_unread()
-              this.send_last_read()
-            }
+
+          if ($('.unread-bar').is(':visible')) {
+            this.hide_unread_bar()
+            this.clear_unread()
+            this.send_last_read()
+          }
         } else {
           if (this.unread_timer_ref) {
             clearTimeout(this.unread_timer_ref)
@@ -443,7 +444,7 @@ class RoomManager {
         this.clear_unread_state();
         $('.first-unread').addClass('first-unread-opaque');
         this.set_badges();
-      }, 2000)
+      }, 1000)
     }
   }
 
@@ -500,7 +501,9 @@ class RoomManager {
 
     $(window).on('focus', () => {
       if (debug) { console.log('room_manager focus') }
-      this.clear_unread();
+      if (this.is_first_unread_visible()) {
+        this.clear_unread();
+      }
       this.has_focus = true;
       if (UccChat.systemchan) {
         UccChat.systemchan.push('state:focus');
