@@ -31,7 +31,7 @@ defmodule UccChat.Subscription do
 
   def join_new(user_id, channel_id, opts \\ []) do
     with nil <- get_by(user_id: user_id, channel_id: channel_id),
-         {:ok, subs} <-ChannelService.join_channel(channel_id, user_id) do
+         {:ok, subs} <- ChannelService.join_channel(channel_id, user_id) do
       subs
     else
       {:error, _} = error -> error
@@ -40,7 +40,7 @@ defmodule UccChat.Subscription do
     |> case do
       {:error, _} = error -> error
       subs ->
-        if opts[:unread] do
+        if opts[:unread] and (not subs.open) do
           __MODULE__.update(subs, %{unread: subs.unread + 1})
         else
           {:ok, subs}
@@ -182,6 +182,10 @@ defmodule UccChat.Subscription do
       select: c
   end
 
+  def open?(channel_id, user_id) do
+    !! @repo.one(from(s in @schema, where: s.channel_id == ^channel_id and s.user_id == ^user_id, select: s.open))
+  end
+
   def get_by_user_and_type(user, type) do
     (from s in @schema,
       join: c in Channel, on: s.channel_id == c.id,
@@ -253,6 +257,11 @@ defmodule UccChat.Subscription do
     |> set_has_unread(false)
   end
 
+  def inc_unread(channel_id, user_id) do
+    from(s in @schema, where: s.channel_id == ^channel_id and s.user_id == ^user_id)
+    |> @repo.update_all(inc: [unread: 1])
+  end
+
   def set_unread({:ok, subscription}, count) do
     __MODULE__.update(subscription, %{unread: count})
   end
@@ -312,5 +321,42 @@ defmodule UccChat.Subscription do
     |> @repo.update_all([])
   end
 
+  def open(channel_id, user_id) do
+    close_opens(user_id)
+    __MODULE__.update channel_id, user_id, %{open: true}
+  end
 
+  def update_message_action("insert", payload) do
+    channel = UccChat.Channel.get payload.channel_id
+
+    channel.id
+    |> get_by_channel_id_and_not_user_id(payload.user_id)
+    |> update_message_subsciptions(payload[:type], channel.nway)
+  end
+
+  def update_message_action("update", payload) do
+    channel = UccChat.Channel.get payload.channel_id
+
+    channel.id
+    |> get_by_channel_id_and_not_user_id(payload.edited_id)
+    |> update_message_subsciptions(payload[:type], channel.nway)
+  end
+
+  def update_message_action(action, payload), do: :ok
+
+  defp update_message_subsciptions(subscriptions, type, nway) when type == "d" or nway do
+    Enum.each(subscriptions, fn subscription ->
+      if !subscription.open do
+        update!(subscription, %{has_unread: true, unread: subscription.unread + 1})
+      end
+    end)
+  end
+
+  defp update_message_subsciptions(subscriptions, _type, _nway) do
+    Enum.each(subscriptions, fn subscription ->
+      if !subscription.open do
+        update!(subscription, %{has_unread: true})
+      end
+    end)
+  end
 end

@@ -25,7 +25,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
   defp set_active_js(sender), do: """
    $('.flex-tab-main-content tr').removeClass('active');
    $('#{this(sender)}').addClass('active');
-    """ |> String.replace("\n", "")
+   """ |> String.replace("\n", "")
 
   def args(socket, {user_id, _channel_id, _, sender}, _params) do
     Logger.debug "sender: " <> inspect(sender)
@@ -41,15 +41,6 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
     type = Map.get channel || %{}, :type
 
     broadcast_js socket, set_active_js(sender);
-
-
-    # assigns =
-    #   socket
-    #   |> Rebel.get_assigns()
-    #   |> Map.put(:channel, channel)
-    #   |> Map.put(:resource_key, :channel)
-
-    # Rebel.put_assigns(socket, assigns)
 
     {[
       channel: channel_settings,

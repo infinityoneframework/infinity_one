@@ -237,6 +237,11 @@ defmodule UccChatWeb.UserChannel do
     {:noreply, socket}
   end
 
+  def handle_user_state(%{state: "blur"}, socket) do
+    trace "blur", ""
+    assign socket, :user_state, "blur"
+  end
+
   def handle_user_state(%{state: "idle"}, socket) do
     trace "idle", ""
     push socket, "focus:change", %{state: false, msg: "idle"}
@@ -798,6 +803,7 @@ defmodule UccChatWeb.UserChannel do
 
   def handle_info(%Broadcast{topic: "room:" <> room,
     event: "message:new" = event, payload: payload}, socket) do
+    Logger.warn "deprecated!!!"
 
     trace event, ""  #socket.assigns
 
@@ -905,16 +911,17 @@ defmodule UccChatWeb.UserChannel do
           channel: channel,
           user_id: assigns.user_id,
           user_state: assigns.user_state,
+          open: Subscription.open?(channel.id, assigns.user_id),
         }
-        # Logger.debug "in the room ... #{assigns.user_id}, room: #{inspect room}"
-        if channel.id != assigns.channel_id or assigns.user_state == "idle" do
+        if channel.id != assigns.channel_id or assigns.user_state != "active" do
           update_has_unread(channel, socket)
         end
+
         Notifier.new_message(new_payload, socket)
-        socket
       else
         socket
       end
+
     {:noreply, socket}
   end
 
@@ -1044,6 +1051,7 @@ defmodule UccChatWeb.UserChannel do
   def terminate(_reason, socket) do
     UccPubSub.unsubscribe "user:" <> socket.assigns[:user_id]
     UccPubSub.unsubscribe "message:new"
+    Subscription.close_opens(socket.assigns[:user_id])
     :ok
   end
 

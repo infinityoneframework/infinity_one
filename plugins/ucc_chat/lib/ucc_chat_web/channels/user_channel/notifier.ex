@@ -25,9 +25,7 @@ defmodule UccChatWeb.UserChannel.Notifier do
 
     UccChatWeb.UserChannel.audit_open_rooms(socket)
 
-    subscription = Subscription.get_by(channel_id: channel.id, user_id: user_id, preload: [:channel])
-    open = Map.get(subscription, :open)
-    active_open = payload.user_state == "active" and open
+    active_open = payload.user_state == "active" and payload.open
     user = Accounts.get_user(user_id, preload: [:account])
 
     all! = Enum.find(payload.message.mentions, & &1.user_id == user.id && &1.name == "all!")
@@ -36,7 +34,6 @@ defmodule UccChatWeb.UserChannel.Notifier do
       UccChatWeb.RebelChannel.Client.add_caution_announcement(socket, payload.message.body)
     end
 
-    # IO.inspect {user.username, user.id, payload.message.user_id}, label: "new_message"
     cond do
       not active_open ->
         socket
@@ -76,8 +73,10 @@ defmodule UccChatWeb.UserChannel.Notifier do
     end
 
     if mention_or_direct do
-      count = Subscription.get_unread(channel.id, user.id) + 1
-      Subscription.set_unread(channel.id, user.id, count)
+      if payload.open do
+        Subscription.inc_unread(channel.id, user.id)
+      end
+      count = Subscription.get_unread(channel.id, user.id)
       broadcast_unread_count(socket, channel.name, count, client)
     end
 
@@ -92,6 +91,7 @@ defmodule UccChatWeb.UserChannel.Notifier do
         broadcast_client_notification socket, [badges_only: true], client
       end
     end
+    socket
   end
 
   def broadcast_client_notification(socket, opts \\ %{}, client \\ UccChatWeb.Client) do

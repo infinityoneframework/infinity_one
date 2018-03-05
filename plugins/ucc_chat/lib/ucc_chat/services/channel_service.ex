@@ -170,6 +170,7 @@ defmodule UccChat.ChannelService do
   end
 
   def insert_channel(user, params) do
+    user = Accounts.preload_schema(user, [:roles, user_roles: :role])
     multi =
       Multi.new
       |> Multi.insert(:channel, Channel.changeset(user, params))

@@ -22,10 +22,7 @@ defmodule UccChatWeb.SystemChannel do
 
   intercept ["presence_diff"]
 
-  def join(ev = CC.chan_system(), params, socket) do
-    _ = ev
-    _ = params
-    # trace(ev, params)
+  def join(CC.chan_system(), _params, socket) do
     send(self(), :after_join)
 
     :ok = UccChat.ChannelMonitor.monitor(:chan_system, self(),
@@ -41,12 +38,10 @@ defmodule UccChatWeb.SystemChannel do
     end
     UcxUccWeb.Presence.untrack(pid, CC.chan_system(), user_id)
     UccPubSub.broadcast("user:" <> user_id, "user:leave")
-    # Logger.warn ".......... leaving " <> inspect(user_id)
   end
 
   def handle_out(ev = "presence_diff", params, socket) do
     trace(ev, params)
-    # Logger.warn "presence_diff params: #{inspect params}, assigns: #{inspect socket.assigns}"
     push socket, ev, params
     {:noreply, socket}
   end
@@ -54,39 +49,27 @@ defmodule UccChatWeb.SystemChannel do
   ###############
   # handle_in
 
-  # def handle_in(ev = "status:set:" <> status, params, socket) do
-  #   trace ev, params
-  #   _ = ev
-  #   _ = params
-  #   # Logger.warn "status:set socket: #{inspect socket}"
-  #   UccChat.PresenceAgent.put(socket.assigns.user_id, status)
-  #   update_status socket, status
-  #   # Presence.update socket, socket.assigns.user_id, %{status: status}
-  #   {:noreply, socket}
-  # end
   def handle_in(ev = "state:blur", params, socket) do
-    # Logger.warn "blur"
     trace ev, params
     # TODO: move this blur timer to a configuration item
     ref = Process.send_after self(), :blur_timeout, @blur_timer
+    UserChannel.user_state(socket.assigns.user_id, "blur")
     {:noreply, assign(socket, :blur_ref, ref)}
   end
   def handle_in(ev = "state:focus", params, socket) do
     trace ev, params
-    # Logger.warn "focus"
     # TODO: move this blur timer to a configuration item
     socket =
       case socket.assigns[:blur_ref] do
         nil ->
           # Logger.warn "focus socket: #{inspect socket}"
           update_status socket, "online"
-          UserChannel.user_state(socket.assigns.user_id, "active")
-          # Presence.update socket, socket.assigns.user_id, %{status: "online"}
           socket
         ref ->
           Process.cancel_timer ref
           assign(socket, :blur_ref, nil)
       end
+      UserChannel.user_state(socket.assigns.user_id, "active")
     {:noreply, socket}
   end
 
@@ -104,20 +87,18 @@ defmodule UccChatWeb.SystemChannel do
     # Logger.warn "blur_timeout, socket: #{inspect socket}"
     update_status socket, "away"
     UserChannel.user_state(socket.assigns.user_id, "idle")
-    # Presence.update socket, socket.assigns.user_id, %{status: "away"}
     {:noreply, assign(socket, :blur_ref, nil)}
   end
 
   def handle_info(:after_join, socket) do
     list = Presence.list(socket)
-    # Logger.warn "after join presence list: #{inspect list}"
+
     push socket, "presence_state", list
     user_id = socket.assigns.user_id
     user = Helpers.get_user!(user_id)
     status =
       if user.chat_status in [nil, ""], do: "online", else: user.chat_status
     {:ok, _} = Presence.track(socket, socket.assigns.user_id, %{
-      # online_at: :os.system_time(:milli_seconds),
       status: status,
       username: user.username
     })
