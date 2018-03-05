@@ -7,6 +7,7 @@
 ### Bug Fixes
 
 * Enforce many permissions for guest accounts
+* Fix message search exception
 
 
 ## 0.3.0 (2018-01-01)
