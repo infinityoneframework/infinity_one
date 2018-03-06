@@ -559,7 +559,7 @@ defmodule UccAdmin.AdminService do
         Enum.map(emails, fn email ->
           UccChat.InvitationService.create_and_send(email)
         end)
-        |> Enum.partition(fn
+        |> Enum.split_with(fn
           {:ok, _} -> false
           _ -> true
         end)

@@ -60,7 +60,7 @@ defmodule UcxUccWeb do
 
   def channel do
     quote do
-      use Phoenix.Channel
+      # use Phoenix.Channel
       use UcxUccWeb.Gettext
       import UcxUccWeb.Channel
     end

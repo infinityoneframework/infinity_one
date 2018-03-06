@@ -8,7 +8,7 @@ defmodule UcxUcc.EarmarkPlugin.Task do
   end
 
   defp render(lines) do
-    Enum.map(lines, &render_line/1) |> Enum.partition(&ok?/1)
+    Enum.map(lines, &render_line/1) |> Enum.split_with(&ok?/1)
   end
 
   defp render_line({"[ ] " <> line, _}) do

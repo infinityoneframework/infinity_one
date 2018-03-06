@@ -1,5 +1,6 @@
 defmodule UccWebrtcWeb.WebrtcChannel do
   use UcxUccWeb, :channel
+  use Phoenix.Channel
   use UccLogger
 
   alias UccWebrtc.ClientDevice

@@ -342,7 +342,7 @@ defmodule UccChat.Subscription do
     |> update_message_subsciptions(payload[:type], channel.nway)
   end
 
-  def update_message_action(action, payload), do: :ok
+  def update_message_action(_action, _payload), do: :ok
 
   defp update_message_subsciptions(subscriptions, type, nway) when type == "d" or nway do
     Enum.each(subscriptions, fn subscription ->
