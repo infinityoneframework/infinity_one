@@ -105,4 +105,16 @@ defmodule UcxUccWeb.LandingView do
   def step5, do: ~g(Summary of Your Input)
   def step6, do: ~g(Complete)
 
+  # helper functions
+
+  def restart_message do
+    [
+      ~g(Login with your administrator account, open Administration section, and select the ),
+      content_tag(:strong, do: ~g(General)),
+      ~g( menu. Click on the ),
+      content_tag(:strong, do: ~g(RESTART THE SERVER)),
+      ~g( button. The application restart takes approximately one minute to complete.
+        After restart, login as administrator and invite users as described below.)
+    ]
+  end
 end
