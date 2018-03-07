@@ -5,7 +5,7 @@ defmodule UcxUccWeb.LandingView do
     content_tag :p do
       gettext("""
         A few items require configuration for this new %{brand} installation. This one-time step
-        configures the settings required to administer this application and to start inviting users.
+        configures the settings required to administer %{brand} and to start inviting users.
         """, brand: UcxUcc.brandname)
     end
   end
@@ -27,7 +27,7 @@ defmodule UcxUccWeb.LandingView do
     end,
     content_tag :p do
       ~g(The host name used to access this page is displayed below. The default can
-          be used if it is name/address that will be used for production service.
+          be used if it is the name/address for production service.
           However, if the plan is to use another address, e.g. external host name,
           please enter it below.)
     end]
@@ -35,10 +35,11 @@ defmodule UcxUccWeb.LandingView do
 
   def step2_instructions do
     content_tag :p do
-      ~g(Create an administrator account. This can be a regular user
-         account with administrator role. This account will allow the )
-       gettext("use of administration section of %{brand}.", brand: UcxUcc.brandname)
-      end
+      gettext("""
+        Create an administrator account. This can be a regular user account with administrator role.
+        This account will allow the use of administration section of %{brand}.
+        """, brand: UcxUcc.brandname)
+    end
   end
 
   def step3_instructions do
@@ -63,9 +64,10 @@ defmodule UcxUccWeb.LandingView do
 
   def step4_instructions do
     content_tag :p do
-      ~g(You need to configure the name and email address to be used when the
-         application sends a user, invitation, registration, confirmation, and
-         password reset emails.)
+      gettext("""
+        Configure the name and email address to be used when %{brand} sends a user, invitation,
+        registration, confirmation, and password reset emails.
+        """, brand: UcxUcc.brandname)
     end
   end
 
