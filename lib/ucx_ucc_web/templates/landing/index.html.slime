@@ -111,7 +111,7 @@ aside.side-nav.primary-background-color.color-tertiary-font-color
           article data-step="5"
             h3 = gettext("Step 5 - %{name}", name: step5())
             .content
-              p = ~g(Please review your data and press Submit if everything lookes ok.)
+              p = ~g(Please review the information and press Submit if it is correct.)
               p.landing-summary
               .controls
                 = prev_button(18)

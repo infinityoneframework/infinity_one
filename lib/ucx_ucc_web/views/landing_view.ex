@@ -3,42 +3,43 @@ defmodule UcxUccWeb.LandingView do
 
   def main_instructions do
     content_tag :p do
-      ~g(It appears that this is the first time this application is being
-         accessed after the initial installation. We need to configure a
-         few things before its ready to be used in production.)
+      gettext("""
+        A few items require configuration for this new %{brand} installation. This one-time step
+        configures the settings required to administer %{brand} and to start inviting users.
+        """, brand: UcxUcc.brandname)
     end
   end
 
   def step1_instructions do
     [content_tag :p do
       [
-        ~g(Enter the Domain Name of IP address of the server. This is used
-           by the emailer to send links for things like registration, account
-           confirmation and password reset links. i.e. "),
+        ~g(Enter the Domain Name or IP address of server. This name/address is used
+           by emailer to send links for registration, account
+           confirmation and password reset links. i.e. ),
          content_tag :strong do
-            "192.168.1.200"
+           ~g("192.168.1.200")
          end,
-         ~g(" or "),
+         ~g( or ),
          content_tag :strong do
-           ~g("messaging.mycompany.com")
-         end,
-         "\"."
+           ~g("messaging.mycompany.com".)
+         end
       ]
     end,
     content_tag :p do
-      ~g(The host name you used to access this page is populated below. If this
-         is the same host name that users will be using to accesss this application
-         then you can leave this default. However, if you plan on accessing this site
-         from a different IP address or host name, please enter it below.)
+      ~g(The host name used to access this page is displayed below. The default can
+          be used if it is the name/address for production service.
+          However, if the plan is to use another address, e.g. external host name,
+          please enter it below.)
     end]
   end
 
   def step2_instructions do
     content_tag :p do
-      ~g(Create an administrator account. This can be a your regular user
-         account with the administrator role. This account will allow your
-         to use the administration section of the application)
-      end
+      gettext("""
+        Create an administrator account. This can be a regular user account with administrator role.
+        This account will allow the use of administration section of %{brand}.
+        """, brand: UcxUcc.brandname)
+    end
   end
 
   def step3_instructions do
@@ -46,7 +47,7 @@ defmodule UcxUccWeb.LandingView do
       content_tag :p do
         ~g(Create the default channel. At least one channel is required and
            it cannot be removed. Furthermore, each new user will automatically
-           subscribed to this channel.)
+           be subscribed to this channel. Additional default channels can be configured later.)
       end,
       content_tag :p do
         [
@@ -54,8 +55,8 @@ defmodule UcxUccWeb.LandingView do
           content_tag :strong do
             ~g("general")
           end,
-          ~g(. To accept the default, just click
-             the next button. Otherwise, you can change the name if desired.)
+          ~g(. To accept the default name, click
+             the next button, or edit and change the channel name.)
         ]
       end
     ]
@@ -63,9 +64,10 @@ defmodule UcxUccWeb.LandingView do
 
   def step4_instructions do
     content_tag :p do
-      ~g(You need to configure the name and email address to be used when the
-         application sends a user invitation, registration, confimation, and
-         password reset emails.)
+      gettext("""
+        Configure the name and email address to be used when %{brand} sends a user, invitation,
+        registration, confirmation, and password reset emails.
+        """, brand: UcxUcc.brandname)
     end
   end
 
@@ -105,4 +107,16 @@ defmodule UcxUccWeb.LandingView do
   def step5, do: ~g(Summary of Your Input)
   def step6, do: ~g(Complete)
 
+  # helper functions
+
+  def restart_message do
+    [
+      ~g(Login with your administrator account, open Administration section, and select the ),
+      content_tag(:strong, do: ~g(General)),
+      ~g( menu. Click on the ),
+      content_tag(:strong, do: ~g(RESTART THE SERVER)),
+      ~g( button. The application restart takes approximately one minute to complete.
+        After restart, login as administrator and invite users as described below.)
+    ]
+  end
 end
