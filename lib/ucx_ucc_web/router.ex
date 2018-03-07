@@ -47,6 +47,12 @@ defmodule UcxUccWeb.Router do
     get "/phone", MasterController, :phone
   end
 
+  scope "/", UccBackupRestoreWeb do
+    pipe_through :protected
+
+    post "/upload_backup", UploadController, :create
+  end
+
   # The following is a prototype of an API implementation. It is basically
   # working, without authentication. Need updates in Coherence to get it
   # working

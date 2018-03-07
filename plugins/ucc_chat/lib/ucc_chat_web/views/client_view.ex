@@ -11,7 +11,6 @@ defmodule UccChatWeb.ClientView do
       .loading-animation {
         top: 0;
         right: 0;
-        bottom: 0;
         left: 0;
         display: flex;
         align-items: center;
@@ -19,6 +18,7 @@ defmodule UccChatWeb.ClientView do
         justify-content: center;
         text-align: center;
         z-index: 100;
+        height: 100% !important;
       }
       .loading-animation > div {
         width: 10px;
@@ -60,6 +60,19 @@ defmodule UccChatWeb.ClientView do
       .page-loading-container .loading-animation > div {
         background-color: #eee !important;
       }
+      .loading-animation.light_on_dark {
+        background-color: rgba(0,0,0,0.7);
+
+        position: fixed;
+        right: 40px;
+        left: unset;
+        bottom: 0;
+        height: 100%;
+        width: 400px;
+      }
+      .loading-animation.light_on_dark > div {
+        background-color: #eee !important;
+      }
     </style>
     """
   end
@@ -67,9 +80,9 @@ defmodule UccChatWeb.ClientView do
     ~s(<li class="load-more"></li>)
   end
 
-  def loading_animation do
+  def loading_animation(class \\ :default) do
     """
-    <div class="loading-animation">
+    <div class="loading-animation #{class}">
       <div class="bounce1"></div>
       <div class="bounce2"></div>
       <div class="bounce3"></div>

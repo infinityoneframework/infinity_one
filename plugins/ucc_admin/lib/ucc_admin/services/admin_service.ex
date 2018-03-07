@@ -333,7 +333,7 @@ defmodule UccAdmin.AdminService do
     if role = UcxUcc.Accounts.get_by_role(name: role_name) do
       changeset = UcxUcc.Accounts.change_role(role)
 
-      Client.swal_model socket, "Delete Role!", "Are you sure?", "warning", "Delete Role!",
+      Client.swal_modal socket, "Delete Role!", "Are you sure?", "warning", "Delete Role!",
         confirm: fn _ ->
           case UcxUcc.Accounts.delete_role changeset do
             {:ok, _} ->

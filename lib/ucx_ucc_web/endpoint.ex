@@ -10,7 +10,8 @@ defmodule UcxUccWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/", from: :ucx_ucc, gzip: false,
-    only: ~w(avatar sprites uploads css fonts fontello images js favicon.ico robots.txt sounds favicon1.ico favicon-alert.ico manifest.json)
+    only: ~w(tmp backups avatar sprites uploads css fonts fontello images js favicon.ico
+      robots.txt sounds favicon1.ico favicon-alert.ico manifest.json)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
