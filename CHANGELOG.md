@@ -8,6 +8,7 @@
 * Reduce clear unreads times from 2000 to 1000 msec.
 * Moved message_agent from Agent to GenServer
 * Changed desktop notification title to 'Message from @username'
+* Backup and Restore feature
 
 ### Bug Fixes
 
