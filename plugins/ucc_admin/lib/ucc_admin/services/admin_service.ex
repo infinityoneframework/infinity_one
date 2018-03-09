@@ -298,7 +298,8 @@ defmodule UccAdmin.AdminService do
     {:noreply, socket}
   end
 
-  def handle_in("permissions:change:" <> change, _params, socket) do
+  def handle_in(ev = "permissions:change:" <> change, _params, socket) do
+    debug ev, ""
     re = ~r/(?:perm\[)([^\]]+)(?:\]\[)([^\]]+)(?:\])/
     with [_, role, permission_name] <- Regex.run(re, change),
          {false, false} <- {is_nil(permission_name), is_nil(role)},
@@ -314,20 +315,23 @@ defmodule UccAdmin.AdminService do
     {:noreply, socket}
   end
 
-  def handle_in("permissions:role:new", _params, socket) do
+  def handle_in(ev = "permissions:role:new", _params, socket) do
+    debug ev, ""
     # Logger.warn "new role"
     Rebel.Core.async_js socket, ~s/$('.admin-link[data-id="admin_role"]').click();/
     {:noreply, socket}
   end
 
-  def handle_in("permissions:role:edit", params, socket) do
+  def handle_in(ev = "permissions:role:edit", params, socket) do
+    debug ev, params
     # Logger.warn "new role params: " <> inspect(params)
 
     AdminChannel.admin_link("admin_role", socket, Map.put(%{}, "edit-name", params["name"]))
     # {:noreply, socket}
   end
 
-  def handle_in("permissions:role:delete", params, socket) do
+  def handle_in(ev = "permissions:role:delete", params, socket) do
+    debug ev, params
     # Logger.warn "new role params: " <> inspect(params)
     role_name = params["name"]
     if role = UcxUcc.Accounts.get_by_role(name: role_name) do
@@ -346,6 +350,8 @@ defmodule UccAdmin.AdminService do
   end
 
   def create_or_update_role(%{"role" => %{"id" => id}} = params, _current_user, socket) do
+    debug "create_or_update_role", params
+
     role = UcxUcc.Accounts.get_role!(id)
 
     case UcxUcc.Accounts.update_role role, params["role"] do
@@ -359,6 +365,7 @@ defmodule UccAdmin.AdminService do
   end
 
   def create_or_update_role(params, _current_user, socket) do
+    debug "create_or_update_role", params
     case UcxUcc.Accounts.create_role params["role"] do
       {:ok, role} ->
         Client.toastr socket, :success, ~s(Role created successfully)
@@ -399,6 +406,7 @@ defmodule UccAdmin.AdminService do
   end
 
   defp flex_action(action, user, _username, _params, _socket) when action in ~w(make-admin remove-admin) do
+    debug "flex_action", action
     [role1, role2, success, error] =
       if action == "make-admin" do
         ["user", "admin", ~g(User is now an admin), ~g(Problem  making the an admin)]
@@ -434,6 +442,7 @@ defmodule UccAdmin.AdminService do
   end
 
   defp flex_action(action, user, _username, _params, _socket) when action in ~w(activate deactivate) do
+    debug "flex_action", action
     [active, success, error, svc] =
       if action == "activate" do
         [true, ~g(User has been activated), ~g(Problem activating User), &UserService.activate_user/1]
@@ -458,6 +467,7 @@ defmodule UccAdmin.AdminService do
   end
 
   def do_slash_commands_params(params, which) do
+    debug "do_slash_commands_params", params
     slash_commands =
       params
       |> Map.get(which, [])

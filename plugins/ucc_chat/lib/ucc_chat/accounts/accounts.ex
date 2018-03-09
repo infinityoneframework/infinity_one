@@ -1,4 +1,6 @@
 defmodule UccChat.Accounts do
+  import Ecto.Changeset
+  import UcxUccWeb.Gettext
 
   alias UccChat.{PresenceAgent, Channel, Subscription}
   alias UcxUcc.Accounts
@@ -143,5 +145,39 @@ defmodule UccChat.Accounts do
       |> Map.put(:status_message_history, history)
 
     Accounts.update_account(account, attrs)
+  end
+
+  @doc """
+  Check if the given user is the last owner of any room.
+
+  Give a user with preloaded user_roles, returns a list of room_ids where the user
+  is the owner of the room. Otherwise, return false.
+  """
+  def user_last_owner_of_any_rooms(%{user_roles: user_roles}) when is_list(user_roles) do
+    with owners when owners != [] <- Enum.filter(user_roles, & &1.role.name == "owner"),
+         singles <- Enum.filter(owners, &Accounts.count_user_roles(&1.role, &1.scope) == 1),
+         list when list != [] <- Enum.map(singles, & &1.scope) do
+      list
+    else
+      _ -> false
+    end
+  end
+
+  def last_admin? do
+    role = Accounts.get_role_by_name("admin")
+    Accounts.count_user_roles(role) == 1
+  end
+
+  def delete_user(%{} = user) do
+    changeset = Accounts.change_user(user)
+
+    cond do
+      ids = user_last_owner_of_any_rooms(user) ->
+        {:error, add_error(changeset, :roles, ~g(Can't delete last owner), room_ids: ids)}
+      last_admin?() ->
+        {:error, add_error(changeset, :roles, ~g(Can't delete last admin))}
+      true ->
+        Accounts.delete_user(user)
+    end
   end
 end

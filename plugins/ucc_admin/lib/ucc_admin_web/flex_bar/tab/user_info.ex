@@ -10,6 +10,7 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
 
   alias UcxUcc.{TabBar, Hooks, UccPubSub}
   alias UccAdminWeb.FlexBarView
+  alias UccChatWeb.RebelChannel.Client, as: RebelClient
 
   @roles_preload [:roles, user_roles: :role]
 
@@ -175,17 +176,28 @@ defmodule UccAdminWeb.FlexBar.Tab.UserInfo do
   end
 
   def delete(socket, sender) do
-    Logger.info inspect(sender)
-    Client.toastr! socket, :warning, ~s(Not yet implemented)
-    # TODO: Need to implement a conformation dialog
-    # current_user = Accounts.get_user socket.assigns.user_id, preload: @roles_preload
-    # if Permission.has_permission?(current_user, "delete-user") do
-    #   sender["dataset"]["userId"]
-    #   |> Accounts.get_user(preload: @roles_preload)
-    #   |> Accounts.delete_user()
-    #   Client.send_js socket, ~s/$('.flex-nav li.active .admin-link').click()/
-    #   Client.toastr!(socket, :success, ~g(User was deleted successfully))
-    # end
+    user = Accounts.get_user(sender["dataset"]["userId"], default_preload: true)
+
+    RebelClient.swal_modal(
+      socket,
+      ~g(Delete User!),
+      gettext("Are you sure you want to delete user %{name}. This cannot be undone.",
+        name: user.username),
+      "warning",
+      ~g(Delete user!),
+      confirm: fn _ ->
+        case UccChat.Accounts.delete_user(user) do
+          {:ok, _} ->
+            RebelClient.swal(socket, ~g(Success!), gettext("User %{name} removed.",
+              name: user.username), "success")
+            async_js(socket, ~s/$('a.admin-link[data-id="admin_users"]').click()/)
+          {:error, changeset} ->
+            message = UccChatWeb.SharedView.format_errors(changeset) |> String.replace("'", "")
+            body = gettext("Could not remove %{name}. ", name: user.username) <> message
+            RebelClient.swal(socket, ~g(Error!), body, "error")
+        end
+      end
+    )
     socket
   end
 

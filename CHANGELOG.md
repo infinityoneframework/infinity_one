@@ -9,6 +9,7 @@
 * Moved message_agent from Agent to GenServer
 * Changed desktop notification title to 'Message from @username'
 * Backup and Restore feature
+* Implement Delete User
 
 ### Bug Fixes
 
