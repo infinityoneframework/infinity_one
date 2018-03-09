@@ -10,6 +10,7 @@
 * Changed desktop notification title to 'Message from @username'
 * Backup and Restore feature
 * Implement Delete User
+* UCX-3815 - Conversations have old date
 
 ### Bug Fixes
 

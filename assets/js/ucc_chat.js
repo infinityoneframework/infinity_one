@@ -155,6 +155,9 @@ window.UccChat = {
     if (message.data('username') != username){
       message.removeClass('own');
     }
+    if (message.data('date') != message.prev().data('date')) {
+      message.addClass('new-day');
+    }
     // message.find(`a.mention-link[data-username="${username}"]`)
     //   .addClass('mention-link-me background-primary-action-color');
     message.find('pre code').each(function(i, block) {

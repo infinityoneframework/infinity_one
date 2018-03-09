@@ -96,6 +96,7 @@ defmodule UccChatWeb.RoomChannel.Message do
   end
 
   def render_message(message, user_id) do
+    Logger.debug fn -> inspect(message.body) end
     user = Accounts.get_user user_id
     message_opts = UccChatWeb.MessageView.message_opts()
     message = Message.preload_schema(message, UccChat.Message.preloads())
