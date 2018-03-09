@@ -6,7 +6,7 @@ defmodule UccBackupRestoreWeb.Admin.Page.BackupRestore do
 
   import UcxUccWeb.Gettext
 
-  alias UcxUcc.{Repo, Hooks, Settings.Accounts}
+  alias UcxUcc.{Repo, Hooks}
   alias UccChatWeb.RebelChannel.Client
   alias UccBackupRestore.Utils
   alias UccChat.ServiceHelpers
@@ -31,7 +31,7 @@ defmodule UccBackupRestoreWeb.Admin.Page.BackupRestore do
     ], user, page, socket}
   end
 
-  def admin_restore_backup(socket, sender) do
+  def admin_restore_backup(socket, _sender) do
     socket
   end
 
@@ -43,7 +43,7 @@ defmodule UccBackupRestoreWeb.Admin.Page.BackupRestore do
       gettext("Are you sure do delete %{id}? This cannot be undone!", id: id),
       "warning",
       ~g(Delete Backup!),
-        confirm: fn result ->
+        confirm: fn _result ->
           {title, text, type} =
             case Utils.delete_backup(id) do
               {:error, message} ->
@@ -69,7 +69,7 @@ defmodule UccBackupRestoreWeb.Admin.Page.BackupRestore do
     socket
   end
 
-  def admin_backup_batch_delete(socket, %{"form" => form} = sender) do
+  def admin_backup_batch_delete(socket, %{"form" => form}) do
     params = ServiceHelpers.normalize_params(form)["backup"] || %{}
 
     backups =

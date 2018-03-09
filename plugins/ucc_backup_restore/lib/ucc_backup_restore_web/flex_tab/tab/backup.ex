@@ -5,15 +5,13 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Backup do
   use UccChatWeb.FlexBar.Helpers
   use UccLogger
 
-  alias UcxUcc.{Accounts, TabBar.Tab, Permissions}
-  alias UcxUcc.{TabBar, Hooks, UccPubSub}
-  alias UccChat.ServiceHelpers
+  alias UcxUcc.{TabBar.Tab}
+  alias UcxUcc.{TabBar}
   alias UccBackupRestoreWeb.FlexBarView
   alias UccBackupRestore.{Utils, Backup}
   alias UccUiFlexTab.FlexTabChannel, as: Channel
   alias UccChatWeb.RebelChannel.Client
-
-  @roles_preload [:roles, user_roles: :role]
+  alias UccChat.ServiceHelpers
 
   @doc """
   Add the Backup tab to the Flex Tabs list
@@ -39,7 +37,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Backup do
   @doc """
   Callback for the rendering bindings for the Backup panel.
   """
-  def args(socket, {user_id, channel_id, _, _,}, params) do
+  def args(socket, {user_id, _channel_id, _, _,}, _params) do
     current_user = Helpers.get_user! user_id
     opts = get_opts()
 
@@ -58,9 +56,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Backup do
   @doc """
   Perform a backup
   """
-  def flex_form_save(socket, %{"form" => %{"flex-id" => tab_name} = form} = sender) do
-    tab = TabBar.get_button tab_name
-
+  def flex_form_save(socket, %{"form" => form} = sender) do
     resource_params = ServiceHelpers.normalize_params(form)["backup"] || %{}
 
     params =

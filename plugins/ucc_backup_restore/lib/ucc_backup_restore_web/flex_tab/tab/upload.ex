@@ -5,16 +5,11 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Upload do
   use UccChatWeb.FlexBar.Helpers
   use UccLogger
 
-  alias UcxUcc.{Accounts, TabBar.Tab, Permissions}
-  alias UcxUcc.{TabBar, Hooks, UccPubSub}
-  alias UccChat.ServiceHelpers
+  alias UcxUcc.{TabBar.Tab}
+  alias UcxUcc.{TabBar}
   alias UccBackupRestoreWeb.FlexBarView
   alias UccBackupRestore.Backup
   alias UccUiFlexTab.FlexTabChannel, as: Channel
-  alias UccChatWeb.RebelChannel.Client
-  alias UccBackupRestore.Utils
-
-  @roles_preload [:roles, user_roles: :role]
 
   @doc """
   Add the Backup Upload tab to the Flex Tabs list
@@ -40,7 +35,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Upload do
   @doc """
   Callback for the rendering bindings for the Upload panel.
   """
-  def args(socket, {user_id, channel_id, _, sender}, params) do
+  def args(socket, {user_id, _channel_id, _, _sender}, _params) do
     current_user = Helpers.get_user! user_id
 
     {[

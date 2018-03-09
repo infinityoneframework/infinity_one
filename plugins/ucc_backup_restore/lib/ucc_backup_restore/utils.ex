@@ -94,24 +94,34 @@ defmodule UccBackupRestore.Utils do
     "#{brand_name}-#{env}-" <> datetime_now()
   end
 
-  def backup_path(_env \\ UcxUcc.env()) do
-    Path.join ~w(priv static backups)
+  def app_dir(env \\ UcxUcc.env())
+
+  def app_dir(:prod) do
+    Application.app_dir(:ucx_ucc)
   end
 
-  def uploads_path(_env) do
-    Path.join(~w(priv static uploads))
+  def app_dir(_) do
+    ""
   end
 
-  def avatars_path(_env) do
-    Path.join(~w(priv static avatar))
+  def backup_path(env \\ UcxUcc.env()) do
+    Path.join [app_dir(env) | ~w(priv static backups)]
   end
 
-  def sounds_path(_env) do
-    Path.join(~w(priv static sounds))
+  def uploads_path(env) do
+    Path.join([app_dir(env) | ~w(priv static uploads)])
   end
 
-  def web_tmp_path do
-    Path.join(~w(priv static tmp))
+  def avatars_path(env) do
+    Path.join([app_dir(env) | ~w(priv static avatar)])
+  end
+
+  def sounds_path(env) do
+    Path.join([app_dir(env) | ~w(priv static sounds)])
+  end
+
+  def web_tmp_path(env \\ UcxUcc.env()) do
+    Path.join([app_dir(env) | ~w(priv static tmp)])
   end
 
   def delete_backup(file, env \\ UcxUcc.env()) do
@@ -141,6 +151,7 @@ defmodule UccBackupRestore.Utils do
     with {:ok, path} <- Briefly.create(directory: true),
          {:ok, _} <- File.cp_r(src_path, path),
          {_, 0} <- System.cmd("tar", ~w(czf #{tmp_path} -C #{path} .)) do
+
       {:ok, tmp_path}
     else
       _ -> {:error, ~g(Could not create cert backup.)}
@@ -151,10 +162,19 @@ defmodule UccBackupRestore.Utils do
     now = datetime_now()
     with :ok <- File.cp(key, key <> "-" <> now) do
       File.cp(cert, cert <> "-" <> now)
-      File.chmod(key, 0o600)
-      File.chmod(cert, 0o600)
+      reset_keys_permissions({key, cert})
       :ok
     end
+  end
+
+  def reset_keys_permissions({key, cert}) do
+    File.chmod(key, 0o400)
+    File.chmod(cert, 0o400)
+  end
+
+  def write_keys_permissions({key, cert}) do
+    File.chmod(key, 0o600)
+    File.chmod(cert, 0o600)
   end
 
   def keys do

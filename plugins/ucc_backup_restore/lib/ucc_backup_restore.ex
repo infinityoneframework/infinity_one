@@ -57,8 +57,6 @@ defmodule UccBackupRestore do
 
   import UccBackupRestore.Utils
 
-  alias UccBackupRestore.Config
-
   require Logger
 
   @doc """
@@ -171,7 +169,7 @@ defmodule UccBackupRestore do
 
   defp unpack_tarfile(config) do
     case untar_backup(config.backup_name) do
-      {:ok, %{path: path} = res} ->
+      {:ok, %{path: path}} ->
         Map.put(config, :path, path)
       {:error, error} ->
         put_error(config, :unpack_tarfile, error)
@@ -287,8 +285,8 @@ defmodule UccBackupRestore do
       {_, 0} ->
         config
 
-      {error, _code} ->
-        put_error(config, :create_tarfile, error)
+      {error, code} ->
+        put_error(config, :create_tarfile, "#{code}: #{error}")
     end
   end
 
@@ -306,14 +304,12 @@ defmodule UccBackupRestore do
   Returns a list of file names and their details, sorted by `mtime`.
   """
   def get_backups do
-    name = UcxUcc.name()
     UcxUcc.env()
     |> backup_path()
     |> Path.join("*")
     |> Path.wildcard()
     |> Enum.map(fn path ->
       base_name = Path.basename(path)
-      ts = String.replace(base_name, ~r/[^\d]/, "")
       info = lstat(path)
       %{
         dt: info[:dt],
@@ -349,7 +345,5 @@ defmodule UccBackupRestore do
   defp database_name(config) do
     config.db_name
   end
-
-  defp attachments_name(_config), do: attachments_name()
 
 end

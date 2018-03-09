@@ -5,17 +5,14 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.GenCert do
   use UccChatWeb.FlexBar.Helpers
   use UccLogger
 
-  alias UcxUcc.{Accounts, TabBar.Tab, Permissions}
-  alias UcxUcc.{TabBar, Hooks, UccPubSub}
-  alias UccChat.ServiceHelpers
+  alias UcxUcc.{TabBar.Tab}
+  alias UcxUcc.{TabBar}
   alias UccBackupRestoreWeb.FlexBarView
   alias UccBackupRestore.Backup
   alias UccUiFlexTab.FlexTabChannel, as: Channel
   alias UccChatWeb.RebelChannel.Client
   alias UccBackupRestore.Utils
   alias UcxUccWeb.Query
-
-  @roles_preload [:roles, user_roles: :role]
 
   @doc """
   Add the Certificates tab to the Flex Tabs list
@@ -41,10 +38,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.GenCert do
   @doc """
   Callback for the rendering bindings for the Certificates panel.
   """
-  def args(socket, {user_id, channel_id, _, sender}, params) do
-    current_user = Helpers.get_user! user_id
-    {key, cert} = Utils.keys()
-
+  def args(socket, {_user_id, _channel_id, _, _sender}, _params) do
     {[
       keys_found: Utils.keys_exist?(),
       warning: false,
@@ -61,10 +55,13 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.GenCert do
   @doc """
   Generate a new certificate.
   """
-  def flex_form_save(socket, %{"form" => form} = sender) do
+  def flex_form_save(socket, sender) do
     {key, cert} = Utils.keys()
+    Logger.debug fn -> inspect({key, cert}) end
 
     Client.prepend_loading_animation(socket, ".content.gen-cert", :light_on_dark)
+
+    Utils.write_keys_permissions({key, cert})
 
     with {_, 0} <- System.cmd("openssl", ~w(genrsa -out #{key} 2048)),
          {_, 0} <- System.cmd("openssl", ~w(rsa -in #{key} -out #{cert} -outform PEM -pubout)) do
@@ -77,14 +74,9 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.GenCert do
         Client.toastr(socket, :error, "Error #{errno}: #{error}")
     end
 
-    Client.stop_loading_animation(socket)
-  end
+    Utils.reset_keys_permissions({key, cert})
 
-  @doc """
-  Handle the cancel button.
-  """
-  def flex_form_cancel(socket, sender) do
-    Channel.flex_close(socket, sender)
+    Client.stop_loading_animation(socket)
   end
 
   @doc """
@@ -93,13 +85,14 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.GenCert do
   def admin_download_cert(socket, _sender) do
     case Utils.download_cert(Utils.keys()) do
       {:ok, path} ->
+        Logger.debug fn -> inspect(path) end
         # Allow time for the download, then remove the tmp file
         spawn fn ->
           Process.sleep(10_000)
           File.rm path
         end
 
-        download_path = String.trim_leading(path, Path.join(~w(priv static)))
+        download_path = String.replace path, ~r/^.*static/, ""
         Client.download_cert(socket, download_path, "ucx_ucc_cert-#{Utils.datetime_now()}.tgz")
 
       {:error, error} ->
@@ -110,7 +103,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.GenCert do
   @doc """
   Handle the certificate regenerate button.
   """
-  def admin_regen_cert(socket, sender) do
+  def admin_regen_cert(socket, _sender) do
     unless Utils.backup_keys(Utils.keys()) == :ok do
       Client.toastr(socket, :warning, ~g(Problem creating backup of existing keys. They were not backed up.))
     end

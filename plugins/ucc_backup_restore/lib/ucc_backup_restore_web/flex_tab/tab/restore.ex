@@ -5,8 +5,8 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Restore do
   use UccChatWeb.FlexBar.Helpers
   use UccLogger
 
-  alias UcxUcc.{Accounts, TabBar.Tab, Permissions}
-  alias UcxUcc.{TabBar, Hooks, UccPubSub}
+  alias UcxUcc.{TabBar.Tab}
+  alias UcxUcc.{TabBar}
   alias UccChat.ServiceHelpers
   alias UccBackupRestoreWeb.FlexBarView
   alias UccBackupRestore.Backup
@@ -15,8 +15,6 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Restore do
   alias UccBackupRestore.Utils
 
   require Logger
-
-  @roles_preload [:roles, user_roles: :role]
 
   @doc """
   Add the Restore tab to the Flex Tabs list
@@ -42,7 +40,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Restore do
   @doc """
   Callback for the rendering bindings for the Restore panel.
   """
-  def args(socket, {user_id, channel_id, _, sender}, params) do
+  def args(socket, {user_id, _channel_id, _, sender}, _params) do
     current_user = Helpers.get_user! user_id
 
     name = sender["dataset"]["name"] |> IO.inspect(label: "name")
@@ -59,8 +57,7 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Restore do
   @doc """
   Perform a Restore.
   """
-  def flex_form_save(socket, %{"form" => %{"flex-id" => tab_name} = form} = sender) do
-    tab = TabBar.get_button tab_name
+  def flex_form_save(socket, %{"form" => form} = sender) do
 
     resource_params = ServiceHelpers.normalize_params(form)["backup"] || %{}
 
@@ -123,8 +120,6 @@ defmodule UccBackupRestoreWeb.FlexBar.Tab.Restore do
   defp get_opts(nil), do: %{}
 
   defp get_opts(name) do
-    tar_path = Path.join(Utils.backup_path(), name)
-
     case Utils.untar_backup(name) do
       {:ok, %{path: path, contents: contents}} ->
         # Only need the ls contents  now, so we can remove the temp dir

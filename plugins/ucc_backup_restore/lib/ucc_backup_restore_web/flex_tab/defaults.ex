@@ -4,8 +4,6 @@ defmodule UccBackupRestoreWeb.FlexBar.Defaults do
   """
   use UcxUccWeb.Gettext
 
-  alias UcxUcc.Hooks
-
   @doc """
   Add the Backup and Restore Flex Tab Buttons.
   """
