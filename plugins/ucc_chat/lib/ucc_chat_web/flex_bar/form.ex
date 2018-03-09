@@ -62,7 +62,7 @@ defmodule UccChatWeb.FlexBar.Form do
           {resource.__struct__.model(), [resource, resource_params], :changeset}
 
         model_exported? and function_exported?(resource.__struct__.model(), :change, 2) ->
-          {resource.__struct__.model(), [resource, resource_params], :changeset}
+          {resource.__struct__.model(), [resource, resource_params], :change}
 
         true ->
           {resource.__struct__, [resource, resource_params], :changeset}
