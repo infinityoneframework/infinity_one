@@ -14,6 +14,7 @@
 * Update rooms after admin delete room
 * UCx-3798 - Add owner role when creating a room.
 * Add fix_owner_roles release task
+* Fix administration permissions
 
 ### Bug Fixes
 

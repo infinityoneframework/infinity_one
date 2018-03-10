@@ -3,9 +3,12 @@ section.page-container.page-home.page-static.page-static.page-list
     = render UccChatWeb.MasterView, "burger.html"
     h2
       span.room-title = ~g(Permissions)
-  .content
-    .permissions-manager
-      = if has_permission? @user, "access-permissions" do
+  = if not has_permission? @user, "access-permissions" do
+    .content(style="padding-left: 40px;")
+      p = unauthorized_message()
+  - else
+    .content
+      .permissions-manager
         a.button.primary.new-role(href="#admin-permissions-new")= ~g"New_role"
         table.permission-grid.secondary-background-color(border="1")
           thead.content-background-color
@@ -27,5 +30,3 @@ section.page-container.page-home.page-static.page-static.page-list
                       input.role-permission(type="checkbox" name="#{name}" value="1" checked="checked" data-role="#{role.name}" data-permission="#{perm}")
                     - else
                       input.role-permission(type="checkbox" name="#{name}" value="1" data-role="#{role.name}" data-permission="#{perm}")
-      - else
-        = ~g"Not_authorized"

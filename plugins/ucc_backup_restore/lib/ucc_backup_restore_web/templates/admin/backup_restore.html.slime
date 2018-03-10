@@ -5,37 +5,40 @@
       h2
         span.room-title= ~g"Backup and Restore"
     .content
-      h3= ~g"Backups"
-      br
-      form
-        button.button.danger.medium#batch-delete rebel-click="admin_backup_batch_delete" disabled="true"
-          = ~g(Delete Selected)
-          i.icon-trash
-        table.striped
-          thead
-            tr
-              th
-                input#backups-change-all type="checkbox"
-              th = ~g(Time)
-              th = ~g(Name)
-              th.right = ~g(Actions)
-          tbody
-            = for %{root_name: name, base_name: base_name} = backup <- @backups do
+      = if not has_permission?(@user, "view-backup-restore-administration") do
+        p = UccChatWeb.AdminView.unauthorized_message()
+      - else
+        h3= ~g"Backups"
+        br
+        form
+          button.button.danger.medium#batch-delete rebel-click="admin_backup_batch_delete" disabled="true"
+            = ~g(Delete Selected)
+            i.icon-trash
+          table.striped
+            thead
               tr
-                td
-                  input.check type="checkbox" name="backup[#{base_name}]"
-                td = backup.dt
-                td
-                  = link to: backup_url(backup), title: ~g(Download), target: "_blank", download: name do
-                    = name
-                    i.icon-download
-                td.right
-                  = link to: "#", title: ~g(Restore), "data-name": base_name, "data-id": "admin_restore", "rebel-click": "flex_tab_open" do
-                    button.button.primary.small
-                      i.icon-ccw
-                  = link to: "#", title: ~g(Delete), "data-id": base_name, "rebel-click": "admin_delete_backup" do
-                    button.button.danger.small
-                      i.icon-trash
-
-  .flex-tab-container#flex-tabs.border-component-color(rebel-chan="user")
-    = render UccUiFlexTabWeb.TabBarView, "index.html", groups: ~w(admin_backup_restore)
+                th
+                  input#backups-change-all type="checkbox"
+                th = ~g(Time)
+                th = ~g(Name)
+                th.right = ~g(Actions)
+            tbody
+              = for %{root_name: name, base_name: base_name} = backup <- @backups do
+                tr
+                  td
+                    input.check type="checkbox" name="backup[#{base_name}]"
+                  td = backup.dt
+                  td
+                    = link to: backup_url(backup), title: ~g(Download), target: "_blank", download: name do
+                      = name
+                      i.icon-download
+                  td.right
+                    = link to: "#", title: ~g(Restore), "data-name": base_name, "data-id": "admin_restore", "rebel-click": "flex_tab_open" do
+                      button.button.primary.small
+                        i.icon-ccw
+                    = link to: "#", title: ~g(Delete), "data-id": base_name, "rebel-click": "admin_delete_backup" do
+                      button.button.danger.small
+                        i.icon-trash
+  = if has_permission? @user, "view-backup-restore-administration" do
+    .flex-tab-container#flex-tabs.border-component-color(rebel-chan="user")
+      = render UccUiFlexTabWeb.TabBarView, "index.html", groups: ~w(admin_backup_restore)

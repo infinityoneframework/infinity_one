@@ -18,7 +18,8 @@ defmodule UccChatWeb.Admin.Page.ChatGeneral do
       UccChatWeb.AdminView,
       "chat_general.html",
       65,
-      [pre_render_check: &UccChatWeb.Admin.view_message_admin_permission?/2]
+      pre_render_check: &check_perissions/2,
+      permission: "view-general-administration"
     )
   end
 
@@ -61,4 +62,7 @@ defmodule UccChatWeb.Admin.Page.ChatGeneral do
     |> elem(0)
   end
 
+  def check_perissions(_page, user) do
+    has_permission? user, "view-general-administration"
+  end
 end

@@ -12,7 +12,8 @@ defmodule UccChatWeb.Admin.Page.FileUpload do
       UccChatWeb.AdminView,
       "file_upload.html",
       80,
-      [pre_render_check: &UccChatWeb.Admin.view_message_admin_permission?/2]
+      pre_render_check: &check_perissions/2,
+      permission: "view-file-upload-administration"
     )
   end
 
@@ -23,4 +24,7 @@ defmodule UccChatWeb.Admin.Page.FileUpload do
     ], user, page, socket}
   end
 
+  def check_perissions(_page, user) do
+    has_permission? user, "view-file-upload-administration"
+  end
 end

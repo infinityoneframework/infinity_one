@@ -521,6 +521,12 @@ defmodule UcxUcc.Permissions do
     |> Map.get(:name, [])
   end
 
+  # def admin_permissions do
+  #   default_permissions()
+  #   |> Enum.filter(& &1.roles == ["admin"])
+  #   |> Enum.map(& &1.name)
+  # end
+
   @doc """
   List of all the permissions and their default values.
   """
@@ -583,6 +589,13 @@ defmodule UcxUcc.Permissions do
     %{name: "view-message-administration",   roles: ["admin"] },
     %{name: "view-statistics",               roles: ["admin"] },
     %{name: "view-user-administration",      roles: ["admin"] },
+    %{name: "view-accounts-administration",  roles: ["admin"] },
+    %{name: "view-general-administration",   roles: ["admin"] },
+    %{name: "view-webrtc-administration",    roles: ["admin"] },
+    %{name: "view-layout-administration",    roles: ["admin"] },
+    %{name: "view-phone-numbers-administration",  roles: ["admin"] },
+    %{name: "view-backup-restore-administration", roles: ["admin"] },
+    %{name: "view-file-upload-administration",    roles: ["admin"] },
   ]
 
   def show_permission_list do
@@ -624,10 +637,17 @@ defmodule UcxUcc.Permissions do
       "view-joined-room",
       "view-other-user-channels",
       "view-p-room",
+      "view-statistics",
       "view-room-administration",
       "view-message-administration",
-      "view-statistics",
       "view-user-administration",
+      "view-accounts-administration",
+      "view-general-administration",
+      "view-webrtc-administration",
+      "view-layout-administration",
+      "view-phone-numbers-administration",
+      "view-backup-restore-administration",
+      "view-file-upload-administration",
     ]
   end
 

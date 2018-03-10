@@ -98,7 +98,7 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     {%{field => value}, socket}
   end
 
-  def flex_form_delete(socket, sender, resource) do
+  def flex_form_delete(socket, _sender, resource) do
     user = Accounts.get_user socket.assigns.user_id, default_preload: true
     resource
     |> Channel.delete(user)

@@ -12,7 +12,8 @@ defmodule UccChatWeb.Admin.Page.Permissions do
       UccChatWeb.AdminView,
       "permissions.html",
       40,
-      opts: [pre_render_check: &check_perissions/2]
+      pre_render_check: &check_perissions/2,
+      permission: "access-permissions"
     )
   end
 

@@ -4,7 +4,16 @@ defmodule UccChatWeb.Admin.Page.General do
   alias UcxUcc.{Repo, Hooks, Settings.General}
 
   def add_page do
-    new("admin_general", __MODULE__, ~g(General), UccChatWeb.AdminView, "general.html", 60)
+    new(
+      "admin_general",
+      __MODULE__,
+      ~g(General),
+      UccChatWeb.AdminView,
+      "general.html",
+      60,
+      pre_render_check: &check_perissions/2,
+      permission: "view-general-administration"
+    )
   end
 
   def args(page, user, _sender, socket) do
@@ -15,4 +24,7 @@ defmodule UccChatWeb.Admin.Page.General do
     ], user, page, socket}
   end
 
+  def check_perissions(_page, user) do
+    has_permission? user, "view-general-administration"
+  end
 end

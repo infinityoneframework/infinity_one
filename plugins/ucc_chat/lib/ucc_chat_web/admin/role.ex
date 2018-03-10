@@ -12,7 +12,9 @@ defmodule UccChatWeb.Admin.Page.Role do
       UccChatWeb.AdminView,
       "role.html",
       41,
-      [visible: false, pre_render_check: &check_perissions/2]
+      visible: false,
+      pre_render_check: &check_perissions/2,
+      permission: "access-permissions"
     )
   end
 

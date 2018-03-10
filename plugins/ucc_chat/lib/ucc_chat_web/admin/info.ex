@@ -1,11 +1,21 @@
 defmodule UccChatWeb.Admin.Page.Info do
   use UccAdmin.Page
 
+  alias UcxUcc.{Repo, Hooks}
   alias UccChat.{Message, Channel, UserService}
   alias UccChatWeb.SharedView
 
   def add_page do
-    new("admin_info", __MODULE__, ~g(Info), UccChatWeb.AdminView, "info.html", 10)
+    new(
+      "admin_info",
+      __MODULE__,
+      ~g(Info),
+      UccChatWeb.AdminView,
+      "info.html",
+      10,
+      pre_render_check: &check_perissions/2,
+      permission: "view-statistics"
+    )
   end
 
   def args(page, user, _sender, socket) do
@@ -43,9 +53,12 @@ defmodule UccChatWeb.Admin.Page.Info do
     ]
 
     {[
-      user: user,
+      user: Repo.preload(user, Hooks.user_preload([])),
       info: [usage: usage, system: system],
     ], user, page, socket}
   end
 
+  def check_perissions(_page, user) do
+    has_permission? user, "view-statistics"
+  end
 end

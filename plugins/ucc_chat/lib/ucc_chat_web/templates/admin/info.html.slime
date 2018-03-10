@@ -3,24 +3,28 @@ section.page-container.page-list(data-page="admin_info")
     = render UccChatWeb.MasterView, "burger.html"
     h2
       span.room-title= ~g"Info"
-  .content
-    h3= ~g"UCc Chat"
-    br
+  = if not has_permission? @user, "view-statistics" do
+    .content(style="padding-left: 40px;")
+      p = unauthorized_message()
+  - else
+    .content
+      h3= ~g"UCc Chat"
+      br
 
-    table.statistics-table.secondary-background-color
-      = for item <- @info[:usage] do
-        tr.admin-table-row
-          th.content-background-color.border-component-color= item[:title]
-          td.border-component-color= item[:value]
+      table.statistics-table.secondary-background-color
+        = for item <- @info[:usage] do
+          tr.admin-table-row
+            th.content-background-color.border-component-color= item[:title]
+            td.border-component-color= item[:value]
 
-    h3= ~g(System Information)
-    br
+      h3= ~g(System Information)
+      br
 
-    table.statistics-table.secondary-background-color
-      = for item <- @info[:system] do
-        tr.admin-table-row
-          th.content-background-color.border-component-color= item[:title]
-          td.border-component-color= item[:value]
+      table.statistics-table.secondary-background-color
+        = for item <- @info[:system] do
+          tr.admin-table-row
+            th.content-background-color.border-component-color= item[:title]
+            td.border-component-color= item[:value]
 
 
-    button.button.primary.refresh= ~g"Refresh"
+      button.button.primary.refresh= ~g"Refresh"

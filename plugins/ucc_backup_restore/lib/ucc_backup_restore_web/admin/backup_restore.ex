@@ -20,7 +20,9 @@ defmodule UccBackupRestoreWeb.Admin.Page.BackupRestore do
       ~g(Backup and Restore),
       UccBackupRestoreWeb.AdminView,
       "backup_restore.html",
-      53
+      53,
+      pre_render_check: &check_perissions/2,
+      permission: "view-backup-restore-administration"
     )
   end
 
@@ -119,5 +121,9 @@ defmodule UccBackupRestoreWeb.Admin.Page.BackupRestore do
         """ |> String.replace("\n", "")
       Rebel.Core.async_js(socket, js)
     end
+  end
+
+  def check_perissions(_page, user) do
+    has_permission? user, "view-backup-restore-administration"
   end
 end

@@ -60,4 +60,8 @@ defmodule UccChatWeb.AdminView do
   def get_slash_commands(item, field) do
     item |> Map.get(field) |> String.split("\n")
   end
+
+  def unauthorized_message do
+    ~g(You are not authorized to view this page.)
+  end
 end

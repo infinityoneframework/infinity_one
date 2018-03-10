@@ -83,7 +83,7 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
     end
   end
 
-  def flex_form_delete(socket, _sender, resource) do
+  def flex_form_delete(socket, _sender, _resource) do
     {:ok, socket}
   end
 

@@ -4,6 +4,8 @@ defmodule UccBackupRestoreWeb.AdminView do
   """
   use UccBackupRestoreWeb, :view
 
+  import UcxUcc.Permissions
+
   @doc """
   The web url for the backup files.
   """

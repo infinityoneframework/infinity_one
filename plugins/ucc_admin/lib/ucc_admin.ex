@@ -1,6 +1,8 @@
 defmodule UccAdmin do
   @name :admin_pages
 
+  alias UcxUcc.Permissions
+
   def initialize do
     :ets.new @name, [:public, :named_table]
   end
@@ -31,4 +33,11 @@ defmodule UccAdmin do
     :ets.lookup @name, key
   end
 
+  def has_admin_permission?(user) do
+    permissions =
+      Enum.reduce(get_pages(), [], fn page, acc ->
+        if permission = page.opts[:permission], do: [permission | acc], else: acc
+      end)
+    Permissions.has_at_least_one_permission? user, permissions
+  end
 end

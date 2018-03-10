@@ -12,7 +12,8 @@ defmodule UccChatWeb.Admin.Page.Message do
       UccChatWeb.AdminView,
       "message.html",
       70,
-      [pre_render_check: &UccChatWeb.Admin.view_message_admin_permission?/2]
+      pre_render_check: &check_perissions/2,
+      permission: "view-message-administration"
     )
   end
 
@@ -24,4 +25,7 @@ defmodule UccChatWeb.Admin.Page.Message do
     ], user, page, socket}
   end
 
+  def check_perissions(_page, user) do
+    has_permission? user, "view-message-administration"
+  end
 end

@@ -35,8 +35,7 @@ defmodule UccChatWeb.SideNavView do
 
   def show_admin_option(%User{} = user) do
     user = Repo.preload(user, [:roles, user_roles: :role])
-    list = ~w(view-statistics  view-room-administration view-user-administration view-privileged-setting)
-    UcxUcc.Permissions.has_at_least_one_permission?(user, list)
+    UccAdmin.has_admin_permission?(user)
   end
 
   def username(chatd), do: chatd.user.username

@@ -8,4 +8,7 @@
       h2
         span.room-title= ~g"Phone Numbers"
     .content
-      = "Coming Soon"
+      = if not has_permission? @user, "view-phone-numbers-administration" do
+        p = unauthorized_message()
+      - else
+        = "Coming Soon"

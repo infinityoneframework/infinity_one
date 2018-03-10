@@ -7,10 +7,15 @@ defmodule UccAdminWeb.AdminView do
   end
 
   def render_flex_item(page, user \\ nil) do
-    if fun = page.opts[:pre_render_check] do
-      fun.(page, user)
-    else
-      true
+    cond do
+      permission = page.opts[:permission] ->
+        UcxUcc.Permissions.has_permission?(user, permission)
+
+      fun = page.opts[:pre_render_check] ->
+        fun.(page, user)
+
+      true ->
+        true
     end
     |> do_render_flex_item(page, user)
   end

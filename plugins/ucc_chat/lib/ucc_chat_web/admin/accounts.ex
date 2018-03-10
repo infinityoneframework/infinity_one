@@ -4,7 +4,16 @@ defmodule UccChatWeb.Admin.Page.Accounts do
   alias UcxUcc.{Repo, Hooks, Settings.Accounts}
 
   def add_page do
-    new("admin_accounts", __MODULE__, ~g(Accounts), UccChatWeb.AdminView, "accounts.html", 55)
+    new(
+      "admin_accounts",
+      __MODULE__,
+      ~g(Accounts),
+      UccChatWeb.AdminView,
+      "accounts.html",
+      55,
+      pre_render_check: &check_perissions/2,
+      permission: "view-accounts-administration"
+    )
   end
 
   def args(page, user, _sender, socket) do
@@ -15,4 +24,7 @@ defmodule UccChatWeb.Admin.Page.Accounts do
     ], user, page, socket}
   end
 
+  def check_perissions(_page, user) do
+    has_permission? user, "view-accounts-administration"
+  end
 end

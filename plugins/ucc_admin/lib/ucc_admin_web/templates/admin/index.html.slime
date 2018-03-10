@@ -5,7 +5,7 @@
     = render UccAdminWeb.AdminView, @template, @assigns
 
   .main-content-cache.hidden
-  aside.steve.side-nav.primary-background-color.color-tertiary-font-color(role="navigation")
+  aside.side-nav.primary-background-color.color-tertiary-font-color(role="navigation")
     .flex-nav.primary-background-color
       section
         = UccAdminWeb.AdminView.render "admin_flex.html", conn: @conn, chatd: @chatd, user: @user

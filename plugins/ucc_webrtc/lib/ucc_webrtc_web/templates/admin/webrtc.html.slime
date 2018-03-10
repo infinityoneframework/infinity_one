@@ -8,16 +8,20 @@ section.page-container.page-home.page-static.page-settings.admin-settings
       button.button.primary.save(disabled="true")
         i.icon-send
         span= ~g"Save changes"
-  .content.background-transparent-dark
-    = form_for @changeset, "#", [id: "admin-webrtc-form", "data-id": "webrtc"], fn f ->
-      = hidden_input f, :id, value: item.id
-      .rocket-form
-        .section
-          .section-content.border-component-color
-            = radio_button_line f, item, :webrtc_enabled, ~g"WebRTC Enabled"
-        .section
-          .section-content.border-component-color
-            = radio_button_line f, item, :webrtc_enable_channel, ~g"WebRTC Enable Channel (experimental)"
-            = radio_button_line f, item, :webrtc_enable_private, ~g"WebRTC Enable Private"
-            = radio_button_line f, item, :webrtc_enable_direct, ~g"WebRTC Enable Direct"
-            = text_input_line f, item, :webrtc_servers, ~g"WebRTC Servers", description: ~g"A list of STUN and TURN servers separated by comma." <> "<br />" <> ~g"Username, password and port are allowed in the format `username:password@stun:host:port` or `username:password@turn:host:port`."
+  = if not UcxUcc.Permissions.has_permission? @user, "view-webrtc-administration" do
+    .content(style="padding-left: 40px;")
+      p = UccChatWeb.AdminView.unauthorized_message()
+  - else
+    .content.background-transparent-dark
+      = form_for @changeset, "#", [id: "admin-webrtc-form", "data-id": "webrtc"], fn f ->
+        = hidden_input f, :id, value: item.id
+        .rocket-form
+          .section
+            .section-content.border-component-color
+              = radio_button_line f, item, :webrtc_enabled, ~g"WebRTC Enabled"
+          .section
+            .section-content.border-component-color
+              = radio_button_line f, item, :webrtc_enable_channel, ~g"WebRTC Enable Channel (experimental)"
+              = radio_button_line f, item, :webrtc_enable_private, ~g"WebRTC Enable Private"
+              = radio_button_line f, item, :webrtc_enable_direct, ~g"WebRTC Enable Direct"
+              = text_input_line f, item, :webrtc_servers, ~g"WebRTC Servers", description: ~g"A list of STUN and TURN servers separated by comma." <> "<br />" <> ~g"Username, password and port are allowed in the format `username:password@stun:host:port` or `username:password@turn:host:port`."

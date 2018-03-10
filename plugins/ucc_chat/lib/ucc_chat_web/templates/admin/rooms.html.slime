@@ -9,7 +9,7 @@
         span.room-title= ~g(Rooms)
     .content
       = if not has_permission? @user, "view-room-administration" do
-        p= ~g(You are not authorized to view this page)
+        p = unauthorized_message()
       - else
         form.search-form(role="form")
           .input-line.search
