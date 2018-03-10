@@ -14,13 +14,14 @@
 * Update rooms after admin delete room
 * UCx-3798 - Add owner role when creating a room.
 * Add fix_owner_roles release task
-* Fix administration permissions
 
 ### Bug Fixes
 
 * Off-line users now see alerts generated while off-line when logging back in
 * Fixed hiding unread-bar when last message not visible on browser focus.
 * Close open subscriptions when logging out or closing browser.
+* Fix administration permissions
+* Fix create and delete room permission checks
 
 
 ## 0.3.1 (2018-01-05)

@@ -711,9 +711,10 @@ defmodule UccChat.ChannelService do
           channel_command(socket, :join, channel, user_id, channel_id)
 
           {:ok, ~g"Channel created successfully"}
-        {:error, _} ->
+        {:error, _, changeset} ->
+          message = UccChatWeb.SharedView.format_errors(changeset)
           {:error,
-            gettext("There was a problem creating #%{name} channel.", name: name)}
+            gettext("There was a problem creating #%{name} channel. ", name: name) <> message}
       end
     end
   end

@@ -11,7 +11,6 @@ defmodule UccChat.Channel do
 
   require Logger
 
-
   def update(channel, user, params) do
     # Logger.warn "update params: " <> inspect(params)
     channel
@@ -64,7 +63,7 @@ defmodule UccChat.Channel do
   end
 
   defp can_delete?(channel, user) do
-    Permissions.has_permission? user, "delete-" <> Permissions.room_type(channel.type)
+    Permissions.has_permission? user, "delete-" <> Permissions.room_type(channel.type), channel.id
   end
 
   def changeset(user, params) do
@@ -117,8 +116,12 @@ defmodule UccChat.Channel do
     true
   end
 
+
+  def has_permission?(user, %{id: nil} = data, changes) do
+    Permissions.has_permission?(user, type_permission("create", changes[:type] || 0))
+  end
+
   def has_permission?(user, data, changes) do
-    # Logger.warn "changes: " <> inspect(changes)
     changes
     |> Enum.all?(fn {field, value} ->
       has_permission?(user, data, field, value)
@@ -126,18 +129,12 @@ defmodule UccChat.Channel do
   end
 
   defp has_permission?(user, %{id: channel_id, type: _type}, _field, _value) do
-    # Logger.warn "{field, value}: " <> inspect({field, value})
-    # permission = type_permission("edit", type)
     Permissions.has_permission?(user, "edit-room", channel_id)
-    # false
   end
 
   defp has_permission?(_user, %{id: _channel_id}, _field, _value) do
     false
   end
-  # defp has_permission?(user, %{type: 1}), do: Permissions.has_permission?(user, "create-p")
-  # defp has_permission?(user, %{type: 2}), do: Permissions.has_permission?(user, "create-d")
-  # defp has_permission?(user, _), do: Permissions.has_permission?(user, "create-c")
 
   def total_rooms do
     from c in @schema, select: count(c.id)
