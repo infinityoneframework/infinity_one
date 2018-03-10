@@ -5,6 +5,8 @@ defmodule UcxUcc.ReleaseTasks do
   Set of helper functions mainly around database creation and migration.
   """
   alias UcxUcc.Repo
+  alias UcxUcc.Accounts
+  alias UccChat.Channel
 
   require Logger
 
@@ -157,5 +159,23 @@ defmodule UcxUcc.ReleaseTasks do
     app = Keyword.get(repo.config, :otp_app)
     repo_underscore = repo |> Module.split |> List.last |> Macro.underscore
     Path.join([priv_dir(app), repo_underscore, filename])
+  end
+
+  def fix_owner_roles do
+    role = Accounts.get_role_by_name("owner")
+    case Accounts.list_by_user_roles(role_id: role.id) |> Enum.filter(& is_nil(&1.scope)) do
+      [] ->
+        :ok
+
+      list ->
+        Enum.each(list, &Repo.delete/1)
+        Channel.list
+        |> Enum.each(fn ch ->
+          unless Accounts.get_by_user_role(user_id: ch.user_id, role_id: role.id, scope: ch.id) do
+            Accounts.create_user_role(%{user_id: ch.user_id, role_id: role.id, scope: ch.id})
+          end
+        end)
+    end
+
   end
 end

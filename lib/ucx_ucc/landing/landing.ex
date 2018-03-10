@@ -8,6 +8,7 @@ defmodule UcxUcc.Landing do
   alias UcxUcc.{Accounts, Repo}
   alias UccChat.Channel
   alias UcxUcc.Settings.General
+  alias UccChat.ChannelService
 
   def create(attrs) do
     Multi.new()
@@ -34,7 +35,7 @@ defmodule UcxUcc.Landing do
     attrs["default_channel"]
     |> Map.put("user_id", user.id)
     |> Map.put("default", true)
-    |> Channel.create()
+    |> ChannelService.insert_channel()
   end
 
   defp subscribe_channel(%{user: user, channel: channel}) do
