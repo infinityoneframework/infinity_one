@@ -198,11 +198,11 @@ defmodule UccChat.ChannelService do
     end
   end
 
-  def do_roles(%{channel: %{id: _ch_id, user_id: u_id} = channel}) do
+  def do_roles(%{channel: %{id: ch_id, user_id: u_id} = channel}) do
     role = UcxUcc.Accounts.get_role_by_name("owner") ||
       raise("owner role required")
     # TODO: The scope concept of user_role is broken.
-    %{user_id: u_id, role_id: role.id}
+    %{user_id: u_id, role_id: role.id, scope: ch_id}
     |> UcxUcc.Accounts.create_user_role() #, scope: "global"})
     |> case do
       {:ok, _} -> {:ok, channel}

@@ -84,7 +84,6 @@ defmodule UccChatWeb.FlexBar.Tab.RoomInfo do
   end
 
   def flex_form_delete(socket, _sender, resource) do
-    Logger.warn "resource: " <> inspect(resource)
     {:ok, socket}
   end
 

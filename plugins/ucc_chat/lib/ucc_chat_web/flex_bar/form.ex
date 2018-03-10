@@ -159,9 +159,7 @@ defmodule UccChatWeb.FlexBar.Form do
         |> apply(:flex_form_delete, [socket, sender, resource])
         |> case do
           {:ok, socket} ->
-            swal socket, ~g(Deleted!),
-              gettext("Your %{name} was deleted!", name: prefix),
-              "success"
+            swal(socket, ~g(Deleted!), gettext("Your %{name} was deleted!", name: prefix), "success")
           {:error, changeset} ->
             swal socket, ~g(Sorry!),
               SharedView.format_errors(changeset),

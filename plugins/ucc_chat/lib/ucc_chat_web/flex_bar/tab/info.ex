@@ -98,12 +98,13 @@ defmodule UccChatWeb.FlexBar.Tab.Info do
     {%{field => value}, socket}
   end
 
-  def flex_form_delete(socket, _sender, resource) do
+  def flex_form_delete(socket, sender, resource) do
     user = Accounts.get_user socket.assigns.user_id, default_preload: true
     resource
     |> Channel.delete(user)
     |> case do
       {:ok, _} ->
+        async_js(socket, ~s/$('.flex-nav:not(.animated-hidden) li.active a.admin-link[data-id="admin_rooms"]').click()/)
         {:ok, socket}
       error ->
         error

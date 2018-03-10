@@ -11,6 +11,8 @@
 * Backup and Restore feature
 * Implement Delete User
 * UCX-3815 - Conversations have old date
+* Update rooms after admin delete room
+* UCx-3798 - Add owner role when creating a room.
 
 ### Bug Fixes
 
