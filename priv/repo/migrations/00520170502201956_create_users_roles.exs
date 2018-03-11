@@ -1,4 +1,4 @@
-defmodule UcxUcc.Repo.Migrations.CreateUsersRoles do
+defmodule InfinityOne.Repo.Migrations.CreateUsersRoles do
   use Ecto.Migration
 
   def change do

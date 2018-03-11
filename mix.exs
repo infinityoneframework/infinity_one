@@ -1,17 +1,17 @@
-defmodule UcxUcc.Mixfile do
+defmodule InfinityOne.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ucx_ucc,
+    [app: :infinity_one,
      version: "0.3.2",
      elixir: "~> 1.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      start_permanent: Mix.env == :prod,
      docs: [
-      extras: ["README.md"],
-      main: "UcxUcc",
-      groups_for_modules: groups_for_modules()
+       extras: ["README.md"],
+       main: "InfinityOne",
+       groups_for_modules: groups_for_modules()
      ],
      dialyzer: [plt_add_apps: [:mix]],
      elixirc_paths: elixirc_paths(Mix.env),
@@ -25,7 +25,7 @@ defmodule UcxUcc.Mixfile do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    [mod: {UcxUcc.Application, []},
+    [mod: {InfinityOne.Application, []},
      extra_applications: extra_applications(Mix.env)]
   end
   defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
@@ -147,30 +147,28 @@ defmodule UcxUcc.Mixfile do
     [
       "Authentication": [ ~r/Coherence.*/ ],
       "Chat Models & Contexts": [
-        UccChat.Attachment, UccChat.Channel, UccChat.Direct, UccChat.Emoji,
-        UccChat.Mention, UccChat.Message, UccChat.Mute, UccChat.Notification,
-        UccChat.NotificationSetting, UccChat.PinnedMessage, UccChat.Reaction,
-        UccChat.StarredMessage, UccChat.Subscription, ~r/UccChat.Schema.*/,
-        UccChat.Accounts, ~r/UccChat.Accounts\.*/
+        OneChat.Attachment, OneChat.Channel, OneChat.Direct, OneChat.Emoji,
+        OneChat.Mention, OneChat.Message, OneChat.Mute, OneChat.Notification,
+        OneChat.NotificationSetting, OneChat.PinnedMessage, OneChat.Reaction,
+        OneChat.StarredMessage, OneChat.Subscription, ~r/OneChat.Schema.*/,
+        OneChat.Accounts, ~r/OneChat.Accounts\.*/
       ],
-      "Chat Settings": [ ~r/UccChat.Settings*/ ],
-      "Chat Services": [ ~r/UccChat.*Service/ ],
+      "Chat Settings": [ ~r/OneChat.Settings*/ ],
+      "Chat Services": [ ~r/OneChat.*Service/ ],
       "Chat": [
-        UccChat, UccChat.AppConfig, UccChat.Application, UccChat.ChannelMonitor,
-        UccChat.ChatConstants, UccChat.ChatDat, UccChat.Console, ~r/EmojiOne*/,
-        UccChat.Hooks, UccChat.MessageAgent, UccChat.PresenceAgent, UccChat.Robot,
-        UccChat.Shared, UccChat.SlashCommands, UccChat.TypingAgent,
-        UccChat.AccountNotification, ~r/UccChat.File.*/, ~r/UccChat.Robot.*/,
-        ~r"UccChatWeb.*"
+        OneChat, OneChat.AppConfig, OneChat.Application, OneChat.ChannelMonitor,
+        OneChat.ChatConstants, OneChat.ChatDat, OneChat.Console, ~r/EmojiOne*/,
+        OneChat.Hooks, OneChat.MessageAgent, OneChat.PresenceAgent, OneChat.Robot,
+        OneChat.Shared, OneChat.SlashCommands, OneChat.TypingAgent,
+        OneChat.AccountNotification, ~r/OneChat.File.*/, ~r/OneChat.Robot.*/,
+        ~r"OneChatWeb.*"
       ],
-      "UccAdmin": [ ~r/UccAdmin.*/ ],
-      "Ucc Dialer": [ ~r/UccDialer*/ ],
-      "Ucc Settings": [ ~r/UccSettings*/ ],
-      "Ucc Webrtc": [ ~r/UccWebrtc.*/ ],
-      "Ucc UI Flex Tab": [ ~r/UccUiFlexTab.*/ ],
-      "Mscs": [ ~r/Mscs.*/, Tn, ~r/Unistim.*/ ],
-      "Ucx Adapter": [ ~r/UcxAdapter.*/, ~r/Ucx.Cert.*/ ],
-      "Ucx Presence": [ ~r/UcxPresence.*/ ]
+      "One Admin": [ ~r/OneAdmin.*/ ],
+      "One Dialer": [ ~r/OneDialer*/ ],
+      "One Settings": [ ~r/OneSettings*/ ],
+      "One Webrtc": [ ~r/OneWebrtc.*/ ],
+      "One UI Flex Tab": [ ~r/OneUiFlexTab.*/ ],
+      "One Presence": [ ~r/OnePresence.*/ ]
     ]
   end
 end

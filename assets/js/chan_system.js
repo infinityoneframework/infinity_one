@@ -71,9 +71,9 @@ let render = (presences) => {
     })
 }
 
-UccChat.on_connect(function(ucc_chat, socket) {
-  let ucxchat = ucc_chat.ucxchat
-  let chan = socket.channel(ucc_chat.chan_system, {user: ucxchat.username, channel_id: ucxchat.channel_id})
+OneChat.on_connect(function(one_chat, socket) {
+  let ucxchat = one_chat.ucxchat
+  let chan = socket.channel(one_chat.chan_system, {user: ucxchat.username, channel_id: ucxchat.channel_id})
 
   console.log('chan_system connect')
 
@@ -97,24 +97,24 @@ UccChat.on_connect(function(ucc_chat, socket) {
 
   chan.on('presence_state', state => {
     // console.log('presence_state', state)
-    presences = ucc_chat.Presence.syncState(presences, state)
+    presences = one_chat.Presence.syncState(presences, state)
     render(presences)
   })
   chan.on('presence_diff', diff => {
     // console.log('presence_diff', diff)
-    presences = ucc_chat.Presence.syncDiff(presences, diff)
+    presences = one_chat.Presence.syncDiff(presences, diff)
     render(presences)
   })
 
   chan.join()
     .receive("ok", resp => {
       console.log('Joined system channel successfully', resp)
-      ucc_chat.handleOnLine()
+      one_chat.handleOnLine()
     })
     .receive("error", resp => {
       console.error('Unable to join system channel', resp)
-      ucc_chat.handleOffLine()
+      one_chat.handleOffLine()
     })
-  ucc_chat.systemchan = chan
+  one_chat.systemchan = chan
   // return chan;
 })

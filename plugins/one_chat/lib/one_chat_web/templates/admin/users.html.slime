@@ -1,0 +1,53 @@
+.main-content-flex
+  section.page-container.page-list.flex-tab-main-content
+    header.fixed-title.border-component-color
+      .burger
+        i
+        i
+        i
+      h2
+        span.room-title= ~g"Users"
+    .content
+      = if not has_permission? @user, "view-user-administration" do
+        p = unauthorized_message()
+      - else
+        form.search-form(role="form")
+          .input-line.search
+            input(type="text" id="users-filter" placeholder="#{~g(Search)}" dir="auto")
+            i.icon-search.secondary-font-color
+              / unless :isReady do
+              /  <%# <i class="icon-spin secondary-font-color"></i> %>
+              /<%# end %>
+        .results
+          = ~g(SHOWING) <> " "
+          b= @users |> length
+          = " " <> ~g(RESULTS)
+        .list
+          table.secondary-background-color
+            thead
+              tr.admin-table-row
+                th.content-background-color.border-component-color &nbsp;
+                th.content-background-color.border-component-color(width="34%")= ~g(Name)
+                th.content-background-color.border-component-color(width="33%")= ~g(Username)
+                = user_details_thead_hook()
+                th.content-background-color.border-component-color(width="33%")= ~g(Email)
+            tbody
+              = for user <- @users do
+                tr.user-info.row-link(data-name="#{user.username}" data-id="admin_user_info" rebel-click="flex_tab_open")
+                  td.border-component-color
+                    div(class="user-image status-#{get_status(user)}" data-status-name="#{user.username}")
+                      = avatar_background_tags(user)
+                  td.border-component-color= user.name
+                  td.border-component-color= user.username
+                  = user_details_body_hook user
+
+                  td.border-component-color= user.email
+          /<%# {{#if hasMore}} %>
+          /  <%# <button class="button secondary load-more {{isLoading}}">{{_ "Load_more"}}</button> %>
+          /<%# {{/if}} %>
+  =# render "admin_flex_tab_bar.html", mode: "user"
+  .flex-tab-container#flex-tabs.border-component-color(rebel-chan="user")
+    = render OneUiFlexTabWeb.TabBarView, "index.html", groups: ~w(admin_users)
+  /<%# {{#with flexData}} %>
+  /   <%# {{> flexTabBar}} %>
+  / <%# {{/with}} %>

@@ -3,7 +3,7 @@ console.log('loading chat_channel');
 
 export function push(message, args={}) {
   let base = {user_id: ucxchat.user_id, channel_id: ucxchat.channel_id, room: ucxchat.room}
-  return window.UccChat.roomchan.push(message, Object.assign(base, args));
+  return window.OneChat.roomchan.push(message, Object.assign(base, args));
 }
 
 export function delete_(route, args={}) {
@@ -26,10 +26,10 @@ export function put(route, args={}) {
 }
 
 export function do_push(verb, route, args={}) {
-  return window.UccChat.roomchan.push(route, {params: args, ucxchat: {assigns: base(), verb: verb}})
+  return window.OneChat.roomchan.push(route, {params: args, ucxchat: {assigns: base(), verb: verb}})
 }
 
 function base() {
-  let ucxchat = window.UccChat.ucxchat
+  let ucxchat = window.OneChat.ucxchat
   return {username: ucxchat.username, user_id: ucxchat.user_id, channel_id: ucxchat.channel_id, room: ucxchat.room}
 }

@@ -39,7 +39,7 @@ import {Socket, Presence} from "phoenix"
 
 // let socket = new Socket("/socket", {params: {token: window.user_token, tz_offset: new Date().getTimezoneOffset() / -60}})
 
-// // window.UccChat = {
+// // window.OneChat = {
 // //   userchan: false,
 // //   roomchan: false,
 // //   systemchan: false,
@@ -129,15 +129,15 @@ import {Socket, Presence} from "phoenix"
 //   socket.onError( () => {
 //     console.log("!! there was an error with the connection!")
 //     handleOffLine()
-//     UccChat.onLine = false
+//     OneChat.onLine = false
 //   })
 //   socket.onClose( () => {
 //     console.log("!! the connection dropped")
 //     handleOffLine()
-//     UccChat.onLine = false
+//     OneChat.onLine = false
 //   })
 
-//   UccChat.onLine = true
+//   OneChat.onLine = true
 
 //   if (flash_error != "")
 //     toastr.error(flash_error)
@@ -453,15 +453,15 @@ import {Socket, Presence} from "phoenix"
 // //   </div>`
 
 // // function handleOffLine() {
-// //   if (UccChat.onLine) {
+// //   if (OneChat.onLine) {
 // //     $('.connection-status').html('').append(offlineContent).removeClass('status-online')
 
-// //     UccChat.onLine = false
+// //     OneChat.onLine = false
 // //   }
 // // }
 // // function handleOnLine() {
-// //   if (!UccChat.onLine) {
-// //     UccChat.onLine = true
+// //   if (!OneChat.onLine) {
+// //     OneChat.onLine = true
 // //     window.location.reload()
 // //     $('.connection-status').html('').addClass('status-online')
 // //   }

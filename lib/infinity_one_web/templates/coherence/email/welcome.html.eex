@@ -1,0 +1,10 @@
+<div>
+  <p><%= dgettext "coherence", "Hello %{name}!", name: @name %><p>
+  <p>
+    <%= dgettext "coherence", "Welcome to InfinityOne. Please visit " %>
+    <a href="<%= @url %>"><%= dgettext "coherence", "this InfinityOne link" %></a>
+    <%= dgettext "coherence", " to access the site with the password provided by your system administrator" %>
+  </p>
+  <p><%= dgettext "coherence", "Thank you!" %></p>
+</div>
+

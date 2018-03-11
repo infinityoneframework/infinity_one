@@ -4,7 +4,7 @@
 // assets/js/device_manager.js
 
 (function() {
-  if (UcxUcc.trace_startup) console.log('loading device_manager.js');
+  if (InfinityOne.trace_startup) console.log('loading device_manager.js');
 
   const disconnect_stream = 255;
 
@@ -58,8 +58,8 @@
       Object.keys(this.plugins).forEach(function (key) {
         var init = null;
         console.log('init plugins, key', key);
-        if (init = UccChat.DeviceManager.plugins[key].init) {
-          init(UccChat.DeviceManager);
+        if (init = OneChat.DeviceManager.plugins[key].init) {
+          init(OneChat.DeviceManager);
         }
       });
       this.ready = true;
@@ -133,7 +133,7 @@
           if (this.debug) { console.log('---------- other device', device); }
         }
       }
-      UcxUcc.installed_devices = devices
+      InfinityOne.installed_devices = devices
       if (DeviceManager.debug) { console.log('installed_devices', devices); }
 
       setTimeout(() => {
@@ -283,16 +283,16 @@
   };
 
   DeviceManager.default_plugin = DeviceManagerDefaultPlugin;
-  window.UccChat.DeviceManager = DeviceManager;
+  window.OneChat.DeviceManager = DeviceManager;
 
   // Just in case we are loaded after the plugins
   document.dispatchEvent(new Event('DeviceManagerLoaded'));
 
-  UccChat.on_connect(function(ucc_chat, socket) {
+  OneChat.on_connect(function(one_chat, socket) {
     if (DeviceManager.debug) { console.log('device_manager on_connect'); }
-    window.UccChat.DeviceManager = DeviceManager;
+    window.OneChat.DeviceManager = DeviceManager;
     setTimeout(function() {
-      window.UccChat.DeviceManager.init();
+      window.OneChat.DeviceManager.init();
     }, 1500);
   });
 

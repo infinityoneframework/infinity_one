@@ -30,7 +30,7 @@ $(document).ready(() => {
       if (chat_settings.allow_upload) {
         let e = event.originalEvent || event
         let files = e.dataTransfer.files || []
-        UccChat.fileUpload.handleAvatarUpload(files, obj)
+        OneChat.fileUpload.handleAvatarUpload(files, obj)
       }
     })
     .on('drop', '.dropzone:not(.avatar-dropzone)', event => {
@@ -38,7 +38,7 @@ $(document).ready(() => {
       if (chat_settings.allow_upload) {
         let e = event.originalEvent || event
         let files = e.dataTransfer.files || []
-        UccChat.fileUpload.handleFileUpload(files, obj)
+        OneChat.fileUpload.handleFileUpload(files, obj)
       }
     })
   }

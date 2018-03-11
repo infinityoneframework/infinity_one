@@ -1,3 +1,3 @@
 #!/bin/sh
 
-$RELEASE_ROOT_DIR/bin/ucx_ucc command Elixir.UcxUcc.ReleaseTasks drop_database
+$RELEASE_ROOT_DIR/bin/infinity_one command Elixir.InfinityOne.ReleaseTasks drop_database

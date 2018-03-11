@@ -1,0 +1,12 @@
+{
+  "name": "one_admin",
+  "version": "0.0.1",
+  "main": "",
+  "repository": {
+  },
+  "files": [
+    "package.json",
+    "brunch-config.js",
+    "priv/static/one_admin.scss"
+  ]
+}

@@ -7,18 +7,18 @@ const wrapper = '.messages-box .wrapper'
 const debug = true
 console.log('loading room_history_manager');
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.roomHistoryManager = new RoomHistoryManager(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  one_chat.roomHistoryManager = new RoomHistoryManager(one_chat)
 })
 
 class RoomHistoryManager {
-  constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat;
+  constructor(one_chat) {
+    this.one_chat = one_chat;
     this.is_loading = true;
     this.scroll_pos = {};
     this.current_room = undefined;
     this.scroll_window = undefined;
-    this.scroll_to = ucc_chat.scroll_to;
+    this.scroll_to = one_chat.scroll_to;
     this.page = this.pagination();
 
     setInterval(e => {
@@ -131,7 +131,7 @@ class RoomHistoryManager {
   restore_cached_room() {
     if (ucxchat.channel_id) {
       $(wrapper)[0].scrollTop = this.cached_scrollTop;
-      UccChat.roomManager.bind_history_manager_scroll_event();
+      OneChat.roomManager.bind_history_manager_scroll_event();
     }
   }
 
@@ -139,7 +139,7 @@ class RoomHistoryManager {
     if (debug) { console.log('roomHistoryManager.getMorePrev()'); }
 
     this.is_loading = true;
-    UccUtils.add_page_animation_styles();
+    OneUtils.add_page_animation_styles();
     this.startLoadMorePrevAnimation();
 
     let html = $('.messages-box .wrapper ul').html();
@@ -172,17 +172,17 @@ class RoomHistoryManager {
 
         this.page = this.pagination_prev(resp.page);
 
-        UccUtils.remove_page_loading();
+        OneUtils.remove_page_loading();
         this.removeLoadMoreAnimation();
         this.add_jump_recent();
         this.is_loading = false;
-        this.ucc_chat.main.run(this.ucc_chat);
+        this.one_chat.main.run(this.one_chat);
         Rebel.set_event_handlers(container);
       });
   }
   get getMoreNext() {
 
-    UccUtils.add_page_animation_styles();
+    OneUtils.add_page_animation_styles();
     this.startLoadMoreNextAnimation();
     this.is_loading = true;
 
@@ -204,11 +204,11 @@ class RoomHistoryManager {
         this.scroll_to($('#' + last_id), 0);
 
         this.page = this.pagination_next(resp.page);
-        UccUtils.remove_page_loading();
+        OneUtils.remove_page_loading();
         this.removeLoadMoreAnimation();
         this.add_jump_recent();
         this.is_loading = false;
-        this.ucc_chat.main.run(this.ucc_chat);
+        this.one_chat.main.run(this.one_chat);
         Rebel.set_event_handlers(container);
       })
   }
@@ -216,11 +216,11 @@ class RoomHistoryManager {
   getLastMessages() {
     if (debug) { console.log("getLastMessages"); }
 
-    UccUtils.add_page_animation_styles();
+    OneUtils.add_page_animation_styles();
     this.startLoadMoreNextAnimation();
     this.is_loading = true;
 
-    $('.messages-box .wrapper ul li.load-more').html(UccUtils.loading_animation());
+    $('.messages-box .wrapper ul li.load-more').html(OneUtils.loading_animation());
     let page = {
       page: this.page.page_size,
       page_size: this.page.page_size
@@ -229,14 +229,14 @@ class RoomHistoryManager {
       .receive("ok", resp => {
         $(container)[0].innerHTML = resp.html;
 
-        UccUtils.scroll_bottom();
+        OneUtils.scroll_bottom();
 
-        UccUtils.remove_page_loading();
+        OneUtils.remove_page_loading();
         this.removeLoadMoreAnimation();
         this.page = this.pagination_set(resp.page);
         this.add_jump_recent();
         this.is_loading = false;
-        this.ucc_chat.main.run(this.ucc_chat);
+        this.one_chat.main.run(this.one_chat);
         Rebel.set_event_handlers(container);
       })
   }
@@ -245,8 +245,8 @@ class RoomHistoryManager {
     if (debug) { console.log("jump-to need to load some messages", timestamp); }
 
     this.is_loading = true;
-    UccUtils.page_loading();
-    $('.messages-box .wrapper ul li.load-more').html(UccUtils.loading_animation());
+    OneUtils.page_loading();
+    $('.messages-box .wrapper ul li.load-more').html(OneUtils.loading_animation());
     cc.get('/messages/surrounding', {page: this.page, timestamp: timestamp})
       .receive("ok", resp => {
         $(container)[0].innerHTML = resp.html;
@@ -257,11 +257,11 @@ class RoomHistoryManager {
           this.scroll_to($('#' + message_id), -200);
         }
 
-        UccUtils.remove_page_loading();
+        OneUtils.remove_page_loading();
         this.page = this.pagination_set(resp.page);
         this.add_jump_recent();
         this.is_loading = false;
-        this.ucc_chat.main.run(this.ucc_chat);
+        this.one_chat.main.run(this.one_chat);
         Rebel.set_event_handlers(container);
       })
   }
@@ -279,19 +279,19 @@ class RoomHistoryManager {
 
     if (!this.scroll_pos[this.current_room]) {
       // console.log('scroll_new_window this.current_room', this.current_room)
-      this.ucc_chat.userchan.push("get:currentMessage", {room: this.current_room})
+      this.one_chat.userchan.push("get:currentMessage", {room: this.current_room})
         .receive("ok", resp => {
           if (debug) { console.warn('scroll_new_window ok resp', resp); }
           this.set_scroll_top("ok", resp);
         })
         .receive("error", resp => {
           // console.warn('scroll_new_window err resp', resp)
-          //UccUtils.remove_page_loading()
+          //OneUtils.remove_page_loading()
           this.set_scroll_top("error", resp)
         })
     } else {
       // console.warn('scroll_new_window else this', this)
-      // UccUtils.remove_page_loading()
+      // OneUtils.remove_page_loading()
       this.set_scroll_top("ok", {value: this.scroll_pos[this.current_room]});
     }
 
@@ -301,14 +301,14 @@ class RoomHistoryManager {
     // I don't like this approach, but not sure how else to get around
     // the debounce timer on the scroll event handler.
     setTimeout(function() {
-      if (UccUtils.is_scroll_bottom()) {
+      if (OneUtils.is_scroll_bottom()) {
         // allow the scroll event handler to detect direction
-        UccUtils.scroll_down(1);
-      } else if (UccUtils.is_scroll_top()) {
+        OneUtils.scroll_down(1);
+      } else if (OneUtils.is_scroll_top()) {
         // allow the scroll event handler to detect direction
-        UccUtils.scroll_up(1);
+        OneUtils.scroll_up(1);
       }
-      UccChat.roomHistoryManager.is_loading = false;
+      OneChat.roomHistoryManager.is_loading = false;
       $('.page-loading-container .loading-animation').remove();
       // console.log('scroll new window timeout')
     }, 1000);
@@ -322,7 +322,7 @@ class RoomHistoryManager {
       $('.jump-recent').addClass('not');
     }
 
-    if (this.hasMorePrev() && UccUtils.is_scroll_top() && UccUtils.is_scroll_bottom()) {
+    if (this.hasMorePrev() && OneUtils.is_scroll_top() && OneUtils.is_scroll_bottom()) {
       $('.jump-previous').removeClass('not');
     } else {
       $('.jump-previous').addClass('not');
@@ -333,7 +333,7 @@ class RoomHistoryManager {
     if (resp.value == "") {
       let elem = $(container);
       // console.log('set_scroll_top 1 value', resp, elem, elem.parent().scrollTop())
-      UccUtils.scroll_bottom();
+      OneUtils.scroll_bottom();
     } else {
       if (debug) { console.log('set_scroll_top 2 value', resp); }
 
@@ -342,7 +342,7 @@ class RoomHistoryManager {
         this.scroll_to_message(resp.value);
       } else {
         // console.log('code not ok', code)
-        UccUtils.scroll_bottom();
+        OneUtils.scroll_bottom();
       }
     }
   }
@@ -355,7 +355,7 @@ class RoomHistoryManager {
         this.scroll_pos[this.current_room] = current_message;
 
         if (current_message && current_message != "") {
-          this.ucc_chat.userchan.push("update:currentMessage", {value: current_message});
+          this.one_chat.userchan.push("update:currentMessage", {value: current_message});
         }
       }
     }
@@ -369,7 +369,7 @@ class RoomHistoryManager {
   }
 
   loadMoreAnimation() {
-    return `<li class='load-more'>${UccUtils.loading_animation()}</li>`;
+    return `<li class='load-more'>${OneUtils.loading_animation()}</li>`;
   }
 
   startLoadMorePrevAnimation() {

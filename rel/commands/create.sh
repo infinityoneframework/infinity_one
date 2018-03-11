@@ -1,3 +1,3 @@
 #!/bin/sh
 
-$RELEASE_ROOT_DIR/bin/ucx_ucc command Elixir.UcxUcc.ReleaseTasks create
+$RELEASE_ROOT_DIR/bin/infinity_one command Elixir.InfinityOne.ReleaseTasks create

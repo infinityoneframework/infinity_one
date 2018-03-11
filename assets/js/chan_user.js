@@ -13,13 +13,13 @@ function to_map(element) {
   return ret
 }
 
-UccChat.on_connect(function(ucc_chat, socket) {
+OneChat.on_connect(function(one_chat, socket) {
   console.log('userchan connect')
-  let ucxchat = ucc_chat.ucxchat
+  let ucxchat = one_chat.ucxchat
   let chan = window.Rebel.channels.user.channel
-  ucc_chat.userchan = chan
+  one_chat.userchan = chan
   console.log('ucxchat', ucxchat)
-  console.log('ucc_chat', ucc_chat)
+  console.log('one_chat', one_chat)
 
   document.addEventListener('device_manager_init', (e) => {
     chan.push('webrtc:device_manager_init', {})
@@ -44,7 +44,7 @@ UccChat.on_connect(function(ucc_chat, socket) {
   })
   chan.on('code:update', resp => {
     console.log('code:update', resp)
-    UccUtils.code_update(resp)
+    OneUtils.code_update(resp)
   })
   chan.on('window:reload', resp => {
     console.log('location')
@@ -62,17 +62,17 @@ UccChat.on_connect(function(ucc_chat, socket) {
     toastr.error(resp.message)
   })
   chan.on("room:mention", resp => {
-    ucc_chat.roomManager.room_mention(resp)
+    one_chat.roomManager.room_mention(resp)
   })
   chan.on("notification:new", resp => {
-    ucc_chat.roomManager.notification(resp)
+    one_chat.roomManager.notification(resp)
   })
   chan.on('message:preview', msg => {
-    ucc_chat.message_preview(msg)
+    one_chat.message_preview(msg)
   })
   chan.on('update:alerts', msg => {
     console.log('update:alerts', msg)
-    ucc_chat.roomManager.update_burger_alert()
+    one_chat.roomManager.update_burger_alert()
   })
 
   console.log('finished starting user channel')

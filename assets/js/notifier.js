@@ -2,14 +2,14 @@ const debug = true
 
 console.log('loading notifier');
 
-UccChat.on_load(function(ucc_chat) {
-  // ucc_chat.desktop_notifier = new DesktopNotification(ucc_chat)
-  ucc_chat.notifier = new Notifier(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  // one_chat.desktop_notifier = new DesktopNotification(one_chat)
+  one_chat.notifier = new Notifier(one_chat)
 });
 
 class Notifier {
-  constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat;
+  constructor(one_chat) {
+    this.one_chat = one_chat;
     Notification.requestPermission().then(function(result) {
       console.log(result);
     });

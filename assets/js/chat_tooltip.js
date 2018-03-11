@@ -1,6 +1,6 @@
 console.log('loading chat_tooltip');
 
-UccChat.tooltip = {
+OneChat.tooltip = {
   source: null,
   opened: false,
 

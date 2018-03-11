@@ -1,6 +1,6 @@
 console.log('loading file_upload_restrections');
 
-UccChat.fileUploadMediaWhiteList = function() {
+OneChat.fileUploadMediaWhiteList = function() {
   var mediaTypeWhiteList = chat_settings.accepted_media_types
   if (!mediaTypeWhiteList || mediaTypeWhiteList === '*') {
     return;
@@ -10,12 +10,12 @@ UccChat.fileUploadMediaWhiteList = function() {
   });
 };
 
-UccChat.fileUploadIsValidContentType = function(type, whiteList) {
+OneChat.fileUploadIsValidContentType = function(type, whiteList) {
   var list, wildCardGlob, wildcards;
   if (whiteList) {
     list = whiteList;
   } else {
-    list = UccChat.fileUploadMediaWhiteList();
+    list = OneChat.fileUploadMediaWhiteList();
   }
   console.log('white list', list)
   if (!list || _.contains(list, type)) {

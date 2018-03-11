@@ -5,13 +5,13 @@ console.log('loading admin');
 
 const reset_i = '<i class="icon-ccw secondary-font-color color-error-contrast"></i>'
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.admin = new Admin(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  one_chat.admin = new Admin(one_chat)
 })
 
 class Admin {
-  constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat
+  constructor(one_chat) {
+    this.one_chat = one_chat
     this.modifed = false
     this.register_events(this)
   }
@@ -61,7 +61,7 @@ class Admin {
         let value = $(this).is(':checked')
 
         if (!value) { value = "false" }
-        UccChat.userchan.push('admin:permissions:change:' + name, {value: value})
+        OneChat.userchan.push('admin:permissions:change:' + name, {value: value})
         .receive("ok", resp => {
           // stop_loading_animation()
           toastr.success('Room ' + name + ' updated successfully.')
@@ -89,7 +89,7 @@ class Admin {
       .on('click', '.admin-settings button.save', function(e) {
         //console.log('saving form....', $('form').data('id'))
         e.preventDefault()
-        UccChat.userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
+        OneChat.userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
           .receive("ok", resp => {
             if (resp.success) {
               admin.disable_save_button()
@@ -141,7 +141,7 @@ class Admin {
         $(password_confirmation_name).attr('type','password');
       })
       .on('click', '#randomPassword', e => {
-        let new_password = UccChat.randomString(12)
+        let new_password = OneChat.randomString(12)
         let prefix = "";
         if ($('#user_password').length > 0) {
           prefix = "user_";
@@ -157,7 +157,7 @@ class Admin {
         $('#hidePassword').hide();
       })
       .on('click', 'section.admin form.user button.save', e => {
-        UccChat.userchan.push('admin:save:user', $('form.user').serializeArray())
+        OneChat.userchan.push('admin:save:user', $('form.user').serializeArray())
           .receive("ok", resp => {
             if (resp.success) {
               toastr.success(resp.success)
@@ -180,16 +180,16 @@ class Admin {
         this.close_edit_form($('form.user').data('username'))
       })
       .on('click', 'a.new-role', e => {
-        UccChat.userchan.push('admin:permissions:role:new', {})
+        OneChat.userchan.push('admin:permissions:role:new', {})
       })
       .on('click', 'a[href="#admin-permissions-edit"]', e => {
         let name = $(e.currentTarget).attr('name')
         console.log('permissions edit', name)
-        UccChat.userchan.push('admin:permissions:role:edit', {name: name})
+        OneChat.userchan.push('admin:permissions:role:edit', {name: name})
       })
       .on('click', '.admin-role.delete', e => {
         let name = $(e.currentTarget).attr('data-name')
-        UccChat.userchan.push('admin:permissions:role:delete', {name: name})
+        OneChat.userchan.push('admin:permissions:role:delete', {name: name})
       })
       .on('click', 'a[href="/admin/permissions"]', e => {
         e.preventDefault();
@@ -238,7 +238,7 @@ class Admin {
   }
 
   close_edit_form(name) {
-    UccChat.userchan.push('admin:flex:user-info', {name: name})
+    OneChat.userchan.push('admin:flex:user-info', {name: name})
       .receive("ok", resp => {
         $('section.flex-tab').html(resp.html).parent().addClass('opened')
         flex.set_tab_buttons_inactive()
@@ -259,7 +259,7 @@ class Admin {
     }
   }
   userchan_push(action, params) {
-    UccChat.userchan.push('admin:channel-settings:' + action, params)
+    OneChat.userchan.push('admin:channel-settings:' + action, params)
       .receive("ok", resp => {
         if (resp.html) {
           $('.content.channel-settings').replaceWith(resp.html)

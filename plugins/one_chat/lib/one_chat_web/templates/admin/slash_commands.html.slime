@@ -1,0 +1,16 @@
+.section.section-collapsed
+  .section-title
+    .section-title-text= @title
+    .section-title-right
+      button.button.primary.expand
+        span= ~g"Expand"
+  .section-content.border-component-color
+    = for cmd <- OneChat.SlashCommands.all_commands() do
+      .input-line.double-col.checkbox-group
+        label.setting-label= cmd
+        .setting-field
+          label
+            - field = @field
+            - opts = [type: "checkbox", name: "chat_general[#{field}][#{cmd}]", id: "chat_general_#{field}_#{cmd}", class: "input-monitor"]
+            - opts = if cmd in get_slash_commands(@item, field), do: [{:checked, "checked"}|opts], else: opts
+            = Phoenix.HTML.Tag.tag(:input, opts)

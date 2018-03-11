@@ -1,4 +1,4 @@
-defmodule UcxUcc.Repo.Migrations.CreateAccountsSettings do
+defmodule InfinityOne.Repo.Migrations.CreateAccountsSettings do
   use Ecto.Migration
 
   def up do

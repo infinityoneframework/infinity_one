@@ -1,8 +1,0 @@
-.content
-  = render "flex_close_button.html"
-  .user-view
-    = if @user do
-      = UccChatWeb.FlexBarView.render "user_card.html", user: @user, current_user: @current_user, channel_id: @channel_id, user_info: @user_info
-    - else
-      .about.clearfix
-        p(style="margin-left: 10px; margin-top: 40px")= ~g(Please select a User)

@@ -1,0 +1,32 @@
+section.page-container.page-home.page-static.page-static.page-list
+  header.fixed-title.border-component-color
+    = render OneChatWeb.MasterView, "burger.html"
+    h2
+      span.room-title = ~g(Permissions)
+  = if not has_permission? @user, "access-permissions" do
+    .content(style="padding-left: 40px;")
+      p = unauthorized_message()
+  - else
+    .content
+      .permissions-manager
+        a.button.primary.new-role(href="#admin-permissions-new")= ~g"New_role"
+        table.permission-grid.secondary-background-color(border="1")
+          thead.content-background-color
+            tr
+              th.border-component-color= " "
+              = for role <- @roles do
+                th.border-component-color(title="#{role.description}")
+                  a(href="#admin-permissions-edit" name="#{role.name}")
+                    = role.name
+                    i.icon-edit
+          tbody
+            = for {perm, roles} <- @permissions do
+              tr.admin-table-row
+                td.border-component-color= perm
+                = for role <- @roles do
+                  td.border-component-color
+                    - name = "perm[#{role.name}][#{perm}]"
+                    = if role.name in roles do
+                      input.role-permission(type="checkbox" name="#{name}" value="1" checked="checked" data-role="#{role.name}" data-permission="#{perm}")
+                    - else
+                      input.role-permission(type="checkbox" name="#{name}" value="1" data-role="#{role.name}" data-permission="#{perm}")

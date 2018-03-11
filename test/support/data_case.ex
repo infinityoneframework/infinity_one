@@ -1,4 +1,4 @@
-defmodule UcxUcc.DataCase do
+defmodule InfinityOne.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -16,21 +16,21 @@ defmodule UcxUcc.DataCase do
 
   using do
     quote do
-      alias UcxUcc.Repo
+      alias InfinityOne.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import UcxUcc.DataCase
-      import UcxUcc.TestHelpers
+      import InfinityOne.DataCase
+      import InfinityOne.TestHelpers
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(UcxUcc.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(InfinityOne.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(UcxUcc.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(InfinityOne.Repo, {:shared, self()})
     end
 
     :ok

@@ -15,18 +15,18 @@ $(document).ready(() => {
   .on('mouseenter','.reactions > li:not(.add-reaction)', (event) => {
     event.preventDefault()
     event.stopPropagation();
-    UccChat.tooltip.showElement($(event.currentTarget).find('.people').get(0), event.currentTarget);
+    OneChat.tooltip.showElement($(event.currentTarget).find('.people').get(0), event.currentTarget);
   })
 
   .on('mouseleave', '.reactions > li:not(.add-reaction)', (event) => {
     event.preventDefault()
     event.stopPropagation();
-    UccChat.tooltip.hide();
+    OneChat.tooltip.hide();
   })
 })
 
 export function select(emoji, message_id) {
-  UccChat.tooltip.hide();
+  OneChat.tooltip.hide();
   chat_emoji.update_recent(emoji)
-  UccChat.userchan.push('reaction:select', {reaction: emoji, message_id: message_id})
+  OneChat.userchan.push('reaction:select', {reaction: emoji, message_id: message_id})
 }

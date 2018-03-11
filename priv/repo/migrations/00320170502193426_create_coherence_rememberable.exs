@@ -1,4 +1,4 @@
-defmodule UcxUcc.Repo.Migrations.CreateCoherenceRememberable do
+defmodule InfinityOne.Repo.Migrations.CreateCoherenceRememberable do
   use Ecto.Migration
   def change do
     create table(:rememberables, primary_key: false) do

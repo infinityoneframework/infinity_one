@@ -2,13 +2,13 @@
   console.log('loading main');
 
   var Main = {
-    run: function(ucc_chat) {
-      this.update_mentions(ucc_chat)
+    run: function(one_chat) {
+      this.update_mentions(one_chat)
     // update_flexbar()
-      ucc_chat.roomManager.updateMentionsMarksOfRoom()
+      one_chat.roomManager.updateMentionsMarksOfRoom()
     },
-    update_mentions: function(ucc_chat, id) {
-      // let username = ucc_chat.ucxchat.username;
+    update_mentions: function(one_chat, id) {
+      // let username = one_chat.ucxchat.username;
       // let selector = `.mention-link[data-username="${username}"]`
       // if (id)
       //   selector = '#' + id + ' ' + selector
@@ -18,6 +18,6 @@
   }
 
   window.mentions = Main.update_mentions
-  window.UccChat.main = Main
+  window.OneChat.main = Main
 })();
 

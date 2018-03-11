@@ -6,14 +6,14 @@ const debug = true
 
 console.log('loading file_upload');
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.fileUpload = new FileUpload(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  one_chat.fileUpload = new FileUpload(one_chat)
 })
 
 class FileUpload {
-  constructor(ucc_chat) {
+  constructor(one_chat) {
     this.whiteList = undefined;
-    this.ucc_chat = ucc_chat
+    this.one_chat = one_chat
     this.register_events()
     this.useConfirmation = true;
   }
@@ -186,7 +186,7 @@ class FileUpload {
       toastr.error('File size exceeds the ' + chat_settings.maximum_file_upload_size_kb + 'KB maximum!')
       return false
     }
-    if (!UccChat.fileUploadIsValidContentType(file.type, this.whiteList)) {
+    if (!OneChat.fileUploadIsValidContentType(file.type, this.whiteList)) {
       // console.log('file.type', file.type)
       toastr.error('Restricted file type')
       return false
@@ -195,19 +195,19 @@ class FileUpload {
   }
 
   initFileUpload(files) {
-    UccChat.fileUpload.alertText = UccChat.fileUpload.fileAlertText;
-    UccChat.fileUpload.uploadURL = "/attachments/create"
-    UccChat.fileUpload.whiteList = undefined;
-    UccChat.fileUpload.extraFields = UccChat.fileUpload.fileUploadExtraFields;
-    UccChat.fileUpload.useConfirmation = true;
+    OneChat.fileUpload.alertText = OneChat.fileUpload.fileAlertText;
+    OneChat.fileUpload.uploadURL = "/attachments/create"
+    OneChat.fileUpload.whiteList = undefined;
+    OneChat.fileUpload.extraFields = OneChat.fileUpload.fileUploadExtraFields;
+    OneChat.fileUpload.useConfirmation = true;
   }
 
   initAvatarUpload(files) {
-    UccChat.fileUpload.alertText = UccChat.fileUpload.avatarAlertText;
-    UccChat.fileUpload.uploadURL = "/avatars/create";
-    UccChat.fileUpload.whiteList = ["image/*"];
-    UccChat.fileUpload.extraFields = UccChat.fileUpload.avatarUploadExtraFields;
-    UccChat.fileUpload.useConfirmation = false;
+    OneChat.fileUpload.alertText = OneChat.fileUpload.avatarAlertText;
+    OneChat.fileUpload.uploadURL = "/avatars/create";
+    OneChat.fileUpload.whiteList = ["image/*"];
+    OneChat.fileUpload.extraFields = OneChat.fileUpload.avatarUploadExtraFields;
+    OneChat.fileUpload.useConfirmation = false;
   }
 
   register_events() {
@@ -218,7 +218,7 @@ class FileUpload {
       if (!files || files.length == 0) {
         files = e.dataTransfer.files || []
       }
-      UccChat.fileUpload.handleFileUpload(files)
+      OneChat.fileUpload.handleFileUpload(files)
     })
     .on('change', '#account-profile-form input[type=file]', function(event) {
       let e = event.originalEvent || event
@@ -226,7 +226,7 @@ class FileUpload {
       if (!files || files.length == 0) {
         files = e.dataTransfer.files || []
       }
-      UccChat.fileUpload.handleAvatarUpload(files)
+      OneChat.fileUpload.handleAvatarUpload(files)
     })
     $('body').on('click', '.attachment .collapse-switch.icon-right-dir', e => {
       $(e.currentTarget).removeData('collapsed').removeClass('icon-right-dir').addClass('icon-down-dir')
@@ -238,7 +238,7 @@ class FileUpload {
     })
   }
   sendFileToServer(formData,status) {
-    var uploadURL = UccChat.fileUpload.uploadURL; //Upload URL
+    var uploadURL = OneChat.fileUpload.uploadURL; //Upload URL
     var extraData ={}; //Extra Data.
     var jqXHR=$.ajax({
       xhr: function() {
@@ -264,8 +264,8 @@ class FileUpload {
       cache: false,
       data: formData,
       success: function(data){
-        if (data.url && UccChat.avatar) {
-          UccChat.avatar.uploadedUrl(data.url);
+        if (data.url && OneChat.avatar) {
+          OneChat.avatar.uploadedUrl(data.url);
         }
         status.updateProgress(100);
         setTimeout(() => {

@@ -1,0 +1,64 @@
+- username = get_username(@message)
+- # reactions = Enum.sort @message.reactions, &(&1.inserted_at < &2.inserted_at)
+= get_message_wrapper_opts(@message, @user)
+  = if @message.avatar do
+    button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+      = avatar_background_tags(@message.user)
+  - else
+    = if emoji = emoji(@message) do
+      button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+        .avatar= emoji
+    - else
+      button.thumb.user-card-message(data-username="#{username}" tabindex="1")
+        = avatar_background_tags(@message.user)
+  = if alias? = alias?(@message) do
+    button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
+      = alias?
+      span.message-alias.border-component-color.color-info-font-color= "@#{username}"
+  - else
+    button.user.user-card-message.color-primary-font-color(type="button" data-username="#{username}" tabindex="1")
+      = username
+  span.info.border-component-color.color-info-font-color
+    = unless @message.type == "d" do
+      = for tag <- role_tags(@message) do
+        = render "message_tag.html", tag: tag
+    = if is_bot(@message) do
+      span.is-bot.background-info-font-color= ~g(BOT)
+    span.time(title="#{get_date_time(@message, @user)}")= get_time(@message, @user)
+    = if edited = edited(@message, @user) do
+      span.edited(title="edited at #{edited[:edit_time]} by #{edited[:edited_by]}")
+        i.icon-edit(aria-label="Edited")
+        button.thumb.thumb-small.user-card-message(data-username="#{edited[:edited_by]}" tabindex="1")
+          = avatar_background_tags(@message.edited_by)
+    = if is_private(@message) do
+      span.private= ~g(Only you can see this message)
+
+    .message-cog-container(class="#{hide_cog(@message)}" rebel-click="message_cog_click")
+      i.icon-cog.message-cog(aria-label="Actions")
+
+  - info = get_info_class(@message)
+  .body.color-primary-font-color(class="#{info}" dir="auto")
+    / TODO: Remove this, its for testing only
+    / -# body = to_string(@message.timestamp) <> " " <> to_string(@message.body)
+    / -#message = struct(@message, body: body)
+    / =#format_message_body(message, @message_opts)
+    = format_message_body(@message, @user, @message_opts)
+    = for attachment <- @message.attachments  do
+      = render OneChatWeb.AttachmentView, "attachment.html", attachment: OneChatWeb.AttachmentView.get_attachment(attachment)
+    - previews = @previews
+    = if previews != [] do
+      = for {_, html} <- previews, html != nil and html != "" do
+        = raw html
+
+  ul(class="actionLinks#{hide_action_links(@message)}")
+    = for action_link <- action_links(@message) do
+      li.color-primary-action-color
+        span.action-link(data-actionlink="#{action_link.id}")
+          = if action_link.icon do
+            i(class="#{action_link.icon}")
+          = if action_link.i18n_label do
+            = action_link.i18n_label
+          - else
+            = action_link.label
+  = render "reactions.html", message: @message, user: @user
+= Phoenix.HTML.raw "</li>"

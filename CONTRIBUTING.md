@@ -1,4 +1,4 @@
-# Contributing to UcxUcc
+# Contributing to InifinityOne
 
 Please take a moment to review this document in order to make the contribution process easy and effective for everyone involved! Also make sure you read our [Code of Conduct](CODE_OF_CONDUCT.md) that outlines our commitment towards an open and welcoming environment.
 
@@ -9,7 +9,7 @@ Use the issues tracker for:
 * [bug reports](#bug-reports)
 * [submitting pull requests](#pull-requests)
 
-We do our best to keep the issue tracker tidy and organized, making it useful for everyone. For example, we classify open issues per perceived difficulty, making it easier for developers to [contribute to UcxUcc](#pull-requests).
+We do our best to keep the issue tracker tidy and organized, making it useful for everyone. For example, we classify open issues per perceived difficulty, making it easier for developers to [contribute to InifinityOne](#pull-requests).
 
 ## Bug reports
 
@@ -27,7 +27,7 @@ Guidelines for bug reports:
 3. **Isolate and report the problem** &mdash; ideally create a reduced test
    case.
 
-Please try to be as detailed as possible in your report. Include information about your Operating System, as well as your Erlang, Elixir, Phoenix, and UcxUcc versions. Please provide steps to reproduce the issue as well as the outcome you were expecting! All these details will help developers to fix any potential bugs.
+Please try to be as detailed as possible in your report. Include information about your Operating System, as well as your Erlang, Elixir, Phoenix, and InifinityOne versions. Please provide steps to reproduce the issue as well as the outcome you were expecting! All these details will help developers to fix any potential bugs.
 
 Example:
 

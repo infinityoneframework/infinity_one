@@ -3,8 +3,8 @@ import Messages from "./messages"
 
 console.log('loading message_cog');
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.messageCog = new MessageCog(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  one_chat.messageCog = new MessageCog(one_chat)
 })
 
 class MessageCog {

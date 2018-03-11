@@ -18,11 +18,11 @@ import "phoenix_html"
 // Local files can be imported directly using relative
 // paths "./socket" or full ones "web/static/js/socket".
 
-require('./ucx_ucc');
+require('./infinity_one');
 require('./utils');
-require('./ucc_chat');
+require('./one_chat');
 require('./typing');
-require('./ucc_webrtc');
+require('./one_webrtc');
 require('./tone_generator');
 require('./device_manager');
 require('./chat_tooltip');

@@ -4,17 +4,17 @@ console.log('loading typing');
 
 const debug = false;
 
-window.UccChat.on_load(function(ucc_chat) {
-  ucc_chat.typing = new Typing(ucc_chat)
+window.OneChat.on_load(function(one_chat) {
+  one_chat.typing = new Typing(one_chat)
 })
 
 class Typing {
 
-  constructor(ucc_chat) {
-    this.typing = ucc_chat.typing
+  constructor(one_chat) {
+    this.typing = one_chat.typing
     this.timer = undefined
-    this.ucc_chat = ucc_chat
-    this.ucxchat = ucc_chat.ucxchat
+    this.one_chat = one_chat
+    this.ucxchat = one_chat.ucxchat
   }
 
   get is_typing() { return this.typing; }
@@ -38,12 +38,12 @@ class Typing {
   }
   update_typing(typing) {
     if (debug) { console.log('Typing.update_typing', typing) }
-    let ucxchat = UccChat.ucxchat;
+    let ucxchat = OneChat.ucxchat;
 
     if (typing.indexOf(ucxchat.username) < 0) {
       this.do_update_typing(false, typing)
     } else {
-      UccUtils.remove(typing, ucxchat.username)
+      OneUtils.remove(typing, ucxchat.username)
       this.do_update_typing(true, typing)
     }
   }
@@ -80,8 +80,8 @@ class Typing {
         // assume they cleared the textedit and did not send
         this_ref.is_typing = false
         this_ref.timer_ref = undefined
-        this.ucc_chat.roomchan.push("/typing/stop", {ucxchat: {method: "delete"},
-          channel_id: channel_id, user_id: user_id, room: this.ucc_chat.ucxchat.room})
+        this.one_chat.roomchan.push("/typing/stop", {ucxchat: {method: "delete"},
+          channel_id: channel_id, user_id: user_id, room: this.one_chat.ucxchat.room})
       }
     } else {
       this_ref.timer_ref = setTimeout(this.typing_timer_timeout, 15000, this_ref, channel_id, user_id)

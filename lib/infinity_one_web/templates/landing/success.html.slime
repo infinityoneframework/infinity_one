@@ -1,0 +1,18 @@
+.information
+  h2 = ~g(Success)
+  p
+    = ~g(The application is almost ready to use.)
+  p
+    = ~g(The configured email settings requires an application restart.)
+
+  p = restart_message()
+  p
+    a(href="/") strong = ~g(Login Here)
+    = ~g( with username )
+    strong = @username
+    = ~g( and invite users from the Administration -> Users section.)
+  p
+    = ~g(New users will automatically be subscribed to )
+    a(href="/channels/#{@channel_name}") = "##{@channel_name}."
+
+  h2 = ~g(Welcome to Infinity One!)

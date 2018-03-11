@@ -1,4 +1,4 @@
-defmodule UcxUcc.MigrationsPlugin do
+defmodule InfinityOne.MigrationsPlugin do
   use Mix.Releases.Plugin
 
   @migrations_path Path.join(~w(priv repo migrations))

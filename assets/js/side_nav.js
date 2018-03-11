@@ -3,22 +3,22 @@ console.log('loading side_nav');
 
 var debug = false;
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.sideNav = new SideNav(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  one_chat.sideNav = new SideNav(one_chat)
 })
 
 class SideNav {
-  constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat
+  constructor(one_chat) {
+    this.one_chat = one_chat
     this.register_events()
   }
 
-  get userchan() { return this.ucc_chat.userchan }
-  get systemchan() { return this.ucc_chat.systemchan }
-  get roomManager() { return this.ucc_chat.roomManager }
-  get roomHistoryManager() {return this.ucc_chat.roomHistoryManager }
-  get navMenu() { return this.ucc_chat.navMenu }
-  get notifier() { return this.ucc_chat.notifier }
+  get userchan() { return this.one_chat.userchan }
+  get systemchan() { return this.one_chat.systemchan }
+  get roomManager() { return this.one_chat.roomManager }
+  get roomHistoryManager() {return this.one_chat.roomHistoryManager }
+  get navMenu() { return this.one_chat.navMenu }
+  get notifier() { return this.one_chat.notifier }
 
   more_users() {
     this.userchan.push('side_nav:more_users')

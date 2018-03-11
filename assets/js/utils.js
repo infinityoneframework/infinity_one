@@ -197,7 +197,7 @@
       $('.input-message').focus()
     },
     push_history: function() {
-      let ucxchat = window.UccChat.ucxchat
+      let ucxchat = window.OneChat.ucxchat
       history.pushState(history.state, ucxchat.display_name, '/' + ucxchat.room_route + '/' + ucxchat.display_name)
     },
     replace_history: function() {
@@ -285,9 +285,9 @@
   window.pl = Utils.page_loading
   window.rpl = Utils.remove_page_loading
 
-  if (window.UccChat) {
-    window.UccChat.utils = Utils
+  if (window.OneChat) {
+    window.OneChat.utils = Utils
   }
-  window.UccUtils = Utils
+  window.OneUtils = Utils
 
  })();

@@ -1,4 +1,4 @@
-# UcxUcc Changelog
+# InfinityOne Changelog
 
 ## 0.3.2 (2018-01-xx)
 
@@ -54,7 +54,7 @@
 
 * Support Avatar upload and change
 * Changing view details in accounts settings automatically updates UI
-* Converges UccConsole and UccChat.Console into UccConsole
+* Converge OneConsole and OneChat.Console into OneConsole
 * Added new Accounts section in Admin
 * Remove register link from login page by admin option
 * Remove forget password link from login page by admin option

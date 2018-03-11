@@ -1,0 +1,32 @@
+#user-card-popover
+#ucx-chat.menu-nav
+  .connection-status.status-online
+  .main-content.content-background-color(style="transform: translateX(0px);")
+    = render OneAdminWeb.AdminView, @template, @assigns
+
+  .main-content-cache.hidden
+  aside.side-nav.primary-background-color.color-tertiary-font-color(role="navigation")
+    .flex-nav.primary-background-color
+      section
+        = OneAdminWeb.AdminView.render "admin_flex.html", conn: @conn, chatd: @chatd, user: @user
+    span.arrow.close
+.sweet-container
+- flash_error = @conn.private[:phoenix_flash]["error"]
+javascript:
+  window.OneChat = {}
+  window.user_token = '<%= Coherence.user_token(@conn) %>'
+  window.ucxchat = {
+    room_route: '<%= @chatd.room_route %>',
+    room: 'lobby', channel_id: undefined,
+    username: '<%= @chatd.user.username %>',
+    user_id: '<%= @chatd.user.id %>',
+    display_name: ""
+  };
+
+  window.chat_settings = {
+    link_preview: false,
+    use_emojis: true
+  };
+
+  let myPanel = $('.page-container')
+  window.flash_error = '<%= flash_error %>'

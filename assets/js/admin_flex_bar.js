@@ -7,13 +7,13 @@ const debug = false;
 
 console.log('loading admin');
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.adminFlexBar = new AdminFlexBar(ucc_chat)
+OneChat.on_load(function(one_chat) {
+  one_chat.adminFlexBar = new AdminFlexBar(one_chat)
 })
 
 class AdminFlexBar {
-  constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat
+  constructor(one_chat) {
+    this.one_chat = one_chat
     this.current = undefined
     this.register_event_handers(this)
   }
@@ -23,7 +23,7 @@ class AdminFlexBar {
     let name = elem.data('name')
     console.log('clicked link-row', type, name, this.current)
 
-    UccChat.userchan.push('admin:flex:' + type, {name: name})
+    OneChat.userchan.push('admin:flex:' + type, {name: name})
       .receive("ok", resp => {
         $('section.flex-tab').html(resp.html).parent().addClass('opened')
         flex.set_tab_buttons_inactive()
@@ -46,7 +46,7 @@ class AdminFlexBar {
     } else if (title == 'Invite Users') {
       if ($('.invite-users').closest('.flex-tab-container.opened').length == 0) {
         flex.toggle_tab_container()
-        UccChat.userchan.push('admin:flex:Invite Users')
+        OneChat.userchan.push('admin:flex:Invite Users')
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             $('section.flex-tab').html(resp.html).parent().addClass('opened')
@@ -74,7 +74,7 @@ class AdminFlexBar {
     // console.log('nav_button', action, username)
     switch(action) {
       case 'edit-user':
-        UccChat.userchan.push('admin:flex:action:' + action, {username: username})
+        OneChat.userchan.push('admin:flex:action:' + action, {username: username})
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             $('section.flex-tab').html(resp.html).parent().addClass('opened')
@@ -90,12 +90,12 @@ class AdminFlexBar {
       case 'remove-admin':
       case 'deactivate':
       case 'activate':
-        UccChat.userchan.push('admin:flex:action:' + action, {username: username})
+        OneChat.userchan.push('admin:flex:action:' + action, {username: username})
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             if (resp.success) { toastr.success(resp.success) }
             if (resp.code_update) {
-              UccUtils.code_update(resp.code_update)
+              OneUtils.code_update(resp.code_update)
             }
           })
           .receive("error", resp => {
@@ -107,7 +107,7 @@ class AdminFlexBar {
           gettext.deleting_user_delete_messages,
           gettext.yes_delete_it,
           function() {
-            UccChat.userchan.push('admin:flex:action:' + action, {username: username})
+            OneChat.userchan.push('admin:flex:action:' + action, {username: username})
               .receive("ok", resp => {
                 // if (resp.success) { toastr.success(resp.success) }
                 sweet.warning_confirmation(gettext.deleted, gettext.the_user_has_been_deleted, 2000)
@@ -144,7 +144,7 @@ class AdminFlexBar {
       .on('click', '.invite-users nav button.send', function(e) {
         let email = $('#inviteEmails')
         let emails = email.val().replace('\n', ' ')
-        UccChat.userchan.push('admin:flex:send-invitation-email', {emails: emails})
+        OneChat.userchan.push('admin:flex:send-invitation-email', {emails: emails})
           .receive("ok", resp => {
             // console.log('flex action resp', resp)
             $('section.flex-tab').html(resp.html).parent().addClass('opened')
@@ -165,7 +165,7 @@ class AdminFlexBar {
       .on('click', '.invite-users .outstanding button.resend', function(e) {
         let email = $(e.currentTarget).data('email')
         let id = $(e.currentTarget).data('id')
-        UccChat.userchan.push('invitation:resend', {email: email, id: id})
+        OneChat.userchan.push('invitation:resend', {email: email, id: id})
           .receive("ok", resp => {
             if (resp.success) { toastr.success(resp.success) }
             $(`button[data-email="${email}"]`).next().append('<i class="icon-verified"></i>')

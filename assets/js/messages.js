@@ -6,8 +6,8 @@ const debug = true;
 window.hljs = hljs;
 console.log('loading messages');
 
-window.UccChat.on_load(function(ucc_chat) {
-  ucc_chat.Messages = Messages
+window.OneChat.on_load(function(one_chat) {
+  one_chat.Messages = Messages
 })
 
 class Messages {
@@ -17,10 +17,10 @@ class Messages {
   static new_message(msg) {
     // TODO: I'm not sure that this code is still used. Check and remove.
     let html = msg.html
-    let ucc_chat = window.UccChat
-    let ucxchat = ucc_chat.ucxchat
+    let one_chat = window.OneChat
+    let ucxchat = one_chat.ucxchat
 
-    let at_bottom = ucc_chat.roomManager.at_bottom
+    let at_bottom = one_chat.roomManager.at_bottom
 
     console.log('new message', msg);
 
@@ -40,16 +40,16 @@ class Messages {
     if (ucxchat.user_id == msg.user_id) {
       if (debug) { console.log('adding own to', msg.id, $('#' + msg.id)) }
       $('#' + msg.id).addClass("own")
-      ucc_chat.main.run(ucc_chat)
+      one_chat.main.run(one_chat)
     }
-    ucc_chat.main.update_mentions(ucc_chat, msg.id)
+    one_chat.main.update_mentions(one_chat, msg.id)
 
     if (at_bottom || msg.user_id == ucxchat.user_id) {
-      UccUtils.scroll_bottom()
+      OneUtils.scroll_bottom()
     }
 
     Rebel.set_event_handlers('[id="' + msg.id + '"]');
-    ucc_chat.roomManager.new_message(msg.id, msg.user_id)
+    one_chat.roomManager.new_message(msg.id, msg.user_id)
   }
   static update_message(msg) {
     $('#' + msg.id).replaceWith(msg.html)
@@ -68,8 +68,8 @@ class Messages {
   }
 
   static send_message(msg) {
-    let ucc_chat = window.UccChat
-    let ucxchat = ucc_chat.ucxchat
+    let one_chat = window.OneChat
+    let ucxchat = one_chat.ucxchat
     let user = ucxchat.user_id
     if (msg.update) {
       cc.put("/messages/" + msg.update, {message: msg.value.trim(), user_id: user})
@@ -83,7 +83,7 @@ class Messages {
             $('.messages-box').children('.wrapper').children('ul').children(':last-child').find('pre').each(function(i, block) {
               hljs.highlightBlock(block)
             })
-            UccUtils.scroll_bottom()
+            OneUtils.scroll_bottom()
             // console.log('got response from send message')
           }
         })
@@ -104,13 +104,13 @@ class Messages {
           // console.log('slash command resp', resp )
           if (resp.html) {
             $('.messages-box .wrapper > ul').append(resp.html)
-            UccUtils.scroll_bottom()
+            OneUtils.scroll_bottom()
           }
         })
 
-      ucc_chat.roomManager.remove_unread()
+      one_chat.roomManager.remove_unread()
 
-    } else if (!UccUtils.empty_string(msg.trim())) {
+    } else if (!OneUtils.empty_string(msg.trim())) {
       cc.post("/messages", {message: msg.trim(), user_id: user})
         .receive("ok", resp => {
           if (resp.html) {
@@ -124,7 +124,7 @@ class Messages {
           }
         })
 
-      ucc_chat.roomManager.remove_unread()
+      one_chat.roomManager.remove_unread()
     }
 
     $('.message-form-text').val('')

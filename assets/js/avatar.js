@@ -1,9 +1,9 @@
 (function() {
   console.log('loading avatar');
 
-  UccChat.on_load(function(ucc_chat) {
+  OneChat.on_load(function(one_chat) {
     Avatar.load();
-    UccChat.avatar = Avatar;
+    OneChat.avatar = Avatar;
   });
 
   const prefix = '.input-line.set-avatar ';

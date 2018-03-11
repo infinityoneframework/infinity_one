@@ -1,6 +1,6 @@
-defmodule UcxUcc.TestHelpers do
+defmodule InfinityOne.TestHelpers do
   alias FakerElixir, as: Faker
-  alias UcxUcc.{Repo, Accounts}
+  alias InfinityOne.{Repo, Accounts}
   alias Accounts.{User, Role, UserRole}
   import Ecto.Query
 

@@ -12,21 +12,21 @@ const new_message_unread_time = 5000;
 const container = '.messages-box .wrapper ul';
 const wrapper = '.messages-box .wrapper';
 
-window.UccChat.on_load(function(ucc_chat) {
-  ucc_chat.roomManager = new RoomManager(ucc_chat);
+window.OneChat.on_load(function(one_chat) {
+  one_chat.roomManager = new RoomManager(one_chat);
 })
 
 class RoomManager {
-  constructor(ucc_chat) {
-    this.ucc_chat = ucc_chat;
-    ucc_chat.scroll_to = this.scroll_to;
+  constructor(one_chat) {
+    this.one_chat = one_chat;
+    one_chat.scroll_to = this.scroll_to;
     this.badges = 0;
     this.register_events();
     this.view_elem = $('.messages-box .wrapper')[0];
     if (this.view_elem) {
       this.rect = this.view_elem.getBoundingClientRect();
       this.focus = false;
-      this.unread = this.ucc_chat.ucxchat.unread;
+      this.unread = this.one_chat.ucxchat.unread;
       this.unread_list = [];
       this.new_message_ref = undefined;
       this.at_bottom = true;
@@ -48,7 +48,7 @@ class RoomManager {
     });
   }
 
-  get roomHistoryManager() { return this.ucc_chat.roomHistoryManager; }
+  get roomHistoryManager() { return this.one_chat.roomHistoryManager; }
 
   get bounding() { return this.rect; }
 
@@ -63,11 +63,11 @@ class RoomManager {
   get is_unread() { return this.unread; }
   set is_unread(val) { this.unread = val; }
 
-  get userchan() { return this.ucc_chat.userchan; }
+  get userchan() { return this.one_chat.userchan; }
 
   new_room() {
     if (debug) { console.log('new_room', this); }
-    let ucxchat = this.ucc_chat.ucxchat;
+    let ucxchat = this.one_chat.ucxchat;
 
     // don't think we need this
     // this.has_more_prev = $('.messages-box li.load-more').length > 0;
@@ -80,7 +80,7 @@ class RoomManager {
       }
     })
 
-    this.ucc_chat.roomchan.on('room:open', resp => {
+    this.one_chat.roomchan.on('room:open', resp => {
     })
   }
 
@@ -92,7 +92,7 @@ class RoomManager {
 
   render_room(resp) {
     if (debug) { console.log('render_room resp', resp) }
-    let ucxchat = this.ucc_chat.ucxchat
+    let ucxchat = this.one_chat.ucxchat
 
     $('.room-link').removeClass("active")
     $('.messages-container').replaceWith(resp.html)
@@ -111,7 +111,7 @@ class RoomManager {
           lr_elem.nextAll('li.message').each((i, elem) => {
             this.unread_list.push($(elem).attr('id'))
           })
-          UccUtils.scroll_bottom()
+          OneUtils.scroll_bottom()
           next.addClass('first-unread')
         }
       }, 2000)
@@ -126,9 +126,9 @@ class RoomManager {
     }
     $('.room-title').html(ucxchat.display_name)
     $('.link-room-' + ucxchat.room).addClass("active")
-    UccUtils.scroll_bottom()
-    this.ucc_chat.roomchan.leave()
-    this.ucc_chat.restart_socket()
+    OneUtils.scroll_bottom()
+    this.one_chat.roomchan.leave()
+    this.one_chat.restart_socket()
   }
   toggle_favorite() {
     if (debug) { console.log('toggle_favorite') }
@@ -147,14 +147,14 @@ class RoomManager {
   update(msg) {
     if(debug) { console.log('update...', msg) }
     let fname = msg.field_name
-    let ucxchat = this.ucc_chat.ucxchat
+    let ucxchat = this.one_chat.ucxchat
     if ( fname == "topic"  || fname == "title" || fname == "description") {
       $('.room-' + fname).html(msg.value)
     } else if (fname == "name") {
       $('.room-title').html(msg.value)
       ucxchat.room = msg.value
       ucxchat.display_name = msg.value
-      UccUtils.replace_history()
+      OneUtils.replace_history()
     }
     setTimeout(() => {
       $('span.current-setting[data-edit="' + fname + '"]').text(msg.value)
@@ -362,7 +362,7 @@ class RoomManager {
   }
 
   bind_history_manager_scroll_event() {
-    if (!this.ucc_chat.ucxchat.channel_id) {
+    if (!this.one_chat.ucxchat.channel_id) {
       return false
     }
     $('.messages-box .wrapper').bind('scroll', _.throttle((e) => {
@@ -505,14 +505,14 @@ class RoomManager {
         this.clear_unread();
       }
       this.has_focus = true;
-      if (UccChat.systemchan) {
-        UccChat.systemchan.push('state:focus');
+      if (OneChat.systemchan) {
+        OneChat.systemchan.push('state:focus');
       }
     })
     .on('blur', () => {
       this.has_focus = false;
-      if (UccChat.systemchan) {
-        UccChat.systemchan.push('state:blur');
+      if (OneChat.systemchan) {
+        OneChat.systemchan.push('state:blur');
         if (debug) { console.log('room_manager blur'); }
       }
     })
@@ -695,7 +695,7 @@ class RoomManager {
       this.message_box_focus();
     })
     .on('click', 'button.new-message', e => {
-      UccUtils.scroll_bottom();
+      OneUtils.scroll_bottom();
       this.message_box_focus();
     })
     .on('click', '.announcement .cancel-button', e => {

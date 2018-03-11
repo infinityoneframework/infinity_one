@@ -105,12 +105,12 @@ $(document).ready(function() {
 
 function start_loading_animation(elem) {
   console.log('start_loading_animation', elem)
-  UccUtils.page_loading()
-  elem.next().after(UccUtils.loading_animation())
+  OneUtils.page_loading()
+  elem.next().after(OneUtils.loading_animation())
 }
 
 function stop_loading_animation(elem) {
   console.log('stop_loading_animation', elem)
-  UccUtils.remove_page_loading()
+  OneUtils.remove_page_loading()
   $('.loading-animation').remove()
 }

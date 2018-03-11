@@ -1,0 +1,37 @@
+- alias OneChatWeb.AdminView, as: Admin
+= if @user_info[:admin] do
+  = Admin.render_user_action_button(@user, "edit")
+  = Admin.render_user_action_button(@user, "admin")
+  = Admin.render_user_action_button(@user, "activate")
+  = Admin.render_user_action_button(@user, "delete")
+- else
+  = if show_webrtc? @user, @user_info do
+    .buttons-group
+      button.button.start-video-call.primary(data-fun="flex_video_open" rebel-click="flex_call" aria-label="Start video call" data-id="webrtc-members-list" data-user_id="#{@user.id}")
+        i.icon-videocam
+      button.button.start-audio-call.secondary(rebel-click="start_audio_call" aria-label="Start audio call" data-id="#{@user.id}")
+        i.icon-phone
+  = unless @current_user.id == @user.id or @user_info[:direct] do
+    button.button.button-block.primary(rebel-click="add_private")
+      span
+        i.icon-chat
+        = ~g"Conversation"
+  = if @user_info[:direct] do
+    = if @user_info[:blocked] do
+      button.button.button-block.tertiary.unblock-user
+        span= ~g"unblock user"
+    - else
+      button.button.button-block.danger.block-user
+        span=~g"Block User"
+  - else
+    = render "user_card_owner_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
+    = render "user_card_moderator_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
+    = render "user_card_mute_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
+    = if has_permission?(@current_user, "remove-user", @channel_id) do
+      button.button.button-block.danger.remove-user(rebel-click="remove_user" data-id="#{@user.id}")
+        span= ~g"Remove from room"
+    = if @user_info[:view_mode] do
+      button.button.back(rebel-click="flex_call" data-fun="view_all" data-id="members-list")
+        span
+          = ~g"View All"
+          i.icon-angle-right

@@ -1,4 +1,4 @@
-defmodule UcxUcc.Repo.Migrations.AddAvatarToUsers do
+defmodule InfinityOne.Repo.Migrations.AddAvatarToUsers do
   use Ecto.Migration
 
   def change do

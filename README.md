@@ -1,13 +1,13 @@
-# UcxUcc - A Team Collaboration Suite
+# InfinityOne - A Team Collaboration Suite
 
-[![Build Status](https://travis-ci.org/smpallen99/ucx_ucc.png?branch=master)](https://travis-ci.org/smpallen99/ucx_ucc) [![License][license-img]][license]
+[![Build Status](https://travis-ci.org/smpallen99/infinity_one.png?branch=master)](https://travis-ci.org/smpallen99/infinity_one) [![License][license-img]][license]
 
 [license-img]: http://img.shields.io/badge/license-MIT-brightgreen.svg
 [license]: http://opensource.org/licenses/MIT
 
-UcxUcc is a simple but powerful team collaboration suite of applications designed to improve communications, information sharing and productivity for the businesses small and large.
+InfinityOne is a simple but powerful team collaboration suite of applications designed to improve communications, information sharing and productivity for the businesses small and large.
 
-Checkout an older version's [Live Demo](http://chat.spallen.com). Click on the [Register a new account](http://chat.spallen.com/registrations/new) link on the sign in page to create an account. This is actually the live demo of the [ucx_chat](https://github.com/smpallen99/ucx_chat) project. [ucx_ucc](https://github.com/smpallen99/ucx_ucc) is based on a significantly different architecture that allows for adding custom plug-ins without extending the base project.
+Checkout an older version's [Live Demo](http://chat.spallen.com). Click on the [Register a new account](http://chat.spallen.com/registrations/new) link on the sign in page to create an account. This is actually the live demo of the [ucx_chat](https://github.com/smpallen99/ucx_chat) project. [infinity_one](https://github.com/smpallen99/infinity_one) is based on a significantly different architecture that allows for adding custom plug-ins without extending the base project.
 
 ![Screen Shoot](priv/images/screen_shot_1.png)
 
@@ -90,13 +90,13 @@ And the bast part is that the data is safe with encrypted connections between yo
 ### Backup Database
 
 ```bash
-mysqldump --add-drop-database --add-drop-table -u user --password=secret --databases ucx_ucc_prod > ucx_ucc.sql
+mysqldump --add-drop-database --add-drop-table -u user --password=secret --databases infinity_one_prod > infinity_one.sql
 ```
 
 ### Restore Database
 
 ```bash
-mysql -u user -psecret < ucx_ucc.sql
+mysql -u user -psecret < infinity_one.sql
 ```
 
 ### Install Dependencies
@@ -132,15 +132,15 @@ mix test
 
 ## Contributing
 
-We appreciate any contribution to UcxUcc. Check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [CONTRIBUTING.md](CONTRIBUTING.md) guides for more information. We usually keep a list of features and bugs [in the issue tracker][1].
+We appreciate any contribution to InfinityOne. Check our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [CONTRIBUTING.md](CONTRIBUTING.md) guides for more information. We usually keep a list of features and bugs [in the issue tracker][1].
 
-  [1]: https://github.com/smpallen99/ucx_ucc/issues
+  [1]: https://github.com/smpallen99/infinity_one/issues
 ## Acknowlegemets
 
 The UI for this version of the project is taken (with some modifications) directly from [Rocket.Chat](https://rocket.chat/).
 ## License
 
-`UcxUcc` is Copyright (c) 2017-2018 E-MetroTel
+`InfinityOne` is Copyright (c) 2017-2018 E-MetroTel
 
 The source code is released under the MIT License.
 

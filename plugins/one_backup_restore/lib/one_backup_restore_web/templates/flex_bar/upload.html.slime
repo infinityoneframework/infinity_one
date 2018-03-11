@@ -1,0 +1,18 @@
+.content.channel-settings.upload
+  = render OneUiFlexTabWeb.FlexBarView, "flex_close_button.html"
+  .list-view.channel-settings
+    .title
+      h2= ~g(Upload backup)
+    br
+    - rebel_opts = [class: "backup", multipart: true, "data-remote": true]
+    = form_for @changeset, "/upload_backup", rebel_opts, fn f ->
+      input(type="hidden" name="flex-id" value="admin_upload_backup")
+      br
+      = file_input f, :file
+      br
+      br
+      nav
+        button.button.button-block.cancel(type="button" rebel-click="flex_form_cancel")
+          span= ~g(Cancel)
+        submit.button.button-block.primary.save
+          span= ~g(Upload Backup)

@@ -44,8 +44,8 @@ end
 # when running `mix release`, the first release in the file
 # will be used by default
 
-release :ucx_ucc do
-  set version: current_version(:ucx_ucc)
+release :infinity_one do
+  set version: current_version(:infinity_one)
   set applications: [
     :runtime_tools,
     :logger,
@@ -62,6 +62,6 @@ release :ucx_ucc do
     "create":  "rel/commands/create.sh",
     "drop_database": "rel/commands/drop_database.sh"
   ]
-  plugin UcxUcc.MigrationsPlugin
+  plugin InfinityOne.MigrationsPlugin
 end
 

@@ -1,7 +1,7 @@
 console.log('loading menu.js');
 
-UccChat.on_load(function(ucc_chat) {
-  ucc_chat.navMenu = new Menu()
+OneChat.on_load(function(one_chat) {
+  one_chat.navMenu = new Menu()
 })
 
 class Menu {

@@ -1,0 +1,15 @@
+= for channel <- @channels do
+  - {subscribed?, hidden?} = OneChat.Channel.subscription_status(channel, @current_user.id)
+  li
+    a.channel-link(href="/channels/#{channel.name}")
+      i(class="#{OneChat.ChannelService.get_icon(channel.type)}")
+      = channel.name
+      span.opt.fixed
+        = if subscribed? do
+          = if hidden? do
+            i.icon-eye-off(title="#{~g(Hidden)}" aria-label="#{~g(Hidden)}")
+          - else
+            i.icon-eye(title="#{~g(Open)}" aria-label="#{~g(Open)}")
+= if false do
+.load-more
+  / {{> loading}}

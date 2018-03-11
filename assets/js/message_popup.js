@@ -17,8 +17,8 @@ const application_command_chars   = {users: "@", slashcommands: "/", channels: "
 
 console.log('loading message_popup');
 
-// window.UccChat.on_load(function(ucc_chat) {
-//   ucc_chat.messagePopup = new MessagePopup(ucc_chat)
+// window.OneChat.on_load(function(one_chat) {
+//   one_chat.messagePopup = new MessagePopup(one_chat)
 // })
 
 $(document).ready(function() {
@@ -40,9 +40,9 @@ $(document).ready(function() {
 
 class MessagePopup {
 
-  constructor(ucc_chat) {
+  constructor(one_chat) {
     // this.open = undefined;
-    this.ucc_chat = ucc_chat;
+    this.one_chat = one_chat;
     this.application = undefined;
     this.match = undefined
     this.command_char = undefined;

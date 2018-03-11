@@ -1,7 +1,7 @@
 (function() {
   console.log('loading tone_generator');
 
-  if (UcxUcc.trace_startup) { console.log('loading tone_generator', UcxUcc); }
+  if (InfinityOne.trace_startup) { console.log('loading tone_generator', InfinityOne); }
 
   var ToneGenerator = {
     debug: true,
@@ -65,14 +65,14 @@
     }
   };
 
-  window.UccChat.ToneGenerator = ToneGenerator;
+  window.OneChat.ToneGenerator = ToneGenerator;
 
-  if (UcxUcc.trace_startup) { console.log('finished loading tone generator'); }
+  if (InfinityOne.trace_startup) { console.log('finished loading tone generator'); }
 })();
 
 function createAudioContext()
 {
-  return new UcxUcc.AudioContext()
+  return new InfinityOne.AudioContext()
 }
 
 function initAudio(tg, toneId) {
@@ -218,7 +218,7 @@ function fixOscillator(osc)
 }
 
 $(document).ready(function() {
-  var tg = window.UccChat.ToneGenerator;
+  var tg = window.OneChat.ToneGenerator;
   if( tg.audioContext )
   {
     tg.control = document.getElementById('audio-stream')

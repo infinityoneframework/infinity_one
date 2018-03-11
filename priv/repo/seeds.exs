@@ -1,12 +1,9 @@
-alias UcxUcc.Repo
-alias UcxUcc.{Accounts, Permissions}
+alias InfinityOne.Repo
+alias InfinityOne.{Accounts, Permissions}
 alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
-alias UccChat.{ChannelService, Subscription, Message, Channel}
-alias UcxPresence.Extension
-# alias Mscs.{Client, Apb}
+alias OneChat.{Subscription, Message, Channel}
 
-# Extension.delete_all
 Message.delete_all
 Subscription.delete_all
 Channel.delete_all
@@ -22,7 +19,7 @@ Repo.delete_all User
 
 IO.puts "Creating Roles"
 roles =
-  UcxUcc.Accounts.Role.default_roles()
+  InfinityOne.Accounts.Role.default_roles()
   |> Enum.map(fn {role, scope} ->
     %{name: to_string(role), scope: to_string(scope)}
     |> Accounts.create_role()
@@ -75,15 +72,18 @@ IO.puts "Creating Permissions"
 # build the permissions
 roles_list = roles
 
-Repo.delete_all UcxUcc.Permissions.Permission
+Repo.delete_all InfinityOne.Permissions.Permission
 
-UcxUcc.Permissions.default_permissions()
+InfinityOne.Permissions.default_permissions()
 |> Enum.each(fn %{name: name, roles: roles} ->
-  {:ok, permission} = Permissions.create_permission(%{name: name})
-  roles
-  |> Enum.each(fn role_name ->
-    Permissions.create_permission_role(%{permission_id: permission.id, role_id: roles_list[role_name]})
-  end)
+  case Permissions.create_permission(%{name: name}) do
+    {:ok, permission} ->
+      roles
+      |> Enum.each(fn role_name ->
+        Permissions.create_permission_role(%{permission_id: permission.id, role_id: roles_list[role_name]})
+      end)
+    _ -> :ok
+  end
 end)
 
 IO.puts "Creating First Users"
@@ -93,7 +93,7 @@ u1 = create_user.("Admin", "admin@spallen.com", "test", true)
 u2 = create_user.("Steve Pallen", "steve.pallen@spallen.com", "test", true)
 u3 = create_user.("Merilee Lackey", "merilee.lackey@spallen.com", "test", false)
 
-# TODO: The following should be moved to the UccChat seeds.exs file
+# TODO: The following should be moved to the OneChat seeds.exs file
 
 IO.puts "Creating Second Users"
 users =
@@ -209,7 +209,7 @@ end
 
 IO.puts "Creating Settings"
 
-UccSettings.init_all()
+OneSettings.init_all()
 
 IO.puts "Setting phone number labels"
 

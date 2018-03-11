@@ -1,0 +1,34 @@
+header.primary-background-color
+  div
+    h4= ~g(Channels)
+.content.primary-background-color
+  .wrapper
+    h4= ~g(Create_new)
+    form
+      .input-line.no-icon
+        label.color-secondary-font-color(for="channel-name")= ~g(Name)
+        input.required#channel-name(type="text" dir="auto" placeholder="#{~g(Enter name here)}" name="channel[name]")
+      .input-line.toggle
+        span= ~g(Private)
+        .input.checkbox.toggle
+          input#channel-type(type="checkbox" name="channel[private]")
+          label.color-tertiary-font-color(for="channel-type")
+      .input-line.toggle
+        span= ~g(Read only channel)
+        .input.checkbox.toggle
+          input#channel-read-only(type="checkbox" name="channel[read_only]")
+          label.color-tertiary-font-color(for="channel-read-only")
+      .input-line.no-icon
+        label.color-secondary-font-color(for="channel-members")= ~g(Select users)
+        / -# {{> inputAutocomplete settings=autocompleteSettings id="channel-members" class="search"
+        = if has_permission?(@user, "invite-user") do
+          input.search#channel-members type="text" placeholder="#{~g(Search by username)}" autocomplete="off" rebel-keydown="side_nav_create_channel_search_members"
+        - else
+          input.search#channel-members type="text" placeholder="#{~g(Search by username)}" disabled="true"
+
+        .-autocomplete-container.hidden
+        ul.selected-users
+      .input-submit
+        = if InfinityOne.Permissions.has_at_least_one_permission?(@user, ~w(create-c create-p)) do
+          button.button.primary.save-channel rebel-click="side_nav_create_channel_save" = ~g(Create)
+        button.button.cancel-channel rebel-click="side_nav_create_channel_cancel" = ~g(Cancel)

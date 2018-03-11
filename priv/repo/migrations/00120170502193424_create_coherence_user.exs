@@ -1,4 +1,4 @@
-defmodule UcxUcc.Repo.Migrations.CreateCoherenceUser do
+defmodule InfinityOne.Repo.Migrations.CreateCoherenceUser do
   use Ecto.Migration
   def change do
     create table(:users, primary_key: false) do

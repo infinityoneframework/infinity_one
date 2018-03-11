@@ -1,0 +1,40 @@
+- flex_opts = ["rebel-change": "flex_form_select_change"]
+- input_devices = Map.get @devices, :input, []
+- output_devices = Map.get @devices, :output, []
+- video_devices = Map.get @devices, :video, []
+.content
+  = OneChatWeb.FlexBarView.render "flex_close_button.html"
+  .list-view.devices
+    .title
+      h2= ~g"Device Settings"
+    = form_for @changeset, "#", fn f ->
+      / input(type="hidden" name="id" value="device-settings")
+      = hidden_input f, :id
+      = hidden_input f, :headset_input_id, value: nil
+      = hidden_input f, :headset_output_id, value: nil
+      = hidden_input f, :user_id
+      input(type="hidden" name="flex-id" value="device-settings")
+      fieldset
+        legend Audio Handsfree
+        ul.list.clearfix
+          li
+            label= ~g"Input Device"
+            div = select f, :handsfree_input_id, input_devices, flex_opts
+          li
+            label= ~g"Output Device"
+            div = select f, :handsfree_output_id, output_devices, flex_opts
+      fieldset
+        legend Audio Headset
+        ul.list.clearfix
+          li
+            label= ~g"Input Device"
+            div = select f, :headset_input_id, [{"Select device...", nil} | input_devices], flex_opts
+          li
+            label= ~g"Output Device"
+            div = select f, :headset_output_id, [{"Select device...", nil} | output_devices], flex_opts
+      fieldset
+        legend Video
+        ul.list.clearfix
+          li
+            label= ~g"Input Device"
+            div = select f, :video_input_id, video_devices, flex_opts

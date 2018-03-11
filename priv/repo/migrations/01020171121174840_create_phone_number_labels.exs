@@ -1,4 +1,4 @@
-defmodule UcxUcc.Repo.Migrations.CreatePhoneNumberLabels do
+defmodule InfinityOne.Repo.Migrations.CreatePhoneNumberLabels do
   use Ecto.Migration
 
   def change do

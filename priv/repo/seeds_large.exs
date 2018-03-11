@@ -1,5 +1,5 @@
-alias UcxUcc.Accounts
-alias UccChat.{Message, Channel}
+alias InfinityOne.Accounts
+alias OneChat.{Message, Channel}
 
 messages = [
     "Give me some of that very fine food from that there box",

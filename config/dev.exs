@@ -6,10 +6,10 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
-config :ucx_ucc, UcxUccWeb.Endpoint,
+config :infinity_one, InfinityOneWeb.Endpoint,
   http: [port: 4018],
   https: [port: 4318,
-    otp_app: :ucx_ucc,
+    otp_app: :infinity_one,
     keyfile: "priv/key.pem",
     certfile: "priv/cert.pem"
   ],
@@ -37,24 +37,24 @@ config :ucx_ucc, UcxUccWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :ucx_ucc, UcxUccWeb.Endpoint,
+config :infinity_one, InfinityOneWeb.Endpoint,
   live_reload: [
     patterns: [
       # ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/static/.*(js|css|svg)$},
       ~r{priv/gettext/.*(po)$},
-      ~r{lib/ucx_ucc/web/views/.*(ex)$},
-      ~r{lib/ucx_ucc/web/templates/.*(eex|slim|slime)$},
+      ~r{lib/infinity_one/web/views/.*(ex)$},
+      ~r{lib/infinity_one/web/templates/.*(eex|slim|slime)$},
       ~r{plugins/.*/lib/.*/web/views/.*(ex)$},
       ~r{plugins/.*/lib/.*/web/templates/.*(eex|slim|slime|md)$},
     ]
   ]
 
-config :ucx_ucc, :ucc_tracer_modules, :all
-config :ucx_ucc, :ucc_tracer_level, :debug
+config :infinity_one, :one_tracer_modules, :all
+config :infinity_one, :one_tracer_level, :debug
 
 config :logger, :console,
-  level: :debug,
+  level: :info,
   # level: :error,
   format: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]

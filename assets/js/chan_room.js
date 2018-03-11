@@ -2,19 +2,19 @@
 
 console.log('loading chan_room.js');
 
-function start_room_channel(ucc_chat, socket) {
+function start_room_channel(one_chat, socket) {
   console.log('chan_room connect')
-  let ucxchat = ucc_chat.ucxchat
+  let ucxchat = one_chat.ucxchat
   let room = ucxchat.room
-  let debug = ucc_chat.debug
-  let typing = ucc_chat.typing
+  let debug = one_chat.debug
+  let typing = one_chat.typing
   // Now that you are connected, you can join channels with a topic:
   let chan = window.Rebel.channels.room.channel
 
   if (debug) { console.log('start socket', ucxchat) }
-  console.log('...', UccUtils)
+  console.log('...', OneUtils)
 
-  UccUtils.push_history();
+  OneUtils.push_history();
 
   Rebel.additional_payloads.push(function(sender, event) {
     // console.log('additional_payloads', sender, event)
@@ -44,7 +44,7 @@ function start_room_channel(ucc_chat, socket) {
       // we have the text area
       return {
         text_len: sender.value.length,
-        caret: UccUtils.getCaretPosition(sender),
+        caret: OneUtils.getCaretPosition(sender),
         message_popup: opened,
         popup_app: app
       }
@@ -55,7 +55,7 @@ function start_room_channel(ucc_chat, socket) {
       var res =  {
         value: input.value,
         text_len: input.value.length,
-        caret: UccUtils.getCaretPosition(input),
+        caret: OneUtils.getCaretPosition(input),
         message_popup: opened,
         popup_app: app
       }
@@ -63,7 +63,7 @@ function start_room_channel(ucc_chat, socket) {
       return {
         value: input.value,
         text_len: input.value.length,
-        caret: UccUtils.getCaretPosition(input),
+        caret: OneUtils.getCaretPosition(input),
         message_popup: opened,
         popup_app: app
       }
@@ -78,11 +78,11 @@ function start_room_channel(ucc_chat, socket) {
 
   chan.on("message:new", msg => {
     if (debug) { console.log('message:new current id, msg.user_id', msg, ucxchat.user_id, msg.user_id) }
-    ucc_chat.Messages.new_message(msg)
+    one_chat.Messages.new_message(msg)
   })
   chan.on("message:update", msg => {
     if (debug) { console.log('message:update current id, msg.user_id', msg, ucxchat.user_id, msg.user_id) }
-    ucc_chat.Messages.update_message(msg)
+    one_chat.Messages.update_message(msg)
   })
 
   chan.on("typing:update", msg => {
@@ -91,7 +91,7 @@ function start_room_channel(ucc_chat, socket) {
   })
 
   chan.on("room:update", msg => {
-    ucc_chat.roomManager.update(msg)
+    one_chat.roomManager.update(msg)
   })
 
   chan.on("toastr:success", resp => {
@@ -112,10 +112,10 @@ function start_room_channel(ucc_chat, socket) {
   })
   chan.on('code:update', resp => {
     console.log('code:update', resp)
-    UccUtils.code_update(resp)
+    OneUtils.code_update(resp)
   })
   chan.on('code:update:reaction', resp => {
-    UccUtils.code_update(resp)
+    OneUtils.code_update(resp)
   })
   chan.on('reload', msg => {
     let loc = msg.location
@@ -124,22 +124,22 @@ function start_room_channel(ucc_chat, socket) {
     window.location = loc
   })
   chan.on('message:preview', msg => {
-    ucc_chat.message_preview(msg)
+    one_chat.message_preview(msg)
   })
 
-  ucc_chat.roomchan = chan;
+  one_chat.roomchan = chan;
 
   console.log('....going to clear')
-  ucc_chat.roomManager.clear_unread()
+  one_chat.roomManager.clear_unread()
   console.log('....going to new_room')
-  ucc_chat.roomManager.new_room()
+  one_chat.roomManager.new_room()
   console.log('....going to scroll_new_window')
-  ucc_chat.roomHistoryManager.scroll_new_window()
+  one_chat.roomHistoryManager.scroll_new_window()
 
   console.log('....going to run')
-  ucc_chat.main.run(ucc_chat)
+  one_chat.main.run(one_chat)
   console.log('....going to update_mentions')
-  ucc_chat.roomManager.updateMentionsMarksOfRoom()
+  one_chat.roomManager.updateMentionsMarksOfRoom()
 
   $('.messages-box .message').find('pre code').each(function(i, block) {
     hljs.highlightBlock(block)
@@ -150,18 +150,18 @@ function start_room_channel(ucc_chat, socket) {
   }
 
   console.log('....going to close')
-  ucc_chat.navMenu.close()
+  one_chat.navMenu.close()
   console.log('....done')
 
 }
 
-UccChat.on_connect(function(ucc_chat, socket) {
+OneChat.on_connect(function(one_chat, socket) {
   console.log('running room channel on_connect');
-  start_room_channel(ucc_chat, socket)
+  start_room_channel(one_chat, socket)
 
   $('body').on('restart-socket', () => {
-    console.log('received restart-socket event', UccChat)
-    Rebel.run_channel("room", Rebel.get_rebel_session_token('room'), UccChat.ucxchat.room)
-    start_room_channel(ucc_chat, socket)
+    console.log('received restart-socket event', OneChat)
+    Rebel.run_channel("room", Rebel.get_rebel_session_token('room'), OneChat.ucxchat.room)
+    start_room_channel(one_chat, socket)
   })
 })

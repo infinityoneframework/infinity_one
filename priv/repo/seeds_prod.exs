@@ -1,8 +1,8 @@
-alias UcxUcc.Repo
-alias UcxUcc.{Accounts, Permissions}
+alias InfinityOne.Repo
+alias InfinityOne.{Accounts, Permissions}
 alias Accounts.{User, Role, UserRole, Account, PhoneNumber, PhoneNumberLabel}
 alias Permissions.{Permission, PermissionRole}
-alias UccChat.{Subscription, Message, Channel}
+alias OneChat.{Subscription, Message, Channel}
 
 Message.delete_all
 Subscription.delete_all
@@ -64,11 +64,11 @@ end
 
 IO.puts "Creating Permissions"
 # build the permissions
-Repo.delete_all UcxUcc.Permissions.Permission
+Repo.delete_all InfinityOne.Permissions.Permission
 
 roles_list = roles
 
-UcxUcc.Permissions.default_permissions()
+InfinityOne.Permissions.default_permissions()
 |> Enum.each(fn %{name: name, roles: roles} ->
   {:ok, permission} = Permissions.create_permission(%{name: name})
   roles
@@ -91,7 +91,7 @@ _u0 = create_user.("Bot", "bot@example.com", random_string.(32), :bot)
 
 IO.puts "Creating Settings"
 
-UccSettings.init_all()
+OneSettings.init_all()
 
 IO.puts "Setting phone number labels"
 
