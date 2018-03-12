@@ -6,13 +6,15 @@ defmodule OneChatWeb.RoomChannel.MessageCog do
   import Rebel.Core, only: [this: 1]
 
   alias OneChatWeb.Client
-  alias OneChat.{StarredMessage, PinnedMessage}
+  alias OneChat.{StarredMessage, PinnedMessage, Message}
   alias OneChatWeb.{MessageView, FlexBarView}
-  alias InfinityOne.Accounts
+  alias InfinityOne.{Accounts, Permissions}
 
   def message_cog_click(socket, sender, client \\ Client) do
+    config = OneSettings.get_all()
     assigns = socket.assigns
     message_id = client.closest socket, this(sender), "li.message", :id
+    message = Message.get(message_id)
     star_count = StarredMessage.count(assigns.user_id, message_id, assigns.channel_id)
     pin_count = PinnedMessage.count(message_id)
     user = Accounts.get_user socket.assigns.user_id, default_preload: true
@@ -21,13 +23,15 @@ defmodule OneChatWeb.RoomChannel.MessageCog do
       starred: star_count > 0,
       pinned: pin_count > 0,
       user: user,
-      channel_id: assigns.channel_id
+      channel_id: assigns.channel_id,
+      config: config,
+      can_edit: OneSettings.allow_message_editing(config) and
+        (message.user_id == user.id or Permissions.has_permission?(user, "edit-message")),
+      can_delete: OneSettings.allow_message_deleting(config) and
+        (message.user_id == user.id or Permissions.has_permission?(user, "delete-message")),
     ]
 
-    html =
-      MessageView
-      |> client.render_to_string("message_cog.html", opts: opts)
-      # |> Poison.encode!
+    html = client.render_to_string(MessageView, "message_cog.html", opts: opts)
 
     client.append(socket, ~s([id="#{message_id}"] .message-cog-container), html)
     client.async_js socket, """
@@ -36,7 +40,6 @@ defmodule OneChatWeb.RoomChannel.MessageCog do
         e.stopPropagation();
       })
       """
-    # client.send_js socket, "$('##{message_id} .message-cog-container').append(#{html})"
     socket
   end
 

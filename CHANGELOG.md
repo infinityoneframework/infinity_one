@@ -1,5 +1,15 @@
 # InfinityOne Changelog
 
+## 1.0.0.beta5 (2018-01-xx)
+
+## Enhancements
+
+* Only display authorized message cog buttons
+
+### Bug Fixes
+
+* Check edit message permissions
+
 ## 0.3.2 (2018-01-xx)
 
 ## Enhancements

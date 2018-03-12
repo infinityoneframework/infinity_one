@@ -209,8 +209,20 @@ defmodule OneChatWeb.RoomChannel.Message do
   end
 
   def message_action(socket, Utils.dataset("id", "edit-message") = sender, client) do
-    message_id = client.closest(socket, Rebel.Core.this(sender), "li.message", "id")
-    start_editing socket, message_id, client
+    user = Accounts.get_user socket.assigns.user_id, default_preload: true
+    with message_id <- client.closest(socket, Rebel.Core.this(sender), "li.message", "id"),
+         false <- is_nil(message_id),
+         message <- Message.get(message_id, preload: [:attachments]),
+         false <- is_nil(message),
+         true <- message.user_id == user.id or has_permission?(user, "edit-message",
+          socket.assigns.channel_id) do
+      start_editing socket, message, client
+    else
+      true ->
+        client.toastr socket, :warning, ~g(There are no message to edit)
+      false ->
+        client.toastr(socket, :error, ~g(Unauthorized))
+    end
     close_cog socket, sender, client
   end
 
@@ -220,23 +232,16 @@ defmodule OneChatWeb.RoomChannel.Message do
     close_cog socket, sender, client
   end
 
-  def start_editing(socket, message_id, client \\ Client)
-
-  def start_editing(socket, nil, client) do
-    client.toastr socket, :warning, ~g(There are no messages to edit)
-  end
-
-  def start_editing(socket, message_id, client) do
-    Rebel.put_assigns socket, :edit_message_id, message_id
-    Logger.debug fn ->  "editing #{message_id}" end
-    message = Message.get message_id, preload: [:attachments]
+  def start_editing(socket, message, client) do
+    Rebel.put_assigns socket, :edit_message_id, message.id
+    Logger.debug fn ->  "editing #{message.id}" end
     body =
       case message.attachments do
         [] -> strip_mentions message.body
         [att | _] -> att.description
       end
       |> Poison.encode!
-    client.async_js socket, set_editing_js(message_id, body)
+    client.async_js socket, set_editing_js(message.id, body)
   end
 
   def open_edit(socket, client \\ Client) do

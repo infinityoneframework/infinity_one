@@ -347,7 +347,10 @@ defmodule OneChatWeb.MessageView do
   def get_popup_title(%{title: title}), do: title
   def get_popup_title(_), do: false
 
-  def get_popup_data(%{data: data}), do: data
+  def get_popup_data(%{data: data}) do
+    data
+  end
+
   def get_popup_data(_), do: false
 
   def md_key, do: Application.get_env(:infinity_one, :markdown_key, "!md")
