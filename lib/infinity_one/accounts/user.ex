@@ -8,6 +8,7 @@ defmodule InfinityOne.Accounts.User do
 
   alias InfinityOne.OnePubSub
   alias InfinityOne.Accounts
+  alias OneChat.Channel
 
   require Logger
 
@@ -187,6 +188,26 @@ defmodule InfinityOne.Accounts.User do
 
   def all do
     from u in @mod
+  end
+
+  def tags(user, nil) do
+    user.user_roles
+    |> Enum.reduce([], fn
+      %{role: %{name: role}, scope: nil}, acc ->
+        [role | acc]
+
+      %{role: %{name: role}, scope: channel_id}, acc ->
+        case Channel.get(channel_id) do
+          nil ->
+            Accounts.delete_user_roles_by_scope(channel_id)
+            Logger.warn "cannot find channel with id: #{inspect channel_id} for #{role}"
+            acc
+          channel ->
+            ["#{role}(#{channel.name})" | acc]
+        end
+    end)
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.sort
   end
 
   def tags(user, channel_id) do

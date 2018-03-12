@@ -608,6 +608,15 @@ defmodule InfinityOne.Accounts do
   end
 
   @doc """
+  Delete all the user_roles by scope.
+  """
+  def delete_user_roles_by_scope(scope) do
+    [scope: scope]
+    |> list_by_user_roles()
+    |> Enum.each(& delete_user_role/1)
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking user_role changes.
 
   ## Examples

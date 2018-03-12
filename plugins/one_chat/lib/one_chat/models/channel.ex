@@ -54,6 +54,8 @@ defmodule OneChat.Channel do
   def delete(channel) do
     case super(channel) do
       {:ok, channel} = ok ->
+        Accounts.delete_user_roles_by_scope(channel.id)
+
         OnePubSub.broadcast "user:all", "channel:deleted",
           %{room_name: channel.name, channel_id: channel.id}
         ok

@@ -5,6 +5,8 @@
 ## Enhancements
 
 * Only display authorized message cog buttons
+* Show all roles in Admin user card
+* Remove scoped user_roles when channel removed
 
 ### Bug Fixes
 
