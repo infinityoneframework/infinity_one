@@ -2,10 +2,12 @@ defmodule OneAdminWeb.FlexBar.Tab.InviteUsers do
   use OneLogger
   use OneChatWeb.FlexBar.Helpers
 
-  alias InfinityOne.TabBar
+  alias InfinityOne.{Repo, TabBar}
   alias TabBar.Tab
   alias OneAdminWeb.FlexBarView
   alias OneAdmin.AdminService
+  alias OneChatWeb.RebelChannel.Client
+  alias InfinityOne.Coherence.Invitation
   # alias InfinityOne.TabBar.Ftab
 
   def add_buttons do
@@ -41,4 +43,35 @@ defmodule OneAdminWeb.FlexBar.Tab.InviteUsers do
     socket
   end
 
+  def delete_invitation(socket, sender) do
+    id = sender["dataset"]["id"]
+    email = sender["dataset"]["email"]
+
+    Client.swal_modal(
+      socket,
+      ~g(Delete Invitation),
+      gettext("Are you sure you want to delete %{name} invitation?", name: email),
+      "warning",
+      ~g(Delete Invitation!),
+      confirm: fn _ ->
+        case delete_invitation(id) do
+          nil ->
+            Client.swal socket, ~g(Error), ~g(Could not find that Invitation), "warning"
+          {:ok, _} ->
+            Client.swal socket, ~g(Succuss),
+              gettext("%{name} invitation was deleted", name: email), "success"
+            Client.slow_delete(socket, ~s/$('#{Rebel.Core.this(sender)}').closest('li')/)
+        end
+      end
+    )
+
+    socket
+  end
+
+  defp delete_invitation(id) do
+    case Repo.get(Invitation, id) do
+      nil -> nil
+      invitation -> Repo.delete(invitation)
+    end
+  end
 end

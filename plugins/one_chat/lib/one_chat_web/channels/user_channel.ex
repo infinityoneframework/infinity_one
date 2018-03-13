@@ -1736,6 +1736,7 @@ defmodule OneChatWeb.UserChannel do
   defdelegate admin_restore_backup(socket, sender), to: OneBackupRestoreWeb.Admin.Page.BackupRestore
   defdelegate admin_download_cert(socket, sender), to: OneBackupRestoreWeb.FlexBar.Tab.GenCert
   defdelegate admin_regen_cert(socket, sender), to: OneBackupRestoreWeb.FlexBar.Tab.GenCert
+  defdelegate admin_delete_invition(socket, sender), to: OneAdminWeb.FlexBar.Tab.InviteUsers, as: :delete_invitation
 
   # TODO: Figure out a way to inject this from the Dialer module
   defdelegate dial(socket, sender), to: OneDialerWeb.Channel.Dialer

@@ -425,4 +425,11 @@ defmodule OneChatWeb.RebelChannel.Client do
       """ |> String.replace("\n", "")
     async_js(socket, link)
   end
+
+  def slow_delete(socket, selector) do
+    async_js(socket, """
+      var target = #{selector};
+      target.hide('slow', function() { target.remove(); });
+      """ |> String.replace("\n", ""))
+  end
 end

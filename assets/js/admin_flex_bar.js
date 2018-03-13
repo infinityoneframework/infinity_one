@@ -168,7 +168,7 @@ class AdminFlexBar {
         OneChat.userchan.push('invitation:resend', {email: email, id: id})
           .receive("ok", resp => {
             if (resp.success) { toastr.success(resp.success) }
-            $(`button[data-email="${email}"]`).next().append('<i class="icon-verified"></i>')
+            $(`button[data-email="${email}"]`).parent().append('<i class="icon-verified"></i>')
           })
           .receive("error", resp => {
             if (resp.error) { toastr.error(resp.error) }
