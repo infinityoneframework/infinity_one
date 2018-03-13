@@ -1,5 +1,15 @@
 # InfinityOne Changelog
 
+## 1.0.0.beta6 (2018-03-xx)
+
+## Enhancements
+
+* Allow users to login with either username or email
+* Change site_name default to Infinity One
+* Use site_name title on authentication pages
+
+### Bug Fixes
+
 ## 1.0.0.beta5 (2018-01-xx)
 
 ## Enhancements

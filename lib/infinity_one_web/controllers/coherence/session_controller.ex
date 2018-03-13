@@ -89,7 +89,7 @@ defmodule InfinityOneWeb.Coherence.SessionController do
     new_bindings = [{login_field, login}, remember: rememberable_enabled?()]
     remember = if Config.user_schema.rememberable?(), do: params["remember"], else: false
     # user = Config.repo.one(from u in user_schema, where: field(u, ^login_field) == ^login)
-    user = Schemas.get_by_user [{login_field, login}]
+    user = Schemas.get_by_user([{login_field, login}]) || Schemas.get_user_by_email(login)
     if valid_user_login? user, params do
       if confirmed_access? user do
         case Schemas.update_user user, %{tz_offset: tz_offset} do

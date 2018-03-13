@@ -7,7 +7,7 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.scroll(lang="en")
     meta(name="description" content="")
     meta(name="author" content="")
 
-    title OneChat
+    title = InfinityOneWeb.LayoutView.site_title()
 
     link(rel="stylesheet" href='#{static_path(@conn, "/fonts/fontello/css/fontello.css")}')
     link(rel="stylesheet" href='#{static_path(@conn, "/css/app.css")}')

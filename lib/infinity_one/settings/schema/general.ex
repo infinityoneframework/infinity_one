@@ -6,7 +6,7 @@ defmodule InfinityOne.Settings.Schema.General do
 
   schema "settings_general" do
     field :site_url, :string, default: "change-this"
-    field :site_name, :string, default: "OneChat"
+    field :site_name, :string, default: "InfinityOne"
     field :enable_desktop_notifications, :boolean, default: true
     field :desktop_notification_duration, :integer, default: 8
   end
