@@ -5,7 +5,7 @@ defmodule InfinityOne.Repo.Migrations.CreateSettingsGeneral do
     create table(:settings_general, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :site_url, :string, default: "change-this"
-      add :site_name, :string, default: "InfinityOne"
+      add :site_name, :string, default: InfinityOne.brandname()
       add :enable_desktop_notifications, :boolean, default: true
       add :desktop_notification_duration, :integer, default: 8
     end
