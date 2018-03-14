@@ -57,6 +57,13 @@ defmodule OneChatWeb.RoomChannel.Message do
         channel_id: assigns.channel_id,
         user_id: assigns.user_id
       })
+      |> case do
+        {:ok, message} ->
+          embed_link_previews(message.body, message.channel_id, message.id)
+          {:ok, message}
+        error ->
+          error
+      end
     end
   end
 
@@ -501,7 +508,7 @@ defmodule OneChatWeb.RoomChannel.Message do
     end)
   end
 
-  defp create_link_preview(url, _message_id) do
+  def create_link_preview(url, _message_id) do
     case LinkPreview.create url do
       {:ok, page} ->
         img =

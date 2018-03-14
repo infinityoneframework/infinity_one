@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 * [UCX-3839] Fix no messages when num messages eq page size
+* [UCX-3838] Fix url previews for new message
 
 ## 1.0.0.beta5 (2018-01-xx)
 
