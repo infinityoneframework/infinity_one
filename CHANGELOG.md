@@ -6,9 +6,11 @@
 
 * Allow users to login with either username or email
 * Change site_name default to Infinity One
-* Use site_name title on authentication pages
+* [UCX-3839] Use site_name title on authentication pages
 
 ### Bug Fixes
+
+* Fix no messages when num messages eq page size
 
 ## 1.0.0.beta5 (2018-01-xx)
 

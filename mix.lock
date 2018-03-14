@@ -83,7 +83,7 @@
   "rudp": {:git, "git@bitbucket.org:emetrotel/rudp.git", "1b39409b2059d98ecf4b415e16f9d3e776818606", []},
   "sbroker": {:hex, :sbroker, "1.0.0", "28ff1b5e58887c5098539f236307b36fe1d3edaa2acff9d6a3d17c2dcafebbd0", [:rebar3], [], "hexpm"},
   "scrivener": {:hex, :scrivener, "2.5.0", "e1f78c62b6806d91cc9c4778deef1ea4e80aa9fadfce2c16831afe0468cc8a2c", [:mix], [], "hexpm"},
-  "scrivener_ecto": {:git, "https://github.com/smpallen99/scrivener_ecto.git", "441e94bb661327dce40d19ec269d7a3b987c1f35", []},
+  "scrivener_ecto": {:git, "https://github.com/smpallen99/scrivener_ecto.git", "8ff22508d5af407b8d81476c5037b3e1b693c33c", []},
   "setup": {:git, "git://github.com/uwiger/setup.git", "51ee7c9f64d2bbe9dcbb58c278e8fbfd4d0ca5e2", [tag: "1.4"]},
   "slime": {:git, "https://github.com/smpallen99/slime.git", "41d1bbf6d7afbbc18813e0846e7ad6634c808117", []},
   "speak_ex": {:git, "https://github.com/smpallen99/speak_ex.git", "db9567f44f16920fad80059b8534de7539bb92ab", []},
