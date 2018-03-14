@@ -40,7 +40,11 @@ defmodule OneChatWeb.RoomChannel.Message do
       end
       |> Map.put(:edited_id, socket.assigns.user_id)
 
-    OneChat.Message.update(message, attrs)
+    case OneChat.Message.update(message, attrs) do
+      {:ok, message} ->
+        embed_link_previews(message.body, message.channel_id, message.id)
+      _ -> :ok
+    end
 
     client.async_js socket, clear_editing_js(message_id)
   end
@@ -235,11 +239,11 @@ defmodule OneChatWeb.RoomChannel.Message do
 
   def message_action(socket, sender, client) do
     action = sender["dataset"]["id"]
-    Logger.debug "message action: #{action}, sender: #{inspect sender}"
+    Logger.debug fn -> "message action: #{action}, sender: #{inspect sender}" end
     close_cog socket, sender, client
   end
 
-  def start_editing(socket, message, client) do
+  def start_editing(socket, %{} = message, client) do
     Rebel.put_assigns socket, :edit_message_id, message.id
     Logger.debug fn ->  "editing #{message.id}" end
     body =
@@ -249,6 +253,10 @@ defmodule OneChatWeb.RoomChannel.Message do
       end
       |> Poison.encode!
     client.async_js socket, set_editing_js(message.id, body)
+  end
+
+  def start_editing(socket, message_id, client) do
+    start_editing(socket, Message.get(message_id, preload: [:attachments]), client)
   end
 
   def open_edit(socket, client \\ Client) do

@@ -12,6 +12,7 @@
 
 * [UCX-3839] Fix no messages when num messages eq page size
 * [UCX-3838] Fix url previews for new message
+* [UCX-3842] Fix up arrow edit exception error
 
 ## 1.0.0.beta5 (2018-01-xx)
 
