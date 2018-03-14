@@ -13,8 +13,9 @@
 * [UCX-3839] Fix no messages when num messages eq page size
 * [UCX-3838] Fix url previews for new message
 * [UCX-3842] Fix up arrow edit exception error
+* [UCX-3843] Fix message popup selection in middle of text
 
-## 1.0.0.beta5 (2018-01-xx)
+## 1.0.0.beta5 (2018-03-12)
 
 ## Enhancements
 
