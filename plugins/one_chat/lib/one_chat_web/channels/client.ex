@@ -209,6 +209,7 @@ defmodule OneChatWeb.Client do
             {message_id: #{id}, name: #{name}, channel_id: #{channel_id}, channel_name: #{channel_name}});
         }
       });
+      OneChat.roomManager.set_badges();
       """
       |> String.replace("\n", "")
     socket

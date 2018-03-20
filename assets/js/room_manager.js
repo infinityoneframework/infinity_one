@@ -172,17 +172,36 @@ class RoomManager {
     }
   }
   update_burger_alert() {
+    let title = $('head title').text();
+    console.log('update_burger_alert', title);
+
     if($('.rooms-list li.has-alert').length > 0) {
       let count = 0;
       for (const has_unread of $('li.room-link span.unread')) {
         count += parseInt($(has_unread).text());
       }
       this.set_burger_unreads(count);
+      console.log('set title count', count);
+
+      let new_title;
+      let count_str = `(${count})`;
+
+      if (/\(\d*\)/.test(title)) {
+        new_title = title.replace(/\(\d*\)/, count_str);
+      } else {
+        new_title = title + count_str;
+      }
+      console.log('.. new_title', new_title);
+      $('head title').text(new_title);
     } else {
+      console.log('clear title count');
       this.clear_burger_unreads();
+      $('head title').text(title.replace(/\(\d*\)/, ""));
     }
+    console.log('new title', $('head title').text());
   }
   set_burger_unreads(count) {
+    console.log('set_burger_unreads', count);
     let value = '•'
     if (count > 0) { value = count; }
     let alert = `<div class="unread-burger-alert color-error-contrast background-error-color">${value}</div>`
@@ -193,10 +212,12 @@ class RoomManager {
     }
   }
   clear_burger_unreads() {
+    console.log('clear_burger_unreads');
     $('.burger .unread-burger-alert').remove()
   }
 
   notification(resp) {
+    console.log('notification', resp);
     if (!resp.badges_only) {
       if (resp.body) {
         notifier.desktop('Message from @' + resp.username, resp.body, {duration: resp.duration})
@@ -482,9 +503,11 @@ class RoomManager {
   }
 
   set_badges() {
+    console.log('set_badges');
     let cnt = this.get_unreads();
     if (cnt != this.badges) {
       this.badges = cnt;
+      console.log('set_badges', cnt);
       if (cnt == 0) {
         // document.title = this.title
         this.favico.reset();

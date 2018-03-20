@@ -11,8 +11,9 @@ class Notifier {
   constructor(one_chat) {
     this.one_chat = one_chat;
     Notification.requestPermission().then(function(result) {
-      console.log(result);
+      console.log('request permissions', result);
     });
+    this.useNewNotification = this.supportsNewNofification();
   }
 
   desktop(title, body, opts = {}) {
@@ -22,7 +23,7 @@ class Notifier {
       icon = opts.icon;
     }
 
-    var notification = new Notification(title, {
+    var notification = this.newNotification(title, {
       body: body,
       icon: icon,
     });
@@ -40,9 +41,32 @@ class Notifier {
     }
   }
 
+  newNotification(title, opts = {}) {
+    let not;
+    if (this.useNewNotification) {
+      not = new Notification(title, opts);
+    } else {
+      not = Notification(title, opts);
+    }
+    return not;
+  }
+
   audio(sound) {
     if (debug) { console.log('notify_audio', sound) }
     $('audio#' + sound)[0].play()
+  }
+
+  supportsNewNofification() {
+    if (!window.Notification || !Notification.requestPermission)
+      return false;
+
+    try {
+      new Notification('');
+    } catch (e) {
+      if (e.name == 'TypeError')
+        return false;
+    }
+    return true;
   }
 }
 

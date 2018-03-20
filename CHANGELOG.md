@@ -7,6 +7,7 @@
 * Allow users to login with either username or email
 * Change site_name default to Infinity One
 * Use site_name title on authentication pages
+* Add notification count to page title
 
 ### Bug Fixes
 

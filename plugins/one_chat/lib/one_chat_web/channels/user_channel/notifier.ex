@@ -54,6 +54,25 @@ defmodule OneChatWeb.UserChannel.Notifier do
   end
 
   def broadcast_unread_count(socket, channel_name, count, client) do
+    # title = Rebel.Core.exec_js!(socket, ~s/$('head title').text()/)
+    # {count, base} =
+    #   case Regex.run(~r/([^\(]+)\((\d*)\)/, title) do
+    #     nil ->
+    #       {0, title}
+
+    #     [_, base, ""] ->
+    #       {0, base}
+
+    #     [_, base, count] ->
+    #       count =
+    #         case Integer.parse(count) do
+    #           {cnt, ""} -> cnt
+    #           _ -> 0
+    #         end
+    #      {count, base}
+    #   end
+
+    # //  $('head title').text('#{base}(#{count + 1})');
     client.broadcast_js socket, """
       $('.link-room-#{channel_name}') .find('.unread').remove();
       $('.link-room-#{channel_name} a.open-room')
