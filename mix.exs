@@ -2,32 +2,39 @@ defmodule InfinityOne.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :infinity_one,
-     version: "0.3.2",
-     elixir: "~> 1.5",
-     elixirc_paths: elixirc_paths(Mix.env),
-     compilers: [:phoenix, :gettext] ++ Mix.compilers,
-     start_permanent: Mix.env == :prod,
-     docs: [
-       extras: ["README.md"],
-       main: "InfinityOne",
-       groups_for_modules: groups_for_modules()
-     ],
-     dialyzer: [plt_add_apps: [:mix]],
-     elixirc_paths: elixirc_paths(Mix.env),
-     test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
-     aliases: aliases(),
-     deps: deps()]
+    [
+      app: :infinity_one,
+      version: "0.3.2",
+      elixir: "~> 1.5",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      start_permanent: Mix.env() == :prod,
+      docs: [
+        extras: ["README.md"],
+        main: "InfinityOne",
+        groups_for_modules: groups_for_modules()
+      ],
+      dialyzer: [plt_add_apps: [:mix]],
+      elixirc_paths: elixirc_paths(Mix.env()),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+      aliases: aliases(),
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.
   def application do
-    [mod: {InfinityOne.Application, []},
-     extra_applications: extra_applications(Mix.env)]
+    [mod: {InfinityOne.Application, []}, extra_applications: extra_applications(Mix.env())]
   end
+
   defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
@@ -36,15 +43,17 @@ defmodule InfinityOne.Mixfile do
     paths =
       plugins()
       |> Enum.map(&Path.join(["plugins", &1, "test", "support"]))
-      |> List.flatten
+      |> List.flatten()
 
     elixirc_paths(nil) ++ ["test/support" | paths]
   end
+
   defp elixirc_paths(_) do
     paths =
       plugins()
       |> Enum.map(&Path.join(["plugins", &1, "lib"]))
       |> List.flatten()
+
     paths ++ ["lib"]
   end
 
@@ -105,7 +114,7 @@ defmodule InfinityOne.Mixfile do
       {:exactor, "~> 2.2", override: true},
       {:sqlite_ecto2, "~> 2.0"},
       {:floki, "~> 0.0", override: true},
-      {:phoenix_markdown, "~> 0.1"},
+      {:phoenix_markdown, "~> 1.0"},
       {:distillery, "~> 1.4"},
       {:conform, "~> 2.5"},
       {:ex_syslogger, github: "smpallen99/ex_syslogger"},
@@ -114,8 +123,7 @@ defmodule InfinityOne.Mixfile do
       # {:scrivener_ecto, path: "../scrivener_ecto"}
       {:scrivener_ecto, github: "smpallen99/scrivener_ecto"},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:briefly, "~> 0.3"},
-
+      {:briefly, "~> 0.3"}
     ] ++ plugin_deps()
   end
 
@@ -126,49 +134,76 @@ defmodule InfinityOne.Mixfile do
   #
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
-    ["ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
-     "ecto.reset": ["ecto.drop", "ecto.setup"],
-     "commit": ["deps.get --only #{Mix.env}", "dialyzer", "credo --strict"],
-     "test": ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]]
-     # # Use the following option if you want to run specific test files
-     #"test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
+    [
+      "ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      commit: ["deps.get --only #{Mix.env()}", "dialyzer", "credo --strict"],
+      test: ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]
+    ]
+
+    # # Use the following option if you want to run specific test files
+    # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
   end
 
   defp plugin_deps do
     "plugins/*/deps.exs"
-    |> Path.wildcard
+    |> Path.wildcard()
     |> Enum.reduce([], fn fname, acc ->
-      {deps, _} = Code.eval_file fname
+      {deps, _} = Code.eval_file(fname)
       acc ++ deps
     end)
   end
 
   defp groups_for_modules do
     [
-      "Authentication": [ ~r/Coherence.*/ ],
+      Authentication: [~r/Coherence.*/],
       "Chat Models & Contexts": [
-        OneChat.Attachment, OneChat.Channel, OneChat.Direct, OneChat.Emoji,
-        OneChat.Mention, OneChat.Message, OneChat.Mute, OneChat.Notification,
-        OneChat.NotificationSetting, OneChat.PinnedMessage, OneChat.Reaction,
-        OneChat.StarredMessage, OneChat.Subscription, ~r/OneChat.Schema.*/,
-        OneChat.Accounts, ~r/OneChat.Accounts\.*/
+        OneChat.Attachment,
+        OneChat.Channel,
+        OneChat.Direct,
+        OneChat.Emoji,
+        OneChat.Mention,
+        OneChat.Message,
+        OneChat.Mute,
+        OneChat.Notification,
+        OneChat.NotificationSetting,
+        OneChat.PinnedMessage,
+        OneChat.Reaction,
+        OneChat.StarredMessage,
+        OneChat.Subscription,
+        ~r/OneChat.Schema.*/,
+        OneChat.Accounts,
+        ~r/OneChat.Accounts\.*/
       ],
-      "Chat Settings": [ ~r/OneChat.Settings*/ ],
-      "Chat Services": [ ~r/OneChat.*Service/ ],
-      "Chat": [
-        OneChat, OneChat.AppConfig, OneChat.Application, OneChat.ChannelMonitor,
-        OneChat.ChatConstants, OneChat.ChatDat, OneChat.Console, ~r/EmojiOne*/,
-        OneChat.Hooks, OneChat.MessageAgent, OneChat.PresenceAgent, OneChat.Robot,
-        OneChat.Shared, OneChat.SlashCommands, OneChat.TypingAgent,
-        OneChat.AccountNotification, ~r/OneChat.File.*/, ~r/OneChat.Robot.*/,
+      "Chat Settings": [~r/OneChat.Settings*/],
+      "Chat Services": [~r/OneChat.*Service/],
+      Chat: [
+        OneChat,
+        OneChat.AppConfig,
+        OneChat.Application,
+        OneChat.ChannelMonitor,
+        OneChat.ChatConstants,
+        OneChat.ChatDat,
+        OneChat.Console,
+        ~r/EmojiOne*/,
+        OneChat.Hooks,
+        OneChat.MessageAgent,
+        OneChat.PresenceAgent,
+        OneChat.Robot,
+        OneChat.Shared,
+        OneChat.SlashCommands,
+        OneChat.TypingAgent,
+        OneChat.AccountNotification,
+        ~r/OneChat.File.*/,
+        ~r/OneChat.Robot.*/,
         ~r"OneChatWeb.*"
       ],
-      "One Admin": [ ~r/OneAdmin.*/ ],
-      "One Dialer": [ ~r/OneDialer*/ ],
-      "One Settings": [ ~r/OneSettings*/ ],
-      "One Webrtc": [ ~r/OneWebrtc.*/ ],
-      "One UI Flex Tab": [ ~r/OneUiFlexTab.*/ ],
-      "One Presence": [ ~r/OnePresence.*/ ]
+      "One Admin": [~r/OneAdmin.*/],
+      "One Dialer": [~r/OneDialer*/],
+      "One Settings": [~r/OneSettings*/],
+      "One Webrtc": [~r/OneWebrtc.*/],
+      "One UI Flex Tab": [~r/OneUiFlexTab.*/],
+      "One Presence": [~r/OnePresence.*/]
     ]
   end
 end

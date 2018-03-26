@@ -6,16 +6,14 @@
 use Mix.Config
 
 # General application configuration
-config :infinity_one,
-  ecto_repos: [InfinityOne.Repo]
+config :infinity_one, ecto_repos: [InfinityOne.Repo]
 
 # Configures the endpoint
 config :infinity_one, InfinityOneWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "wsFrikxHW07+ALSOPyI681jvpAdnRTQHyrfCwfd0gQlIEfqKegAvSGTVnaTzVSqH",
   render_errors: [view: InfinityOneWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: InfinityOneWeb.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: InfinityOneWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -25,7 +23,8 @@ config :logger, :console,
 config :infinity_one, :generators,
   migration: true,
   binary_id: true
-  # sample_binary_id: "11111111-1111-1111-1111-111111111111"
+
+# sample_binary_id: "11111111-1111-1111-1111-111111111111"
 
 # The example below replaces [UCX-123] with
 # [UCX-123](https://emetrotel.atlassian.net/browse/UCX-123) before
@@ -45,14 +44,14 @@ config :infinity_one, :settings_modules, [
   OneChat.Settings.FileUpload,
   OneChat.Settings.Layout,
   OneChat.Settings.Message,
-  OneWebrtc.Settings.Webrtc,
+  OneWebrtc.Settings.Webrtc
 ]
 
 config :phoenix, :template_engines,
   # haml: PhoenixHaml.Engine,
   slim: PhoenixSlime.Engine,
   slime: PhoenixSlime.Engine,
-  md:   PhoenixMarkdown.Engine
+  md: PhoenixMarkdown.Engine
 
 # %% Coherence Configuration %%   Don't remove this line
 config :coherence,
@@ -70,12 +69,24 @@ config :coherence,
   layout: {InfinityOneWeb.Coherence.LayoutView, "app.html"},
   email_from_name: {:system, "COH_NAME"},
   email_from_email: {:system, "COH_EMAIL"},
-  opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
-  # opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
+  opts: [
+    :rememberable,
+    :invitable,
+    :authenticatable,
+    :recoverable,
+    :lockable,
+    :trackable,
+    :unlockable_with_token,
+    :confirmable,
+    :registerable
+  ]
+
+# opts: [:rememberable, :invitable, :authenticatable, :recoverable, :lockable, :trackable, :unlockable_with_token, :confirmable, :registerable]
 
 config :coherence, InfinityOneWeb.Coherence.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: {:system, "SENDGRID_API_KEY"}
+
 # %% End Coherence Configuration %%
 
 config :slime, :keep_lines, true
@@ -88,12 +99,19 @@ config :distillery,
     :postgrex
   ]
 
+config :phoenix_markdown,
+  earmark: %{
+    gfm: true,
+    breaks: true
+  },
+  server_tags: :all
+
 import_config("../plugins/*/config/config.exs")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
 
-if File.exists? Path.join("config", "unbrella.exs") do
+if File.exists?(Path.join("config", "unbrella.exs")) do
   import_config Path.join("config", "unbrella.exs")
 end

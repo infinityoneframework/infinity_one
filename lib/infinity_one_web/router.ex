@@ -3,54 +3,55 @@ defmodule InfinityOneWeb.Router do
   use Coherence.Router
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-    plug InfinityOne.Plugs.Setup
-    plug Coherence.Authentication.Session
+    plug(:accepts, ["html", "md"])
+    plug(:fetch_session)
+    plug(:fetch_flash)
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(InfinityOne.Plugs.Setup)
+    plug(Coherence.Authentication.Session)
   end
 
   pipeline :protected do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-    plug InfinityOne.Plugs.Setup
-    plug Coherence.Authentication.Session, protected: true
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_flash)
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(InfinityOne.Plugs.Setup)
+    plug(Coherence.Authentication.Session, protected: true)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
-  scope "/", InfinityOneWeb  do
-    pipe_through :browser
-    get "/landing", LandingController, :index
+  scope "/", InfinityOneWeb do
+    pipe_through(:browser)
+    get("/landing", LandingController, :index)
+    get("/help", HelpController, :index)
     coherence_routes()
   end
 
-  scope "/", InfinityOneWeb  do
-    pipe_through :protected
+  scope "/", InfinityOneWeb do
+    pipe_through(:protected)
 
-    get "/logout", Coherence.SessionController, :delete
-    coherence_routes :protected
+    get("/logout", Coherence.SessionController, :delete)
+    coherence_routes(:protected)
   end
 
-
   scope "/", OneChatWeb do
-    pipe_through :protected # Use the default browser stack
+    # Use the default browser stack
+    pipe_through(:protected)
 
-    get "/", ChannelController, :page
-    get "/phone", MasterController, :phone
+    get("/", ChannelController, :page)
+    get("/phone", MasterController, :phone)
   end
 
   scope "/", OneBackupRestoreWeb do
-    pipe_through :protected
+    pipe_through(:protected)
 
-    post "/upload_backup", UploadController, :create
+    post("/upload_backup", UploadController, :create)
   end
 
   # The following is a prototype of an API implementation. It is basically

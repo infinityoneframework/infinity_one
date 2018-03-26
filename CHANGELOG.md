@@ -1,6 +1,17 @@
 # InfinityOne Changelog
 
-## 1.0.0.beta6 (2018-03-xx)
+## 1.0.0.beta8 (2018-03-xx)
+
+### Enhancements
+
+* Add support for the upcoming desktop app
+  * Fix exception in notification JS
+  * Add page_params for the desktop app
+* Add couple new help pages for the desktop app - WIP
+
+### Bug Fixes
+
+## 1.0.0.beta6 (2018-03-19)
 
 ## Enhancements
 

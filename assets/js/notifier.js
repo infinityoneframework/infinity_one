@@ -10,9 +10,14 @@ OneChat.on_load(function(one_chat) {
 class Notifier {
   constructor(one_chat) {
     this.one_chat = one_chat;
-    Notification.requestPermission().then(function(result) {
-      console.log('request permissions', result);
-    });
+    let promise = Notification.requestPermission();
+    if (promise) {
+      promise.then(function(result) {
+        console.log('request permissions', result);
+      });
+    } else {
+      console.log('no promise returned');
+    }
     this.useNewNotification = this.supportsNewNofification();
   }
 
