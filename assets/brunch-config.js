@@ -9,6 +9,7 @@ exports.config = {
       joinTo: {
        "js/app.js": /^(js|..\/deps|node_modules)/,
        "js/landing.js": /^(landing_js|..\/deps|node_modules)/,
+       "js/help.js": /^(help_js|..\/deps|node_modules)/,
        "js/adapter.js": ["vendor/adapter.js"],
        "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"]
        // "js/vendor.js": /^(web\/static\/vendor)|(deps)/
@@ -35,6 +36,7 @@ exports.config = {
 
         ],
         "css/channel_settings.css": ["scss/channel_settings.scss"],
+        "css/help.css": ["scss/help.scss", "scss/components.scss"],
         "css/toastr.css": ["css/toastr.css"],
         "css/emojipicker.css": ["vendor/emojiPicker.css"]
         // "css/toastr.css": ["web/static/scss/toastr.scss"]
@@ -59,7 +61,7 @@ exports.config = {
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "fonts", "css", "js", "vendor", "scss", "../plugins/one_admin/priv/static"],
+    watched: ["static", "fonts", "css", "js", "help_js", "vendor", "scss", "../plugins/one_admin/priv/static"],
     // Where to compile files to
     public: "../priv/static"
   },
@@ -88,7 +90,8 @@ exports.config = {
 
   modules: {
     autoRequire: {
-      "js/app.js": ["js/app"]
+      "js/app.js": ["js/app"],
+      "js/help.js": ["help_js/help"]
     }
   },
 

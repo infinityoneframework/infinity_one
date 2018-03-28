@@ -79,6 +79,7 @@ window.OneChat = {
   loads: [],
   connects: [],
   socket: false,
+  notificationsEnabled: true,
   Presence: require('phoenix').Presence,
   on_load: function(f) {
     this.loads.push(f)

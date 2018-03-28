@@ -30,6 +30,7 @@ defmodule InfinityOneWeb.Router do
     pipe_through(:browser)
     get("/landing", LandingController, :index)
     get("/help", HelpController, :index)
+    get("/help/:id", HelpController, :show)
     coherence_routes()
   end
 
@@ -57,10 +58,11 @@ defmodule InfinityOneWeb.Router do
   # The following is a prototype of an API implementation. It is basically
   # working, without authentication. Need updates in Coherence to get it
   # working
-  # scope "/api/v1", InfinityOneWeb.API do
-  #   pipe_through :api
-  #   post "/login", SessionController, :create
-  # end
+  scope "/api/v1", InfinityOneWeb.API do
+    pipe_through(:api)
+    # post "/login", SessionController, :create
+    get("/server_settings", PublicController, :server_settings)
+  end
 
   # forward "/admin", OneAdminWeb.Router
   # TODO: get unbrella working for this

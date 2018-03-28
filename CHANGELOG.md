@@ -1,6 +1,17 @@
 # InfinityOne Changelog
 
-## 1.0.0.beta8 (2018-03-xx)
+## 1.0.0.beta9 (2018-03-28)
+
+### Enhancements
+
+* Added local help framework with couple help pages (WIP)
+* Use Message poster avatar in desktop notifications
+* Added server_settings public API for use by desktop clients
+
+
+### Bug Fixes
+
+## 1.0.0.beta8 (2018-03-26)
 
 ### Enhancements
 

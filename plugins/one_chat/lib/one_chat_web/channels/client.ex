@@ -1,4 +1,7 @@
 defmodule OneChatWeb.Client do
+  @moduledoc """
+  An interface to the Clint Application.
+  """
   use OneChatWeb.RoomChannel.Constants
 
   import InfinityOneWeb.Utils
@@ -14,22 +17,6 @@ defmodule OneChatWeb.Client do
 
   @wrapper       ".messages-box .wrapper"
   @wrapper_list  @wrapper <> " > ul"
-
-  # defmacro __using__(_) do
-  #   quote do
-  #     import InfinityOneWeb.Utils
-  #     defdelegate send_js(socket, js), to: unquote(__MODULE__)
-  #     defdelegate send_js!(socket, js), to: unquote(__MODULE__)
-  #     defdelegate closest(socket, selector, class, attr), to: unquote(__MODULE__)
-  #     defdelegate append(socket, selector, html), to: unquote(__MODULE__)
-  #     defdelegate broadcast!(socket, event, bindings), to: Phoenix.Channel
-  #     defdelegate render_to_string(view, templ, bindings), to: Phoenix.View
-  #     defdelegate insert_html(socket, selector, position, html), to: Rebel.Element
-  #     defdelegate query_one(socket, selector, prop), to: Rebel.Element
-  #     defdelegate toastr!(socket, which, message), to: OneChatWeb.RebelChannel.Client
-  #     defdelegate toastr(socket, which, message), to: OneChatWeb.RebelChannel.Client
-  #   end
-  # end
 
   def send_js(socket, js) do
     exec_js socket, strip_nl(js)
@@ -194,19 +181,31 @@ defmodule OneChatWeb.Client do
       """
   end
 
-  def desktop_notify(socket, name, body, message, duration) do
-    title = ~s/"Message from @#{name}"/
-    body = Poison.encode! body
+  def desktop_notify(socket, opts) do
+    message = opts.message
+    title =
+      if message.channel.type == 2 do
+        ~s/"New Direct Message"/
+      else
+        ~s/"New Message in ##{opts.channel_name}"/
+      end
+    subtitle = ~s/"From @#{opts.username}"/
+    body = Poison.encode! opts.body
     id = inspect message.id
     channel_id = inspect message.channel_id
     channel_name = inspect message.channel.name
+    # icon = OneChatWeb.Router.Helpers.home_url(InfinityOneWeb.Endpoint, :index) <>
+    #   String.trim_leading(opts.icon, "/")
 
     async_js socket, """
       OneChat.notifier.desktop(#{title}, #{body}, {
-        duration: #{duration},
+        duration: #{opts.duration},
+        channel_id: #{channel_id},
+        subtitle: #{subtitle},
+        icon: '#{opts.icon}',
         onclick: function(event) {
           OneChat.userchan.push("notification:click",
-            {message_id: #{id}, name: #{name}, channel_id: #{channel_id}, channel_name: #{channel_name}});
+            {message_id: #{id}, name: '#{opts.username}', channel_id: #{channel_id}, channel_name: #{channel_name}});
         }
       });
       OneChat.roomManager.set_badges();

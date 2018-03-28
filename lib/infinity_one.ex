@@ -1,9 +1,8 @@
 defmodule InfinityOne do
-
   @env Mix.env()
-  @version InfinityOne.Mixfile.project[:version]
-  @brandname Application.get_env :infinity_one, :brand_name, "InfinityOne"
-  @name InfinityOne.Mixfile.project[:app]
+  @version InfinityOne.Mixfile.project()[:version]
+  @brandname Application.get_env(:infinity_one, :brand_name, "InfinityOne")
+  @name InfinityOne.Mixfile.project()[:app]
 
   def env, do: @env
   def version, do: @version
@@ -20,9 +19,10 @@ defmodule InfinityOne do
 
   defmacro deprecated(message \\ "") do
     function = __CALLER__.function
+
     quote do
       {name, arity} = unquote(function)
-      Logger.error "!!! #{__MODULE__}.#{name}/#{arity} #{unquote(message)} is deprecated!"
+      Logger.error("!!! #{__MODULE__}.#{name}/#{arity} #{unquote(message)} is deprecated!")
     end
   end
 end

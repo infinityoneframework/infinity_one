@@ -16,6 +16,12 @@ defmodule InfinityOneWeb do
   below.
   """
 
+  def root_url do
+    InfinityOneWeb.Endpoint
+    |> InfinityOneWeb.Router.Helpers.channel_url(:page)
+    |> String.trim_trailing("/")
+  end
+
   def service do
     quote do
       import Ecto.Query
@@ -34,8 +40,9 @@ defmodule InfinityOneWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/infinity_one_web/templates",
-                        namespace: InfinityOneWeb
+      use Phoenix.View,
+        root: "lib/infinity_one_web/templates",
+        namespace: InfinityOneWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]

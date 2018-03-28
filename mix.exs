@@ -4,7 +4,7 @@ defmodule InfinityOne.Mixfile do
   def project do
     [
       app: :infinity_one,
-      version: "0.3.2",
+      version: "1.0.0-beta9",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),

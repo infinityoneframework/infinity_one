@@ -100,11 +100,14 @@ defmodule OneChatWeb.UserChannel.Notifier do
     end
 
     if OneChat.Settings.desktop_notification?(user, channel.id, mention_or_direct) do
-      client.desktop_notify(socket,
-        message.user.username,
-        Helpers.strip_tags(message.body),
-        message,
-        Settings.get_desktop_notification_duration(user, channel))
+      client.desktop_notify(socket, %{
+        username: message.user.username,
+        channel_name: channel.name,
+        icon: OneChatWeb.SharedView.avatar_url(message.user, :thumb),
+        body: Helpers.strip_tags(message.body),
+        message: message,
+        duration: Settings.get_desktop_notification_duration(user, channel)
+      })
     else
       if mention_or_direct do
         broadcast_client_notification socket, [badges_only: true], client

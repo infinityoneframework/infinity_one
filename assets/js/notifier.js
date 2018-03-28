@@ -21,7 +21,14 @@ class Notifier {
     this.useNewNotification = this.supportsNewNofification();
   }
 
+  audioEnabled() {
+    return true;
+  }
+
   desktop(title, body, opts = {}) {
+    // this will fail sometimes because it much be an absolute path on native
+    // clients. However, it should not be used anymore since we pass the users
+    // url.
     var icon = '/images/notification_logo.png';
 
     if (opts.icon) {
@@ -31,6 +38,7 @@ class Notifier {
     var notification = this.newNotification(title, {
       body: body,
       icon: icon,
+      subtitle: opts.subtitle
     });
 
     if (opts.duration) {
@@ -58,21 +66,27 @@ class Notifier {
 
   audio(sound) {
     if (debug) { console.log('notify_audio', sound) }
-    $('audio#' + sound)[0].play()
+    if (this.audioEnabled()) {
+      $('audio#' + sound)[0].play()
+    }
   }
 
   supportsNewNofification() {
     if (!window.Notification || !Notification.requestPermission)
       return false;
 
-    try {
-      new Notification('');
-    } catch (e) {
-      if (e.name == 'TypeError')
-        return false;
-    }
-    return true;
+    // try {
+    //   new Notification('');
+    // } catch (e) {
+    //   if (e.name == 'TypeError')
+    //     return false;
+    // }
+    return isConstructor(Notification);
   }
+}
+
+function isConstructor(obj) {
+  return !!obj.prototype && !!obj.prototype.constructor.name;
 }
 
 export default Notifier

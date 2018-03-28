@@ -2,5 +2,4 @@
 
 ## Overview
 
-{!sidebar.html!}
 
