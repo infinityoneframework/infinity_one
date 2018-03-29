@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 * [UCX-3869] require either first char of leading space to trigger app pop-ups.
+* [UCX-3868] Stop /unknown command for eating the message
 
 ## 1.0.0.beta8 (2018-03-26)
 

@@ -3,7 +3,6 @@ defmodule OneChatWeb.RoomChannel.MessageInput.SpecialKeys do
   Handle message input special key presses.
 
   """
-
   alias OneChatWeb.RoomChannel.MessageInput
   alias OneChatWeb.RoomChannel.{Message, Channel}
   alias OneChatWeb.RoomChannel.MessageInput.Buffer
@@ -28,12 +27,13 @@ defmodule OneChatWeb.RoomChannel.MessageInput.SpecialKeys do
       nil ->
         MessageInput.close_popup(context)
       {pattern, key} ->
-        Logger.debug "pattern: #{inspect {pattern, key}}"
+        # Logger.debug "pattern: #{inspect {pattern, key}}"
         MessageInput.dispatch_handle_in(key, pattern, context)
     end
   end
 
   def handle_in(%{app: _app, open?: true} = context, key) when key in [@tab, @cr] do
+    # Logger.warn "handle in open"
     MessageInput.handle_select context, MessageInput.get_selected_item(context)
   end
 

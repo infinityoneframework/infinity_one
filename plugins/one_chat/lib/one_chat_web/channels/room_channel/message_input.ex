@@ -99,7 +99,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
   end
 
   defp handle_in(context, key) when key in @special_keys do
-    # Logger.info "key: #{inspect key}, state: #{inspect context.state}"
+    # Logger.warn "key: #{inspect key}, state: #{inspect context.state}"
     SpecialKeys.handle_in context, key
   end
 
@@ -112,12 +112,12 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
   end
 
   defp handle_in(%{app: app, state: state} = context, _key) do
-    # Logger.info "handle in"
+    # Logger.info "handle in open?: #{context[:open?]}"
     if match = Buffer.pattern_mod_match? app, state.head do
-      # Logger.info "matched: "
+      # Logger.warn "matched: #{inspect match}"
       dispatch_handle_in(app, match, context)
     else
-      # Logger.info "did not match: "
+      # Logger.warn "did not match: "
       check_and_close :close, context
     end
   end
@@ -158,8 +158,9 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
 
   def check_and_close(:close, context) do
     context.client.close_popup context.socket
-
-    Map.delete context, :app
+    context
+    |> Map.delete(:app)
+    |> Map.put(:open?, false)
   end
 
   def check_and_close(_, context) do

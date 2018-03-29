@@ -33,9 +33,9 @@ defmodule OneChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   def run("/" <> buffer, sender, socket, client) do
     # Logger.info "Command #{buffer}, sender: #{inspect sender}"
     [command | args] = String.split buffer, " ", trim: true
-    run_command(command, args, sender, socket, client)
+    result = run_command(command, args, sender, socket, client) == true
     client.clear_message_box socket
-    false
+    result
   end
 
   def run(_buffer, _sender, _socket, _client) do
@@ -260,8 +260,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
 
   # Default catch all
   def run_command(unsupported, _args, sender, socket, _client) do
-    Logger.error "Unsupported command #{unsupported}, sender: #{inspect sender}"
-    socket
+    true
   end
 
   defp get_channel_name([name], _, _client) do

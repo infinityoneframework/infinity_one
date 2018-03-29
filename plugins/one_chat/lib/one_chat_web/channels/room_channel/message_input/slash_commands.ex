@@ -42,7 +42,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput.SlashCommands do
       """
   end
 
-  defp render_commands([], context) do
+  defp render_commands(commands, context) when commands in [nil, []] do
     context.client.close_popup context.socket
     :close
   end
