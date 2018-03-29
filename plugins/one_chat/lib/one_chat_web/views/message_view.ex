@@ -283,9 +283,9 @@ defmodule OneChatWeb.MessageView do
 
   def show_markdown1(%{show_mark_down?: true}) do
     [
-      content_tag(:b, "*bold*"),
-      content_tag(:i, "_italics_"),
-      content_tag(:span, do: ["~", content_tag(:strike, "strike"), "~"])
+      content_tag(:b, "**bold**"),
+      content_tag(:i, "__italics__"),
+      content_tag(:span, do: ["~~", content_tag(:strike, "strike"), "~~"])
     ]
   end
   def show_markdown1(_), do: []
@@ -325,7 +325,6 @@ defmodule OneChatWeb.MessageView do
       ]
     end
   end
-
 
   defp hidden_br do
     content_tag :span, class: "hidden-br" do
@@ -516,27 +515,31 @@ defmodule OneChatWeb.MessageView do
   def message_formats(body, _), do: body
 
   defp italic_formats(body) do
-    if body =~ ~r/(\<.*?_.*?_.*?\>)|`|!md/ do
+    if body =~ ~r/(\<.*?__.*?__.*?\>)|`|!md/ do
       body
     else
-      String.replace(body, ~r/_([^\<\>]+?)_/, "<i>\\1</i>")
+      translate_markup(body, "_", :i)
     end
   end
 
   defp bold_formats(body) do
-    if body =~ ~r/\<.*?\*.*?\*.*?\>|`|!md/ do
+    if body =~ ~r/\<.*?\*\*.*?\*\*.*?\>|`|!md/ do
       body
     else
-      String.replace(body, ~r/\*([^\<\>]+?)\*/, "<strong>\\1</strong>")
+      translate_markup(body, "\\*", :strong)
     end
   end
 
   defp strike_formats(body) do
-    if body =~ ~r/\<.*?~.*?~.*?\>|`|!md/ do
+    if body =~ ~r/\<.*?~~.*?~~.*?\>|`|!md/ do
       body
     else
-      String.replace(body, ~r/\~([^\<\>]+?)\~/, "<strike>\\1</strike>")
+      translate_markup(body, "~", :strike)
     end
+  end
+
+  defp translate_markup(body, ch, tag) do
+    String.replace(body, ~r/(?:^|\s)#{ch}#{ch}([^\<\>]+?)#{ch}#{ch}(?:$|\s)/, " <#{tag}>\\1</#{tag}> ")
   end
 
   defp format_newlines(string, true, _), do: string

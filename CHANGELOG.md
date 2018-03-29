@@ -7,6 +7,7 @@
 * Added local help framework with couple help pages (WIP)
 * Use Message poster avatar in desktop notifications
 * Added server_settings public API for use by desktop clients
+* [UCX-3852] Double markup characters and match on leading and trailing spaces
 
 ### Bug Fixes
 
