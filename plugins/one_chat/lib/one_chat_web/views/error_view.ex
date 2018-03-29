@@ -1,13 +1,7 @@
 defmodule OneChatWeb.ErrorView do
   use OneChatWeb, :view
 
-  def render("404.html", _assigns) do
-    "Page not found"
-  end
-
-  def render("500.html", _assigns) do
-    "Internal server error"
-  end
+  defdelegate render(page, assigns), to: InfinityOneWeb.ErrorView
 
   # In case no render clause matches or no
   # template is found, let's render it as 500

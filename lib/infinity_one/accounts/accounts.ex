@@ -121,6 +121,16 @@ defmodule InfinityOne.Accounts do
     Repo.one from u in User, where: u.id == ^id, preload: ^preload
   end
 
+  def get_first_admin_email do
+    Repo.one from u in User,
+      order_by: [asc: :inserted_at],
+      join: ur in UserRole, on: ur.user_id == u.id,
+      join: r in Role, on: r.id == ur.role_id,
+      where: r.name == "admin",
+      select: u.email,
+      limit: 1
+  end
+
   def get_by_user(opts) do
     {preload, opts} = pop_user_preloads(opts)
     opts
