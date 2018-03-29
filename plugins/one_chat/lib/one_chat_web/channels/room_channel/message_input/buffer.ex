@@ -109,7 +109,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput.Buffer do
 
   def match_app_pattern(buffer) do
     case Regex.run @match_all_apps, buffer do
-      [_, _, _, match] -> match
+      [_, _, match] -> match
       [_, match] -> match
       nil -> nil
     end

@@ -14,7 +14,7 @@ defmodule OneChatWeb.RoomChannel.Constants do
       @app_patterns       Enum.map(@app_pattern_strs, &Regex.compile!/1)
 
       @slash_app_pattern  "^\/([^\s]*)$"
-      @other_apps_pattern "(.)*[@#:]([^\s]*)$"
+      @other_apps_pattern "(?:.*\s|^)[@#:]([^\s]*)$"
       @match_all_apps     ~r/#{@slash_app_pattern}|#{@other_apps_pattern}/
 
       @slash_app_pattern1  "^(\/)([^\s]*)$"

@@ -8,8 +8,9 @@
 * Use Message poster avatar in desktop notifications
 * Added server_settings public API for use by desktop clients
 
-
 ### Bug Fixes
+
+* [UCX-3869] require either first char of leading space to trigger app pop-ups.
 
 ## 1.0.0.beta8 (2018-03-26)
 
