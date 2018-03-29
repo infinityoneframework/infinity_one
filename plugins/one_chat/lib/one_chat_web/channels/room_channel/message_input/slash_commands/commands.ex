@@ -259,7 +259,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput.SlashCommands.Commands do
   # end
 
   # Default catch all
-  def run_command(unsupported, _args, sender, socket, _client) do
+  def run_command(_, _args, _sender, _socket, _client) do
     true
   end
 
