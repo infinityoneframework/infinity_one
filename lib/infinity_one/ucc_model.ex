@@ -1,4 +1,4 @@
-defmodule OneModel do
+defmodule OneModelOld do
   @moduledoc """
   Model abstraction for InfinityOne.
 

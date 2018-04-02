@@ -24,6 +24,11 @@ config :infinity_one, :generators,
   migration: true,
   binary_id: true
 
+config :infinity_one_pages,
+  standalone: false,
+  repo: InfinityOne.Repo,
+  endpoint: InfinityOneWeb.Endpoint,
+  deps_path: Mix.Project.deps_path() <> "/infinity_one_pages"
 # sample_binary_id: "11111111-1111-1111-1111-111111111111"
 
 # The example below replaces [UCX-123] with

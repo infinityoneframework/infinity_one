@@ -1,4 +1,5 @@
 $(function () {
+    console.log('header running....');
     $('.portico-header a .logout').on('click', function () {
         $('#logout_form').submit();
         return false;

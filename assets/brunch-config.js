@@ -9,9 +9,17 @@ exports.config = {
       joinTo: {
        "js/app.js": /^(js|..\/deps|node_modules)/,
        "js/landing.js": /^(landing_js|..\/deps|node_modules)/,
-       "js/help.js": /^(help_js|..\/deps|node_modules)/,
+       // "js/help.js": /^(help_js|..\/deps|node_modules)/,
        "js/adapter.js": ["vendor/adapter.js"],
-       "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"]
+       "js/header.js": ["vendor/header.js"],
+       "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"],
+        "js/infinity_one_pages.js": [
+          "node_modules/infinity_one_pages/priv/dist/js/infinity_one_pages.js",
+          "node_modules/infinity_one_pages/priv/dist/js/help.js",
+        ],
+        "js/infinity_one_pages_vendor.js": [
+          "node_modules/infinity_one_pages/priv/dist/js/infinity_one_pages_vendor.js"
+        ]
        // "js/vendor.js": /^(web\/static\/vendor)|(deps)/
       },
       //
@@ -38,7 +46,10 @@ exports.config = {
         "css/channel_settings.css": ["scss/channel_settings.scss"],
         "css/help.css": ["scss/help.scss", "scss/components.scss"],
         "css/toastr.css": ["css/toastr.css"],
-        "css/emojipicker.css": ["vendor/emojiPicker.css"]
+        "css/emojipicker.css": ["vendor/emojiPicker.css"],
+        "css/infinity_one_pages.css": [
+          "../deps/infinity_one_pages/priv/dist/css/infinity_one_pages.css"
+        ]
         // "css/toastr.css": ["web/static/scss/toastr.scss"]
       },
       order: {
@@ -55,13 +66,25 @@ exports.config = {
     // This option sets where we should place non-css and non-js assets in.
     // By default, we set this to "/assets/static". Files in this directory
     // will be copied to `paths.public`, which is "priv/static" by default.
-    assets: /^(static)/
+    assets: [
+      /^(static)/,
+      /^(node_modules\/infinity_one_pages)/,
+    ]
   },
 
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "fonts", "css", "js", "help_js", "vendor", "scss", "../plugins/one_admin/priv/static"],
+    watched: [
+      "static",
+      "fonts",
+      "css",
+      "js",
+      "help_js",
+      "vendor",
+      "scss", "../plugins/one_admin/priv/static",
+      "node_modules/infinity_one_pages/priv/dist/js"
+    ],
     // Where to compile files to
     public: "../priv/static"
   },
@@ -86,12 +109,20 @@ exports.config = {
     coffeescript: {
       // bare: true
     },
+    copycat: {
+      "fonts": ["node_modules/infinity_one_pages/priv/dist/fonts"],
+      "images": ["node_modules/infinity_one_pages/priv/dist/images"],
+      // "js": ["node_modules/infinity_one_pages/priv/dist/js"],
+      "css": ["node_modules/infinity_one_pages/priv/dist/css"],
+      verbose: false,
+      onlyChanged: true
+    },
   },
 
   modules: {
     autoRequire: {
       "js/app.js": ["js/app"],
-      "js/help.js": ["help_js/help"]
+      "js/help.js": ["help_js/help"],
     }
   },
 
@@ -101,7 +132,8 @@ exports.config = {
     styles: {
       // toastr: ["toastr.css"],
       "highlight.js": ['styles/solarized-dark.css'],
-      sweetalert: ['dist/sweetalert.css']
+      sweetalert: ['dist/sweetalert.css'],
+      infinity_one_pages: ['css/infinity_one_pages.css']
       // one_admin: ['priv/static/one_admin.scss']  // this isn't working
       // emojionearea: ['dist/emojionearea.min.css']
       // emojipicker: ['dist/emojipicker.css']

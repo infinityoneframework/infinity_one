@@ -12,7 +12,8 @@
           i
         h2
           .room-title= OneSettings.content_home_title()
-      .content= raw OneSettings.content_home_body()
+      .content.markdown-body
+        = raw Earmark.as_html!(OneSettings.content_home_body())
 
   div.main-content-cache.hidden
   = render OneChatWeb.SideNavView, "show.html", conn: @conn, chatd: @chatd

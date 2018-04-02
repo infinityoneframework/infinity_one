@@ -1,5 +1,16 @@
 # InfinityOne Changelog
 
+## 1.0.0.beta10 (2018-04-02)
+
+### Enhancements
+
+* Add InfinityOnePages package including download desktop app support
+* Update the default home page default text
+* Support markdown for home page text entry
+
+### Bug Fixes
+
+
 ## 1.0.0.beta9 (2018-03-28)
 
 ### Enhancements

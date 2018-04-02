@@ -73,7 +73,7 @@ defmodule InfinityOne.Mixfile do
       # {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
-      {:mariaex, ">= 0.0.0", only: [:dev, :prod]},
+      {:mariaex, ">= 0.0.0", only: [:dev, :prod], override: true},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.13"},
@@ -123,7 +123,10 @@ defmodule InfinityOne.Mixfile do
       # {:scrivener_ecto, path: "../scrivener_ecto"}
       {:scrivener_ecto, github: "smpallen99/scrivener_ecto"},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:briefly, "~> 0.3"}
+      {:briefly, "~> 0.3"},
+      {:one_model, github: "infinityoneframework/one_model"},
+      {:infinity_one_pages, github: "infinityoneframework/infinity_one_pages", branch: "integrate"}
+      # {:infinity_one_pages, path: "../infinity_one_pages"},
     ] ++ plugin_deps()
   end
 

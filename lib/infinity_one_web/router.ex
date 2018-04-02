@@ -1,5 +1,6 @@
 defmodule InfinityOneWeb.Router do
   use InfinityOneWeb, :router
+  use InfinityOnePagesWeb.Router
   use Coherence.Router
 
   pipeline :browser do
@@ -29,9 +30,15 @@ defmodule InfinityOneWeb.Router do
   scope "/", InfinityOneWeb do
     pipe_through(:browser)
     get("/landing", LandingController, :index)
-    get("/help", HelpController, :index)
-    get("/help/:id", HelpController, :show)
+    # get("/help", HelpController, :index)
+    # get("/help/:id", HelpController, :show)
     coherence_routes()
+  end
+
+  scope "/", InfinityOnePagesWeb do
+    pipe_through :browser
+
+    infinity_one_pages_routes()
   end
 
   scope "/", InfinityOneWeb do
