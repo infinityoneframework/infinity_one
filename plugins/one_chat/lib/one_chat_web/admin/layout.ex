@@ -3,6 +3,7 @@ defmodule OneChatWeb.Admin.Page.Layout do
 
   alias InfinityOne.{Repo, Hooks}
   alias OneChat.Settings.Layout
+  alias OneAdminWeb.View.Utils
 
   def add_page do
     new(
@@ -18,10 +19,11 @@ defmodule OneChatWeb.Admin.Page.Layout do
   end
 
   def args(page, user, _sender, socket) do
+    layout = Layout.get()
     {[
       user: Repo.preload(user, Hooks.user_preload([])),
-      changeset: Layout.get |> Layout.changeset,
-    ], user, page, socket}
+      changeset: layout |> Layout.changeset,
+    ] ++ Utils.changed_bindings(Layout, layout), user, page, socket}
   end
 
   def check_perissions(_page, user) do

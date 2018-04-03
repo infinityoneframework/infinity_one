@@ -2,6 +2,7 @@ defmodule OneChatWeb.Admin.Page.Accounts do
   use OneAdmin.Page
 
   alias InfinityOne.{Repo, Hooks, Settings.Accounts}
+  alias OneAdminWeb.View.Utils
 
   def add_page do
     new(
@@ -17,11 +18,12 @@ defmodule OneChatWeb.Admin.Page.Accounts do
   end
 
   def args(page, user, _sender, socket) do
+    accounts = Accounts.get()
     {[
       user: Repo.preload(user, Hooks.user_preload([])),
-      changeset: Accounts.get() |> Accounts.changeset()
+      changeset: accounts |> Accounts.changeset()
         |> Hooks.all_users_post_filter,
-    ], user, page, socket}
+    ] ++ Utils.changed_bindings(Accounts, accounts), user, page, socket}
   end
 
   def check_perissions(_page, user) do

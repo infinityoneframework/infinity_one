@@ -33,7 +33,7 @@ defmodule OneAdminWeb.View.Utils do
           ~g"Reset section settings"
         end,
         content_tag :div, class: "setting-field" do
-          content_tag :button, class: "reset-group button danger" do
+          content_tag :button, class: "reset-group button danger", "rebel-click": :admin_reset_settings_click do
             ~g"Reset"
           end
         end
@@ -41,7 +41,7 @@ defmodule OneAdminWeb.View.Utils do
     end
   end
 
-  def text_input_line(f, _item, field, title, opts \\ []) do
+  def text_input_line(f, item, field, title, opts \\ []) do
     type = opts[:type] || :text
     description = opts[:description]
 
@@ -54,12 +54,43 @@ defmodule OneAdminWeb.View.Utils do
           f
           |> text_input(field, class: "input-monitor", type: type)
           |> do_description(description)
-        end
+        end,
+        add_changed(opts, item, field)
       ]
     end
   end
 
-  def textarea_input_line(f, _item, field, title, opts \\ []) do
+
+  def add_changed(opts, item, field) do
+    module = item.__struct__ |> Module.split() |> List.last() |> Inflex.Underscore.underscore()
+    changed = opts[:changed]
+    if changed[field] do
+      content_tag :button, class: "reset-settings button danger", text: "Reset",
+        "data-setting": "#{module}__#{field}", "rebel-click": :admin_reset_setting_click do
+
+        content_tag :i, [class: "icon-ccw secondary-font-color color-error-contrast"], do: ""
+      end
+    else
+      []
+    end
+  end
+
+  def changed_bindings(module, current) do
+    defaults = apply(module, :new, [])
+    schema = apply(module, :schema, [])
+
+    changed =
+      Enum.reduce(schema.__schema__(:fields), %{}, fn field, acc ->
+        if Map.get(defaults, field) != Map.get(current, field) do
+          Map.put(acc, field, true)
+        else
+          acc
+        end
+      end)
+    [defaults: defaults, changed: changed]
+  end
+
+  def textarea_input_line(f, item, field, title, opts \\ []) do
     type = opts[:type] || :text
     description = opts[:description]
 
@@ -72,7 +103,8 @@ defmodule OneAdminWeb.View.Utils do
           f
           |> textarea(field, class: "input-monitor", type: type)
           |> do_description(description)
-        end
+        end,
+        add_changed(opts, item, field)
       ]
     end
   end
@@ -118,12 +150,13 @@ defmodule OneAdminWeb.View.Utils do
             end
           ]
           |> do_description(description)
-        end
+        end,
+        add_changed(opts, item, field)
       ]
     end
   end
 
-  def select_line(f, _item, field, options, title, opts \\ []) do
+  def select_line(f, item, field, options, title, opts \\ []) do
     description = opts[:description]
     content_tag :div, class: "input-line double-col" do
       [
@@ -139,7 +172,8 @@ defmodule OneAdminWeb.View.Utils do
             select(f, field, options)
           ]
           |> do_description(description)
-        end
+        end,
+        add_changed(opts, item, field)
       ]
     end
   end

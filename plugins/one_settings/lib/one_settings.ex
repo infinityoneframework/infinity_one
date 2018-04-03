@@ -49,7 +49,28 @@ defmodule OneSettings do
     end)
   end)
 
-  # Module.register_attribute(__MODULE__, :modules, persist: true, accumulate: true)
+  @module_map :infinity_one |>
+    Application.get_env(:settings_modules, []) |>
+    Enum.map(fn m -> {m |> Module.split() |> List.last() |> Module.concat(nil), m} end) |>
+    Enum.into(%{})
+
+  @doc """
+  Return a map of the module.
+
+  Returns a map of the full module indexed by the last segment of the module.
+  """
+  def module_map, do: @module_map
+
+  @doc """
+  Get the fill module give either an Atom or a binary.
+  """
+  def module_map(module) when is_atom(module) do
+    Map.get(@module_map, module)
+  end
+
+  def module_map(module) when is_binary(module) do
+    Map.get(@module_map, module |> Inflex.camelize() |> Module.concat(nil))
+  end
 
   fields =
     :infinity_one

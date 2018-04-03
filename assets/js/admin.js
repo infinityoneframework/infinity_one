@@ -30,29 +30,40 @@ class Admin {
     save.attr('disabled', 'disabled')
     $('button.discard').remove()
   }
+  add_reset_setting_button(target, input_line) {
+    let data_settings = target.getAttribute('name').replace('[', '__').replace(']', '')
+    let reset = `<button text='Reset' data-setting="${data_settings}"
+      class="reset-settings button danger" rebel-click="admin_reset_setting_click">${reset_i}</button>`
+    if (input_line.find('button.reset-settings').length === 0) {
+      input_line.append(reset);
+
+      Rebel.set_event_handlers($(target).selector);
+    }
+  }
+  handle_change(e) {
+    let target = e.currentTarget;
+    let input_line = $(target).closest('.input-line');
+    this.enable_save_button()
+    input_line.addClass('setting-changed')
+    this.add_reset_setting_button(target, input_line);
+  }
   register_events(admin) {
     $('body')
-      .on('click', 'button.discard', function() {
+      .on('click', 'button.discard', () => {
         // admin.disable_save_button()
         $('a.admin-link[data-id="admin_info"]').click()
       })
-      .on('change', '.admin-settings form input:not(.search)', function(e) {
-        let target = e.currentTarget
-        admin.enable_save_button()
-        let reset = `<button text='Reset' data-setting="${target.getAttribute('name')}" class="reset-setting button danger">${reset_i}</button>`
-        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      .on('change', '.admin-settings form input:not(.search)', (e) => {
+        this.handle_change(e);
       })
-      .on('change', '.admin-settings form select', function(e) {
-        admin.enable_save_button()
-        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      .on('change', '.admin-settings form select', (e) => {
+        this.handle_change(e);
       })
-      .on('keyup keypress paste', '.admin-settings form input:not(.search)', function(e) {
-        admin.enable_save_button()
-        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      .on('keyup keypress paste', '.admin-settings form input:not(.search)', (e) => {
+        this.handle_change(e);
       })
-      .on('keyup keypress paste', '.admin-settings form textarea', function(e) {
-        admin.enable_save_button()
-        $(this).closest('.input-line').addClass('setting-changed') //.append(reset)
+      .on('keyup keypress paste', '.admin-settings form textarea', (e) => {
+        this.handle_change(e);
       })
       .on('change', '.permissions-manager [type="checkbox"]', function(e, t) {
         e.preventDefault()

@@ -254,7 +254,7 @@ defmodule OneAdminWeb.AdminChannel do
 
   def admin_restart_server(socket, _sender) do
     SweetAlert.swal_modal socket, ~g(Are you sure?),
-      ~g(This will disrupt servic for all active users), "warning",
+      ~g(This will disrupt service for all active users), "warning",
       [
         showCancelButton: true, closeOnConfirm: false, closeOnCancel: true,
         confirmButtonColor: "#DD6B55", confirmButtonText: ~g(Yes, restart it)
@@ -380,6 +380,40 @@ defmodule OneAdminWeb.AdminChannel do
       "" -> nil
       other -> other
     end
+  end
+
+  def admin_reset_setting_click(socket, sender) do
+    setting_name = sender["dataset"]["setting"]
+    [mod, field] = String.split(setting_name, "__", trim: true)
+    module = OneSettings.module_map(mod)
+    field = String.to_existing_atom(field)
+    schema = apply(module, :schema, [])
+    default = Map.get(schema.__struct__, field)
+
+    control_type = Rebel.Core.exec_js!(socket,
+      ~s/let e=$('[name="#{mod}[#{field}]"]'); e.attr('type') + ' ' + e.get(0).tagName/)
+
+    selector = "#" <> String.replace(setting_name, "__", "_")
+
+    case String.split(control_type) do
+      [_, "TEXTAREA"] ->
+        Rebel.Query.update(socket, :val, set: default, on: selector)
+      ["radio", _] ->
+        selector = selector <> "_"
+        which = if default in [true, "true"], do: "1", else: "0"
+        Rebel.Query.update(socket, prop: "checked", set: true, on: selector <> which)
+      [_, "INPUT"] ->
+        Rebel.Query.update(socket, :val, set: default, on: selector)
+      [_, "SELECT"] ->
+        Rebel.Query.update(socket, :val, set: default, on: selector)
+      other ->
+        raise "invalid control type: #{inspect other}"
+    end
+
+    socket
+    |> async_js(~s/OneChat.admin.enable_save_button()/)
+    |> async_js(~s/$('[data-setting="#{setting_name}"]').closest('.input-line').addClass('setting-changed')/)
+    |> async_js(~s/$('[data-setting="#{setting_name}"]').remove()/)
   end
 
   defp clear_selected_users(socket) do

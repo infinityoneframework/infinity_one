@@ -3,6 +3,7 @@ defmodule OneChatWeb.Admin.Page.Message do
 
   alias InfinityOne.{Repo, Hooks}
   alias OneChat.Settings.Message
+  alias OneAdminWeb.View.Utils
 
   def add_page do
     new(
@@ -18,11 +19,12 @@ defmodule OneChatWeb.Admin.Page.Message do
   end
 
   def args(page, user, _sender, socket) do
+    message = Message.get()
     {[
       user: Repo.preload(user, Hooks.user_preload([])),
-      changeset: Message.get |> Message.changeset,
+      changeset: message |> Message.changeset(),
       message_opts: OneChatWeb.MessageView.message_opts()
-    ], user, page, socket}
+    ] ++ Utils.changed_bindings(Message, message), user, page, socket}
   end
 
   def check_perissions(_page, user) do

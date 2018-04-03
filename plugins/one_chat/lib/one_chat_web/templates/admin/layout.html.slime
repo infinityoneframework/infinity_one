@@ -1,5 +1,5 @@
 - item = @changeset.data
-- defer = Application.get_env :ucx_chat, :defer, true
+- defer = Application.get_env :infinity_one, :defer, true
 section.page-container.page-home.page-static.page-settings.admin-settings
   header.fixed-title.border-component-color
     = render OneChatWeb.MasterView, "burger.html"
@@ -18,19 +18,19 @@ section.page-container.page-home.page-static.page-settings.admin-settings
         = hidden_input f, :id, value: item.id
         .rocket-form
           = collapsable_section ~g"Content", fn _ ->
-            = text_input_line f, item, :content_home_title, ~g"Home Title"
-            = textarea_input_line f, item, :content_home_body, ~g"Home Body"
-            = text_input_line f, item, :content_side_nav_footer, ~g"Side Navigation Footer"
+            = text_input_line f, item, :content_home_title, ~g"Home Title", changed: @changed
+            = textarea_input_line f, item, :content_home_body, ~g"Home Body", changed: @changed
+            = text_input_line f, item, :content_side_nav_footer, ~g"Side Navigation Footer", changed: @changed
             = unless defer do
               = reset_section_settings()
 
             = collapsable_section ~g"Fonts", fn _ ->
-              = text_input_line f, item, :body_font_family, ~g"Body Font Family"
+              = text_input_line f, item, :body_font_family, ~g"Body Font Family", changed: @changed
               = reset_section_settings()
 
           = collapsable_section ~g"User Interface", fn _ ->
-            = radio_button_line f, item, :display_roles, ~g"Display Roles"
+            = radio_button_line f, item, :display_roles, ~g"Display Roles", changed: @changed
             = unless defer do
-              = radio_button_line f, item, :merge_private_groups, ~g"Merge private groups with channels"
-              = radio_button_line f, item, :user_full_initials_for_avatars, ~g"Use full name initials to generate default avatar"
+              = radio_button_line f, item, :merge_private_groups, ~g"Merge private groups with channels", changed: @changed
+              = radio_button_line f, item, :user_full_initials_for_avatars, ~g"Use full name initials to generate default avatar", changed: @changed
               = reset_section_settings()

@@ -1,5 +1,5 @@
 - item = @changeset.data
-- defer = Application.get_env :ucx_chat, :defer, true
+- defer = Application.get_env :infinity_one, :defer, true
 - import OneChatWeb.Admin.Page.ChatGeneral, only: [options: 1]
 section.page-container.page-home.page-static.page-settings.admin-settings
   header.fixed-title.border-component-color
@@ -20,20 +20,20 @@ section.page-container.page-home.page-static.page-settings.admin-settings
         .rocket-form
           .section
             .section-content.border-component-color
-              = select_line f, item, :unread_count, options(:unread_count), ~g(Unread Count)
-              = select_line f, item, :unread_count_dm, options(:unread_count_dm), ~g(Unread Count for Direct Messages)
-              = text_input_line f, item, :first_channel_after_login, ~g(First channel after login), disabled: "disabled"
+              = select_line f, item, :unread_count, options(:unread_count), ~g(Unread Count), changed: @changed
+              = select_line f, item, :unread_count_dm, options(:unread_count_dm), ~g(Unread Count for Direct Messages), changed: @changed
+              = text_input_line f, item, :first_channel_after_login, ~g(First channel after login), disabled: "disabled", changed: @changed
               = unless defer do
-                = radio_button_line(f, item, :enable_favorite_rooms, ~g"Enable Favorite Rooms")
+                = radio_button_line(f, item, :enable_favorite_rooms, ~g"Enable Favorite Rooms", changed: @changed)
           = collapsable_section ~g"Notifications", fn _ ->
             - desc = ~g(Can be any custom sound or the default ones: beep, chelle, ding, droplet, highbell, seasons)
-            = text_input_line f, item, :default_message_notification_audio, ~g"Default message notification audio", description: desc
-            = select_line f, item, :audio_notifications_default_alert, options(:notifications), ~g(Audio Notifications Default Alert)
-            = select_line f, item, :desktop_notifications_default_alert, options(:notifications), ~g(Desktop Notifications Default Alert)
-            = select_line f, item, :mobile_notifications_default_alert, options(:notifications), ~g(Mobile Notifications Default Alert)
+            = text_input_line f, item, :default_message_notification_audio, ~g"Default message notification audio", description: desc, changed: @changed
+            = select_line f, item, :audio_notifications_default_alert, options(:notifications), ~g(Audio Notifications Default Alert), changed: @changed
+            = select_line f, item, :desktop_notifications_default_alert, options(:notifications), ~g(Desktop Notifications Default Alert), changed: @changed
+            = select_line f, item, :mobile_notifications_default_alert, options(:notifications), ~g(Mobile Notifications Default Alert), changed: @changed
             - msg = ~g(Max room members before disabling all message notifications)
             - desc = ~g"Max number of members in room when notifications for all messages gets disabled. Users can still change per room setting to receive all notifications on an individual basis. (0 to disable)"
-            = text_input_line f, item, :max_members_disable_notifications, msg, type: :number, description: desc
+            = text_input_line f, item, :max_members_disable_notifications, msg, type: :number, description: desc, changed: @changed
 
-          = render "slash_commands.html", f: f, item: item, field: :rooms_slash_commands, title: ~g"Slash Commands (Rooms Mode)"
-          = render "slash_commands.html", f: f, item: item, field: :chat_slash_commands, title: ~g"Slash Commands (Chat Mode)"
+          = render "slash_commands.html", f: f, item: item, field: :rooms_slash_commands, title: ~g"Slash Commands (Rooms Mode)", changed: @changed
+          = render "slash_commands.html", f: f, item: item, field: :chat_slash_commands, title: ~g"Slash Commands (Chat Mode)", changed: @changed

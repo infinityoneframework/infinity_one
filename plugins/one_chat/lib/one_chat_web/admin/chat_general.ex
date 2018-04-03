@@ -6,6 +6,7 @@ defmodule OneChatWeb.Admin.Page.ChatGeneral do
 
   alias InfinityOne.{Repo, Hooks}
   alias OneChat.Settings.ChatGeneral
+  alias OneAdminWeb.View.Utils
 
   @doc """
   Callback to add the ChatGeneral page into the administration pages.
@@ -27,10 +28,11 @@ defmodule OneChatWeb.Admin.Page.ChatGeneral do
   Callback to provide the ChatGeneral page rendering bindings.
   """
   def args(page, user, _sender, socket) do
+    general = ChatGeneral.get()
     {[
       user: Repo.preload(user, Hooks.user_preload([])),
-      changeset: ChatGeneral.get |> ChatGeneral.changeset,
-    ], user, page, socket}
+      changeset: general |> ChatGeneral.changeset(),
+    ] ++ Utils.changed_bindings(ChatGeneral, general), user, page, socket}
   end
 
   @doc """

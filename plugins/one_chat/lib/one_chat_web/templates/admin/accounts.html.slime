@@ -18,21 +18,21 @@ section.page-container.page-home.page-static.page-settings.admin-settings
         .rocket-form
           .section
             .section-content.border-component-color
-              = radio_button_line f, item, :allow_users_delete_own_account, ~g'Allow users delete own account'
-              = radio_button_line f, item, :allow_user_profile_change, ~g'Allow user profile change'
-              = radio_button_line f, item, :allow_username_change, ~g'Allow username change'
-              = radio_button_line f, item, :allow_email_change, ~g'Allow email change'
-              = radio_button_line f, item, :allow_password_change, ~g'Allow password change'
-              = radio_button_line f, item, :login_extiration_in_days, ~g'Login extiration in days', description: "feature coming soon"
+              = radio_button_line f, item, :allow_users_delete_own_account, ~g'Allow users delete own account', changed: @changed
+              = radio_button_line f, item, :allow_user_profile_change, ~g'Allow user profile change', changed: @changed
+              = radio_button_line f, item, :allow_username_change, ~g'Allow username change', changed: @changed
+              = radio_button_line f, item, :allow_email_change, ~g'Allow email change', changed: @changed
+              = radio_button_line f, item, :allow_password_change, ~g'Allow password change', changed: @changed
+              = radio_button_line f, item, :login_extiration_in_days, ~g'Login extiration in days', description: "feature coming soon", changed: @changed
           = collapsable_section ~g"Registraton", fn _ ->
-              = radio_button_line f, item, :require_account_confirmation, ~g'Require account confirmation', description: "feature coming soon"
-              = radio_button_line f, item, :allow_remember_me, ~g'Allow remember me'
-              = radio_button_line f, item, :require_name_for_signup, ~g'Require name for signup', description: "feature coming soon"
-              = radio_button_line f, item, :require_password_confirmation, ~g'Require password confirmation', description: "feature coming soon"
-              = radio_button_line f, item, :require_email_verificaton, ~g'Require email verificaton', description: "feature coming soon"
-              = radio_button_line f, item, :manually_approve_new_users, ~g'Manually approve new users', description: "feature coming soon"
-              = text_input_line f, item, :blocked_username_list, ~g(Blocked username list), description: "feature coming soon"
+              = radio_button_line f, item, :require_account_confirmation, ~g'Require account confirmation', description: "feature coming soon", changed: @changed
+              = radio_button_line f, item, :allow_remember_me, ~g'Allow remember me', changed: @changed
+              = radio_button_line f, item, :require_name_for_signup, ~g'Require name for signup', description: "feature coming soon", changed: @changed
+              = radio_button_line f, item, :require_password_confirmation, ~g'Require password confirmation', description: "feature coming soon", changed: @changed
+              = radio_button_line f, item, :require_email_verificaton, ~g'Require email verificaton', description: "feature coming soon", changed: @changed
+              = radio_button_line f, item, :manually_approve_new_users, ~g'Manually approve new users', description: "feature coming soon", changed: @changed
+              = text_input_line f, item, :blocked_username_list, ~g(Blocked username list), description: "feature coming soon", changed: @changed
               - opts = [{~g(Public), "Public"}, {~g(Disabled), "Disabled"}, {~g(Secret URL), "Secret URL"}]
-              = select_line f, item, :registraton_form, opts, ~g'Registraton form'
-              = text_input_line f, item, :registration_form_secret_url, ~g(Registration form secret url), description: ~g(You must provide a random string that will be added to your registration URL.) <> "<br>" <> "feature coming soon"
-              = radio_button_line f, item, :password_reset, ~g'Password reset'
+              = select_line f, item, :registraton_form, opts, ~g'Registraton form', changed: @changed
+              = text_input_line f, item, :registration_form_secret_url, ~g(Registration form secret url), description: ~g(You must provide a random string that will be added to your registration URL.) <> "<br>" <> "feature coming soon", changed: @changed
+              = radio_button_line f, item, :password_reset, ~g'Password reset', changed: @changed
