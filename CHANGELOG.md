@@ -1,5 +1,12 @@
 # InfinityOne Changelog
 
+## 1.0.0.beta11 (2018-04-xx)
+
+### Enhancements
+
+### Bug Fixes
+
+
 ## 1.0.0.beta10 (2018-04-03)
 
 ### Enhancements
