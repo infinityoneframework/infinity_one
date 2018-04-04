@@ -1,6 +1,6 @@
 {
-  "name": "infinity_one_pages",
-  "version": "0.1.0",
+  "name": "one_pages",
+  "version": "0.2.0",
   "description": "The javascript and css for infinity_one_pages.",
   "license": "Apache-2.0",
   "main": "../../../priv/js/one_pages.js",
@@ -24,7 +24,8 @@
   },
   "scripts": {
     "watch": "brunch watch",
-    "build": "brunch build"
+    "build": "brunch build",
+    "replease": "brunch build -p"
   },
   "style": "./css/one_pages.css",
   "files": [
