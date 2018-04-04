@@ -22,7 +22,7 @@ exports.config = {
     stylesheets: {
       joinTo: {
         "css/one_pages.css": [
-          /^(css|scss)/
+          /^(css)/
         ]
       }
     },
@@ -41,7 +41,7 @@ exports.config = {
   // Phoenix paths configuration
   paths: {
     // Dependencies and current project directories to watch
-    watched: ["static", "third", "css", "scss", "js", "vendor"],
+    watched: ["static", "third", "css", "js", "vendor"],
     // Where to compile files to
     public: "../../../priv/static"
   },
@@ -56,12 +56,6 @@ exports.config = {
       processors: [
         require("autoprefixer")
       ]
-    },
-    sass: {
-      mode: "native", // This is the important part!
-      options: {
-        // includePaths: [ 'node_modules' ]
-      }
     }
   },
 

@@ -1,11 +1,21 @@
 # InfinityOne Changelog
 
-## 1.0.0.beta11 (2018-04-xx)
+## 1.0.0.beta11 (2018-04-04)
 
 ### Enhancements
 
+* Add Getting started guide in help
+* Add several page place holders
+* Add new sections in help sidenav
+* Add some nice page transitions in pages section
+* Move the infinity_one_pages dependency into the one_pages plugin
+
 ### Bug Fixes
 
+* Fix Typos on /pages
+* User correct platform name in description on Windows and Linux download pages
+* Fix Issue expanding help sections in sidenav
+* Fix some markdown formatting issue on help pages
 
 ## 1.0.0.beta10 (2018-04-03)
 
