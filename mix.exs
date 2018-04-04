@@ -35,7 +35,8 @@ defmodule InfinityOne.Mixfile do
     [mod: {InfinityOne.Application, []}, extra_applications: extra_applications(Mix.env())]
   end
 
-  defp extra_applications(:prod), do: [:logger, :runtime_tools, :coherence]
+  defp extra_applications(:dev), do: [:logger, :runtime_tools, :coherence]
+  defp extra_applications(:prod), do: extra_applications(:dev) ++ [:ex_syslogger]
   defp extra_applications(_), do: extra_applications(:prod) ++ [:faker_elixir_octopus]
 
   # Specifies which paths to compile per environment.
@@ -124,7 +125,7 @@ defmodule InfinityOne.Mixfile do
       {:scrivener_ecto, github: "smpallen99/scrivener_ecto"},
       {:ex_doc, "~> 0.18", only: :dev},
       {:briefly, "~> 0.3"},
-      {:one_model, github: "infinityoneframework/one_model"}
+      {:one_model, github: "infinityoneframework/one_model"},
       # {:infinity_one_pages, path: "../infinity_one_pages"},
     ] ++ plugin_deps()
   end

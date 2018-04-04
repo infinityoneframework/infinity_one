@@ -25,7 +25,7 @@
   "scripts": {
     "watch": "brunch watch",
     "build": "brunch build",
-    "replease": "brunch build -p"
+    "deploy": "brunch build -p"
   },
   "style": "./css/one_pages.css",
   "files": [
