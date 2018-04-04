@@ -17,8 +17,8 @@ config :infinity_one, InfinityOneWeb.Endpoint,
   url: [host: "localhost", port: 4021],
   https: [port: 4021,
     otp_app: :infinity_one,
-    # keyfile: "priv/key.pem",
-    # certfile: "priv/cert.pem"
+    keyfile: "priv/key.pem",
+    certfile: "priv/cert.pem"
   ],
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
