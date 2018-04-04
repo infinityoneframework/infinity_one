@@ -118,7 +118,7 @@ defmodule InfinityOne.Mixfile do
       {:phoenix_markdown, "~> 1.0"},
       {:distillery, "~> 1.4"},
       {:conform, "~> 2.5"},
-      {:ex_syslogger, github: "smpallen99/ex_syslogger"},
+      {:ex_syslogger, github: "smpallen99/ex_syslogger", only: [:prod]},
       {:gen_smtp, "~> 0.12.0"},
       {:exprof, "~> 0.2.0"},
       # {:scrivener_ecto, path: "../scrivener_ecto"}

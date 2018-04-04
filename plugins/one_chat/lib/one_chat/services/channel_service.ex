@@ -156,11 +156,23 @@ defmodule OneChat.ChannelService do
     |> insert_channel!(params)
   end
 
+  def insert_channel!(%{user_id: user_id} = params) do
+    user_id
+    |> Accounts.get_user(default_preload: true)
+    |> insert_channel!(params)
+  end
+
   def insert_channel!(user, params) do
     case insert_channel user, params do
       {:ok, channel} -> channel
       cs -> raise "insert channel failed: #{inspect cs}"
     end
+  end
+
+  def insert_channel(%{"user_id" => user_id} = params) do
+    user_id
+    |> Accounts.get_user(default_preload: true)
+    |> insert_channel(params)
   end
 
   def insert_channel(%{user_id: user_id} = params) do

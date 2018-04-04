@@ -17,13 +17,14 @@ config :infinity_one, InfinityOneWeb.Endpoint,
   url: [host: "localhost", port: 4021],
   https: [port: 4021,
     otp_app: :infinity_one,
-    keyfile: "priv/key.pem",
-    certfile: "priv/cert.pem"
+    # keyfile: "priv/key.pem",
+    # certfile: "priv/cert.pem"
   ],
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
   root: ".",
-  version: Application.spec(:infinity_one, :vsn)
+  version: Application.spec(:infinity_one, :vsn),
+  check_origin: false
 
 # uncomment the following lines if you would like to use a symlink
 # for production releases. Change the second path in the tuple to
@@ -36,13 +37,36 @@ config :infinity_one, InfinityOneWeb.Endpoint,
 #config :logger, level: :info
 
 config :logger, [
-  level: :info,
-  backends: [:console],
-  console: [level: :warn, format: "[$level] $metadata$message\n",
-    metadata: [:module, :function]
+  backends: [:console, {ExSyslogger, :syslog}],
+  console: [
+    level: :warn,
+    format: {InfinityOne.Logger.Formatter, :console},
+    compile: "[$level] $metadata$message\n",
+    metadata: [:module, :function, :line]
   ],
+
+  # the following section controls logging to syslog
+  syslog: [
+    level: :info,
+    ident: "one",
+    facility: :local5,
+    formatter: InfinityOne.Logger.Formatter,
+
+    # syslog already prints timestamp, so no $date and $time needed
+    # format: "$date $time [$level] $metadata$message\n",
+    format: "[$level] $metadata$message\n",
+    metadata: [:module, :function, :line],
+    option: :pid
+  ]
 ]
 
+# uncomment the following lines if you would like to use a symlink
+# for production releases. Change the second path in the tuple to
+# point to an existing  directory on your server somewhere.
+config :infinity_one,
+  release_simlink_uploads: {"uploads", "/var/lib/infinity_one/uploads"},
+  release_simlink_backups: {"backups", "/var/lib/infinity_one/backups"},
+  restart_command: ~w(sudo service infinity_one restart)
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
