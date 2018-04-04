@@ -23,11 +23,11 @@ html lang="en"
                   span style="margin-left: 10px" InfinityOne
                 ul
                   .exit x
-                  li
+                  li on-page="pages"
                     a href="/pages" = gettext("Home")
-                  li
+                  li on-page="features"
                     a href="/features" = gettext("Features")
-                  li
+                  li on-page="apps"
                     a href="/apps" = gettext("Apps")
                   = render("logged_in.html", conn: @conn)
             .gradients
@@ -39,6 +39,8 @@ html lang="en"
               .gradient.white-fade
             = render @view_module, @view_template, assigns
       = render("footer.html")
+      .markdown style="display: none;"
+      .sidebar style="display: none;"
     script(src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous")
     script src="#{static_path(@conn, "/js/one_pages.js")}"
     script src="#{static_path(@conn, "/js/one_pages_vendor.js")}"

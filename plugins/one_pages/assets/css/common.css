@@ -69,3 +69,6 @@ code, pre {
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
+ul {
+  padding-left: 0;
+}

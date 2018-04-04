@@ -1,4 +1,4 @@
-.portico-landing.features-app.show
+.portico-landing.features-app
   section.hero
     .copy
       h1 = gettext("Effortless team chat")

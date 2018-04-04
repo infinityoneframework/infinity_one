@@ -1,4 +1,4 @@
-.portico-landing.hello.show
+.portico-landing.hello
   .hero
     .content
       header
@@ -211,7 +211,7 @@
         .main-page
           .navbar
           .center-page
-            .message-feed
+            .message-feed  style="transform: translateY(-61.6px);"
               .stream
                 .line.micro.red
                 .line.nano
@@ -254,7 +254,7 @@
         .main-page
           .navbar
           .center-page
-            .message-feed
+            .message-feed style="transform: translateY(-61.6px);"
               .stream
                 .line.micro.red
                 .line.nano
