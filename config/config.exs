@@ -109,7 +109,7 @@ config :phoenix_markdown,
     gfm: true,
     breaks: false,
     line: 1,
-    smartypants: true
+    smartypants: false
   },
   server_tags: :all
 

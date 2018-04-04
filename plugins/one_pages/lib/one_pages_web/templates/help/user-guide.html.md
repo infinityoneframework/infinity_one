@@ -267,4 +267,4 @@ You can control the audio notification under your account preferences or via the
 
 ##### How is the hashtag used here compared to the twitter/instagram/snapchat world?
 
-The hash is a prefix to a room. When used in a message it is prepended to a valid room name, this allows a single click to get to the room. For example, you can write "... check out **#general** for general discussions...
+The hash is a prefix to a room. When used in a message it is prepended to a valid room name, this allows a single click to get to the room. For example, you can write "... check out **#general** for general discussions..."

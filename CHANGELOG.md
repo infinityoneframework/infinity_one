@@ -9,6 +9,8 @@
 * Add new sections in help sidenav
 * Add some nice page transitions in pages section
 * Move the infinity_one_pages dependency into the one_pages plugin
+* Added new Users Guide
+* Added new Administration Guide
 
 ### Bug Fixes
 
