@@ -124,8 +124,7 @@ defmodule InfinityOne.Mixfile do
       {:scrivener_ecto, github: "smpallen99/scrivener_ecto"},
       {:ex_doc, "~> 0.18", only: :dev},
       {:briefly, "~> 0.3"},
-      {:one_model, github: "infinityoneframework/one_model"},
-      {:infinity_one_pages, github: "infinityoneframework/infinity_one_pages", branch: "integrate"}
+      {:one_model, github: "infinityoneframework/one_model"}
       # {:infinity_one_pages, path: "../infinity_one_pages"},
     ] ++ plugin_deps()
   end

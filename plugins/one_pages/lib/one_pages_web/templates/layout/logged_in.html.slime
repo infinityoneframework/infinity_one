@@ -1,0 +1,17 @@
+= if @conn.assigns[:current_user] do
+  .dropdown
+    .dropdown-pill
+      img.header-realm-icon src="/images/infinityone.png" alt="Go to InfinityOne"
+      .realm-name
+        | InfinityOne
+        i.fa.fa-chevron-down
+    ul
+      li
+        a href="/"
+          i.icon-vector-home
+          | Go Home
+      li
+        a href="/logout"
+          span.logout
+          i.icon-vector-off
+          = gettext("Log out")

@@ -11,15 +11,7 @@ exports.config = {
        "js/landing.js": /^(landing_js|..\/deps|node_modules)/,
        // "js/help.js": /^(help_js|..\/deps|node_modules)/,
        "js/adapter.js": ["vendor/adapter.js"],
-       "js/header.js": ["vendor/header.js"],
        "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"],
-        "js/infinity_one_pages.js": [
-          "node_modules/infinity_one_pages/priv/dist/js/infinity_one_pages.js",
-          "node_modules/infinity_one_pages/priv/dist/js/help.js",
-        ],
-        "js/infinity_one_pages_vendor.js": [
-          "node_modules/infinity_one_pages/priv/dist/js/infinity_one_pages_vendor.js"
-        ]
        // "js/vendor.js": /^(web\/static\/vendor)|(deps)/
       },
       //
@@ -47,8 +39,8 @@ exports.config = {
         "css/help.css": ["scss/help.scss", "scss/components.scss"],
         "css/toastr.css": ["css/toastr.css"],
         "css/emojipicker.css": ["vendor/emojiPicker.css"],
-        "css/infinity_one_pages.css": [
-          "../deps/infinity_one_pages/priv/dist/css/infinity_one_pages.css"
+        "css/one_pages.css": [
+          "../plugins/one_pages/priv/static/css/one_pages.css"
         ]
         // "css/toastr.css": ["web/static/scss/toastr.scss"]
       },
@@ -68,7 +60,7 @@ exports.config = {
     // will be copied to `paths.public`, which is "priv/static" by default.
     assets: [
       /^(static)/,
-      /^(node_modules\/infinity_one_pages)/,
+      "../plugins/one_pages/assets/static"
     ]
   },
 
@@ -83,7 +75,7 @@ exports.config = {
       "help_js",
       "vendor",
       "scss", "../plugins/one_admin/priv/static",
-      "node_modules/infinity_one_pages/priv/dist/js"
+      "../plugins/one_pages/priv/static",
     ],
     // Where to compile files to
     public: "../priv/static"
@@ -109,20 +101,19 @@ exports.config = {
     coffeescript: {
       // bare: true
     },
-    copycat: {
-      "fonts": ["node_modules/infinity_one_pages/priv/dist/fonts"],
-      "images": ["node_modules/infinity_one_pages/priv/dist/images"],
-      // "js": ["node_modules/infinity_one_pages/priv/dist/js"],
-      "css": ["node_modules/infinity_one_pages/priv/dist/css"],
-      verbose: false,
-      onlyChanged: true
-    },
+    // copycat: {
+    //   "fonts": ["node_modules/infinity_one_pages/priv/dist/fonts"],
+    //   "images": ["node_modules/infinity_one_pages/priv/dist/images"],
+    //   // "js": ["node_modules/infinity_one_pages/priv/dist/js"],
+    //   "css": ["node_modules/infinity_one_pages/priv/dist/css"],
+    //   verbose: false,
+    //   onlyChanged: true
+    // },
   },
 
   modules: {
     autoRequire: {
-      "js/app.js": ["js/app"],
-      "js/help.js": ["help_js/help"],
+      "js/app.js": ["js/app"]
     }
   },
 
@@ -133,7 +124,7 @@ exports.config = {
       // toastr: ["toastr.css"],
       "highlight.js": ['styles/solarized-dark.css'],
       sweetalert: ['dist/sweetalert.css'],
-      infinity_one_pages: ['css/infinity_one_pages.css']
+      // infinity_one_pages: ['css/infinity_one_pages.css']
       // one_admin: ['priv/static/one_admin.scss']  // this isn't working
       // emojionearea: ['dist/emojionearea.min.css']
       // emojipicker: ['dist/emojipicker.css']

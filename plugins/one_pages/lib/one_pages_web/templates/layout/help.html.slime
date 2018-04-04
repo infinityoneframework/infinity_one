@@ -1,0 +1,39 @@
+doctype html
+html lang="en"
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    meta(name="description" content="")
+    meta(name="author" content="")
+    meta(name="apple-mobile-web-app-title" content="WebRTC Chat")
+    meta(name="apple-mobile-web-app-capable" content="yes")
+
+    title= site_title()
+    link(href="/favicon1.ico" rel="shortcut icon" type="image/x-icon")
+    link(href="/favicon1.ico" rel="icon" type="image/x-icon")
+    link(rel="stylesheet" href='#{static_path(@conn, "/css/one_pages.css")}')
+
+    link(rel="apple-touch-icon" href="/images/logo_globe.png")
+    script(src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous")
+
+  body
+    .portico-container.help
+      .portico-wrap
+        = OnePagesWeb.HelpView.render("portico-header.html", conn: @conn)
+        .app.portico-page
+          .app-main.portico-page-container
+            .app.help.terms-page.inline-block
+              .sidebar.slide.ps.ps--active-y
+                h1
+                  a.no-underline.highlighted href="/help" = gettext("Index")
+                = OnePagesWeb.HelpView.render("sidebar.html")
+                h1.home-link
+                  a.no-underline href="/pages" = gettext("Back to Home")
+              .markdown.ps.ps--active-y
+                .content
+                  = render @view_module, @view_template, assigns
+
+  script(src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous")
+  script src="#{static_path(@conn, "/js/one_pages.js")}"
+  script src="#{static_path(@conn, "/js/one_pages_vendor.js")}"

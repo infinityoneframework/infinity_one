@@ -1,0 +1,28 @@
+.footer
+  section
+    h3 = gettext("About InfinityOne")
+    ul
+      li: a href="/pages" = gettext("Home")
+      li: a.disabled = gettext("Why InfinityOne")
+      li: a href="/features" = gettext("Features")
+  section
+    h3 = gettext("Help & Community")
+    ul
+      li: a.disabled = gettext("Community chat")
+      li: a href="/help" = gettext("Help center")
+      li: a.disabled = gettext("Documentation")
+      li
+        a href="https://github.com/infinityoneframework/infinity_one" target="_blank"
+          = gettext("GitHub")
+  section
+    h3 = gettext("Apps & Integrations")
+    ul
+      li: a href="/apps" = gettext("Desktop apps")
+      li: a.disabled = gettext("Integrations")
+      li: a.disabled = gettext("REST API")
+  section
+    h3 = gettext("Company")
+    ul
+      li: a.disabled = gettext("About us")
+      li: a href="https://emetrotel.com" target="_blank" = gettext("E-MetroTel")
+

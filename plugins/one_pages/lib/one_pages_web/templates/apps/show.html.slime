@@ -1,0 +1,36 @@
+.portico-landing.apps.show
+  .hero
+    #waves
+    .inner-content
+      .info
+        .flex
+          .cta
+            h1
+              = "InfinityOne for "
+              span.platform = @platform_name
+            p.description
+              | InfinityOne on macOS is even better than on the web. It has a cleaner
+              | look, tray integration, native notifications, and support for multiple
+              | InfinityOne accounts.
+            p.download-instructions
+              | For download instructions, go to the
+              a.silver.bold href="#{@help_url}" target="_blank"
+                | &nbsp; desktop app install guide
+              | .
+            a.link.no-action href="#{@url}" rel="nofollow"
+              button type="button" name="button"
+                | Download InfinityOne for &nbsp;
+                span.platform
+                  = @platform_name
+      .image
+        .flex
+          img src="#{@image}"
+  .other-apps
+    h2 Apps for many platforms.
+    .apps
+      a href="/apps/mac"
+        i.icon.fa.fa-apple data-label="macOS"
+      a href="/apps/win"
+        i.icon.fa.fa-windows data-label="Windows"
+      a href="/apps/linux"
+        i.icon.fa.fa-linux data-label="Linux"

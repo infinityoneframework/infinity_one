@@ -1,0 +1,104 @@
+.portico-landing.features-app.show
+  section.hero
+    .copy
+      h1 = gettext("Effortless team chat")
+      h2 = gettext("All your real-time communication needs in one place.")
+  section.messages
+    .features
+      h2 = gettext("Powerful messaging")
+      .feature-block
+        h3 = gettext("MARKDOWN OPTIMIZED FOR CHAT")
+        p = gettext("Express your ideas clearly with bold, italics, and more. InfinityOne even supports full Markdown.")
+      .feature-block
+        h3 = gettext("EMOJI AND EMOJI REACTIONS")
+        p = gettext("Have fun expressing yourself with emojis!")
+      .feature-block
+        h3 = gettext("INLINE IMAGE, VIDEO, AND WEB LINK PREVIEWS")
+        p
+          = gettext("Send a link and we'll automatically generate a preview linked to the web site.")
+      .feature-block
+        h3 = gettext("DRAG-AND-DROP FILE UPLOADS")
+        p
+          = gettext("Drag a file onto any chat page to upload the file and create a preview if appropriate. Sharing and collaborating has never been easier.")
+      .feature-block
+        h3 = gettext("CODE AND QUOTE BLOCKS")
+        p
+          = gettext("Discuss code with ease with Markdown code blocks (with syntax highlighting).")
+      .feature-block
+        h3 = gettext("CUSTOMIZE YOUR OWN MARKUP")
+        p
+          = gettext("Customize InfinityOne's markup and automatically add links.")
+      .feature-block
+        h3 = gettext("LINK TO OTHER USERS AND CHAT ROOMS")
+        p
+          = gettext("Use @mentions to notify someone of an important message. Link other rooms with #room mentions.")
+
+    img.image src="/images/features/message-formatting.png"
+  section.notifications
+    svg.envelope height="500" width="100" preserveAspectRatio="none" viewBox="0 0 100 100"
+      polygon points="0,0 100,0 50,50" style="fill: #fafafa;"
+        | Oops, inline SVG is not supported in your browser
+    h2 = gettext("Notifications galore!")
+    .center
+      .image-block
+      .feature-list
+        h3 = gettext("@-mentions")
+        h3 = gettext("Room-wide announcements")
+        h3 = gettext("Desktop notifications")
+        h3 = gettext("Audible notifications")
+        h3 = gettext("Email notifications - Coming soon")
+        h3 = gettext("SMS notifications - Coming soon")
+        h3 = gettext("Alert words - Coming soon")
+  section
+    h2 = gettext("Apps, Integrations, and API")
+    .feature-block
+      h3 = gettext("INTEGRATIONS")
+      p = gettext("Get your favorite services to post messages. Coming soon.")
+    .feature-block
+      h3 = gettext("API")
+      p = gettext("Roll your own notifications with a simple RESTful API with several language bindings. Coming soon.")
+    .feature-block
+      h3 = gettext("MOBILE APPS")
+      p = gettext("Quality iOS and Android apps. Coming soon.")
+    .feature-block
+      h3 = gettext("DESKTOP APPS")
+      p = gettext("Enrich your InfinityOne experience with rich desktop applications for Windows, macOS, and Linux.")
+  section
+    h2 = gettext("And Much, Much More...")
+    .feature-block
+      h3 = gettext("FULL-TEXT FULL-HISTORY SEARCH")
+      p = full_search_text()
+    .feature-block
+      h3 = gettext("STARRED MESSAGES")
+      p = gettext("Keep important messages handy for quick access at a later time.")
+    .feature-block
+      h3 = gettext("STATISTICS")
+      p = gettext("InfinityOne has a powerful set of analytics available for anyone with the appropriate permissions.")
+    .feature-block
+      h3 = gettext("EXTENSIVE PERMISSION SYSTEM")
+      p = gettext("Almost every aspect of InfinityOne can be controlled with the Role based permission system. Add custom Roles for even more control.")
+    .feature-block
+      h3 = gettext("ONE-ON-ONE, GROUP, PRIVATE, AND N-WAY CONVERSATIONS")
+      p = private_conversations_text()
+    .feature-block
+      h3 = gettext("CHAT PRESENCE")
+      p = gettext("See who's online at glance.")
+    .feature-block
+      h3 = gettext("AUDIO AND VIDEO CALLS")
+      p = gettext("Call someone with a single click. Coming soon.")
+    .feature-block
+      h3 = gettext("FAVORITE CHANNELS")
+      p = gettext("Add Room and Direct Message channels to your list of favorites for quick access.")
+    .feature-block
+      h3 = gettext("EXTENSIVE ADMINISTRATION SECTION")
+      p = gettext("Easily administer InfinityOne with the administration pages.")
+    .feature-block
+      h3 = gettext("PHONE SYSTEM INTEGRATION")
+      p = gettext("Add click-to-call and phone presence with an adapter-based solution. Coming soon.")
+    .feature-block
+      h3 = gettext("NEW INSTALLATION CONFIGURATION WIZARD")
+      p = gettext("Configure you new installation with a web based wizard. No default accounts or passwords.")
+    .feature-block
+      h3 = gettext("SECURE BACKUP AND RESTORE")
+      p = gettext("Web based, encrypted backup and restore ensures the privacy our your users' messages.")
+

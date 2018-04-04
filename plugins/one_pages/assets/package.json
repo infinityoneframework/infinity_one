@@ -1,0 +1,37 @@
+{
+  "name": "infinity_one_pages",
+  "version": "0.1.0",
+  "description": "The javascript and css for infinity_one_pages.",
+  "license": "Apache-2.0",
+  "main": "../../../priv/js/one_pages.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/infinityoneframework/infinity_one.git"
+  },
+  "author": "Steve pallen <smpallen99@gmain.com> (http://www.infinityoneframework.org)",
+  "devDependencies": {
+    "autoprefixer": "^6.3.6",
+    "babel-brunch": "6.1.1",
+    "babel-preset-env": "^1.6.1",
+    "brunch": "2.10.9",
+    "clean-css-brunch": "^2",
+    "css-brunch": "^2",
+    "postcss-brunch": "^0.5.0",
+    "sass-brunch": "^2.10.4",
+    "uglify-js-brunch": "2.10.0"
+  },
+  "dependencies": {
+    "perfect-scrollbar": "^1.3.0"
+  },
+  "scripts": {
+    "watch": "brunch watch",
+    "build": "brunch build"
+  },
+  "style": "./css/one_pages.css",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "package.json",
+    "assets"
+  ]
+}

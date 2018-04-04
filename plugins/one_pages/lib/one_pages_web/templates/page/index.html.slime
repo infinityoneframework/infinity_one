@@ -1,0 +1,301 @@
+.portico-landing.hello.show
+  .hero
+    .content
+      header
+        h1 = gettext("Highly Reliable Communications")
+        = home_intro()
+  .screen.hero-screen
+    .main-page
+      .left-sidebar.col-4
+        .action-block
+          .line.med
+          .line
+          .line
+          .line.med
+        .action-block
+          .line.small.red
+          .sub-block
+            .line.small
+            .line
+            .line.med
+            .line.med
+          .line.blue
+          .sub-block
+            .line.small
+            .line
+            .line.small
+          .line.green
+          .sub-block
+            .line
+            .line.med
+            .line.small
+            .line.med
+            .line
+          .line.med.orange
+          .sub-block
+            .line.med
+      .center-page.col-2
+        .message-feed style="transform: translateY(-61.6px);"
+          .stream
+            .line.micro.red
+            .line.nano
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line
+                .line
+                .line.med
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line.med
+                .line.small
+          .stream
+            .line.micro.green
+            .line.nano
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line
+                .line.small
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line.med
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line
+                .line.small
+          .stream
+            .line.micro.blue
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line.med
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line.med
+                .line.small
+                .line.small
+          .stream
+            .line.micro.green
+            .line.nano
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line
+                .line.small
+                .line.med
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line
+                .line.small
+            .message
+              .top
+                .avatar
+                .line.top-line
+              .content
+                .line.med
+      .right-sidebar.col-4
+        .action-block
+          .line.small.darker
+          .line
+          .line
+          .line.med
+          .line
+          .line
+          .line.med
+          .line.med
+          .line
+          .line.med
+          .line.med
+          .line
+        .action-block
+          .line.small.darker
+          .line
+          .line.med
+          .line
+          .line.med
+          .line.med
+
+  .full-width
+    .image style="background-image: url(/images/mobile.jpg);"
+  .features
+    header
+    .content
+      .center
+        h2 Two Versions to choose from
+        br
+        br
+      .col-2
+        img src="/images/chat-icon.png"
+        .il-block
+          h2 Standalone Open source version
+          p
+            | InfinityOne is a free and Open Source project, meaning that you can download
+             the source code and customize it at will. Need a new feature, new extension,
+             or new integration. No problem. Download and modify the code as needed.
+          p
+            | Leverage the open source community to get new features and bug fixes frequently.
+          p
+            | InfinityOne is backed by
+            a href="https://emetrotel.com" target="_blank"
+              | &nbsp;E-MetroTel&nbsp;
+            | and is part of their commercial IP-PBX offering, giving you the confidence
+             that development and bug fix will continue for years to come.
+      .col-2
+        img src="/images/devide_cloud.png"
+        .il-block
+          h2 UCx Phone Server Embedded
+          p
+            a href="https://emetrotel.com" target="_blank"
+              | E-MetroTel's&nbsp;
+            | UCx IP-PBX products include InfinityOne integrated into their on-premise
+             appliance, bring your own server, and cloud-based solutions. These products
+             include an enterprise class WebRTC soft-client, phone presence, and
+             click-to-call capabilities with several commercial support options.
+          p
+            | Get the benefit of team chat integrated with a soft-phone, including 100's
+             of enterprise phone features right in your browser, or even better yet, with
+             one of the native applications.
+
+  .apps
+    .triangle
+    .left-side
+      .content
+        header: h1 = gettext("Apps for every platform")
+        p = gettext("InfinityOne has modern apps for all the major platforms, powered by Electron and React Native.")
+        br
+      .platform-icons
+        .group
+          h2 = gettext("Web")
+          a href="/apps"
+            i.icon-vector-desktop.platform-icon
+        .group
+          h2 = gettext("Desktop")
+          a href="/apps/mac"
+            i.icon-vector-apple.platform-icon
+          a href="/apps/win"
+            i.icon-vector-windows.platform-icon
+          a href="/apps/linux"
+            i.icon-vector-linux.platform-icon
+        .group
+          h2 = gettext("Mobile")
+          a
+            i.icon-vector-phone.platform-icon
+          a
+            i.icon-vector-android.platform-icon
+    .right-side
+      .screen.ios
+        .main-page
+          .navbar
+          .center-page
+            .message-feed
+              .stream
+                .line.micro.red
+                .line.nano
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line
+                    .line
+                    .line.med
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line.med
+                    .line
+                    .line.small
+              .stream
+                .line.micro.blue
+                .line.nano
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line.med
+                    .line.med
+                    .line.small
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line
+                    .line
+                    .line.small
+      .screen.android
+        .main-page
+          .navbar
+          .center-page
+            .message-feed
+              .stream
+                .line.micro.red
+                .line.nano
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line
+                    .line
+                    .line.med
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line.med
+                    .line
+                    .line.small
+              .stream
+                .line.micro.blue
+                .line.nano
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line.med
+                    .line.med
+                    .line.small
+                .message
+                  .top
+                    .avatar
+                    .line.top-line
+                  .content
+                    .line
+                    .line
+                    .line.small
+  .padded-content.call-to-action-bottom
+    h1 = gettext("Experience InfinityOne today!")
+    a title="Coming soon"
+      button.download-button type="button" name="button"
+        = gettext("See plans and pricing!")
+    .infinityone-symbol
