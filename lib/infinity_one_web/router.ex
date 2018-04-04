@@ -1,6 +1,6 @@
 defmodule InfinityOneWeb.Router do
   use InfinityOneWeb, :router
-  # use OnePagesWeb.Router
+  use OnePagesWeb.Router
   use Coherence.Router
 
   pipeline :browser do
@@ -35,11 +35,11 @@ defmodule InfinityOneWeb.Router do
     coherence_routes()
   end
 
-  # scope "/", OnePagesWeb do
-  #   pipe_through :browser
+  scope "/", OnePagesWeb do
+    pipe_through :browser
 
-  #   one_pages_routes()
-  # end
+    one_pages_routes()
+  end
 
   scope "/", InfinityOneWeb do
     pipe_through(:protected)

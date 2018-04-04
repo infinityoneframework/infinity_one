@@ -8,6 +8,6 @@ use Mix.Config
 config :unbrella, :plugins, one_pages: [
   module: OnePages,
   application: OnePages.Application,
-  router: OnePagesWeb.Router
+  # router: OnePagesWeb.Router
 ]
 # import_config "#{Mix.env}.exs"
