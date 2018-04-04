@@ -1,5 +1,7 @@
 ## Guides
 * [Getting Started with InfinityOne](/help/getting-started-guide)
+* [User Guide](/help/user-guide)
+* [Administration Guide](/help/administration-guide)
 
 # Using InfinityOne
 
