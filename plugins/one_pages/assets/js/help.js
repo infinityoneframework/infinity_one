@@ -24,7 +24,7 @@ function highlight_current_article() {
     if (!path) {
         return;
     }
-console.log('path', path, path[0]);
+
     var article = $('.help .sidebar a[href="' + path[0] + '"]');
     article.addClass('highlighted');
 }
@@ -189,6 +189,11 @@ function scrollToHash(container) {
     });
 
     render_code_sections();
+
+    $('.markdown .content h2').each(function() {
+      let id = $(this).text().toLowerCase().replace(/\s/g, '-');
+      $(this).attr('id', id);
+    });
 
     // Finally, make sure if we loaded a window with a hash, we scroll
     // to the right place.

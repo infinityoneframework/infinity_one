@@ -12,13 +12,4 @@ any significant features additional to those in the web application.
    endemic to a browser will no longer work, for example, ALT-LEFT to go back to the previous page.
 {: .warn .boxed}
 
-## Connecting to a server
-
-When you open the InfinityOne client for the first time, you will come across a screen
-asking for your organizations's server address on InfinityOne. Enter your organization's
-address and press the **Connect** button.
-
-   There's no need to add `https://` in the case that your server is running a secure
-   HTTP (HTTPS) protocol.
-{: .warn .boxed}
 
