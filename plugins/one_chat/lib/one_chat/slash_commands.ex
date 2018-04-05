@@ -52,8 +52,11 @@ defmodule OneChat.SlashCommands do
   ]
 
   @command_map @command_data |> Enum.reduce(%{}, fn %{command: command} = map, acc -> Map.put(acc, command, map) end)
+  @command_list @command_data |> Enum.filter(& &1.command in @commands) |> Enum.sort(& &1.command < &2.command)
 
   def all_commands, do: @commands |> Enum.sort
+
+  def command_list, do: @command_list
 
   def commands(pattern, count \\ @default_count) do
     pattern

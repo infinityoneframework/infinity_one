@@ -40,7 +40,6 @@ Channels are useful for sharing information with your users, for example, you ca
 
 To create a channel, type the command `/create` followed by the channel name in the message text box:
 
-
     /create #channel
 
 ### <a name="Chapter2-2"></a>Direct Messages
@@ -140,9 +139,10 @@ The messaging functions supported by Infnity One include:
 
 The functions available depend on the permissions configured by the administrator. The default permission for a normal user typically does not allow the PIN function.
 
-# <a name="RMenu"></a>Chapter 5 - Right Icon Menu
+# <a name="RMenu"></a>Chapter 5 - Right Icon Bar
 
-Located on the right side of the screen, there is an icon menu that provides quick access to the following functions:
+Located on the right side of the screen, there is a vertical icon bar that provides quick
+access to the following functions:
 
 *   Info
 *   Search

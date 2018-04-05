@@ -2,6 +2,17 @@ body {
     background-color: #fafafa;
 }
 
+table.full-width {
+    width: 100%;
+}
+
+.markdown blockquote.boxed {
+    margin: 16px 0px 16px 0;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
 .container-fluid {
     padding: 0px;
     min-height: 100%;

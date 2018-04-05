@@ -29,6 +29,8 @@ html lang="en"
                     a href="/features" = gettext("Features")
                   li on-page="apps"
                     a href="/apps" = gettext("Apps")
+                  li on-page="help"
+                    a href="/help" = gettext("Help")
                   = render("logged_in.html", conn: @conn)
             .gradients
               .gradient.pattern
