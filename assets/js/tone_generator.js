@@ -15,7 +15,7 @@
     destination: undefined,
     control: undefined,
     initStart: function() {
-      var ctrl = this.control //
+      var ctrl = this.control; //
       this.destination = this.audioContext.createMediaStreamDestination();
       if (ctrl) {
         ctrl.srcObject = this.destination.stream

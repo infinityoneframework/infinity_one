@@ -131,7 +131,7 @@ defmodule OneChatWeb.Client do
     var at_bottom = OneUtils.is_scroll_bottom(30);
     var user_id = '#{message.user_id}';
     var id = '#{message.id}';
-    elem.append(node);
+    elem.appendChild(node);
     Rebel.set_event_handlers('[id="#{message.id}"]');
     OneChat.normalize_message(id);
     if (at_bottom || user_id == ucxchat.user_id) {

@@ -1,6 +1,6 @@
 # InfinityOne Changelog
 
-## 1.0.0.beta11 (2018-04-04)
+## 1.0.0.beta11 (2018-04-05)
 
 ### Enhancements
 
@@ -18,6 +18,7 @@
 * User correct platform name in description on Windows and Linux download pages
 * Fix Issue expanding help sections in sidenav
 * Fix some markdown formatting issue on help pages
+* Fix the message posting issue on MS Edge
 
 ## 1.0.0.beta10 (2018-04-03)
 
