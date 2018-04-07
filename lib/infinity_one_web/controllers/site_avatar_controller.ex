@@ -25,7 +25,7 @@ defmodule InfinityOneWeb.SiteAvatarController do
 
     case General.update(general, params) do
       {:ok, general} ->
-        SiteAvatar.delete({old_site_avatar, nil})
+        if old_site_avatar, do: SiteAvatar.delete({old_site_avatar, nil})
         render conn, "success.json", url: SiteAvatar.url(general.site_avatar)
           |> OneChatWeb.SharedView.view_url()
       {:error, _} ->

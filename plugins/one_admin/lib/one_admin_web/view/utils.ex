@@ -54,7 +54,7 @@ defmodule OneAdminWeb.View.Utils do
         content_tag :div, class: "setting-field" do
           [
             content_tag :div, class: "avatar-full", title: title do
-              tag :img, src: InfinityOne.SiteAvatar.url(Map.get(item, field, "")) |> OneChatWeb.SharedView.view_url()
+              tag :img, src: InfinityOne.SiteAvatar.url(Map.get(item, field) || "") |> OneChatWeb.SharedView.view_url()
             end,
             content_tag :div, class: "file", style: "position: relative;", title: ~g"Upload File" do
               content_tag :i, class: "icon-upload" do
