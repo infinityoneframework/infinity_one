@@ -41,6 +41,37 @@ defmodule OneAdminWeb.View.Utils do
     end
   end
 
+  def file_upload_line(_f, item, field, _title, opts \\ []) do
+    # description = opts[:description]
+    dropzone = opts[:dropzone]
+    title = opts[:title]
+
+    content_tag :div, class: "input-line double-col set-avatar" do
+      [
+        content_tag :label, class: "setting-label" do
+          title
+        end,
+        content_tag :div, class: "setting-field" do
+          [
+            content_tag :div, class: "avatar-full", title: title do
+              tag :img, src: InfinityOne.SiteAvatar.url(Map.get(item, field, "")) |> OneChatWeb.SharedView.view_url()
+            end,
+            content_tag :div, class: "file", style: "position: relative;", title: ~g"Upload File" do
+              content_tag :i, class: "icon-upload" do
+                tag :input, accept: "", type: "file"
+              end
+            end,
+            content_tag :div, class: "dropzone #{dropzone}-dropzone", style: "margin-top: 10px;", title: ~g"Drop file here to upload" do
+              content_tag :span, [], do: ~g"Drop file to upload"
+            end,
+            # hidden_input(f, field),
+              # |> do_description(description)
+          ]
+        end
+      ]
+    end
+  end
+
   def text_input_line(f, item, field, title, opts \\ []) do
     type = opts[:type] || :text
     description = opts[:description]

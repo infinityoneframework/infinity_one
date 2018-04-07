@@ -1,5 +1,5 @@
 .room-container
-  .dropzone
+  .dropzone.attachment-dropzone
     .dropzone-overlay.background-transparent-darkest.color-content-background-color
       .background-transparent-darkest
         = ~g"Drop to upload file"

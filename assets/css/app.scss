@@ -485,6 +485,14 @@ aside.side-nav nav.options {
     }
   }
 }
+.dropzone.site-avatar-dropzone {
+  height: 125px;
+  width: calc(100% - 178px);
+}
+.dropzone.site-avatar-dropzone span {
+  top: calc(50% - 8px);
+}
+.site-avatar-dropzone,
 .avatar-dropzone {
   border: 1px dashed #ddd;
   border-radius: 5px;
@@ -494,6 +502,7 @@ aside.side-nav nav.options {
   display: inline-block;
   text-align: center;
   z-index: 9999;
+  position: relative;
 
   &.over {
     border: 1px dashed #666;

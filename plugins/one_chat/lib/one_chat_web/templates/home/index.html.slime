@@ -34,7 +34,8 @@ javascript:
 
   window.chat_settings = {
     link_preview: false,
-    use_emojis: true
+    use_emojis: true,
+    allow_upload: true
   };
 
   let myPanel = $('.page-container')

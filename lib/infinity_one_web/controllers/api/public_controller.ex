@@ -1,13 +1,18 @@
 defmodule InfinityOneWeb.API.PublicController do
   use InfinityOneWeb, :controller
 
+  alias InfinityOne.Settings.General
+
   require Logger
 
   plug(:put_layout, false)
 
   def server_settings(conn, _params) do
+    general = General.get()
+    site_avatar_url = General.site_avatar_url(general, external: true)
+
     data = %{
-      realm_name: "InfinityOne",
+      realm_name: General.get_site_client_name(general),
       require_email_format_usernames: false,
       push_notifications_enabled: true,
       authentication_methods: %{
@@ -22,11 +27,15 @@ defmodule InfinityOneWeb.API.PublicController do
       realm_uri: InfinityOneWeb.root_url(),
       email_auth_enabled: true,
       msg: "",
-      # realm_icon: "https:\/\/secure.gravatar.com\/avatar\/6fa1013f5e7cb449d3d96b36327566da?d=identicon",
       infinityone_version: InfinityOne.version(),
       realm_description: "<p>The coolest place in the universe.<\/p>"
     }
+    |> add_realm_icon(site_avatar_url)
 
     render(conn, "server_settings.json", data: data)
   end
+
+  defp add_realm_icon(data, nil), do: data
+
+  defp add_realm_icon(data, url), do: Map.put(data, :realm_icon, url)
 end

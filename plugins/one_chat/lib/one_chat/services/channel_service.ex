@@ -150,7 +150,7 @@ defmodule OneChat.ChannelService do
     Subscription.get_by_user_id user_id, opts
   end
 
-  def insert_channel!(%{user_id: user_id} = params) do
+  def insert_channel!(%{"user_id" => user_id} = params) do
     user_id
     |> Accounts.get_user(default_preload: true)
     |> insert_channel!(params)

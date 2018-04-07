@@ -11,6 +11,8 @@
 * Move the infinity_one_pages dependency into the one_pages plugin
 * Added new Users Guide
 * Added new Administration Guide
+* Add site avatar to admin for customizing the desktop app icon
+* Add site_client_name to admin for customizing the desktop app tooltip
 
 ### Bug Fixes
 

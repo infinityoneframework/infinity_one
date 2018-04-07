@@ -62,6 +62,11 @@ defmodule InfinityOneWeb.Router do
     post("/upload_backup", UploadController, :create)
   end
 
+  scope "/", InfinityOneWeb do
+    pipe_through(:api)
+
+    post("/site_avatar", SiteAvatarController, :create)
+  end
   # The following is a prototype of an API implementation. It is basically
   # working, without authentication. Need updates in Coherence to get it
   # working

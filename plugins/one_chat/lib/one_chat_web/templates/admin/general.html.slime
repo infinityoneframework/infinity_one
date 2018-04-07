@@ -13,13 +13,15 @@ section.page-container.page-home.page-static.page-settings.admin-settings
       = unauthorized_message()
   - else
     .content.background-transparent-dark
-      = form_for @changeset, "#", [id: "admin-general-form", "data-id": "general"], fn f ->
+      = form_for @changeset, "#", [multipart: true, id: "admin-general-form", "data-id": "general"], fn f ->
         = hidden_input f, :id, value: item.id
         .rocket-form
           .section
             .section-content.border-component-color
               = text_input_line f, item, :site_name, ~g(Site Name), changed: @changed
               = text_input_line f, item, :site_url, ~g(Site Url), changed: @changed
+              = text_input_line f, item, :site_client_name, ~g(Site Client Name), changed: @changed, description: ~g(The name given to this site in the desktop application.)
+              = file_upload_line f, item, :site_avatar, ~g(Site Avatar), changed: @changed, description: ~g(Override the default icon for this site in the desktop application.), title: ~g(Upload Site Avatar), dropzone: "site-avatar"
               .input-line.double-col
                 label.setting-label title="#{~g(Restart)}" = ~g(Restart)
                 .setting-field
