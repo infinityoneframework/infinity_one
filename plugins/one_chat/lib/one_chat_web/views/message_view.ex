@@ -369,11 +369,17 @@ defmodule OneChatWeb.MessageView do
   defp compile_message_replacement_patterns do
     :infinity_one
     |> Application.get_env(:message_replacement_patterns, [])
-    |> Enum.reduce([], fn {re, sub}, acc ->
-      case Regex.compile re do
-        {:ok, re} -> [{re, sub} | acc]
-        _         -> acc
-      end
+    |> Enum.reduce([], fn
+      {re, sub}, acc ->
+        case Regex.compile re do
+          {:ok, re} -> [{re, sub} | acc]
+          _         -> acc
+        end
+      {re, sub, command}, acc ->
+        case Regex.compile re do
+          {:ok, re} -> [{re, sub, command} | acc]
+          _         -> acc
+        end
     end)
   end
 
@@ -425,8 +431,12 @@ defmodule OneChatWeb.MessageView do
   message body.
   """
   def run_message_replacement_patterns(body, [_ | _] = patterns) do
-    Enum.reduce(patterns, body, fn {re, sub}, body ->
-      Regex.replace(re, body, sub)
+    Enum.reduce(patterns, body, fn
+      {re, sub}, body ->
+        Regex.replace(re, body, sub)
+      {re, sub, {mod, fun}}, body ->
+        apply(mod, fun, [Regex.scan(re, body)])
+        Regex.replace(re, body, sub)
     end)
   end
 

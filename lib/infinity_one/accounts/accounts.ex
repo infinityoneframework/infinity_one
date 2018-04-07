@@ -164,6 +164,15 @@ defmodule InfinityOne.Accounts do
   end
 
   @doc """
+  Get the user_id for a given username.
+  """
+  def user_id_by_username(username) do
+    Repo.one(from(u in User,
+      where: u.username == ^username,
+      select: u.id))
+  end
+
+  @doc """
   Creates a user.
 
   ## Examples

@@ -63,7 +63,7 @@ defmodule OneChatWeb.UserChannel do
   alias OneChat.{
     Subscription, ChannelService, Channel, Web.RoomChannel, Message,
     SideNavService, ChannelService, InvitationService,
-    UserService, EmojiService
+    UserService, EmojiService, PresenceAgent
   }
   alias OneChatWeb.{RoomChannel, AccountView, MasterView, FlexBarView}
   alias Rebel.SweetAlert
@@ -767,6 +767,7 @@ defmodule OneChatWeb.UserChannel do
     subscribe_callback "user:all", "avatar:change", :user_all_event
     subscribe_callback "user:all", "account:change", :user_all_event
     subscribe_callback "user:all", "status_message:update", :status_message_update
+    OnePubSub.subscribe "user:all", "status:refresh-user"
 
     {:noreply, socket}
   end
@@ -1017,6 +1018,13 @@ defmodule OneChatWeb.UserChannel do
         nil
     end
 
+    {:noreply, socket}
+  end
+
+  def handle_info({"user:all", "status:refresh-user", payload}, socket) do
+    status = PresenceAgent.get(payload[:user_id])
+    user = Accounts.get_user(payload[:user_id], preload: [:account])
+    Client.refresh_users_status(socket, payload[:username], status, user.account.status_message)
     {:noreply, socket}
   end
 

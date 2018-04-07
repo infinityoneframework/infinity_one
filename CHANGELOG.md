@@ -13,6 +13,7 @@
 * Added new Administration Guide
 * Add site avatar to admin for customizing the desktop app icon
 * Add site_client_name to admin for customizing the desktop app tooltip
+* Add support for @@username and @@@username live status and status-message messages
 
 ### Bug Fixes
 

@@ -432,4 +432,24 @@ defmodule OneChatWeb.RebelChannel.Client do
       target.hide('slow', function() { target.remove(); });
       """ |> String.replace("\n", ""))
   end
+
+  @doc """
+  Execute the JS on the client to update presence status and status messages
+  for the appropriate markup. Only changes status if require. It only affects
+  message markup too.
+
+  Not sure if we want to constrain it to just messages, so need to review after
+  we get more experience with it.
+  """
+  def refresh_users_status(socket, username, status, status_message) do
+    socket
+    |> async_js("""
+      let elems = $('.message [data-status-name="#{username}"]:not(.status-#{status})');
+      for (let i=0;i<elems.length;i++) {
+        let elem = elems[i];
+        elem.className = elem.className.replace(/status-[a-zA-Z]+/, 'status-#{status}');
+      }
+      """ |> String.replace("\n", ""))
+    |> Query.update(:text, set: status_message, on: ~s(.message .status-message[data-username="#{username}"]))
+  end
 end

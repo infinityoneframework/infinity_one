@@ -38,9 +38,15 @@ config :infinity_one, :generators,
 # third arguments to Regex.replace/3.
 #   The first element is the string version of the regex
 #   The second element is the replacement string using captures
-# config :infinity_one, :message_replacement_patterns, [
-#   {~S"\[(UCX-\d+)\]([^\(]|$|\n)", "[\\1](https://emetrotel.atlassian.net/browse/\\1)\\2"}
-# ]
+config :infinity_one, :message_replacement_patterns, [
+  {~S"\[(UCX-\d+)\]([^\(]|$|\n)", "[\\1](https://emetrotel.atlassian.net/browse/\\1)\\2"},
+  {"@@([\\w\\d_]+)",
+   "<i class='icon-at status-offline' data-status-name='\\1'></i>\\1",
+   {OneChat, :refresh_users_status}},
+  {"@@@([\\w\\d_]+)",
+   "<i class='icon-at status-offline' data-status-name='\\1'></i>\\1<span class='status-message color-primary-action-color' data-username='\\1'></span>",
+   {OneChat, :refresh_users_status}}
+]
 
 config :infinity_one, :settings_modules, [
   InfinityOne.Settings.General,
