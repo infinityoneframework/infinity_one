@@ -1,0 +1,11 @@
+.section.section-collapsed
+  .section-title
+    .section-title-text= @title
+    .section-title-right
+      button.button.primary.expand
+        span= ~g"Expand"
+  .section-content.border-component-color.message-patterns
+    input.pattern-deleted type="hidden" name="chat_general[patterns[999999]deleted]"
+    = for {{name, re, sub, cmd}, index} <- format_message_replacement_patterns() do
+      = render("replacement_pattern.html", [bindings: [name: name, re: re, sub: sub, cmd: cmd, index: index]])
+    a.button.primary.new-message-pattern href="#" style="margin-top: 10px;" rebel-click="admin_new_pattern" = ~g(NEW PATTERN)

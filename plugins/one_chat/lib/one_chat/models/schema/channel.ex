@@ -36,6 +36,8 @@ defmodule OneChat.Schema.Channel do
   @fields ~w(archived name type topic read_only blocked default user_id description active nway)a
 
   def model, do: OneChat.Channel
+
+  def validate_name_re, do: ~r/^[a-z0-9\.\-_]+$/i
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
@@ -68,7 +70,7 @@ defmodule OneChat.Schema.Channel do
   def validate(changeset, params \\ %{}) do
     changeset
     |> validate_required([:name, :user_id])
-    |> validate_format(:name, ~r/^[a-z0-9\.\-_]+$/i)
+    |> validate_format(:name, validate_name_re())
     |> validate_length(:name, min: 2, max: 55)
     |> handle_virtual_private(params)
   end

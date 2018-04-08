@@ -1,0 +1,17 @@
+- index = @bindings[:index]
+- cmd = @bindings[:cmd] || ""
+- style = if @bindings[:hidden], do: "display: none;", else: ""
+.input-line.double-col.message-pattern data-id="#{index}" style="#{style}"
+  label.setting-label = ~g(Pattern) <> " #{index + 1}"
+  .setting-field
+    label.message-pattern = ~g(Name)
+    input.message-pattern.name type="text" value="#{@bindings[:name]}" name="chat_general[patterns[#{index}]name]"
+    label.message-pattern = ~g(Match Expression)
+    input.message-pattern.re type="text" value="#{escape_val(@bindings[:re])}" name="chat_general[patterns[#{index}]re]"
+    label.message-pattern = ~g(Substution Expression)
+    input.message-pattern.sub type="text" value="#{escape_val(@bindings[:sub])}" name="chat_general[patterns[#{index}]sub]"
+    label.message-pattern = ~g(Command Module and Function)
+    input.message-pattern.cmd type="text" value="#{get_command_value(cmd)}" placeholder="#{~g(MyModule.handle_pattern)}" name="chat_general[patterns[#{index}]cmd]"
+  a.button.danger.delete-pattern href="#" data-id="#{index}" title="#{~g(Delete this pattern)}"
+    = ~g(Delete)
+    i.icon-trash

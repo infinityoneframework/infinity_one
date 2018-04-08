@@ -63,3 +63,21 @@ form.backup {
 .reset-settings {
   margin-left: 20px;
 }
+
+label.message-pattern {
+  font-weight: bold;
+}
+input.message-pattern.cmd {
+  display: inline-block;
+  width: 50%
+}
+.input-line.double-col.message-pattern {
+  position: relative;
+  button.reset-settings {
+    display: none;
+  }
+}
+a.delete-pattern {
+  position: absolute;
+  bottom: 10px;
+}

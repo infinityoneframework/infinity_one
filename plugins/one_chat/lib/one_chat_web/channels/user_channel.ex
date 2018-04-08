@@ -1778,5 +1778,6 @@ defmodule OneChatWeb.UserChannel do
   defdelegateadmin :admin_click_scoped_room
   defdelegateadmin :admin_autocomplete_mouseenter
   defdelegateadmin :admin_reset_setting_click
+  defdelegateadmin :admin_new_pattern
 
 end

@@ -25,6 +25,7 @@ section.page-container.page-home.page-static.page-settings.admin-settings
               = text_input_line f, item, :first_channel_after_login, ~g(First channel after login), disabled: "disabled", changed: @changed
               = unless defer do
                 = radio_button_line(f, item, :enable_favorite_rooms, ~g"Enable Favorite Rooms", changed: @changed)
+          = render "message_replacement_patterns.html", f: f, item: item, field: :message_replacement_patterns, title: ~g"Message Replacement Patterns", changed: @changed
           = collapsable_section ~g"Notifications", fn _ ->
             - desc = ~g(Can be any custom sound or the default ones: beep, chelle, ding, droplet, highbell, seasons)
             = text_input_line f, item, :default_message_notification_audio, ~g"Default message notification audio", description: desc, changed: @changed

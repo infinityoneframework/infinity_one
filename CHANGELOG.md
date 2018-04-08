@@ -14,6 +14,8 @@
 * Add site avatar to admin for customizing the desktop app icon
 * Add site_client_name to admin for customizing the desktop app tooltip
 * Add support for @@username and @@@username live status and status-message messages
+* Move message_replacement_patterns to ChatGeneral Settings
+* Optimize message_replacement_patterns processing with a run-time compiled module
 
 ### Bug Fixes
 

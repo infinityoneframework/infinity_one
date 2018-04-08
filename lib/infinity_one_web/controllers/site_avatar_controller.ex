@@ -5,7 +5,6 @@ defmodule InfinityOneWeb.SiteAvatarController do
   """
   use InfinityOneWeb, :controller
 
-  alias InfinityOne.Accounts
   alias InfinityOne.Settings.General
   alias InfinityOne.SiteAvatar
 

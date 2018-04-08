@@ -363,24 +363,7 @@ defmodule OneChatWeb.MessageView do
   * message_replacement_patterns - A compiled version of Regex translations
   """
   def message_opts do
-    [md_key: md_key(), message_replacement_patterns: compile_message_replacement_patterns()]
-  end
-
-  defp compile_message_replacement_patterns do
-    :infinity_one
-    |> Application.get_env(:message_replacement_patterns, [])
-    |> Enum.reduce([], fn
-      {re, sub}, acc ->
-        case Regex.compile re do
-          {:ok, re} -> [{re, sub} | acc]
-          _         -> acc
-        end
-      {re, sub, command}, acc ->
-        case Regex.compile re do
-          {:ok, re} -> [{re, sub, command} | acc]
-          _         -> acc
-        end
-    end)
+    [md_key: md_key()]
   end
 
   @doc """
@@ -400,19 +383,18 @@ defmodule OneChatWeb.MessageView do
   def format_message_body(message, user, opts \\ []) do
     body = message.body || ""
     md_key = Keyword.get(opts, :md_key, md_key())
-    message_replacement_patterns = opts[:message_replacement_patterns] || compile_message_replacement_patterns()
 
     markdown? = md_key && String.contains?(body, md_key)
     quoted? = String.contains?(body, "```") && !markdown?
 
     body
     |> html_escape(!message.system)
-    |> autolink()
     |> encode_mentions(user)
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
     |> message_formats(markdown?)
-    |> run_message_replacement_patterns(message_replacement_patterns)
+    |> run_message_replacement_patterns()
+    |> autolink()
     |> run_markdown(markdown?, md_key)
     |> format_newlines(quoted? || markdown?, message.system)
     |> OneChatWeb.SharedView.format_quoted_code(quoted? && !markdown?, message.system)
@@ -430,17 +412,13 @@ defmodule OneChatWeb.MessageView do
   Runs the configured message replacement patterns regex's against the
   message body.
   """
-  def run_message_replacement_patterns(body, [_ | _] = patterns) do
-    Enum.reduce(patterns, body, fn
-      {re, sub}, body ->
-        Regex.replace(re, body, sub)
-      {re, sub, {mod, fun}}, body ->
-        apply(mod, fun, [Regex.scan(re, body)])
-        Regex.replace(re, body, sub)
-    end)
+  def run_message_replacement_patterns(body) do
+    if function_exported?(OneChat.RunPatterns, :run, 1) do
+      apply(OneChat.RunPatterns, :run, [body])
+    else
+      body
+    end
   end
-
-  def run_message_replacement_patterns(body, _), do: body
 
   defp autolink(body, opts \\ [])
   defp autolink(body, false), do: body

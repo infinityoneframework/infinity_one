@@ -102,6 +102,8 @@ class Admin {
       })
       .on('click', '.admin-settings button.save', function(e) {
         //console.log('saving form....', $('form').data('id'))
+        $('input.error').removeClass('error');
+        $('.help-block').remove();
         e.preventDefault()
         OneChat.userchan.push('admin:save:' + $('form').data('id'), $('form').serializeArray())
           .receive("ok", resp => {
@@ -132,6 +134,7 @@ class Admin {
       })
       .on('click', '#showPassword', e => {
         let prefix = "";
+
         if ($('#user_password').length > 0) {
           prefix = "user_";
         }
@@ -240,6 +243,33 @@ class Admin {
       .on('change', 'section.page-container input.check', e => {
         this.enable_disable_batch_delete();
       })
+      .on('click', '.delete-pattern', e => {
+        let id = $(e.currentTarget).attr('data-id');
+        let target = $(`.input-line.message-pattern[data-id="${id}"]`);
+        $(`input.pattern-deleted`).val("true");
+        target.hide('slow', () => {
+          target.remove();
+          this.enable_save_button();
+          this.adjust_pattern_indexes();
+        });
+      });
+  }
+
+  adjust_pattern_indexes() {
+    // adjust pattern numbers and indexes
+    $.each($('.input-line.message-pattern'), (cnt, item) => {
+      let $item = $(item);
+      if (parseInt($item.attr('data-id')) !== cnt) {
+        $item.attr('data-id', cnt);
+        $item.find('[data-id]').attr('data-id', cnt);
+        $.each($item.find('[name]'), (_, item) => {
+          let $elem = $(item);
+          $elem.attr('name', $elem.attr('name').replace(/\[\d+\]/, `[${cnt}]`));
+        });
+        let label = $item.find('label.setting-label');
+        label.text(label.text().replace(/[0-9]+/, cnt + 1));
+      }
+    });
   }
 
   enable_disable_batch_delete() {

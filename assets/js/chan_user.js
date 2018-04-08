@@ -17,6 +17,13 @@ OneChat.on_connect(function(one_chat, socket) {
   console.log('userchan connect')
   let ucxchat = one_chat.ucxchat
   let chan = window.Rebel.channels.user.channel
+
+  // TODO: This is a temporary work around to stop the duplicate messages.
+  //       It however does not stop the duplicate channels on the server.
+  if (one_chat.userchan) {
+    console.warn('found an existing user channel', one_chat.userchan, chan);
+    return;
+  }
   one_chat.userchan = chan
   console.log('ucxchat', ucxchat)
   console.log('one_chat', one_chat)

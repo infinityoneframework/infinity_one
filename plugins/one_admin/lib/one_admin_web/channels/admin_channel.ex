@@ -482,4 +482,19 @@ defmodule OneAdminWeb.AdminChannel do
     async_js socket, ~s/$('.-autocomplete-container.rooms').removeClass('hidden')/
   end
 
+  def admin_new_pattern(socket, sender) do
+    last_id_string = Rebel.Core.exec_js!(socket, ~s/$('.input-line.message-pattern').last().attr('data-id')/)
+    index =
+      case is_binary(last_id_string) && Integer.parse(last_id_string) do
+        {int, ""} -> int + 1
+        _ -> 0
+      end
+
+    html = Phoenix.View.render_to_string(OneChatWeb.AdminView, "replacement_pattern.html", bindings: [hidden: true, index: index])
+
+    socket
+    |> Rebel.Query.insert(html, before: ~s/a.new-message-pattern/)
+    |> async_js(~s/$('a.new-message-pattern').prev().show('slow')/)
+  end
+
 end

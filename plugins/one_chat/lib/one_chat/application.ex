@@ -28,6 +28,11 @@ defmodule OneChat.Application do
   def start(_type, _args) do
     OneChatWeb.FlexBar.Defaults.add_buttons()
     OneChatWeb.RoomChannel.KeyStore.initialize()
+    spawn fn ->
+      # Need time for the app to fully load before compiling the Message Patterns
+      Process.sleep(1000)
+      OneChat.MessageReplacementPatterns.compile()
+    end
   end
 
 end

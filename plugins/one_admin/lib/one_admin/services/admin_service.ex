@@ -70,8 +70,13 @@ defmodule OneAdmin.AdminService do
       |> case do
         {:ok, _} ->
           {:ok, %{success: ~g"General settings updated successfully"}}
-        {:error, cs} ->
-          Logger.error "problem updating general: #{inspect cs}"
+        {:error, %{errors: errors} = cs} ->
+          Logger.debug fn -> "problem updating general: #{inspect cs.errors}" end
+          Enum.each(errors, fn {name, {error, _}} ->
+            error = String.replace(error, "'", "\\'")
+            js = ~s|$('input[name="#{name}"]').addClass('error').after('<div class="help-block">#{error}</div>')|
+            Rebel.Core.exec_js(socket, js);
+          end)
           {:ok, %{error: ~g"There a problem updating your settings."}}
       end
     {:reply, resp, socket}
@@ -317,14 +322,12 @@ defmodule OneAdmin.AdminService do
 
   def handle_in(ev = "permissions:role:new", _params, socket) do
     debug ev, ""
-    # Logger.warn "new role"
     Rebel.Core.async_js socket, ~s/$('.admin-link[data-id="admin_role"]').click();/
     {:noreply, socket}
   end
 
   def handle_in(ev = "permissions:role:edit", params, socket) do
     debug ev, params
-    # Logger.warn "new role params: " <> inspect(params)
 
     AdminChannel.admin_link("admin_role", socket, Map.put(%{}, "edit-name", params["name"]))
     # {:noreply, socket}
@@ -332,7 +335,6 @@ defmodule OneAdmin.AdminService do
 
   def handle_in(ev = "permissions:role:delete", params, socket) do
     debug ev, params
-    # Logger.warn "new role params: " <> inspect(params)
     role_name = params["name"]
     if role = InfinityOne.Accounts.get_by_role(name: role_name) do
       changeset = InfinityOne.Accounts.change_role(role)

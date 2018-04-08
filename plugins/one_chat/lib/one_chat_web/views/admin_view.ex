@@ -64,4 +64,18 @@ defmodule OneChatWeb.AdminView do
   def unauthorized_message do
     ~g(You are not authorized to view this page.)
   end
+
+  def format_message_replacement_patterns do
+    OneSettings.message_replacement_patterns()
+    |> Code.eval_string()
+    |> elem(0)
+    |> Enum.with_index()
+  end
+
+  def escape_val(value) do
+    value
+  end
+
+  def get_command_value({mod, fun}), do: "#{mod}.#{fun}"
+  def get_command_value(command), do: command
 end
