@@ -1,0 +1,25 @@
+section.page-container.page-home.page-static
+  header.fixed-title.content-background-color.border-component-color
+    .burger
+      i
+      i
+      i
+    h2
+      span.room-title = ~g(New Page)
+  .content
+    form action="#" id="wiki-new-page"
+      .rocket-form
+        fieldset
+          .input-line
+            label = ~g(Title)
+            div
+              input type="text" name="wiki[title]"
+          .input-line
+            label = ~g(Body)
+            div
+              textarea style="height: 300px" name="wiki[body]"
+        fieldset
+        .submit
+          button.button.primary.save rebel-channel="wiki" rebel-click="create_page"
+            i.icon-save
+            span = ~g(Create Page)

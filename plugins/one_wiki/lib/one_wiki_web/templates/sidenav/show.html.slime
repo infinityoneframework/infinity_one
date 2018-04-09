@@ -1,0 +1,9 @@
+h3.add-room.wiki
+  = ~g(Pages)
+  span.room-count-small = "(1)"
+  .add-wiki-page rebel-click="new_page" rebel-channel="wiki" title="#{~g(New Page)}"
+    i.icon-plus
+ul.wiki rebel-channel="wiki"
+  = for page <- get_pages(@user) do
+    = render "page_item.html", name: page.title
+

@@ -15,6 +15,7 @@ defmodule InfinityOneWeb.UserSocket do
   channel CC.chan_webrtc <> "*", OneWebrtcWeb.WebrtcChannel
   channel CC.chan_client <> "*", MscsWeb.ClientChannel
   channel "landing:*", InfinityOneWeb.LandingChannel
+  channel CC.chan_wiki <> "*", OneWikiWeb.WikiChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

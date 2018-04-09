@@ -69,4 +69,7 @@ defmodule InfinityOne.Hooks do
   defhook :landing_update , 1, doc: """
     Notify the settings when user completes the Landing wizard.
     """
+  defhook :sidenav_lists, 2, doc: """
+    Hook addition page lists into the sidenav.
+    """
 end

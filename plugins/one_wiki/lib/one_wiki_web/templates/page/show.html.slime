@@ -1,0 +1,14 @@
+section.page-container.page-home.page-static
+  header.fixed-title.content-background-color.border-component-color
+    .burger
+      i
+      i
+      i
+    h2
+      span.room-title = @title
+    .submit
+      button.button.primary.save rebel-channel="wiki" rebel-click="edit_page" data-id="#{@id}"
+        span = ~g(Edit)
+
+  .content.markdown-body
+    = raw @body

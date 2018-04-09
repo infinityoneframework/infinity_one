@@ -6,4 +6,5 @@ defmodule OneChat.ChatConstants do
   define chan_system,           "system:"
   define chan_webrtc,           "webrtc:"
   define chan_client,           "mscs:"
+  define chan_wiki,             "wiki:"
 end
