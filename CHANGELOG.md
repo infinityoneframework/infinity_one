@@ -6,6 +6,8 @@
 
 ### Bug Fixes
 
+* [UCX-3898] Can't unmute user from User details flex panel
+
 
 ## 1.0.0.beta12 (2018-04-09)
 
