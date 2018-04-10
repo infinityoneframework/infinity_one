@@ -7,6 +7,8 @@ defmodule InfinityOne.ReleaseTasks do
   alias InfinityOne.Repo
   alias InfinityOne.Accounts
   alias OneChat.Channel
+  alias OneChat.Settings.Layout
+  alias OneChat.Direct
 
   require Logger
 
@@ -176,6 +178,35 @@ defmodule InfinityOne.ReleaseTasks do
           end
         end)
     end
-
   end
+
+  @doc """
+  Reset the admin layout content_home_body setting back to its default.
+
+  Run this command after upgrading a system to get the default content page which
+  includes the link to download the desktop clients.
+  """
+  def reset_content_home_body do
+    default = Layout.schema().__struct__
+    Layout.update(Layout.get, %{content_home_body: default.content_home_body})
+  end
+
+  @doc """
+  Run database migration functions, if required.
+
+  Run this command after upgrading system to execute database migration functions.
+  """
+  def migrate_dm_friends do
+    if Enum.any?(Direct.list(), & is_nil(&1.friend_id)) do
+      IO.puts "Migration required! Running now"
+      result = Direct.migrate_db()
+      if result != [] do
+        IO.puts "Some errors were found. Please check the output below!"
+      end
+      result
+    else
+      IO.puts "Migration not needed!"
+    end
+  end
+
 end
