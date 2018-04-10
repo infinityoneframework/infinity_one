@@ -7,7 +7,7 @@
 ### Bug Fixes
 
 * [UCX-3896] Message replacement patterns with OneChat.refresh_users_status exception
-
+* [UCX-3897] Fix Error when deleting user on system with only one admin.
 
 ## 1.0.0.beta11 (2018-04-05)
 

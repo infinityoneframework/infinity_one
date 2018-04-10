@@ -168,13 +168,17 @@ defmodule OneChat.Accounts do
     Accounts.count_user_roles(role) == 1
   end
 
+  def user_is_admin?(user) do
+    Accounts.has_role?(user, "admin")
+  end
+
   def delete_user(%{} = user) do
     changeset = Accounts.change_user(user)
 
     cond do
       ids = user_last_owner_of_any_rooms(user) ->
         {:error, add_error(changeset, :roles, ~g(Can't delete last owner), room_ids: ids)}
-      last_admin?() ->
+      user_is_admin?(user) and last_admin?() ->
         {:error, add_error(changeset, :roles, ~g(Can't delete last admin))}
       true ->
         Accounts.delete_user(user)
