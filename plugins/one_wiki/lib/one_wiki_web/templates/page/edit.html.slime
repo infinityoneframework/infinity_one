@@ -6,24 +6,7 @@ section.page-container.page-home.page-static
       i
     h2
       span.room-title = @title
-  .content
+  .content.wiki-content
     form action="#" id="wiki-edit-page"
       input type="hidden" name="id" value="#{@id}"
-      .rocket-form
-        fieldset
-          .input-line
-            label = ~g(Title)
-            div
-              input type="text" name="wiki[title]" value="#{@title}"
-          .input-line
-            label = ~g(Body)
-            div
-              textarea style="height: 300px" name="wiki[body]"
-                = @body
-        .submit
-          button.button.default.cancel rebel-channel="wiki" rebel-click="cancel_edit"
-            i.icon-cancel
-            span = ~g(Cancel)
-          button.button.primary.save rebel-channel="wiki" rebel-click="update_page"
-            i.icon-ok
-            span = ~g(Save page changes)
+      = render "form.html", title: @title, body: @body, submit: ~g(Save page changes)

@@ -401,6 +401,17 @@ defmodule OneChatWeb.MessageView do
     |> raw
   end
 
+  def format_page(body, user, opts \\ []) do
+    require_space = Keyword.get(opts, :require_mention_space, false)
+    body
+    |> encode_mentions(user, require_space)
+    |> encode_room_links
+    |> EmojiOne.shortname_to_image(single_class: "big")
+    |> IO.inspect(label: "before mrp")
+    |> run_message_replacement_patterns()
+    |> autolink()
+  end
+
   defp html_escape(body, true) do
     body
     |> Phoenix.HTML.html_escape
@@ -448,18 +459,26 @@ defmodule OneChatWeb.MessageView do
   @doc """
   Encodes mention links in the body text.
   """
-  def encode_mentions(body, user) do
+  def encode_mentions(body, user, require_space \\ true) do
     body
     |> encode_mark_alls()
-    |> encode_users(user.username)
+    |> encode_users(user.username, require_space)
     |> encode_alls()
   end
 
-  def encode_users(body, username) do
-    Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
-      x = String.replace(x, ~r/\s*@/, "")
-      ~s'#{y}<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
-      ~s' data-fun="flex_user_open" class="mention-link#{get_own_class(username, x)}" data-username="#{x}">@#{x}</a>'
+  def encode_users(body, username, require_space) do
+    sp = if require_space, do: "(?:^|\s)", else: "(?:^|\s|>)"
+    Logger.warn "sp: " <> sp
+    # Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
+    Regex.replace ~r/#{sp}@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
+    # Regex.replace ~r/(?:^|\s|>)@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
+      Logger.warn "{x,y}: " <> inspect({x,y})
+      x = String.trim_trailing(x, "@" <> y)
+      # y = String.trim_trailing(y, ">")
+      # ~s'#{y}<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
+      # ~s' data-fun="flex_user_open" class="mention-link#{get_own_class(username, x)}" data-username="#{x}">#{x}</a>'
+      ~s'#{x}<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
+      ~s' data-fun="flex_user_open" class="mention-link#{get_own_class(username, y)}" data-username="#{y}">@#{y}</a>'
     end
   end
 

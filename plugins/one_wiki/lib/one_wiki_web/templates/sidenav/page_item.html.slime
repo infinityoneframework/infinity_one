@@ -1,7 +1,7 @@
 li.page-link.background-transparent-darker-hover
-  a.open-page href="#" rebel-click="open_page" data-name="#{@name}"
+  a.open-page href="#" rebel-click="open_page" data-name="#{@title}"
     i.icon-doc.status-offline
-    span.name = @name
+    span.name = name(@title)
     span.opt
       i.icon-eye-off.hide-room aria-label="#{~g(Hide Page)}" title="#{~g(Hide Page)}"
       i.icon-logout.leave-room aria-label="#{~g(Disconnect Page)}" title="#{~g(Disconnect Page)}"

@@ -5,21 +5,9 @@ section.page-container.page-home.page-static
       i
       i
     h2
-      span.room-title = ~g(New Page)
+      - title = if @title == "", do: ~g(New Page), else: @title
+      span.room-title = title
   .content
     form action="#" id="wiki-new-page"
-      .rocket-form
-        fieldset
-          .input-line
-            label = ~g(Title)
-            div
-              input type="text" name="wiki[title]"
-          .input-line
-            label = ~g(Body)
-            div
-              textarea style="height: 300px" name="wiki[body]"
-        fieldset
-        .submit
-          button.button.primary.save rebel-channel="wiki" rebel-click="create_page"
-            i.icon-save
-            span = ~g(Create Page)
+      = render "form.html", title: @title, body: "", submit: ~g(Create page)
+

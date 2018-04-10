@@ -5,5 +5,5 @@ h3.add-room.wiki
     i.icon-plus
 ul.wiki rebel-channel="wiki"
   = for page <- get_pages(@user) do
-    = render "page_item.html", name: page.title
+    = render "page_item.html", title: page.title
 

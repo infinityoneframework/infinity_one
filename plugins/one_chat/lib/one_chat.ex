@@ -42,8 +42,9 @@ defmodule OneChat do
   end
 
   def refresh_users_status(username) when is_binary(username) do
-    user_id = Accounts.user_id_by_username(username)
-    OnePubSub.broadcast "user:all", "status:refresh-user", %{username: username, user_id: user_id}
+    if user_id = Accounts.user_id_by_username(username) do
+      OnePubSub.broadcast "user:all", "status:refresh-user", %{username: username, user_id: user_id}
+    end
   end
 
 end

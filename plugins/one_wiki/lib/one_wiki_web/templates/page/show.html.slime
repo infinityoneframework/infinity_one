@@ -8,7 +8,7 @@ section.page-container.page-home.page-static
       span.room-title = @title
     .submit
       button.button.primary.save rebel-channel="wiki" rebel-click="edit_page" data-id="#{@id}"
-        span = ~g(Edit)
+        span = ~g(Edit Page)
 
-  .content.markdown-body
+  .content.wiki.markdown-body.message
     = raw @body

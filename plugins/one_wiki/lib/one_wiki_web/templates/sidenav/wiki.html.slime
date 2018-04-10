@@ -1,0 +1,18 @@
+section.wiki rebel-channel="wiki"
+  header
+    div
+      h4 = ~g(Pages)
+  .content
+    .wrapper
+      ul
+        li
+          i.icon-plus
+          a.admin-link rebel-click="new_page" = ~g(New Page)
+
+        / li.separator style="border-bottom: 1px solid #999; margin-top: 5px; margin-bottom: 5px"
+        li
+          span.heading = ~g(Pages)
+        = for page <- get_pages(%{}) do
+          li
+            i.icon-doc
+            a.admin-link rebel-click="open_page" data-name="#{page.title}" = name(page)
