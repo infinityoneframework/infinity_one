@@ -1,5 +1,14 @@
 # InfinityOne Changelog
 
+## 1.0.0.beta11 (2018-04-09)
+
+### Enhancements
+
+### Bug Fixes
+
+* [UCX-3896] Message replacement patterns with OneChat.refresh_users_status exception
+
+
 ## 1.0.0.beta11 (2018-04-05)
 
 ### Enhancements
