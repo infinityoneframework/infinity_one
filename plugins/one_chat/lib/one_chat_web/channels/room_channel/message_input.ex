@@ -111,8 +111,27 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
     end
   end
 
-  defp handle_in(%{app: app, state: state} = context, _key) do
-    # Logger.info "handle in open?: #{context[:open?]}"
+  # WIP for the ii command to bring up pages list.
+  # defp handle_in(%{app: app, state: state} = context, key) do
+  #   if key == "i" and state.head =~ ~r/i$/ do
+  #     if match = Buffer.match_app_pattern state.head do
+  #       dispatch_handle_in(key, match, context)
+  #     else
+  #       context
+  #     end
+  #   # Logger.info "handle in open?: #{context[:open?]}"
+  #   else
+  #     if match = Buffer.pattern_mod_match? app, state.head do
+  #       # Logger.warn "matched: #{inspect match}"
+  #       dispatch_handle_in(app, match, context)
+  #     else
+  #       # Logger.warn "did not match: "
+  #       check_and_close :close, context
+  #     end
+  #   end
+  # end
+
+  defp handle_in(%{app: app, state: state} = context, key) do
     if match = Buffer.pattern_mod_match? app, state.head do
       # Logger.warn "matched: #{inspect match}"
       dispatch_handle_in(app, match, context)

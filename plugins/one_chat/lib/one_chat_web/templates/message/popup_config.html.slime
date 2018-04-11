@@ -8,3 +8,4 @@
   = render "popup_channel.html", chatd: @chatd
   = render "popup_user.html", chatd: @chatd
   = render "popup_slash_commands.html", chatd: @chatd
+  / = render "popup_pages.html", chatd: @chat

@@ -91,4 +91,34 @@ defmodule OneWiki.Page do
     |> where([p, s], s.hidden == false)
     |> @repo.all()
   end
+
+  def get_pages_by_pattern(user_id, pattern, count \\ 5)
+
+  def get_pages_by_pattern(%{id: id}, pattern, count) do
+    get_pages_by_pattern(id, pattern, count)
+  end
+
+  def get_pages_by_pattern(user_id, pattern, count) do
+    user_id
+    |> get_authorized_pages
+    |> where([c], like(c.title, ^pattern))
+    |> order_by([c], asc: c.title)
+    |> limit(^count)
+    |> select([c], {c.id, c.title})
+    |> @repo.all
+  end
+
+  def get_all_pages_by_pattern(pattern, count \\ 8) do
+    @schema
+    |> where([c], like(fragment("LOWER(?)", c.title), ^pattern))
+    |> where([c], c.type in [0, 1])
+    |> order_by([c], asc: c.type)
+    |> limit(^count)
+    |> select([c], %{id: c.id, name: c.type})
+    |> @repo.all
+  end
+
+  def get_authorized_pages(_) do
+    list()
+  end
 end
