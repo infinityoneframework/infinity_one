@@ -11,6 +11,14 @@ defmodule OneChatWeb.RebelChannel.SideNav do
     """
   end
 
+  # defjs :close do
+  #   alias OneChatWeb.RebelChannel.{RoomHistoryManager, NavMenu}, warn: false
+  #   """
+  #   #{NavMenu.close_js()};
+  #   $('div.flex-nav').addClass('animated-hidden');
+  #   OneChat.sideNav.set_nav_top_icon('open');
+  #   """
+  # end
   # defjs :set_nav_top_icon, [:icon] do
 
   # end

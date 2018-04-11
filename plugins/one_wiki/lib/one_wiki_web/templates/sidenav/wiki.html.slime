@@ -12,7 +12,10 @@ section.wiki rebel-channel="wiki"
         / li.separator style="border-bottom: 1px solid #999; margin-top: 5px; margin-bottom: 5px"
         li
           span.heading = ~g(Pages)
-        = for page <- get_pages(%{}) do
-          li
-            i.icon-doc
-            a.admin-link rebel-click="open_page" data-name="#{page.title}" = name(page)
+        = for page <- @pages do
+          li style="position: relative;"
+            a.page-link rebel-click="open_page" data-name="#{page.title}" data-id="#{page.id}"
+              i.icon-info
+              = name(page)
+            scan.opt.fixed
+              = page_opts(page)

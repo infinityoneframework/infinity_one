@@ -21,4 +21,16 @@ defmodule OneWiki.Page do
     changeset
   end
 
+  def get_subscribed_for_user(user) do
+    user
+    |> @schema.subscribed_pages_query()
+    |> @repo.all()
+  end
+
+  def get_visible_subscribed_for_user(user) do
+    user
+    |> @schema.subscribed_pages_query()
+    |> where([p, s], s.hidden == false)
+    |> @repo.all()
+  end
 end

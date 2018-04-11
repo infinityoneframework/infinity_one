@@ -1,7 +1,8 @@
 li.page-link.background-transparent-darker-hover
   a.open-page href="#" rebel-click="open_page_link" data-name="#{@page.title}" data-id="#{@page.id}"
-    i.icon-doc.status-offline
+    /  i.icon-help-circled.status-offline
+    i.icon-info.status-offline
     span.name = name(@page.title)
     span.opt
-      i.icon-eye-off.hide-room aria-label="#{~g(Hide Page)}" title="#{~g(Hide Page)}"
-      i.icon-logout.leave-room aria-label="#{~g(Disconnect Page)}" title="#{~g(Disconnect Page)}"
+      i.icon-eye-off.hide-room aria-label="#{~g(Hide Page)}" title="#{~g(Hide Page)}" rebel-click="hide_page"
+      i.icon-logout.leave-room aria-label="#{~g(Disconnect Page)}" title="#{~g(Disconnect Page)}" rebel-click="unsubscribe_page"

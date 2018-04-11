@@ -10,7 +10,7 @@ defmodule OneWikiWeb.WikiChannel do
 
   alias OneChat.ServiceHelpers, as: Helpers
   alias OneWikiWeb.{PageView, SidenavView}
-  alias OneWiki.Page
+  alias OneWiki.{Page, Subscription}
   alias InfinityOne.{Accounts, OnePubSub}
   alias OneChatWeb.RebelChannel.Client
   alias OneChatWeb.{SharedView, MessageView}
@@ -40,16 +40,14 @@ defmodule OneWikiWeb.WikiChannel do
 
   def handle_info({"wiki:all", "update:page", payload}, socket) do
     Logger.warn "update:page " <> inspect(payload)
-    html = Phoenix.View.render_to_string(SidenavView, "pages.html", pages: Page.list())
-    Query.update(socket, :html, set: html, on: "aside.side-nav ul.wiki")
-    {:noreply, socket}
+    {:noreply, update_users_page_list(socket)}
   end
 
   def handle_info({"wiki:all", "create:page", payload}, socket) do
     Logger.warn "create:page " <> inspect(payload)
-    html = Phoenix.View.render_to_string(SidenavView, "pages.html", pages: Page.list())
-    Query.update(socket, :html, set: html, on: "aside.side-nav ul.wiki")
-    {:noreply, socket}
+    # html = Phoenix.View.render_to_string(SidenavView, "pages.html", pages: Page.list())
+    # Query.update(socket, :html, set: html, on: "aside.side-nav ul.wiki")
+    {:noreply, update_users_page_list(socket)}
   end
 
   def handle_info(event, socket) do
@@ -83,7 +81,7 @@ defmodule OneWikiWeb.WikiChannel do
 
     hide_active_room(socket)
     render_to_string({[title: title], get_user(socket), nil, "new.html", socket})
-    # sidenav(socket)
+    sidenav(socket)
     # html = Phoenix.View.render_to_string(PageView, "new.html", [])
     # Rebel.Query.update(socket, :html, set: html, on: ".main-content")
   end
@@ -176,8 +174,80 @@ defmodule OneWikiWeb.WikiChannel do
     Query.update(socket, :html, set: body, on: "#preview")
   end
 
+  def subscribe_page(socket, sender) do
+    Logger.warn "subscribe_page"
+    user = get_user(socket)
+    with id <- get_opts_id(socket, sender),
+         false <- is_nil(id),
+         {:ok, _} <- Subscription.create(%{user_id: user.id, page_id: id}) do
+      socket |> update_users_page_list() |> close_sidenav() |> open_by_id(id)
+    else
+      error ->
+        Logger.warn "error: " <> inspect(error)
+        Client.toastr(socket, :error, ~s(Problem showing page.))
+    end
+  end
+
+  def unsubscribe_page(socket, sender) do
+    Logger.warn "unsubscribe_page"
+    user = get_user(socket)
+    with id <- get_opts_id(socket, sender),
+         false <- is_nil(id),
+         {:ok, _} <- socket |> get_user() |> Subscription.delete(id) do
+      socket |> update_users_page_list()
+    else
+      error ->
+        Logger.warn "error: " <> inspect(error)
+        Client.toastr(socket, :error, ~s(Problem hiding page.))
+    end
+  end
+
+  def hide_page(socket, sender) do
+    Logger.warn "hide_page"
+    user = get_user(socket)
+    with id <- get_opts_id(socket, sender),
+         false <- is_nil(id),
+         {:ok, _} <- Subscription.hide_page(user, id) do
+      socket |> update_users_page_list()
+    else
+      error ->
+        Logger.warn "error: " <> inspect(error)
+        Client.toastr(socket, :error, ~s(Problem hiding page.))
+    end
+  end
+
+  def unhide_page(socket, sender) do
+    Logger.warn "unhide_page"
+    user = get_user(socket)
+    with id <- get_opts_id(socket, sender),
+         false <- is_nil(id),
+         {:ok, _} <- Subscription.unhide_page(user, id) do
+      socket |> update_users_page_list() |> close_sidenav() |> open_by_id(id)
+    else
+      error ->
+        Logger.warn "error: " <> inspect(error)
+        Client.toastr(socket, :error, ~s(Problem showing page.))
+    end
+  end
+
+  def show_page(socket, sender) do
+    Logger.warn "show_page: " <> inspect(sender)
+    id = get_opts_id(socket, sender)
+    Logger.warn "id: " <> inspect(id)
+    socket
+    |> close_sidenav()
+    |> open_by_id(id)
+  end
+
   #########################
   # Private helpers
+
+  defp get_opts_id(socket, sender) do
+    Rebel.Core.exec_js!(socket, """
+      let $this = $('#{Rebel.Core.this(sender)}');
+      $this.closest('[data-id]').attr('data-id') || $this.parent().prev().attr('data-id');
+      """ |> String.replace("\n", "") |> IO.inspect(label: "get_opts_id_js"))
+  end
 
   defp wrap_for_preview(html) do
     "<div class='content wiki markdown-body message preview'>" <> html <> "</div>"
@@ -202,13 +272,28 @@ defmodule OneWikiWeb.WikiChannel do
 
   defp sidenav(socket) do
     SideNav.open socket
-    Phoenix.View.render_to_string(SidenavView, "wiki.html", [])
+    user = get_user(socket)
+    pages = get_pages_with_subscriptions(user)
+    html = Phoenix.View.render_to_string(SidenavView, "wiki.html", user: user, pages: pages)
+    Query.update(socket, :html, set: html, on: ".flex-nav")
+  end
+
+  def close_sidenav(socket) do
+    Rebel.Query.execute(socket, :click, on: ".side-nav .arrow.close")
+  end
+
+  defp get_pages_with_subscriptions(user) do
+    subscriptions = Subscription.list_by(user_id: user.id)
+    Enum.map(Page.list(), fn page ->
+      page
+      |> Map.from_struct()
+      |> Map.put(:subscription, Enum.find(subscriptions, & &1.page_id == page.id))
+    end)
   end
 
   defp render_to_string({bindings, user, page, template, socket}) do
     html = Phoenix.View.render_to_string(PageView, template, bindings)
-    length = Rebel.Core.exec_js! socket, ~s/$('.page-container.page-home.page-static').length/
-    Logger.warn "length: " <> inspect(length)
+    length = Rebel.Core.exec_js!(socket, ~s/$('.page-container.page-home.page-static').length/)
     if length == 0 do
       Rebel.Query.insert(socket, html, append: ".main-content-flex")
     else
@@ -227,6 +312,7 @@ defmodule OneWikiWeb.WikiChannel do
   defp active_link_js(page) do
     """
     $('.page-link').removeClass('active');
+    $('section.wiki li.active').removeClass('active');
     $('li a[data-name="#{page.title}"]').parent().addClass('active');
     """
     |> String.replace("\n", "")
@@ -234,6 +320,10 @@ defmodule OneWikiWeb.WikiChannel do
 
   defp get_user(socket) do
     Accounts.get_user(socket.assigns.user_id, default_preload: true)
+  end
+
+  defp open_by_id(socket, id) do
+    render_page(Page.get_by(id: id), socket)
   end
 
   defp open(socket, title) do
@@ -271,5 +361,14 @@ defmodule OneWikiWeb.WikiChannel do
       """ |> String.replace("\n", ""))
   end
 
+  defp update_users_page_list(socket) do
+    # user = get_user(socket)
+    pages = socket |> get_user() |> SidenavView.get_pages()
+    count = ~s/"(#{length(pages)})"/
+    html = Phoenix.View.render_to_string(SidenavView, "pages.html", pages: pages)
+    socket
+    |> Query.update(:html, set: html, on: "aside.side-nav ul.wiki")
+    |> Rebel.Core.async_js(~s/$('h3.add-room.wiki .room-count-small').text(#{count})/)
+  end
 
 end

@@ -88,6 +88,7 @@ class RoomManager {
     if (debug) { console.log('open_room', this) }
 
     $('.page-container.page-home.page-static').remove();
+    $('.page-link').removeClass('active');
     // let currentId = $('.room-link.active a.open-room').attr('data-id');
     // if (currentId) {
     //   $(`#chat-window-${currentId}`).hide();
@@ -557,6 +558,7 @@ class RoomManager {
           $(e.currentTarget).attr('data-name'));
       } else {
         $('.page-container.page-home.page-static').remove();
+        $('.page-link').removeClass('active');
         $room.show();
         $target.parent().addClass('active');
       }

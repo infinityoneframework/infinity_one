@@ -13,7 +13,9 @@ defmodule OneWiki.Schema.Page do
     field :body, :string
     field :type, :integer, default: 0
     field :format, :string, default: "markdown"
+
     belongs_to :parent, __MODULE__
+    has_many :subscriptions, OneWiki.Schema.Subscription
 
     timestamps(type: :utc_datetime)
   end
@@ -30,5 +32,14 @@ defmodule OneWiki.Schema.Page do
     struct
     |> cast(params, @fields)
     |> validate_required(@required)
+  end
+
+  def subscribed_pages_query(user) do
+    from p in __MODULE__,
+      join: s in OneWiki.Schema.Subscription,
+      on: s.page_id == p.id,
+      where: s.user_id == ^user.id,
+      select: p,
+      order_by: [asc: p.title]
   end
 end
