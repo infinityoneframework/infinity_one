@@ -6,4 +6,6 @@ h3.add-room.wiki
     i.icon-plus
 ul.wiki rebel-channel="wiki"
   = render "pages.html", pages: pages
+button.more.more-pages.background-transparent-darker-hover rebel-click="more_pages" rebel-channel="wiki"
+  = ~g(More Pages) <> "..."
 

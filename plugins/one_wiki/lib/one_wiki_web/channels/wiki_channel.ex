@@ -239,6 +239,11 @@ defmodule OneWikiWeb.WikiChannel do
     |> open_by_id(id)
   end
 
+  def more_pages(socket, sender) do
+    Logger.warn "more pages"
+    sidenav(socket)
+  end
+
   #########################
   # Private helpers
 
