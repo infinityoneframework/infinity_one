@@ -141,7 +141,7 @@ defmodule OneWikiWeb.WikiChannel do
     # Logger.warn "assigns: " <> inspect(socket.assigns)
 
     resource_params = (Helpers.normalize_params(form)["wiki"])
-    case Page.update(Page.get(form["id"]), resource_params) do
+    case Page.update(get_user(socket), Page.get(form["id"]), resource_params) do
       {:ok, page} ->
         Client.toastr(socket, :success, ~g(Page updated successfully.))
         OnePubSub.broadcast("wiki:all", "update:page", %{page: page})
