@@ -9,6 +9,8 @@ section.page-container.page-home.page-static
     .submit
       button.button.primary.save rebel-channel="wiki" rebel-click="edit_page" data-id="#{@id}"
         span = ~g(Edit Page)
+      button.button.danger.delete rebel-channel="wiki" rebel-click="delete_page" data-id="#{@id}"
+        span = ~g(Delete Page)
 
   .content.wiki.markdown-body.message
     = raw @body

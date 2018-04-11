@@ -407,7 +407,6 @@ defmodule OneChatWeb.MessageView do
     |> encode_mentions(user, require_space)
     |> encode_room_links
     |> EmojiOne.shortname_to_image(single_class: "big")
-    |> IO.inspect(label: "before mrp")
     |> run_message_replacement_patterns()
     |> autolink()
   end
@@ -449,7 +448,8 @@ defmodule OneChatWeb.MessageView do
       [first, markdown | rest] ->
         markdown = String.trim_leading(markdown, "\n")
         first <> ~s|<div class="markdown-body">| <>
-          Earmark.as_html!(markdown, %Earmark.Options{gfm: true, plugins: %{"" => InfinityOne.EarmarkPlugin.Task}})
+          Earmark.as_html!(markdown, %Earmark.Options{gfm: true, plugins:
+            %{"" => InfinityOne.EarmarkPlugin.Task}})
           <> "</div>" <> String.trim_leading(Enum.join(rest, ""))
       _ ->
         body
@@ -468,15 +468,8 @@ defmodule OneChatWeb.MessageView do
 
   def encode_users(body, username, require_space) do
     sp = if require_space, do: "(?:^|\s)", else: "(?:^|\s|>)"
-    Logger.warn "sp: " <> sp
-    # Regex.replace ~r/(^|\s)@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
     Regex.replace ~r/#{sp}@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
-    # Regex.replace ~r/(?:^|\s|>)@([\.a-zA-Z0-9-_]+)/, body, fn x, y ->
-      Logger.warn "{x,y}: " <> inspect({x,y})
       x = String.trim_trailing(x, "@" <> y)
-      # y = String.trim_trailing(y, ">")
-      # ~s'#{y}<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
-      # ~s' data-fun="flex_user_open" class="mention-link#{get_own_class(username, x)}" data-username="#{x}">#{x}</a>'
       ~s'#{x}<a rebel-channel="user" rebel-click="flex_call" data-id="members-list"' <>
       ~s' data-fun="flex_user_open" class="mention-link#{get_own_class(username, y)}" data-username="#{y}">@#{y}</a>'
     end

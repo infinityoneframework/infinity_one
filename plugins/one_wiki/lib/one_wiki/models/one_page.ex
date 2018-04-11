@@ -4,11 +4,16 @@ defmodule OneWiki.Page do
   """
   use OneModel, schema: OneWiki.Schema.Page
   alias Ecto.Multi
+  alias InfinityOne.Accounts.User
 
   require Logger
 
-  def changeset(user, params) do
+  def changeset(%User{} = user, params) do
     changeset %@schema{}, user, params
+  end
+
+  def changeset(%@schema{} = struct, %User{} = user) do
+    changeset(struct, user, %{})
   end
 
   def changeset(struct, user, params) do
@@ -17,36 +22,62 @@ defmodule OneWiki.Page do
     |> validate_permission(user)
   end
 
-  # def create(user, params) do
-  #   user
-  #   |> changeset(params)
-  #   |> create
-  # end
+  @doc """
+  Create a new page.
+
+  Creates the database entry for the page. Also creates a file with the page
+  body in `priv/static/uploads/pages` directory. This directory is a git repo.
+  After writing the file, it is committed to the git repo, providing version
+  control of each page revision.
+  """
   def create(user, params) do
-    case transaction(user, params) |> @repo.transaction() do
+    case create_transaction(user, params) |> @repo.transaction() do
       {:ok, %{insert: insert}} -> {:ok, insert}
       {:error, _, reason} -> {:error, reason}
       {:error, _, reason, _} -> {:error, reason}
     end
-    |> IO.inspect(label: "transaction result")
   end
 
-  def transaction(user, params) do
+  defp create_transaction(user, params) do
     Multi.new()
-    |> Multi.run(:insert, fn _ -> insert(user, params) end)
+    |> Multi.run(:insert, fn _ -> run_insert(user, params) end)
     |> Multi.run(:create_file, &create_file(user, &1.insert))
   end
 
-  defp insert(user, params) do
+  defp run_insert(user, params) do
     user
     |> changeset(params)
     |> create
   end
 
+  @doc """
+  Updates an existing page.
+
+  Updates the database record with the modified page. Runs the same git commands
+  as create/2 to commit the revisions in git.
+  """
+  def update(user, page, params) do
+    case update_transaction(user, page, params) |> @repo.transaction() do
+      {:ok, %{update: update}} -> {:ok, update}
+      {:error, _, reason} -> {:error, reason}
+      {:error, _, reason, _} -> {:error, reason}
+    end
+  end
+
+  defp update_transaction(user, page, params) do
+    Multi.new()
+    |> Multi.run(:update, fn _ -> run_update(user, page, params) end)
+    |> Multi.run(:create_file, &create_file(user, &1.update, :updated))
+  end
+
+  defp run_update(user, page, params) do
+    page
+    |> changeset(user, params)
+    |> __MODULE__.update()
+  end
+
   defp create_file(user, page, action \\ :added) do
-    Logger.warn "page: " <> inspect(page)
     contents = page.body
-    # contents = "Title: " <> page.title <> "\n" <> page.body <> "\n"
     repo = Git.new OneWiki.pages_path()
     message = "'#{page.title}' #{action} by @#{user.username}"
     path = Path.join(OneWiki.pages_path(), page.id)
@@ -60,22 +91,41 @@ defmodule OneWiki.Page do
     end
   end
 
-  def update(user, page, params) do
-    case update_transaction(user, page, params) |> @repo.transaction() do
-      {:ok, %{update: update}} -> {:ok, update}
+  def delete(user, id) do
+    case delete_transaction(user, id) |> @repo.transaction() do
+      {:ok, %{delete: delete}} -> {:ok, delete}
       {:error, _, reason} -> {:error, reason}
       {:error, _, reason, _} -> {:error, reason}
     end
-    |> IO.inspect(label: "transaction result")
   end
 
-  defp update_transaction(user, page, params) do
+  defp delete_transaction(user, id) do
     Multi.new()
-    |> Multi.run(:update, fn _ -> __MODULE__.update(page, params) end)
-    |> Multi.run(:create_file, &create_file(user, &1.update, :updated))
+    |> Multi.run(:delete, fn _ -> run_delete(user, id) end)
+    |> Multi.run(:delete_file, &delete_file(user, &1.delete))
   end
 
-  def validate_permission(changeset, _user) do
+  defp run_delete(user, page_id) do
+    page_id
+    |> get()
+    |> changeset(user)
+    |> delete()
+  end
+
+  defp delete_file(user, page) do
+    repo = Git.new OneWiki.pages_path()
+    message = "'#{page.title}' delete by @#{user.username}"
+    path = Path.join(OneWiki.pages_path(), page.id)
+    with :ok <- File.rm(path),
+         {:ok, _} <- Git.commit(repo, ["-am", message]) do
+      {:ok, path}
+    else
+      {:error, error} -> {:error, error}
+      other -> {:error, other}
+    end
+  end
+
+  defp validate_permission(changeset, _user) do
     changeset
   end
 

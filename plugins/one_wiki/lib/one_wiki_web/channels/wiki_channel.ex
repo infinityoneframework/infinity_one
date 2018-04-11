@@ -103,13 +103,9 @@ defmodule OneWikiWeb.WikiChannel do
   end
 
   def create_page(socket, %{"form" => form} = _sender) do
-    # Logger.warn "sender: " <> inspect(sender)
-    # Logger.warn "assigns: " <> inspect(socket.assigns)
-    # sidenav(socket)
     user = get_user(socket)
 
     resource_params = Helpers.normalize_params(form)["wiki"]
-    # |> IO.inspect(label: "resource_params")
 
     case Page.create(user, resource_params) do
       {:ok, page} ->
@@ -117,29 +113,19 @@ defmodule OneWikiWeb.WikiChannel do
         OnePubSub.broadcast("wiki:all", "create:page", %{page: page})
         render_page(page, socket)
       {:error, changeset} ->
-        errors = SharedView.format_errors(changeset)
-        Client.toastr(socket, :error, gettext("Problem creating page: %{errors}", errors: errors))
+        page_action_error(socket, changeset, :creating)
     end
   end
 
   def edit_page(socket, sender) do
-    # Logger.warn "sender: " <> inspect(sender)
-    # Logger.warn "assigns: " <> inspect(socket.assigns)
-    # user = Accounts.get_user socket.assigns.user_id, default_preload: true
-
     page = Page.get(sender["dataset"]["id"])
 
-    # html = Phoenix.View.render_to_string(PageView, "edit.html", title: page.title, body: page.body, id: page.id)
-    # Rebel.Query.update(socket, :html, set: html, on: ".main-content")
     render_to_string({
       [title: page.title, body: page.body, id: page.id],
       get_user(socket), page, "edit.html", socket})
   end
 
   def update_page(socket, %{"form" => form} = _sender) do
-    # Logger.warn "sender: " <> inspect(sender)
-    # Logger.warn "assigns: " <> inspect(socket.assigns)
-
     resource_params = (Helpers.normalize_params(form)["wiki"])
     case Page.update(get_user(socket), Page.get(form["id"]), resource_params) do
       {:ok, page} ->
@@ -147,9 +133,23 @@ defmodule OneWikiWeb.WikiChannel do
         OnePubSub.broadcast("wiki:all", "update:page", %{page: page})
         render_page(page, socket)
       {:error, changeset} ->
-        errors = SharedView.format_errors(changeset)
-        Client.toastr(socket, :error, gettext("Problem updating page: %{errors}", errors: errors))
+        page_action_error(socket, changeset, :updating)
     end
+  end
+
+  def delete_page(socket, sender) do
+    id = sender["dataset"]["id"]
+    user = get_user(socket)
+    Logger.warn "delete_page #{id}"
+    case Page.delete(user, id) do
+      {:ok, page} ->
+        Client.toastr(socket, :success, ~g(Page deleted successfully.))
+        OnePubSub.broadcast("wiki:all", "page:delete", %{page: page})
+        socket |> update_users_page_list() |> close_sidenav()
+      {:error, changeset} ->
+        page_action_error(socket, changeset, :deleting)
+    end
+
   end
 
   def cancel_edit(socket, %{"form" => form} = sender) do
@@ -374,6 +374,18 @@ defmodule OneWikiWeb.WikiChannel do
     socket
     |> Query.update(:html, set: html, on: "aside.side-nav ul.wiki")
     |> Rebel.Core.async_js(~s/$('h3.add-room.wiki .room-count-small').text(#{count})/)
+  end
+
+  defp page_action_error(socket, changeset, action) do
+    errors =
+      case changeset do
+        %Ecto.Changeset{} = changeset ->
+          SharedView.format_errors(changeset)
+        string when is_binary(string) ->
+          string
+      end
+    Client.toastr(socket, :error, gettext("Problem %{action} page: %{errors}",
+      errors: errors, action: to_string(action)))
   end
 
 end
