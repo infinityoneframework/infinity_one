@@ -88,6 +88,10 @@ class RoomManager {
     if (debug) { console.log('open_room', this) }
 
     $('.page-container.page-home.page-static').remove();
+    // let currentId = $('.room-link.active a.open-room').attr('data-id');
+    // if (currentId) {
+    //   $(`#chat-window-${currentId}`).hide();
+    // }
     cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
   }
 
@@ -543,10 +547,19 @@ class RoomManager {
 
     $('body').on('click', 'a.open-room', e => {
       e.preventDefault();
+      e.stopPropagation();
+      let $target = $(e.currentTarget);
       if (debug) { console.log('clicked a.open-room', e,
-        $(e.currentTarget), $(e.currentTarget).attr('data-room')) }
-      this.open_room($(e.currentTarget).attr('data-room'),
-        $(e.currentTarget).attr('data-name'));
+        $target, $target.attr('data-room')) }
+      let $room = $(`#chat-window-${$target.attr('data-id')}`);
+      if ($room.length === 0) {
+        this.open_room($(e.currentTarget).attr('data-room'),
+          $(e.currentTarget).attr('data-name'));
+      } else {
+        $('.page-container.page-home.page-static').remove();
+        $room.show();
+        $target.parent().addClass('active');
+      }
     })
     .on('click', 'a.toggle-favorite', e => {
       if (debug) { console.log('click a.toggle-favorite') }
