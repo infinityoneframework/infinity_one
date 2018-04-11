@@ -333,6 +333,7 @@ defmodule OneChat.ChannelService do
         do: user.account.status_message, else: nil
 
     %{
+      id: chan.id,
       open: open,
       status_message: status_message,
       has_unread: cc.has_unread,

@@ -11,7 +11,7 @@ defmodule OneWikiWeb.WikiChannel do
   alias OneChat.ServiceHelpers, as: Helpers
   alias OneWikiWeb.{PageView, SidenavView}
   alias OneWiki.Page
-  alias InfinityOne.Accounts
+  alias InfinityOne.{Accounts, OnePubSub}
   alias OneChatWeb.RebelChannel.Client
   alias OneChatWeb.{SharedView, MessageView}
   alias OneChatWeb.RebelChannel.{SideNav}
@@ -28,8 +28,32 @@ defmodule OneWikiWeb.WikiChannel do
     super(ev, payload, socket)
   end
 
+  ###############
+  # handle_info
+
   def handle_info(:after_join, socket) do
     Logger.warn "Wiki after join"
+    OnePubSub.subscribe("wiki:all", "update:page")
+    OnePubSub.subscribe("wiki:all", "create:page")
+    {:noreply, socket}
+  end
+
+  def handle_info({"wiki:all", "update:page", payload}, socket) do
+    Logger.warn "update:page " <> inspect(payload)
+    html = Phoenix.View.render_to_string(SidenavView, "pages.html", pages: Page.list())
+    Query.update(socket, :html, set: html, on: "aside.side-nav ul.wiki")
+    {:noreply, socket}
+  end
+
+  def handle_info({"wiki:all", "create:page", payload}, socket) do
+    Logger.warn "create:page " <> inspect(payload)
+    html = Phoenix.View.render_to_string(SidenavView, "pages.html", pages: Page.list())
+    Query.update(socket, :html, set: html, on: "aside.side-nav ul.wiki")
+    {:noreply, socket}
+  end
+
+  def handle_info(event, socket) do
+    Logger.error("Unhandled event: " <> inspect(event))
     {:noreply, socket}
   end
 
@@ -45,42 +69,19 @@ defmodule OneWikiWeb.WikiChannel do
     end
   end
 
-  defp sidenav(socket) do
-    SideNav.open socket
-    Phoenix.View.render_to_string(SidenavView, "wiki.html", [])
+  def handle_in(event, socket) do
+    Logger.error("Unhandled event: " <> inspect(event))
+    {:noreply, socket}
   end
 
-  defp render_to_string({bindings, user, page, template, socket}) do
-    html = Phoenix.View.render_to_string(PageView, template, bindings)
-    socket
-    |> Query.update(:html, set: html, on: ".main-content")
-    |> Query.update(:html, set: sidenav(socket), on: ".flex-nav section")
-    |> Rebel.Core.async_js(active_link_js(page))
-  end
-
-  defp async_js(socket, nil), do: socket
-
-  defp async_js(socket, js) do
-    Rebel.Core.async_js(socket, js)
-  end
-
-  defp active_link_js(nil), do: nil
-  defp active_link_js(page) do
-    """
-    $('.flex-nav .wrapper li').removeClass('active');
-    $('.flex-nav li a[data-id="#{page.id}"]').parent().addClass('active');
-    """
-    |> String.replace("\n", "")
-  end
-
-  defp get_user(socket) do
-    Accounts.get_user(socket.assigns.user_id, default_preload: true)
-  end
+  #########################
+  # Rebel event handlers
 
   def new_page(socket, _sender, title \\ "") do
     # Logger.warn "sender: " <> inspect(sender)
     # Logger.warn "assigns: " <> inspect(socket.assigns)
 
+    hide_active_room(socket)
     render_to_string({[title: title], get_user(socket), nil, "new.html", socket})
     # sidenav(socket)
     # html = Phoenix.View.render_to_string(PageView, "new.html", [])
@@ -90,39 +91,23 @@ defmodule OneWikiWeb.WikiChannel do
   def open_page(socket, sender) do
     # Logger.warn "sender: " <> inspect(sender)
     # Logger.warn "assigns: " <> inspect(socket.assigns)
-    sidenav(socket)
+    # sidenav(socket)
     name = sender["dataset"]["name"]
     open(socket, name)
     # render_page(Page.get_by(title: name), socket)
   end
 
-  defp open(socket, title) do
-    render_page(Page.get_by(title: title), socket)
-  end
-
-  defp render_markdown(body, user) do
-    case Earmark.as_html(body) do
-      {:ok, body, _} -> body
-      {:error, error} -> inspect(error)
-    end
-    |> MessageView.format_page(user)
-    |> encode_custom_markdown()
-  end
-
-  defp render_page(page, socket) do
-    user = get_user(socket)
-    body = render_markdown(page.body, user) |> Phoenix.HTML.raw()
-
-    render_to_string({[title: page.title, body: body, id: page.id], user, page, "show.html", socket})
-
-    # html = Phoenix.View.render_to_string(PageView, "show.html", title: page.title, body: body, id: page.id)
-    # Rebel.Query.update(socket, :html, set: html, on: ".main-content")
+  def open_page_link(socket, sender) do
+    name = sender["dataset"]["name"]
+    socket
+    |> hide_active_room()
+    |> open(name)
   end
 
   def create_page(socket, %{"form" => form} = _sender) do
     # Logger.warn "sender: " <> inspect(sender)
     # Logger.warn "assigns: " <> inspect(socket.assigns)
-    sidenav(socket)
+    # sidenav(socket)
     user = get_user(socket)
 
     resource_params = Helpers.normalize_params(form)["wiki"]
@@ -131,6 +116,7 @@ defmodule OneWikiWeb.WikiChannel do
     case Page.create(user, resource_params) do
       {:ok, page} ->
         Client.toastr(socket, :success, ~g(Page created successfully!))
+        OnePubSub.broadcast("wiki:all", "create:page", %{page: page})
         render_page(page, socket)
       {:error, changeset} ->
         errors = SharedView.format_errors(changeset)
@@ -160,6 +146,7 @@ defmodule OneWikiWeb.WikiChannel do
     case Page.update(Page.get(form["id"]), resource_params) do
       {:ok, page} ->
         Client.toastr(socket, :success, ~g(Page updated successfully.))
+        OnePubSub.broadcast("wiki:all", "update:page", %{page: page})
         render_page(page, socket)
       {:error, changeset} ->
         errors = SharedView.format_errors(changeset)
@@ -189,6 +176,9 @@ defmodule OneWikiWeb.WikiChannel do
     Query.update(socket, :html, set: body, on: "#preview")
   end
 
+  #########################
+  # Private helpers
+
   defp wrap_for_preview(html) do
     "<div class='content wiki markdown-body message preview'>" <> html <> "</div>"
   end
@@ -209,4 +199,77 @@ defmodule OneWikiWeb.WikiChannel do
   defp encode_remote_links(body) do
     Regex.replace(~r/(href=['"]http)/, body, "target='_blank' \\1")
   end
+
+  defp sidenav(socket) do
+    SideNav.open socket
+    Phoenix.View.render_to_string(SidenavView, "wiki.html", [])
+  end
+
+  defp render_to_string({bindings, user, page, template, socket}) do
+    html = Phoenix.View.render_to_string(PageView, template, bindings)
+    length = Rebel.Core.exec_js! socket, ~s/$('.page-container.page-home.page-static').length/
+    Logger.warn "length: " <> inspect(length)
+    if length == 0 do
+      Rebel.Query.insert(socket, html, append: ".main-content-flex")
+    else
+      Query.update(socket, :replaceWith, set: html, on: ".page-container.page-home.page-static")
+    end
+    |> Rebel.Core.async_js(active_link_js(page))
+  end
+
+  defp async_js(socket, nil), do: socket
+
+  defp async_js(socket, js) do
+    Rebel.Core.async_js(socket, js)
+  end
+
+  defp active_link_js(nil), do: nil
+  defp active_link_js(page) do
+    """
+    $('.page-link').removeClass('active');
+    $('li a[data-name="#{page.title}"]').parent().addClass('active');
+    """
+    |> String.replace("\n", "")
+  end
+
+  defp get_user(socket) do
+    Accounts.get_user(socket.assigns.user_id, default_preload: true)
+  end
+
+  defp open(socket, title) do
+    render_page(Page.get_by(title: title), socket)
+  end
+
+  defp render_markdown(body, user) do
+    case Earmark.as_html(body) do
+      {:ok, body, _} -> body
+      {:error, error} -> inspect(error)
+    end
+    |> MessageView.format_page(user)
+    |> encode_custom_markdown()
+  end
+
+  defp render_page(page, socket) do
+    user = get_user(socket)
+    body = render_markdown(page.body, user) |> Phoenix.HTML.raw()
+
+    render_to_string({[title: page.title, body: body, id: page.id], user, page, "show.html", socket})
+
+    # html = Phoenix.View.render_to_string(PageView, "show.html", title: page.title, body: body, id: page.id)
+    # Rebel.Query.update(socket, :html, set: html, on: ".main-content")
+  end
+
+  defp hide_active_room(socket) do
+    Rebel.Core.async_js(socket, """
+      let channelId = $('.room-link.active a.open-room[data-id]').attr('data-id');
+      console.log('channelId', channelId);
+      if (channelId) {
+        $(`#chat-window-${channelId}`).hide();
+        $('.room-link.active').removeClass('active');
+      }
+      $('#flex-tabs').hide();
+      """ |> String.replace("\n", ""))
+  end
+
+
 end

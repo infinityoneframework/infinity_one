@@ -1,0 +1,2 @@
+= for page <- @pages do
+  = render "page_item.html", page: page

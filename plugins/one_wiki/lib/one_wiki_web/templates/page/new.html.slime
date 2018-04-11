@@ -9,5 +9,5 @@ section.page-container.page-home.page-static
       span.room-title = title
   .content
     form action="#" id="wiki-new-page"
-      = render "form.html", title: @title, body: "", submit: ~g(Create page)
+      = render "form.html", title: @title, body: "", action: :create_page, submit: ~g(Create page)
 

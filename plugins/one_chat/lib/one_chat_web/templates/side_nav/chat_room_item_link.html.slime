@@ -1,4 +1,4 @@
-a.open-room(href="#" title="#{@room[:name]}" data-room="#{@room[:name]}" data-name="#{@room[:display_name]}")
+a.open-room(href="#" data-id="#{@room[:id]}" title="#{@room[:name]}" data-room="#{@room[:name]}" data-name="#{@room[:display_name]}")
   = if @room[:unread] do
     span.unread= @room[:unread]
   i(class="#{get_room_icon_class(@room)}" aria-label="" data-status-name="#{@room[:display_name]}")

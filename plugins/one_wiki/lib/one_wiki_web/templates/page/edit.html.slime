@@ -9,4 +9,4 @@ section.page-container.page-home.page-static
   .content.wiki-content
     form action="#" id="wiki-edit-page"
       input type="hidden" name="id" value="#{@id}"
-      = render "form.html", title: @title, body: @body, submit: ~g(Save page changes)
+      = render "form.html", title: @title, body: @body, action: :update_page, submit: ~g(Save page changes)

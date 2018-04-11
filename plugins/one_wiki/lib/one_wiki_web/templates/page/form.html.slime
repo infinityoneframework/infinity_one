@@ -21,6 +21,6 @@
     button.button.default.cancel rebel-channel="wiki" rebel-click="cancel_edit"
       i.icon-cancel
       span = ~g(Cancel)
-    button.button.primary.save rebel-channel="wiki" rebel-click="update_page"
+    button.button.primary.save rebel-channel="wiki" rebel-click="#{@action}"
       i.icon-ok
       span = @submit

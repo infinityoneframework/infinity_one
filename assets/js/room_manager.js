@@ -87,6 +87,7 @@ class RoomManager {
   open_room(room, display_name, callback) {
     if (debug) { console.log('open_room', this) }
 
+    $('.page-container.page-home.page-static').remove();
     cc.get("/room/" + room, {display_name: display_name, room: ucxchat.room})
   }
 

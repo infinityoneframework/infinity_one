@@ -1,4 +1,4 @@
-.room-container
+.room-container data-id="#{@chatd.channel.id}"
   .dropzone.attachment-dropzone
     .dropzone-overlay.background-transparent-darkest.color-content-background-color
       .background-transparent-darkest
