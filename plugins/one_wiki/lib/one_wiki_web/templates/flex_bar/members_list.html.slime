@@ -1,0 +1,18 @@
+.content
+  = OneChatWeb.FlexBarView.render("flex_close_button.html")
+  .list-view.animated
+    .title
+      h2= ~g(Members List)
+      .buttons-group
+      .control
+        .search-form
+          .input-line.search
+            input#user-add-search.search.content-background-color(type="text" placeholder="#{~g(Add users)}")
+            i.icon-plus.secondary-font-color
+      p
+        = OneChatWeb.FlexBarView.get_users_list_stats(@users, @user_info)
+        button.see-all.show-all(rebel-click="flex_call" data-id="members-list" flex-fun="flex_show_all" data-fun="flex_show_all")= ~g(Show all)
+    ul.list.clearfix.lines
+      = for user <- @users do
+        = render "users_list_item.html", user: user, page_id: @page.id
+  .user-view.animated.animated-hidden

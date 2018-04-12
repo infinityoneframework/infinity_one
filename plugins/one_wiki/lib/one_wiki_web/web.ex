@@ -14,7 +14,7 @@ defmodule OneWikiWeb do
       # Use all HTML functionality (forms, tags, etc)
       # import OneChatWeb.Router.Helpers
       import InfinityOneWeb.ErrorHelpers
-      # import OneChatWeb.SharedView
+      import OneChatWeb.SharedView
       import InfinityOneWeb.Utils, warn: false
       # import OneChatWeb.Gettext
       # alias InfinityOne.Accounts.User

@@ -1,0 +1,36 @@
+- hidden = hidden_on_nil(@user_info[:user_mode] || @user_info[:admin] || @user_info[:direct], "animated-")
+- cls = OneChatWeb.FlexBarView.get_user_card_class @user_info
+div(class="#{cls} #{hidden}" data-username="#{@user.username}")
+  .about.clearfix
+    .thumb
+      = avatar_background_tags(@user, :avatar)
+    .info
+      h3(title="#{@user.username}")
+        i(class="status-#{@user.status}" data-status-name="#{@user.username}")
+        = @user.username <> " (#{@user.id})"
+      p.secondary-font-color= @user.username
+      = if tags = InfinityOne.Accounts.User.tags(@user, @channel_id) do
+        p.secondary-font-color
+          = for tag <- tags do
+            span.role-tag(data-role="#{tag}")= tag
+
+      p.secondary-font-color
+        i.icon-clock
+        = "#{OneChatWeb.MessageView.format_time(Timex.now(), @user)} (UTC #{@user.tz_offset})"
+      = user_card_details @user
+      = if has_permission?(@current_user, "view-full-other-user-info") do
+        p.secondary-font-color
+          i.icon-mail
+          = @user.email
+        p.secondary-font-color
+          i.icon-calendar
+          = "#{~g(Created at)}:"
+          = OneChatWeb.MessageView.format_date_time(@user.inserted_at, @user)
+        p.secondary-font-color
+          i.icon-calendar
+          = "#{~g(Last Login)}:"
+          = OneChatWeb.MessageView.format_date_time(@user.last_sign_in_at, @user)
+
+  nav(data-username="#{map_field(@user, :username)}")
+    = render "user_card_actions.html", user: @user, channel_id: @channel_id, current_user: @current_user, user_info: @user_info
+

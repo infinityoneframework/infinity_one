@@ -1,4 +1,4 @@
-section.page-container.page-home.page-static
+section.page-container.page-home.page-static data-id="#{@id}"
   header.fixed-title.content-background-color.border-component-color
     .burger
       i
@@ -6,11 +6,6 @@ section.page-container.page-home.page-static
       i
     h2
       span.room-title = @title
-    .submit
-      button.button.primary.save rebel-channel="wiki" rebel-click="edit_page" data-id="#{@id}"
-        span = ~g(Edit Page)
-      button.button.danger.delete rebel-channel="wiki" rebel-click="delete_page" data-id="#{@id}"
-        span = ~g(Delete Page)
 
   .content.wiki.markdown-body.message
     = raw @body

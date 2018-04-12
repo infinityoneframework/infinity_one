@@ -10,6 +10,7 @@ defmodule OneWiki.Application do
   Try initializing the file storage.
   """
   def start(_type, _args) do
+    OneWikiWeb.FlexBar.Defaults.add_buttons()
     try do
       OneWiki.initialize()
     rescue

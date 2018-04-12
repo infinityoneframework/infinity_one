@@ -1,0 +1,41 @@
+.content rebel-channel="wiki"
+  = OneChatWeb.FlexBarView.render("flex_close_button.html")
+  .list-view.channel-settings
+    = if @page do
+      .title
+        h2= ~g"Page Info"
+      - rebel_opts = ["rebel-change": "flex_form_save"]
+      = form_for @changeset, "#", rebel_opts, fn f ->
+        input(type="hidden" name="flex-id" value="wiki_info")
+        = hidden_input f, :id
+        ul.list.clearfix
+          li
+            .file-name
+              = ~g(Filename)
+              span.filename = @page.id
+          li
+            h3 = ~g(Page History)
+          li
+            = for commit <- @log do
+              .page-info
+                td.border-component-color
+                  a.commit-entry href="#" rebel-click="show_revision"
+                    .commit = commit.commit
+                  .commit-entry
+                    .author = commit.author
+                  .commit-entry
+                    .date = commit.date
+                  .commit-entry
+                    .message = commit.message
+
+        nav
+          button type="submit" style="display:none"
+          button.button.primary title="#{~g(Edit Page)}" rebel-click="edit_page" rebel-channel="wiki" data-id="#{@page.id}"
+            i.icon-pencil
+            = ~g(Edit Page)
+          button.button.danger.delete title="#{~g(Delete Page)}" rebel-click="delete_page" rebel-channel="wiki" data-id="#{@page.id}"
+            i.icon-trash
+            = ~g(Delete Page)
+    - else
+      .about.clearfix
+        p(style="margin-left: 10px; margin-top: 40px")= ~g(Please select a Page)

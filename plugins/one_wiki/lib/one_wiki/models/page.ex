@@ -142,6 +142,34 @@ defmodule OneWiki.Page do
     |> @repo.all()
   end
 
+  def get_all_users(%@schema{} = page) do
+    page
+    |> @repo.preload([:users])
+    |> Map.get(:users)
+  end
+
+  def get_all_page_online_users(%@schema{} = page) do
+    page
+    |> get_all_page_users()
+    |> Enum.reject(&(&1.status == "offline"))
+  end
+
+  def get_all_page_users(%@schema{} = page) do
+    page
+    |> get_all_users()
+    |> Enum.map(fn user ->
+      user
+      |> struct(status: OneChat.PresenceAgent.get(user.id))
+      |> OneChat.Hooks.preload_user([])
+    end)
+  end
+
+  def get_page_offline_users(page) do
+    page
+    |> get_all_page_users
+    |> Enum.filter(&(&1.status == "offline"))
+  end
+
   def get_pages_by_pattern(user_id, pattern, count \\ 5)
 
   def get_pages_by_pattern(%{id: id}, pattern, count) do

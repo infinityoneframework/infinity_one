@@ -46,6 +46,7 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
         .bounce3
     // #ip-address(data-ip="#{get_ipaddress(@conn)}")
     = render @view_module, @view_template, assigns
+    .body-mask style="display: none"
   = render "translations.html"
   script(src='#{static_path(@conn, "/js/app.js")}')
 

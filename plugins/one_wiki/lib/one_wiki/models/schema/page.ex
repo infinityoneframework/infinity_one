@@ -1,6 +1,8 @@
 defmodule OneWiki.Schema.Page do
   use OneChat.Shared, :schema
 
+  alias InfinityOne.Accounts.User
+
   @formats ~w(markdown html)
   @types %{
     0 => "topic",
@@ -16,6 +18,7 @@ defmodule OneWiki.Schema.Page do
 
     belongs_to :parent, __MODULE__
     has_many :subscriptions, OneWiki.Schema.Subscription
+    many_to_many :users, User, join_through: OneWiki.Schema.Subscription
 
     timestamps(type: :utc_datetime)
   end

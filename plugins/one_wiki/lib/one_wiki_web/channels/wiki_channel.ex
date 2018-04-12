@@ -8,14 +8,16 @@ defmodule OneWikiWeb.WikiChannel do
   ], intercepts: [
   ]
 
+  import Rebel.Core, only: []
   alias OneChat.ServiceHelpers, as: Helpers
   alias OneWikiWeb.{PageView, SidenavView}
   alias OneWiki.{Page, Subscription}
   alias InfinityOne.{Accounts, OnePubSub}
   alias OneChatWeb.RebelChannel.Client
-  alias OneChatWeb.{SharedView, MessageView}
+  alias OneChatWeb.{SharedView, MessageView, UserChannel}
   alias OneChatWeb.RebelChannel.{SideNav}
   alias InfinityOneWeb.Query
+  alias InfinityOneWeb.Endpoint
 
   require OneChat.ChatConstants, as: CC
 
@@ -27,6 +29,10 @@ defmodule OneWikiWeb.WikiChannel do
     send(self(), :after_join)
     super(ev, payload, socket)
   end
+
+  ###############
+  # handle_out
+
 
   ###############
   # handle_info
@@ -120,9 +126,15 @@ defmodule OneWikiWeb.WikiChannel do
   def edit_page(socket, sender) do
     page = Page.get(sender["dataset"]["id"])
 
+    close_flex_tab(socket)
+
     render_to_string({
       [title: page.title, body: page.body, id: page.id],
       get_user(socket), page, "edit.html", socket})
+  end
+
+  defp close_flex_tab(socket) do
+    Rebel.Core.async_js(socket, ~s/$('.tab-button.active[data-id="wiki_info"]').click()/)
   end
 
   def update_page(socket, %{"form" => form} = _sender) do
@@ -244,6 +256,38 @@ defmodule OneWikiWeb.WikiChannel do
     sidenav(socket)
   end
 
+  def show_revision(socket, sender) do
+    Logger.warn "sender: " <> inspect(sender)
+    commit = String.trim(sender["text"])
+    page = Rebel.get_assigns(socket, :page)
+    contents =
+      commit
+      |> OneWiki.Git.show(page.id)
+      |> Earmark.as_html!
+      |> IO.inspect(label: "html")
+
+    html = """
+      <div class="markdown-body version-preview">
+        <header>
+          #{page.title}
+          <a href="#" rebel-click="close_file_preview" rebel-channel="wiki">
+            <span class="right"><i class="icon-cancel"></i></span>
+          </a>
+        </header>
+        <section class="preview-contents">
+          #{contents}
+        </section>
+      </div>
+      """
+    socket
+    |> Rebel.Query.insert(html, append: "body")
+    |> Rebel.Core.async_js(~s/$('.body-mask').show();/)
+  end
+
+  def close_file_preview(socket, sender) do
+    async_js(socket, ~s/$('.version-preview').remove();$('.body-mask').hide();/)
+  end
+
   #########################
   # Private helpers
 
@@ -300,7 +344,7 @@ defmodule OneWikiWeb.WikiChannel do
     html = Phoenix.View.render_to_string(PageView, template, bindings)
     length = Rebel.Core.exec_js!(socket, ~s/$('.page-container.page-home.page-static').length/)
     if length == 0 do
-      Rebel.Query.insert(socket, html, append: ".main-content-flex")
+      Rebel.Query.insert(socket, html, before: "#flex-tabs")
     else
       Query.update(socket, :replaceWith, set: html, on: ".page-container.page-home.page-static")
     end
@@ -345,25 +389,30 @@ defmodule OneWikiWeb.WikiChannel do
   end
 
   defp render_page(page, socket) do
+    UserChannel.put_assign(socket.assigns.user_id, :page, page)
+    Rebel.put_assigns(socket, :page, page)
     user = get_user(socket)
     body = render_markdown(page.body, user) |> Phoenix.HTML.raw()
 
     render_to_string({[title: page.title, body: body, id: page.id], user, page, "show.html", socket})
-
-    # html = Phoenix.View.render_to_string(PageView, "show.html", title: page.title, body: body, id: page.id)
-    # Rebel.Query.update(socket, :html, set: html, on: ".main-content")
   end
 
   defp hide_active_room(socket) do
-    Rebel.Core.async_js(socket, """
+    socket
+    |> render_flex_tabs()
+    |> Rebel.Core.async_js("""
       let channelId = $('.room-link.active a.open-room[data-id]').attr('data-id');
       console.log('channelId', channelId);
       if (channelId) {
         $(`#chat-window-${channelId}`).hide();
         $('.room-link.active').removeClass('active');
       }
-      $('#flex-tabs').hide();
       """ |> String.replace("\n", ""))
+  end
+
+  defp render_flex_tabs(socket) do
+    html = Phoenix.View.render_to_string(OneUiFlexTabWeb.TabBarView, "index.html", groups: ~w(wiki))
+    Query.update(socket, :html, set: html, on: "#flex-tabs")
   end
 
   defp update_users_page_list(socket) do

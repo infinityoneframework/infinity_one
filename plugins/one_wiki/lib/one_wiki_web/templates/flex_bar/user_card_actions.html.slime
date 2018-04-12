@@ -1,0 +1,18 @@
+- alias OneChatWeb.AdminView, as: Admin
+= if @user_info[:admin] do
+  / ignore
+- else
+  = unless @current_user.id == @user.id or @user_info[:direct] do
+    button.button.button-block.primary(rebel-click="add_private")
+      span
+        i.icon-chat
+        = ~g"Conversation"
+  = if @user_info[:direct] do
+  - else
+    = render "user_card_owner_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
+    = render "user_card_moderator_button.html", current_user: @current_user, user: @user, channel_id: @channel_id
+    = if @user_info[:view_mode] do
+      button.button.back(rebel-click="flex_call" data-fun="view_all" data-id="members-list")
+        span
+          = ~g"View All"
+          i.icon-angle-right

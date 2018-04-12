@@ -40,7 +40,8 @@ defmodule OneChatWeb.UserChannel do
     "webrtc:declined_video_call",
     "webrtc:leave",
     "get",
-    "get:assigns"
+    "get:assigns",
+    "put:assigns"
   ]
 
   use OneChatWeb.RebelChannel.Macros
@@ -115,6 +116,14 @@ defmodule OneChatWeb.UserChannel do
     end
   end
 
+  def put_assign(user_id, key) do
+    put_assign(user_id, key, nil)
+  end
+
+  def put_assign(user_id, key, value) do
+    Endpoint.broadcast(CC.chan_user() <> user_id, "put:assigns", %{key: key, value: value})
+  end
+
   @doc """
   API to get internal state from a channel.
 
@@ -145,16 +154,20 @@ defmodule OneChatWeb.UserChannel do
     conn_assigns[:current_user] |> Map.get(:id)
   end
 
-   def handle_out("get:assigns", %{pid: pid}, socket) do
-     send pid, socket.assigns
-     {:noreply, socket}
-   end
+  def handle_out("put:assigns", %{key: key, value: value}, socket) do
+    {:noreply, assign(socket, key, value)}
+  end
 
-   def handle_out("webrtc:leave" = ev, payload, socket) do
-     trace ev, payload
-     broadcast_js socket, ~s/$('.webrtc-video button.stop-call').click()/
-     {:noreply, socket}
-   end
+  def handle_out("get:assigns", %{pid: pid}, socket) do
+    send pid, socket.assigns
+    {:noreply, socket}
+  end
+
+  def handle_out("webrtc:leave" = ev, payload, socket) do
+    trace ev, payload
+    broadcast_js socket, ~s/$('.webrtc-video button.stop-call').click()/
+    {:noreply, socket}
+  end
 
   def handle_out("webrtc:" <> event, payload, socket) do
     apply WebrtcChannel, String.to_atom(event), [payload, socket]

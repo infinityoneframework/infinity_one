@@ -155,3 +155,63 @@ aside.side-nav {
 a.new-page {
   color: $wiki-link;
 }
+
+section.page-container.page-static {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.page-info {
+  margin-bottom: 10px;
+  padding: 10px 5px 0 10px;
+  border: 1px solid #13679a;
+  background: white;
+  border-radius: 5px;
+  .commit-entry {
+    padding-bottom: 5px;
+  }
+}
+
+.version-preview {
+  display: block;
+  position: fixed;
+  margin: auto auto;
+  top: 50px;
+  bottom: 50px;
+  left: 150px;
+  right: 150px;
+  z-index: 1000;
+  border: 1px solid #666;
+  background-color: white;
+  border-radius: 8px;
+  header {
+    padding: 10px;
+    text-alignment: center;
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    font-size: 20px;
+    span.right {
+      position: absolute;
+      right: 6px;
+      top: 9px;
+      height: 25px;
+      width: 25px;
+      text-align: center;
+      display: inline-block;
+      i {
+        color: #666;
+        font-size: 14px;
+      }
+    }
+  }
+  section.preview-contents {
+    padding: 20px;
+    overflow-y: scroll;
+    position: absolute;
+    height: calc(100% - 70px);
+    width: 100%;
+  }
+}
