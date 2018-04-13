@@ -7,7 +7,7 @@
       fieldset
         .input-line
           div
-            input type="text" required="true" name="wiki[title]" value="#{@title}" placeholder="#{~g(Title)}"
+            input type="text" required="true" name="wiki[title]" value="#{@title}" placeholder="#{~g(Title)}" tabindex="1"
         .input-line
           .editor-nav-container
             ul.nav.nav-tabs#bodyTab role="tablist"
@@ -21,18 +21,18 @@
             .tab-pane.fade.active.show#markdown role="tabpanel" aria-labelledby="markdown-tab"
               = render("tool_bar.html", [])
               - class = "#{@format} input-block"
-              textarea#gollum-editor-body.gollum-editor-body class="#{class}" required="required" style="height: 400px" name="wiki[body]" placeholder="#{~g(Body)}"
+              textarea#gollum-editor-body.gollum-editor-body class="#{class}" required="required" style="height: 400px" name="wiki[body]" placeholder="#{~g(Body)}" tabindex="2"
                 = @body
               .input-line
                 label = ~g(Edit Message)
                 div
-                  input type="text" name="wiki[commit_message]" placeholder="#{~g/Write a small message explaining this change. (Optional)/}"
+                  input type="text" name="wiki[commit_message]" placeholder="#{~g/Write a small message explaining this change. (Optional)/}" tabindex="3"
             .tab-pane.fade#preview role="tabpanel" aria-labelledby="preview-tab"
 
       .submit
-        button.button.default.cancel rebel-channel="wiki" rebel-click="cancel_edit"
+        button.button.default.cancel rebel-channel="wiki" rebel-click="cancel_edit" tabindex="5"
           i.icon-cancel
           span = ~g(Cancel)
-        button.button.primary.save rebel-channel="wiki" rebel-click="#{action}"
+        button.button.primary.save rebel-channel="wiki" rebel-click="#{action}" tabindex="4"
           i.icon-ok
           span = @submit

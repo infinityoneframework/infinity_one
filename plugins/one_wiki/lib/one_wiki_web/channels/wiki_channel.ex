@@ -237,15 +237,13 @@ defmodule OneWikiWeb.WikiChannel do
   def show_revision(socket, sender) do
     commit = String.trim(sender["text"])
     page = Rebel.get_assigns(socket, :page)
-    contents =
-      commit
-      |> OneWiki.Git.show(page.id)
-      |> Earmark.as_html!
+    {title, markup} = OneWiki.Git.show(commit)
+    contents = Earmark.as_html!(markup)
 
     html = """
       <div class="markdown-body version-preview wiki">
         <header>
-          #{page.title}
+          #{title}
           <a href="#" rebel-click="close_file_preview" rebel-channel="wiki">
             <span class="right"><i class="icon-cancel"></i></span>
           </a>
@@ -431,6 +429,8 @@ defmodule OneWikiWeb.WikiChannel do
           SharedView.format_errors(changeset)
         string when is_binary(string) ->
           string
+        %Git.Error{message: message} ->
+          "Git: #{message}"
       end
     Client.toastr(socket, :error, gettext("Problem %{action} page: %{errors}",
       errors: errors, action: to_string(action)))

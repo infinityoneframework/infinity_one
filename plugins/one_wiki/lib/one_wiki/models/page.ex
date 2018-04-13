@@ -32,22 +32,17 @@ defmodule OneWiki.Page do
   """
   def create(user, params) do
     case create_transaction(user, params) |> @repo.transaction() do
-      {:ok, %{insert: insert}} -> {:ok, insert}
+      {:ok, %{page: page}} -> {:ok, page}
       {:error, _, reason} -> {:error, reason}
       {:error, _, reason, _} -> {:error, reason}
     end
   end
 
   defp create_transaction(user, params) do
+    changeset = changeset(user, params)
     Multi.new()
-    |> Multi.run(:insert, fn _ -> run_insert(user, params) end)
-    |> Multi.run(:create_file, &create_file(user, &1.insert))
-  end
-
-  defp run_insert(user, params) do
-    user
-    |> changeset(params)
-    |> create
+    |> Multi.insert(:page, changeset)
+    |> Multi.run(:create_file, &create_file(user, &1.page, changeset))
   end
 
   @doc """
@@ -58,37 +53,70 @@ defmodule OneWiki.Page do
   """
   def update(user, page, params) do
     case update_transaction(user, page, params) |> @repo.transaction() do
-      {:ok, %{update: update}} -> {:ok, update}
+      {:ok, %{page: page}} -> {:ok, page}
       {:error, _, reason} -> {:error, reason}
       {:error, _, reason, _} -> {:error, reason}
     end
   end
 
   defp update_transaction(user, page, params) do
+    changeset = changeset(page, user, params)
     Multi.new()
-    |> Multi.run(:update, fn _ -> run_update(user, page, params) end)
-    |> Multi.run(:create_file, &create_file(user, &1.update, :updated))
+    |> Multi.update(:page, changeset)
+    |> Multi.run(:update_file, &update_file(user, &1.page, changeset))
   end
 
-  defp run_update(user, page, params) do
-    page
-    |> changeset(user, params)
-    |> __MODULE__.update()
-  end
-
-  defp create_file(user, page, action \\ :added) do
-    contents = page.body
+  defp create_file(user, page, _changeset) do
     repo = Git.new OneWiki.pages_path()
-    message = page.commit_message || "'#{page.title}' #{action} by @#{user.username}"
-    path = Path.join(OneWiki.pages_path(), page.id)
-    with :ok <- File.write(path, contents),
-         {:ok, _} <- Git.add(repo, page.id),
+    {path, message} = path_and_message(page, user, :added)
+    with :ok <- File.write(path, page.body),
+         {:ok, _} <- Git.add(repo, page.title),
          {:ok, _} <- Git.commit(repo, ["-m", message]) do
       {:ok, path}
     else
+      true -> {:ok, path}
       {:error, error} -> {:error, error}
       other -> {:error, other}
     end
+  end
+
+  defp update_file(user, page, %{changes: %{title: _title} = changes} = changeset) do
+    repo = Git.new OneWiki.pages_path()
+    {path, message} = path_and_message(page, user, :renamed)
+    old_path = Path.join(repo.path, changeset.data.title)
+    old_name = changeset.data.title
+
+    with :ok <- File.write(old_path, page.body),
+         {:ok, _} <- Git.mv(repo, [old_name, page.title]),
+         {:ok, _} <- Git.commit(repo, ["-am", message]) do
+      {:ok, path}
+    else
+      true -> {:ok, path}
+      {:error, error} -> {:error, error}
+      other -> {:error, other}
+    end
+  end
+
+  defp update_file(user, page, _changeset) do
+    repo = Git.new OneWiki.pages_path()
+    {path, message} = path_and_message(page, user, :changed)
+    with :ok <- File.write(path, page.body),
+         {:ok, status} <- Git.status(repo),
+         false <- status =~ "nothing to commit",
+         {:ok, _} <- Git.add(repo, page.title),
+         {:ok, _} <- Git.commit(repo, ["-m", message]) do
+      {:ok, path}
+    else
+      true -> {:ok, path}
+      {:error, error} -> {:error, error}
+      other -> {:error, other}
+    end
+  end
+
+  defp path_and_message(page, user, action) do
+    message = page.commit_message || "'#{page.title}' #{action} by @#{user.username}"
+    path = Path.join(OneWiki.pages_path(), page.title)
+    {path, message}
   end
 
   def delete(user, id) do

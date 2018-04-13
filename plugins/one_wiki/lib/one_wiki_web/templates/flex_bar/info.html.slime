@@ -28,7 +28,7 @@
                 label = ~g(File name)
                 div
                   span.current-setting
-                    = @page.id
+                    = @page.title
               li
                 label = ~g(Type)
                 div

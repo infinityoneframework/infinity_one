@@ -41,7 +41,7 @@ defmodule OneWikiWeb.FlexBar.Tab.Info do
     page = socket.assigns[:page]
 
     log =
-      case page && OneWiki.Git.log(page.id) do
+      case page && OneWiki.Git.log(page.title, ["--follow"]) do
         nil -> nil
         {:error, error} -> error
         results -> results

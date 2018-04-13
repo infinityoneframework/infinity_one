@@ -4,6 +4,7 @@ defmodule OneWiki.Git do
   """
   use Timex
 
+  require Logger
   @doc """
   The path the the pages repo.
   """
@@ -42,10 +43,21 @@ defmodule OneWiki.Git do
   @doc """
   Run git show on commit and file.
   """
-  def show(commit, filename) do
-    case Git.show repo(), commit <> ":" <> filename do
+  def show(commit, title) do
+    case Git.show repo(), commit <> ":" <> title do
       {:ok, contents} -> contents
       {:error, error} -> error
+    end
+  end
+
+  def show(commit) do
+    repo = repo()
+    with {:ok, show} <- Git.show(repo, ["--name-only", commit]),
+         [_, title] <- Regex.run(~r/([^\n]+)\n$/, show) do
+      {title, show(commit, title)}
+    else
+      {:error, error} -> error
+      nil -> {:error, "Could not find the title."}
     end
   end
 
@@ -57,11 +69,11 @@ defmodule OneWiki.Git do
   * parse: <true|false> - (true) When true, parses the output and returns an
     array of maps for each commit
   """
-  def log(file_name, opts \\ []) do
+  def log(title, opts \\ []) do
     repo = opts[:repo] || repo()
     parse = Keyword.get(opts, :parse, true)
     repo
-    |> Git.log(["--abbrev-commit", file_name])
+    |> Git.log(["--follow", "--abbrev-commit", title])
     |> parse_log(parse)
   end
 
