@@ -3,7 +3,7 @@
 - action = item.id
 - attrs = scope_attrs(item.name)
 - scoped = item.scope != "global"
-- scope = nil
+- scope = item.scope
 section.page-container.page-home.page-static.admin-settings
   header.fixed-title.border-component-color
     = render OneChatWeb.MasterView, "burger.html"
@@ -41,13 +41,17 @@ section.page-container.page-home.page-static.admin-settings
           .select-control
             .select-arrow
               i.icon-down-open.secondary-font-color
+            =# select f, :scope, ["Global": "global", "Rooms": "rooms", "Pages": "pages"], attrs
             = select f, :scope, ["Global": "global", "Rooms": "rooms"], attrs
     = if action do
       = if scoped do
+        - scope = to_string(scope)
+        - singular_scope = Inflex.singularize(scope)
         .choose-room
-          label = ~g(Choose a room)
-          input.search#search-room type="text" autocomplete="off" placeholder="#{~g(Enter a room name)}" rebel-keydown="admin_user_role_search_channel"
-          div class="-autocomplete-container rooms"
+          label = gettext("Choose a %{scope}", scope: singular_scope)
+          - place_holder = gettext("Enter a %{scope} name", scope: singular_scope)
+          input.search#search-room type="text" autocomplete="off" placeholder="#{place_holder}" rebel-keydown="admin_user_role_search_channel"
+          div class="-autocomplete-container #{scope}"
       #user-roles-container data-role="#{item.name}"
         = if !scoped do
           = render "permissions_user_roles_container.html", item: item, scope: scope

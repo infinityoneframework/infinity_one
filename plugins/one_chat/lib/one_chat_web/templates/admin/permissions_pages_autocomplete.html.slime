@@ -1,0 +1,8 @@
+div class="-autocomplete-container pages"
+  ul class="-autocomplete-list"
+    = for {page, inx} <- Enum.with_index(@pages) do
+      - sel = if inx == 0, do: " selected", else: ""
+      li class="-autocomplete-item#{sel}" data-id="#{page.title}" rebel-click="admin_click_scoped_page"
+        div rebel-event="mouseenter" rebel-handler="admin_autocomplete_mouseenter"
+          i.icon-hash
+          = page.title

@@ -596,6 +596,12 @@ defmodule InfinityOne.Permissions do
     %{name: "view-phone-numbers-administration",  roles: ["admin"] },
     %{name: "view-backup-restore-administration", roles: ["admin"] },
     %{name: "view-file-upload-administration",    roles: ["admin"] },
+    %{name: "create-page",                   roles: ["admin", "user", "bot"] },
+    %{name: "view-page",                     roles: ["admin", "user", "bot"] },
+    %{name: "view-p-page",                   roles: ["admin", "user", "bot"] },
+    %{name: "edit-page",                     roles: ["admin", "user"] },
+    %{name: "remove-page",                   roles: ["admin", "p-owner", "p-moderator"] },
+    %{name: "view-pages-administration",     roles: ["admin"] },
   ]
 
   def show_permission_list do
@@ -648,6 +654,12 @@ defmodule InfinityOne.Permissions do
       "view-phone-numbers-administration",
       "view-backup-restore-administration",
       "view-file-upload-administration",
+      # "create-page",
+      # "view-page",
+      # "view-p-page",
+      # "edit-page",
+      # "remove-page",
+      "view-pages-administration",
     ]
   end
 

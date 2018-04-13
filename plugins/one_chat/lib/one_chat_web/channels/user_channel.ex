@@ -1787,7 +1787,8 @@ defmodule OneChatWeb.UserChannel do
   defdelegateadmin :admin_add_user_role
   defdelegateadmin :admin_user_role_remove
   defdelegateadmin :admin_click_user_role_member
-  defdelegateadmin :admin_user_role_search_channel
+  defdelegateadmin :admin_user_role_search_rooms
+  defdelegateadmin :admin_user_role_search_pages
   defdelegateadmin :admin_click_scoped_room
   defdelegateadmin :admin_autocomplete_mouseenter
   defdelegateadmin :admin_reset_setting_click

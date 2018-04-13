@@ -28,8 +28,13 @@ defmodule InfinityOne.Accounts.Role do
     owner: :rooms,
     user: :global,
     bot: :global,
-    guest: :global
+    guest: :global,
+    "p-moderator": :pages,
+    "p-owner": :pages,
   ]
+
+  def scopes, do: ~w(global rooms pages)
+  def scopes_list, do: Enum.map(scopes(), & {&1 |> String.capitalize() |> String.to_atom(), &1})
 
   def default_role_names do
     Enum.map(default_roles(), & &1 |> elem(0) |> to_string)
