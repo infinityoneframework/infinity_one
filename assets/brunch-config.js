@@ -12,6 +12,9 @@ exports.config = {
        // "js/help.js": /^(help_js|..\/deps|node_modules)/,
        "js/adapter.js": ["vendor/adapter.js"],
        "js/textarea-autogrow.js": ["vendor/textarea-autogrow.js"],
+       "js/frameworks.js": ["vendor/frameworks.js"],
+       "js/application.js": ["vendor/application.js"],
+       "js/wiki.js": ["vendor/wiki.js"]
        // "js/vendor.js": /^(web\/static\/vendor)|(deps)/
       },
       //

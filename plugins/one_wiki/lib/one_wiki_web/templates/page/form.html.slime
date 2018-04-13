@@ -1,26 +1,38 @@
-.rocket-form
-  fieldset
-    .input-line
-      div
-        input type="text" name="wiki[title]" value="#{@title}" placeholder="#{~g(Title)}"
-    .input-line
-      ul.nav.nav-tabs#bodyTab role="tablist"
-        li.nav-item
-          a.nav-link.active.show#markdown-tab data-toggle="tab" href="#markdown" role="tab" aria-controls="markdown" aria-selected="true"
-            = ~g(Write)
-        li.nav-item
-          a.nav-link#preview-tab data-toggle="tab" href="#preview" role="tab" aria-controls="preview" aria-selected="false" rebel-channel="wiki" rebel-click="preview_mode"
-            = ~g(Preview)
-      .tab-content#bodyTabContent
-        .tab-pane.fade.active.show#markdown role="tabpanel" aria-labelledby="markdown-tab"
-          textarea#wiki_body style="height: 400px" name="wiki[body]" placeholder="#{~g(Body)}"
-            = @body
-        .tab-pane.fade#preview role="tabpanel" aria-labelledby="preview-tab"
+- action = "#{@action}_page"
+#gollum-editor.gollum-editor class="#{@action}"
+  form.wiki-page id="wiki-#{@action}-page" action="#" name="gollum-editor"
+    = if @id do
+      input type="hidden" name="id" value="#{@id}"
+    .rocket-form
+      fieldset
+        .input-line
+          div
+            input type="text" required="true" name="wiki[title]" value="#{@title}" placeholder="#{~g(Title)}"
+        .input-line
+          .editor-nav-container
+            ul.nav.nav-tabs#bodyTab role="tablist"
+              li.nav-item
+                a.nav-link.active.show#markdown-tab data-toggle="tab" href="#markdown" role="tab" aria-controls="markdown" aria-selected="true"
+                  = ~g(Write)
+              li.nav-item
+                a.nav-link#preview-tab data-toggle="tab" href="#preview" role="tab" aria-controls="preview" aria-selected="false" rebel-channel="wiki" rebel-click="preview_mode"
+                  = ~g(Preview)
+          .tab-content#bodyTabContent
+            .tab-pane.fade.active.show#markdown role="tabpanel" aria-labelledby="markdown-tab"
+              = render("tool_bar.html", [])
+              - class = "#{@format} input-block"
+              textarea#gollum-editor-body.gollum-editor-body class="#{class}" required="required" style="height: 400px" name="wiki[body]" placeholder="#{~g(Body)}"
+                = @body
+              .input-line
+                label = ~g(Edit Message)
+                div
+                  input type="text" name="wiki[commit_message]" placeholder="#{~g/Write a small message explaining this change. (Optional)/}"
+            .tab-pane.fade#preview role="tabpanel" aria-labelledby="preview-tab"
 
-  .submit
-    button.button.default.cancel rebel-channel="wiki" rebel-click="cancel_edit"
-      i.icon-cancel
-      span = ~g(Cancel)
-    button.button.primary.save rebel-channel="wiki" rebel-click="#{@action}"
-      i.icon-ok
-      span = @submit
+      .submit
+        button.button.default.cancel rebel-channel="wiki" rebel-click="cancel_edit"
+          i.icon-cancel
+          span = ~g(Cancel)
+        button.button.primary.save rebel-channel="wiki" rebel-click="#{action}"
+          i.icon-ok
+          span = @submit

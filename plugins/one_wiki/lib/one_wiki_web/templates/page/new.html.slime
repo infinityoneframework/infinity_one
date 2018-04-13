@@ -7,7 +7,5 @@ section.page-container.page-home.page-static
     h2
       - title = if @title == "", do: ~g(New Page), else: @title
       span.room-title = title
-  .content
-    form action="#" id="wiki-new-page"
-      = render "form.html", title: @title, body: "", action: :create_page, submit: ~g(Create page)
-
+  .content.wiki.markdown-body.message
+    = render "form.html", title: @title, body: "", action: :create, submit: ~g(Create page), id: nil, format: @format

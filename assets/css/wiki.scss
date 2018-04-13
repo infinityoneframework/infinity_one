@@ -102,8 +102,6 @@ aside.side-nav {
   }
 }
 .nav-tabs {
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #dee2e6;
 }
 .nav {
   display: -webkit-box;
@@ -112,6 +110,13 @@ aside.side-nav {
   flex-wrap: wrap;
   padding-left: 0;
   list-style: none;
+}
+.editor-nav-container {
+  padding: 6px 10px 0;
+  background: #f6f8fa;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid #dfe2e5;
+  margin-bottom: 1rem;
 }
 .nav.nav-tabs {
   li.nav-item {
@@ -123,10 +128,14 @@ aside.side-nav {
         color: #444;
         border-color: #dee2e6 #dee2e6 #fff;
         font-weight: 500;
+        background-color: #fff;
       }
       &:hover:not(.active) {
         border-color: #e9ecef #e9ecef #dee2e6;
         color: #444;
+      }
+      &:hover {
+        text-decoration: none;
       }
       &:visited {
         color: inherit;
@@ -165,13 +174,27 @@ section.page-container.page-static {
 }
 
 .page-info {
-  margin-bottom: 10px;
+  margin-bottom: 8px !important;
   padding: 10px 5px 0 10px;
   border: 1px solid #13679a;
   background: white;
   border-radius: 5px;
   .commit-entry {
     padding-bottom: 5px;
+    &.author {
+      margin-top: 10px;
+    }
+    &.commit {
+      display: inline-block;
+      a,
+      span {
+        display: inline-block;
+      }
+      a,
+      a:visited {
+        color: #5a7920
+      }
+    }
   }
 }
 
@@ -214,4 +237,303 @@ section.page-container.page-static {
     height: calc(100% - 70px);
     width: 100%;
   }
+}
+
+form.wiki-page {
+  .input-line {
+    margin-top: 10px !important;
+    label {
+      font-weight: 500;
+    }
+  }
+}
+.gollum-editor-function-bar {
+  .gollum-editor-format-selector {
+    label { font-weight: 600 !important; }
+    select { width: unset; }
+  }
+}
+
+.gollum-editor {
+    padding: 10px 0 0;
+    margin: 10px 0 50px;
+    border: 0
+}
+.gollum-editor .comment-form-head.tabnav {
+    border: 1px solid #dfe2e5
+}
+.gollum-editor .gollum-editor-body {
+    height: 390px;
+    margin: 13px 0 5px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 22px;
+    resize: vertical
+}
+.gollum-editor .gollum-editor-body+.collapsed, .gollum-editor .gollum-editor-body+.expanded {
+    margin-top: 7px;
+    border-top: 1px solid #dfe2e5
+}
+.gollum-editor .collapsed, .gollum-editor .expanded {
+    display: block;
+    padding: 10px 0 5px;
+    overflow: hidden;
+    border-bottom: 1px solid #dfe2e5
+}
+.gollum-editor .collapsed a.button, .gollum-editor .expanded a.button {
+    display: block;
+    float: left;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    margin: 2px 5px 7px 0;
+    overflow: hidden;
+    color: #0366d6;
+    border: 1px solid rgba(27, 31, 35, 0.2);
+    border-radius: 3px
+}
+.gollum-editor .collapsed a.button:hover, .gollum-editor .expanded a.button:hover {
+    color: #fff;
+    text-decoration: none;
+    background-color: #0366d6
+}
+.gollum-editor .collapsed a.button span, .gollum-editor .expanded a.button span {
+    margin: 4px
+}
+.gollum-editor .collapsed h4, .gollum-editor .expanded h4 {
+    float: left;
+    padding: 6px 0 0 4px;
+    margin: 0;
+    font-size: 16px;
+    text-shadow: 0 -1px 0 #fff
+}
+.gollum-editor .collapsed a.button span.octicon-triangle-right {
+    display: inline-block
+}
+.gollum-editor .collapsed textarea, .gollum-editor .collapsed a.button span.octicon-triangle-down {
+    display: none
+}
+.gollum-editor .expanded a.button span.octicon-triangle-down {
+    display: inline-block
+}
+.gollum-editor .expanded a.button span.octicon-triangle-right {
+    display: none
+}
+.gollum-editor .expanded textarea {
+    display: block;
+    width: 883px;
+    height: 84px;
+    padding: 6px;
+    margin: 8px 0;
+    clear: both;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 12px;
+    resize: vertical;
+    border: 1px solid #dfe2e5
+}
+.gollum-editor a.gollum-minibutton, .gollum-editor a.gollum-minibutton:visited {
+    display: block;
+    padding: 5px 12px;
+    margin: 0 0 0 9px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #24292e;
+    cursor: pointer;
+    border: 1px solid rgba(27, 31, 35, 0.2);
+    border-radius: 3px
+}
+.gollum-editor a.gollum-minibutton:hover, .gollum-editor a.gollum-minibutton:visited:hover {
+    color: #fff;
+    text-decoration: none;
+    background: #0366d6;
+    border-color: #0366d6
+}
+.singleline {
+    display: block;
+    margin: 20px 0
+}
+.singleline label {
+    display: block;
+    margin-bottom: 6px
+}
+.gollum-editor-title-field {
+    margin: 0 0 10px;
+    border-bottom: 0
+}
+.gollum-editor-page-title {
+    margin-top: 0;
+    font-weight: 600
+}
+.gollum-editor-page-title.ph {
+    color: #24292e
+}
+.gollum-editor-function-bar {
+    padding-bottom: 10px;
+    margin: 10px 0;
+    border: 0;
+    border-bottom: 1px solid #dfe2e5
+}
+.gollum-editor-function-bar .gollum-editor-function-buttons {
+    display: none;
+    float: left
+}
+.gollum-editor-function-bar.active .gollum-editor-function-buttons {
+    display: block
+}
+.gollum-editor-function-bar .gollum-editor-format-selector {
+    float: left;
+    margin-left: 20px
+}
+.gollum-editor-function-bar .gollum-editor-format-selector select {
+    margin: 0
+}
+.gollum-editor-function-bar .gollum-editor-format-selector label {
+    padding: 0 5px 0 0;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 17px;
+    color: #586069
+}
+.gollum-editor-help {
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #dfe2e5;
+    border-radius: 3px
+}
+.gollum-editor-help-parent, .gollum-editor-help-list {
+    display: block;
+    float: left;
+    width: 160px;
+    height: 170px;
+    padding: 10px 0;
+    margin: 0;
+    overflow: auto;
+    list-style-type: none;
+    border-right: 1px solid #eaecef
+}
+.gollum-editor-help-parent li, .gollum-editor-help-list li {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6
+}
+.gollum-editor-help-parent li a, .gollum-editor-help-list li a {
+    display: block;
+    padding: 2px 12px;
+    font-weight: 600;
+    text-shadow: 0 -1px 0 #fff;
+    border: 1px solid transparent;
+    border-width: 1px 0
+}
+.gollum-editor-help-parent li a:hover, .gollum-editor-help-list li a:hover {
+    text-decoration: none;
+    background: #fff;
+    border-color: #e1e4e8;
+    box-shadow: none
+}
+.gollum-editor-help-parent li a.selected, .gollum-editor-help-list li a.selected {
+    color: #24292e;
+    background: #fff;
+    border: 1px solid #eaecef;
+    border-width: 1px 0;
+    border-bottom-color: #e1e4e8;
+    box-shadow: 0 1px 2px #d1d5da
+}
+.gollum-editor-help-list {
+    background: #f6f8fa
+}
+.gollum-editor-help-wrapper {
+    height: 170px;
+    padding: 10px;
+    overflow: auto;
+    background: #fff
+}
+.gollum-editor-help-content {
+    padding: 0;
+    margin: 0 10px 0 5px;
+    font-size: 12px;
+    line-height: 1.8
+}
+.gollum-editor-help-content p {
+    padding: 0;
+    margin: 0 0 10px
+}
+.ie .gollum-editor .singleline input {
+    padding-top: 0.25em;
+    padding-bottom: 0.75em
+}
+.gollum-footer {
+    font-size: 12px;
+    line-height: 19px
+}
+.gollum-dialog-dialog h4 {
+    padding: 0 0 6px;
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+    color: #24292e;
+    text-shadow: 0 -1px 0 #f6f8fa;
+    border-bottom: 1px solid #dfe2e5
+}
+.gollum-dialog-dialog-body {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px
+}
+.gollum-dialog-dialog-body fieldset {
+    display: block;
+    padding: 0 12px;
+    margin: 0;
+    overflow: hidden;
+    border: 0
+}
+.gollum-dialog-dialog-body fieldset .field {
+    padding: 0;
+    margin: 0 0 18px
+}
+.gollum-dialog-dialog-body fieldset .field:last-child {
+    margin: 0 0 12px
+}
+.gollum-dialog-dialog-body fieldset label {
+    display: block;
+    min-width: 80px;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.6;
+    color: #586069
+}
+.gollum-dialog-dialog-body fieldset .form-control {
+    display: block;
+    width: 100%;
+    margin: 3px 0 0
+}
+.gollum-dialog-dialog-body fieldset .code {
+    font-family: Monaco, "Courier New", Courier, monospace
+}
+.gollum-dialog-dialog-buttons {
+    padding: 12px 0 0;
+    margin: 14px 0 0;
+    overflow: hidden;
+    border-top: 1px solid #dfe2e5
+}
+a.gollum-minibutton, a.gollum-minibutton:visited {
+    float: right;
+    width: auto;
+    padding: 4px 12px;
+    margin: 0 0 0 9px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0366d6;
+    cursor: pointer;
+    border: 1px solid rgba(27, 31, 35, 0.2);
+    border-radius: 3px
+}
+a.gollum-minibutton:hover, a.gollum-minibutton:visited:hover {
+    color: #fff;
+    text-decoration: none;
+    background-color: #0366d6;
+    border-color: #0366d6
 }

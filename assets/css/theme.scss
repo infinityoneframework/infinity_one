@@ -199,19 +199,23 @@ input,select,textarea,fieldset {
 }
 
 input::-webkit-input-placeholder,select::-webkit-input-placeholder,textarea::-webkit-input-placeholder {
-    color: #737373
+    // color: #737373
+    color: #aaa;
 }
 
 input::-moz-placeholder,select::-moz-placeholder,textarea::-moz-placeholder {
-    color: #737373
+    // color: #737373
+    color: #aaa;
 }
 
 input:-ms-input-placeholder,select:-ms-input-placeholder,textarea:-ms-input-placeholder {
-    color: #737373
+    // color: #737373
+    color: #aaa;
 }
 
 input::placeholder,select::placeholder,textarea::placeholder {
-    color: #737373
+    // color: #737373
+    color: #aaa;
 }
 
 input[disabled],select[disabled],textarea[disabled] {
@@ -219,7 +223,8 @@ input[disabled],select[disabled],textarea[disabled] {
 }
 
 .disabled label,[disabled] label {
-    color: #737373
+    // color: #737373
+    color: #aaa;
 }
 
 .-autocomplete-container {

@@ -47,7 +47,11 @@ html.js.no-touch.cssanimations.csstransitions.csscalc.noscroll(lang="en")
     // #ip-address(data-ip="#{get_ipaddress(@conn)}")
     = render @view_module, @view_template, assigns
     .body-mask style="display: none"
+    = render(OneWikiWeb.PageView, "facebox.html", [])
   = render "translations.html"
   script(src='#{static_path(@conn, "/js/app.js")}')
+  script(src='#{static_path(@conn, "/js/frameworks.js")}')
+  script(src='#{static_path(@conn, "/js/application.js")}')
+  script(src='#{static_path(@conn, "/js/wiki.js")}')
 
   = client_js(@conn)

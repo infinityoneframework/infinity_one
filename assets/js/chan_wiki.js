@@ -33,8 +33,8 @@ $('body')
 
   $(`#${contentId} .active[role="tabpanel"]`).removeClass('active show');
   $(`#${contentId}`).find(`#${tabId}`).addClass('active show');
-  $tablist.find('[role="tab"]').removeClass('active');
-  $target.addClass('active');
+  $tablist.find('[role="tab"]').removeClass('active').attr('aria-selected', 'false');
+  $target.addClass('active').attr('aria-selected', 'true');
 })
 .on('click', 'a[href]', e => {
   console.log('e', e);

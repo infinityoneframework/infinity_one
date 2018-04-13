@@ -15,6 +15,9 @@ defmodule OneWiki.Schema.Page do
     field :body, :string
     field :type, :integer, default: 0
     field :format, :string, default: "markdown"
+    field :commit_message, :string
+    field :commit, :string
+    field :draft, :boolean, default: false
 
     belongs_to :parent, __MODULE__
     has_many :subscriptions, OneWiki.Schema.Subscription
@@ -24,7 +27,8 @@ defmodule OneWiki.Schema.Page do
   end
 
   @required ~w(title body)a
-  @fields ~w(type format parent_id)a ++ @required
+  # @fields ~w(type format parent_id)a ++ @required
+  @fields ~w(type format parent_id commit commit_message draft)a ++ @required
 
   def model, do: OneWiki.Page
 

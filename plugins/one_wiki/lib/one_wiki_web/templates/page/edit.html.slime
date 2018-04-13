@@ -7,6 +7,4 @@ section.page-container.page-home.page-static
     h2
       span.room-title = @title
   .content.wiki-content
-    form action="#" id="wiki-edit-page"
-      input type="hidden" name="id" value="#{@id}"
-      = render "form.html", title: @title, body: @body, action: :update_page, submit: ~g(Save page changes)
+    = render "form.html", title: @title, body: @body, action: :update_page, submit: ~g(Save page changes), id: @id, format: @format

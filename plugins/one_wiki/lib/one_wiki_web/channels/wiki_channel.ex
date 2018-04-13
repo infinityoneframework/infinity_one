@@ -86,7 +86,7 @@ defmodule OneWikiWeb.WikiChannel do
     # Logger.warn "assigns: " <> inspect(socket.assigns)
 
     hide_active_room(socket)
-    render_to_string({[title: title], get_user(socket), nil, "new.html", socket})
+    render_to_string({[title: title, format: "markdown"], get_user(socket), nil, "new.html", socket})
     sidenav(socket)
     # html = Phoenix.View.render_to_string(PageView, "new.html", [])
     # Rebel.Query.update(socket, :html, set: html, on: ".main-content")
@@ -129,7 +129,7 @@ defmodule OneWikiWeb.WikiChannel do
     close_flex_tab(socket)
 
     render_to_string({
-      [title: page.title, body: page.body, id: page.id],
+      [title: page.title, body: page.body, id: page.id, format: "markdown"],
       get_user(socket), page, "edit.html", socket})
   end
 
