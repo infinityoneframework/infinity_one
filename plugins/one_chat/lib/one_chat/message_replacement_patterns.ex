@@ -10,8 +10,10 @@ defmodule OneChat.MessageReplacementPatterns do
 
   defp compile_patterns do
     try do
-      {res, _} = Code.eval_string OneSettings.message_replacement_patterns()
-      res
+      case Code.eval_string OneSettings.message_replacement_patterns() do
+        {nil, _} -> []
+        {res, _} -> res
+      end
     rescue
       _ -> []
     end
