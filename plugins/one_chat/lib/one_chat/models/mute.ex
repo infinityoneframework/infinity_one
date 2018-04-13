@@ -1,5 +1,5 @@
 defmodule OneChat.Mute do
-  @doc """
+  @moduledoc """
   Track mute status for user and channel.
 
   When created, the associated user is muted in the given channel. Delete
