@@ -79,7 +79,7 @@ defmodule OneWiki.Page do
   defp create_file(user, page, action \\ :added) do
     contents = page.body
     repo = Git.new OneWiki.pages_path()
-    message = "'#{page.title}' #{action} by @#{user.username}"
+    message = page.commit_message || "'#{page.title}' #{action} by @#{user.username}"
     path = Path.join(OneWiki.pages_path(), page.id)
     with :ok <- File.write(path, contents),
          {:ok, _} <- Git.add(repo, page.id),

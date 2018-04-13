@@ -8,13 +8,14 @@
       = form_for @changeset, "#", rebel_opts, fn f ->
         input(type="hidden" name="flex-id" value="wiki_info")
         = hidden_input f, :id
-        ul.nav.nav-tabs#infoTab role="tablist"
-          li.nav-item
-            a.nav-link.active.show#info-tab data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true"
-              = ~g(Page Info)
-          li.nav-item
-            a.nav-link#history-tab data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"
-              = ~g(Page History)
+        .flex-nav-container
+          ul.nav.nav-tabs#infoTab role="tablist"
+            li.nav-item
+              a.nav-link.active.show#info-tab data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true"
+                = ~g(Page Info)
+            li.nav-item
+              a.nav-link#history-tab data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"
+                = ~g(Page History)
         .tab-content#infoTabContent
           .tab-pane.fade.active.show#info role="tabpanel" aria-labelledby="info-tab"
             ul.list.clearfix
@@ -41,7 +42,7 @@
                   .commit-entry
                     .date = commit.date
                   .commit-entry
-                    .message = commit.message
+                    .message: i = commit.message
         nav
           button type="submit" style="display:none"
           button.button.primary title="#{~g(Edit Page)}" rebel-click="edit_page" rebel-channel="wiki" data-id="#{@page.id}"

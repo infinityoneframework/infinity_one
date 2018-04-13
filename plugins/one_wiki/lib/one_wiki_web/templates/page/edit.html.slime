@@ -7,4 +7,4 @@ section.page-container.page-home.page-static
     h2
       span.room-title = @title
   .content.wiki-content
-    = render "form.html", title: @title, body: @body, action: :update_page, submit: ~g(Save page changes), id: @id, format: @format
+    = render "form.html", title: @title, body: @body, action: :update, submit: ~g(Save page changes), id: @id, format: @format

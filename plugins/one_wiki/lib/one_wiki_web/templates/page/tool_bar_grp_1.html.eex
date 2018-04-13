@@ -1,0 +1,11 @@
+<div class="BtnGroup">
+  <button type="button" id="function-h1" class="btn btn-sm BtnGroup-item function-button" title="Header 1" tabindex="-1">
+  <b>h1</b>
+  </button>
+  <button type="button" id="function-h2" class="btn btn-sm BtnGroup-item function-button" title="Header 2" tabindex="-1">
+  <b>h2</b>
+  </button>
+  <button type="button" id="function-h3" class="btn btn-sm BtnGroup-item function-button" title="Header 3" tabindex="-1">
+  <b>h3</b>
+  </button>
+</div>

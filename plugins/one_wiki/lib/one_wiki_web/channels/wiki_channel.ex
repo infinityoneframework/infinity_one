@@ -267,7 +267,7 @@ defmodule OneWikiWeb.WikiChannel do
       |> IO.inspect(label: "html")
 
     html = """
-      <div class="markdown-body version-preview">
+      <div class="markdown-body version-preview wiki">
         <header>
           #{page.title}
           <a href="#" rebel-click="close_file_preview" rebel-channel="wiki">

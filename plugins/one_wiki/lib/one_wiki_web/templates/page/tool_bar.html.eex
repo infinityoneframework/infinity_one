@@ -1,0 +1,44 @@
+<div id="gollum-editor-function-bar" class="gollum-editor-function-bar clearfix active">
+  <div id="gollum-editor-function-buttons" class="gollum-editor-function-buttons">
+    <%= render("tool_bar_grp_1.html", []) %>
+    <%= render("tool_bar_grp_2.html", []) %>
+    <%= render("tool_bar_grp_3.html", []) %>
+    <%= render("tool_bar_grp_4.html", []) %>
+    <button type="button" id="function-help" class="btn btn-sm function-button" aria-label="Help" title="Help" tabindex="-1" data-dismiss-help-url="/wiki/help" data-dismiss-help-authenticity-token="gL+lZ4lXNTM21wQqnXigTfRvknxXm43YhQaqOM321XD/ltROYxW5M0oBidgCZ/SXaw61l/0h7cthv2suDKf+Ig==">
+      <svg class="octicon octicon-question" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6 10h2v2H6v-2zm4-3.5C10 8.64 8 9 8 9H6c0-.55.45-1 1-1h.5c.28 0 .5-.22.5-.5v-1c0-.28-.22-.5-.5-.5h-1c-.28 0-.5.22-.5.5V7H4c0-1.5 1.5-3 3-3s3 1 3 2.5zM7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7z"></path></svg>
+    </button>
+  </div>
+  <div id="gollum-editor-format-selector" class="gollum-editor-format-selector">
+    <label for="wiki_format">Edit mode:</label>
+    <select name="wiki[format]" id="wiki_format" class="form-select select select-sm"><option value="asciidoc">AsciiDoc</option>
+      <option value="creole">Creole</option>
+      <option value="markdown">Markdown</option>
+      <option value="mediawiki">MediaWiki</option>
+      <option value="org">Org-mode</option>
+      <option value="pod">Pod</option>
+      <option value="rdoc">RDoc</option>
+      <option value="textile">Textile</option>
+      <option value="rest">reStructuredText</option>
+    </select>
+  </div>
+</div>
+<div id="gollum-editor-help" class="gollum-editor-help" style="display: none;">
+  <ul id="gollum-editor-help-parent" class="gollum-editor-help-parent">
+    <li>
+      <a href="#" rel="0" class="selected">Block Elements</a></li><li><a href="#" rel="1">Span Elements</a></li><li><a href="#" rel="2">Miscellaneous</a>
+    </li>
+  </ul>
+  <ul id="gollum-editor-help-list" class="gollum-editor-help-list">
+    <li>
+      <a href="#" rel="0:0" class="selected">Paragraphs &amp; Breaks</a></li><li><a href="#" rel="0:1">Headers</a></li><li><a href="#" rel="0:2">Blockquotes</a>
+    </li>
+    <li>
+      <a href="#" rel="0:3">Lists</a></li><li><a href="#" rel="0:4">Code Blocks</a></li><li><a href="#" rel="0:5">Horizontal Rules</a>
+    </li>
+  </ul>
+  <div id="gollum-editor-help-wrapper" class="gollum-editor-help-wrapper">
+    <div id="gollum-editor-help-content" class="gollum-editor-help-content">
+      <p>To create a paragraph, simply create a block of text that is not separated by one or more blank lines. Blocks of text separated by one or more blank lines will be parsed as paragraphs.</p><p>If you want to create a line break, end a line with two or more spaces, then hit Return/Enter.</p>
+    </div>
+  </div>
+</div>

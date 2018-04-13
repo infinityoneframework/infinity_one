@@ -118,6 +118,13 @@ aside.side-nav {
   border: 1px solid #dfe2e5;
   margin-bottom: 1rem;
 }
+.flex-nav-container {
+  padding: 6px 10px 0;
+  background: #f6f8fa;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid #dfe2e5;
+  margin-bottom: 1rem;
+}
 .nav.nav-tabs {
   li.nav-item {
     display: block;
@@ -181,6 +188,9 @@ section.page-container.page-static {
   border-radius: 5px;
   .commit-entry {
     padding-bottom: 5px;
+    .message {
+      padding: 8px 0 4px 0px;
+    }
     &.author {
       margin-top: 10px;
     }
@@ -247,6 +257,7 @@ form.wiki-page {
     }
   }
 }
+
 .gollum-editor-function-bar {
   .gollum-editor-format-selector {
     label { font-weight: 600 !important; }
