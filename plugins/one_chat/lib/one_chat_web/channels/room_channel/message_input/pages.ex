@@ -5,7 +5,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput.Pages do
   import InfinityOneWeb.Gettext
 
   alias OneChatWeb.MessageView
-  alias OneChat.Channel
+  # alias OneChat.Channel
   alias OneWiki.Page
 
   require OneChatWeb.RoomChannel.MessageInput

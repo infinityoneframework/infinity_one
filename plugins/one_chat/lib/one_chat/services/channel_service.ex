@@ -535,9 +535,13 @@ defmodule OneChat.ChannelService do
     |> set_flex_html(channel.type, old_channel.type)
   end
 
-  defp set_flex_html(map, type, type) do
-    map
-  end
+  # TODO: This does not work anymore with the addition of static pages (wiki). Need a
+  # better solution here. This will also not catch the case when we leave staic
+  # pages to an already open channel.
+
+  # defp set_flex_html(map, type, type) do
+  #   map
+  # end
   defp set_flex_html(map, 2, _) do
     Map.put map, :flex_html,
       Phoenix.View.render_to_string(TabBarView, "tab_bar.html", groups: ["direct"])

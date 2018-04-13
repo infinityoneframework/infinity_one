@@ -6,5 +6,6 @@ section.page-container.page-home.page-static
       i
     h2
       span.room-title = @title
+  /.content.wiki.markdown-body.message.wiki-content
   .content.wiki-content
     = render "form.html", title: @title, body: @body, action: :update, submit: ~g(Save page changes), id: @id, format: @format

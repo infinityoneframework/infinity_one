@@ -202,6 +202,7 @@ require('./chan_user')
 require('./chan_system')
 require('./chan_room')
 require('./chan_wiki')
+require('./wiki')
 require('./messages')
 
 import * as cc from "./chat_channel"

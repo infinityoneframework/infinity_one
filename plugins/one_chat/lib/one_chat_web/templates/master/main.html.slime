@@ -10,11 +10,12 @@
     / = #{{#if modal}}main-modal{{/if}}">
     = render "room.html", chatd: @chatd, conn: @conn
 
-  div.main-content-cache.hidden
+  .main-content-cache.hidden
   = render OneChatWeb.SideNavView, "show.html", conn: @conn, chatd: @chatd
 = OneChatWeb.EmojiView.render("emoji_picker.html", account: @chatd.user.account)
 .sweet-container
   / =# render "sweet.html"
+#flex-tab-cache.hidden
 - flash_error = @conn.private[:phoenix_flash]["error"]
 javascript:
   window.OneChat = {}

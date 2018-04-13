@@ -87,8 +87,7 @@ class RoomManager {
   open_room(room, display_name, callback) {
     if (debug) { console.log('open_room', this) }
 
-    $('.page-container.page-home.page-static').remove();
-    $('.page-link').removeClass('active');
+    OneChat.Wiki.restoreChannelFlexTax();
     // let currentId = $('.room-link.active a.open-room').attr('data-id');
     // if (currentId) {
     //   $(`#chat-window-${currentId}`).hide();
@@ -557,8 +556,7 @@ class RoomManager {
         this.open_room($(e.currentTarget).attr('data-room'),
           $(e.currentTarget).attr('data-name'));
       } else {
-        $('.page-container.page-home.page-static').remove();
-        $('.page-link').removeClass('active');
+        OneChat.Wiki.restoreChannelFlexTax();
         $room.show();
         $target.parent().addClass('active');
       }

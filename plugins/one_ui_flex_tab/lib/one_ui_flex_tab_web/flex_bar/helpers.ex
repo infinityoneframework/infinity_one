@@ -183,7 +183,36 @@ defmodule OneUiFlexTabWeb.FlexBar.Helpers do
       @spec notify_update_success(socket, tab, map, map) :: socket
       def notify_update_success(socket, tab, _sender, _opts), do: socket
 
-      defoverridable [open: 3, refresh: 3,close: 2, args: 3, notify_update_success: 4, on_change: 2, refresh_tab_bar: 2]
+      @doc """
+      Callback to get the resource id.
+
+      This does not need to be overridden for channel tabs. However, to track
+      tabs for other resources, this can be overridden with a unique ID.
+      """
+      @spec resource_id(socket, map, String.t) :: String.t
+      def resource_id(_socket, _sender, resource_id) do
+        resource_id
+      end
+
+      # @doc """
+      # Callback to get the last resource id.
+
+      # Default works for channels. Override for other resource types
+      # """
+      # @spec last_resource_id(socket) :: String.t | nil
+      # def last_resource_id(socket), do: socket.assigns[:last_channel_id]
+
+      defoverridable [
+        open: 3,
+        refresh: 3,
+        close: 2,
+        args: 3,
+        notify_update_success: 4,
+        on_change: 2,
+        refresh_tab_bar: 2,
+        resource_id: 3,
+        # last_resource_id: 1
+      ]
     end
   end
 

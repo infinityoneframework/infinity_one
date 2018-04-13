@@ -1,14 +1,13 @@
 defmodule OneWikiWeb.FlexBar.Defaults do
   @moduledoc """
-  Adds all the Backup and Restore Admin Flex Tab buttons.
+  Adds all the Wiki Flex Tab buttons.
   """
   use InfinityOneWeb.Gettext
 
   @doc """
-  Add the Backup and Restore Flex Tab Buttons.
+  Add the Wiki Flex Tab Buttons.
   """
   def add_buttons do
-    # [Backup, Restore, Upload]
     [Info, MembersList]
     |> Enum.each(fn module ->
       OneWikiWeb.FlexBar.Tab

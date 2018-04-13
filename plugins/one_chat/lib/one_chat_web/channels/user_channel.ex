@@ -869,7 +869,7 @@ defmodule OneChatWeb.UserChannel do
       |> assign(:room, new_channel.name)
 
     OnePubSub.broadcast "user:" <> assigns.user_id, "room:join",
-      %{channel_id: channel_id}
+      %{resource_id: channel_id, last_resoure_key: :last_channel_id}
 
     {:noreply, socket}
   end

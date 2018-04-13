@@ -8,8 +8,7 @@ defmodule OneWikiWeb.FlexBar.Tab.Info do
   alias InfinityOne.{TabBar.Tab}
   alias InfinityOne.{TabBar}
   alias OneWikiWeb.FlexBarView
-  alias OneChatWeb.RebelChannel.Client
-  alias OneChat.ServiceHelpers
+  # alias OneChatWeb.RebelChannel.Client
   alias OneWiki.Page
 
   @doc """
@@ -34,77 +33,44 @@ defmodule OneWikiWeb.FlexBar.Tab.Info do
   end
 
   @doc """
-  Callback for the rendering bindings for the Backup panel.
+  Callback for the rendering bindings for the Info panel.
   """
   def args(socket, {user_id, _channel_id, _, _,}, _params) do
     current_user = Helpers.get_user! user_id
     opts = get_opts()
-    page = socket.assigns.page
+    page = socket.assigns[:page]
 
     log =
-      case OneWiki.Git.log(page.id) do
+      case page && OneWiki.Git.log(page.id) do
+        nil -> nil
         {:error, error} -> error
         results -> results
       end
-      |> IO.inspect(label: "git info")
 
-    {[
-      current_user: current_user,
-      changeset: Page.change(page),
-      opts: opts,
-      page: page,
-      log: log
-    ], socket}
+    if log do
+      {[
+        current_user: current_user,
+        changeset: Page.change(page),
+        opts: opts,
+        page: page,
+        log: log
+      ], socket}
+    else
+      nil
+    end
   end
 
-  @doc """
-  Perform a backup
-  """
-  def flex_form_save(socket, %{"form" => form} = sender) do
-    resource_params = ServiceHelpers.normalize_params(form)["backup"] || %{}
-
-    # params =
-    #   for {key, val} <- resource_params, into: %{} do
-    #     {String.to_existing_atom(key), val == "1"}
-    #   end
-
-    # Client.prepend_loading_animation(socket, ".content.backup", :light_on_dark)
-
-    # case create_backup(params, Enum.any?(params, &elem(&1, 1))) do
-    #   {:ok, name} ->
-    #     socket
-    #     |> Client.stop_loading_animation()
-    #     |> Channel.flex_close(sender)
-    #     |> async_js(~s/$('a.admin-link[data-id="admin_backup_restore"]').click()/)
-    #     |> Client.toastr(:success, gettext("Backup %{name} created successfully!", name: name))
-
-    #   {:error, message} when is_binary(message) ->
-    #     socket
-    #     |> Client.stop_loading_animation()
-    #     |> Client.toastr(:error, message)
-
-    #   {:error, message} ->
-    #     socket
-    #     |> Client.stop_loading_animation()
-    #     |> Client.toastr(:error, inspect(message))
-
-    #   false ->
-    #     socket
-    #     |> Client.stop_loading_animation()
-    #     |> Client.toastr(:error, ~g(Must select at least one backup option!))
-    # end
+  def resource_id(socket, _, _) do
+    Map.get(socket.assigns[:page] || %{}, :id)
   end
+
 
   @doc """
   Handle the cancel button.
   """
-  def flex_form_cancel(socket, sender) do
-    # Channel.flex_close(socket, sender)
+  def flex_form_cancel(socket, _sender) do
     socket
   end
-
-  # defp create_backup(_params, false), do: false
-
 
   def get_opts do
     %{

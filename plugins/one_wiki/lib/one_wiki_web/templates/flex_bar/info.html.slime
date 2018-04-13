@@ -20,6 +20,11 @@
           .tab-pane.fade.active.show#info role="tabpanel" aria-labelledby="info-tab"
             ul.list.clearfix
               li
+                label = ~g(Title)
+                div
+                  span.current-setting
+                    = @page.title
+              li
                 label = ~g(File name)
                 div
                   span.current-setting

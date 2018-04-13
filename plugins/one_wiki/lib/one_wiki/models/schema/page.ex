@@ -3,12 +3,13 @@ defmodule OneWiki.Schema.Page do
 
   alias InfinityOne.Accounts.User
 
-  @formats ~w(markdown html)
-  @types %{
-    0 => "topic",
-    1 => "private",
-    2 => "draft"
-  }
+  # @formats ~w(markdown html)
+
+  # @types %{
+  #   0 => "topic",
+  #   1 => "private",
+  #   2 => "draft"
+  # }
 
   schema "wiki_pages" do
     field :title, :string

@@ -4,8 +4,6 @@ defmodule OneWiki.Subscription do
   """
   use OneModel, schema: OneWiki.Schema.Subscription
 
-  alias Ecto.Changeset
-
   alias OneWiki.Schema.Page
   alias InfinityOne.Accounts.User
 
@@ -55,7 +53,7 @@ defmodule OneWiki.Subscription do
   @doc """
   Set the hidden status for a given User's page.
   """
-  def update_page_hidden(%{} = user, page_id, hidden \\ true) do
+  def update_page_hidden(%{} = _user, page_id, hidden \\ true) do
     with subscription <- get_by(page_id: page_id),
          false <- is_nil(subscription) do
       __MODULE__.update(subscription, %{hidden: hidden})
@@ -243,9 +241,8 @@ defmodule OneWiki.Subscription do
   #   end
   # end
 
-  def clear_unread(page_id, user_id) do
+  def clear_unread(page_id, _user_id) do
     page_id
-    # |> set_unread(user_id, 0)
     |> set_has_unread(false)
   end
 
