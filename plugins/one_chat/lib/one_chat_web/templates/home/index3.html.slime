@@ -45,7 +45,8 @@ javascript:
     room: 'lobby', channel_id: undefined,
     username: '<%= @chatd.user.username %>',
     user_id: '<%= @chatd.user.id %>',
-    display_name: ""
+    display_name: "",
+    key: '<%= Plug.Conn.get_session(@conn, "session_auth") || "" %>'
   };
 
   window.chat_settings = {

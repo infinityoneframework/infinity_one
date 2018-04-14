@@ -4,6 +4,8 @@
 
 ### Enhancements
 
+* [UCX-3907] Support only one logged in device. Logout other devices automatically
+
 ### Bug Fixes
 
 * [UCX-3898] Can't unmute user from User details flex panel
