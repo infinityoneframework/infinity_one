@@ -5,12 +5,14 @@ defmodule OneChat.Direct do
 
   def migrate_db() do
     __MODULE__.list()
-    |> Enum.reduce([], fn direct, acc ->
-      user = InfinityOne.Accounts.get_by_username(direct.users)
-      case __MODULE__.update(direct, %{friend_id: user.id}) do
-        {:ok, _} -> acc
-        {:error, changeset} -> [changeset | acc]
-      end
+    |> Enum.reduce([], fn
+      %{friend_id: nil} = direct, acc ->
+        friend = InfinityOne.Accounts.get_by_username(direct.users)
+        case __MODULE__.update(direct, %{friend_id: friend.id}) do
+          {:ok, _} -> acc
+          {:error, changeset} -> [changeset | acc]
+        end
+      _, acc -> acc
     end)
   end
 
