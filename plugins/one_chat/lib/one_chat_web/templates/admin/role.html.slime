@@ -45,8 +45,8 @@ section.page-container.page-home.page-static.admin-settings
             = select f, :scope, ["Global": "global", "Rooms": "rooms"], attrs
     = if action do
       = if scoped do
-        - scope = to_string(scope)
-        - singular_scope = Inflex.singularize(scope)
+        - str_scope = to_string(scope)
+        - singular_scope = Inflex.singularize(str_scope)
         .choose-room
           label = gettext("Choose a %{scope}", scope: singular_scope)
           - place_holder = gettext("Enter a %{scope} name", scope: singular_scope)

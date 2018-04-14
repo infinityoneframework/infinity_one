@@ -341,8 +341,14 @@ defmodule OneChat.Channel do
     end
   end
 
-  def direct?(channel) do
+  def direct?(%@schema{} = channel) do
     channel.type == 2
+  end
+
+  def direct?(channel_id) when is_binary(channel_id) do
+    channel_id
+    |> get()
+    |> direct?()
   end
 
   def subscription_status(%{subscriptions: subs} = _channel, user_id) when is_list(subs) do

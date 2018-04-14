@@ -325,12 +325,12 @@ defmodule OneChatWeb.FlexBar.Tab.MembersList do
   defp update_mute_unmute_button(socket, channel_id, user, current_user) do
     # Logger.warn "assigns: #{inspect socket.assigns}"
     html =
-      Phoenix.View.render_to_string OneChatWeb.FlexBarView,
+      Phoenix.View.render_to_string(OneChatWeb.FlexBarView,
         "user_card_mute_button.html", [
           channel_id: channel_id,
           user: user,
           current_user: current_user
-        ]
+        ])
     socket.endpoint.broadcast! CC.chan_room <> socket.assigns.room,
       "update:flex-button", %{username: user.username, html: html, button: "mute-unmute"}
   end

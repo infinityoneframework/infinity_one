@@ -14,7 +14,7 @@
           .room-title= OneSettings.content_home_title()
       .content.markdown-body
         = raw Earmark.as_html!(OneSettings.content_home_body())
-
+    .flex-tab-container#flex-tabs.border-component-color
   div.main-content-cache.hidden
   = render OneChatWeb.SideNavView, "show.html", conn: @conn, chatd: @chatd
 .sweet-container
@@ -29,7 +29,8 @@ javascript:
     room: 'lobby', channel_id: undefined,
     username: '<%= @chatd.user.username %>',
     user_id: '<%= @chatd.user.id %>',
-    display_name: ""
+    display_name: "",
+    key: '<%= Plug.Conn.get_session(@conn, "session_auth") || "" %>'
   };
 
   window.chat_settings = {

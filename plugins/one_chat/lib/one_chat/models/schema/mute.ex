@@ -22,6 +22,10 @@ defmodule OneChat.Schema.Mute do
     struct
     |> cast(params, @fields)
     |> validate_required(@fields)
-    |> unique_constraint(:user_id, name: :muted_user_id_channel_id_index)
+    |> unique_constraint(:user_id,
+      name: :muted_user_id_channel_id_index,
+      message: "is already muted"
+    )
+    |> prepare_changes(&OneChat.Mute.prepare_check_channel/1)
   end
 end

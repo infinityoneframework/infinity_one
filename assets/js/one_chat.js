@@ -210,5 +210,5 @@ import * as cc from "./chat_channel"
 window.page_params = {
   default_language: "en",
   default_language_name: "English",
-  ucxchat: ucxchat,
+  ucxchat: window.ucxchat || {},
 };

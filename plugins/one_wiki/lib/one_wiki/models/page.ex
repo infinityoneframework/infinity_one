@@ -80,7 +80,7 @@ defmodule OneWiki.Page do
     end
   end
 
-  defp update_file(user, page, %{changes: %{title: _title} = changes} = changeset) do
+  defp update_file(user, page, %{changes: %{title: _title}} = changeset) do
     repo = Git.new OneWiki.pages_path()
     {path, message} = path_and_message(page, user, :renamed)
     old_path = Path.join(repo.path, changeset.data.title)

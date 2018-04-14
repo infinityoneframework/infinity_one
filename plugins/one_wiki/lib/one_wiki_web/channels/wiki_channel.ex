@@ -236,7 +236,7 @@ defmodule OneWikiWeb.WikiChannel do
 
   def show_revision(socket, sender) do
     commit = String.trim(sender["text"])
-    page = Rebel.get_assigns(socket, :page)
+    # page = Rebel.get_assigns(socket, :page)
     {title, markup} = OneWiki.Git.show(commit)
     contents = Earmark.as_html!(markup)
 

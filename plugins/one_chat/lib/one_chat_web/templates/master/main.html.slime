@@ -28,7 +28,8 @@ javascript:
     username: '<%= @chatd.user.username %>',
     user_id: '<%= @chatd.user.id %>',
     display_name: '<%= @chatd.active_room[:display_name] %>',
-    env: '<%= InfinityOne.env() %>'
+    env: '<%= InfinityOne.env() %>',
+    key: '<%= Plug.Conn.get_session(@conn, "session_auth") || "" %>'
   };
   <%= Phoenix.HTML.raw get_chat_settings(@chatd.channel) %>
 

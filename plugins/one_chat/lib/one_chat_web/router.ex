@@ -20,6 +20,7 @@ defmodule OneChatWeb.Router do
     plug :put_secure_browser_headers
     plug InfinityOne.Plugs.Setup
     plug Coherence.Authentication.Session, protected: true
+    plug(InfinityOne.Plug.SingleLogin)
   end
 
   pipeline :api do

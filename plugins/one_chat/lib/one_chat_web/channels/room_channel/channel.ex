@@ -6,7 +6,7 @@ defmodule OneChatWeb.RoomChannel.Channel do
 
   alias OneChat.{Message, Subscription, Settings, Mute, TypingAgent}
   alias InfinityOne.{Accounts, OnePubSub, Permissions}
-  alias OneChatWeb.UserChannel
+  alias OneChatWeb.{UserChannel, SharedView}
 
   require OneChat.ChatConstants, as: CC
 
@@ -78,9 +78,12 @@ defmodule OneChatWeb.RoomChannel.Channel do
     current_user = Accounts.preload_schema current_user, [:roles, user_roles: :role]
     if Permissions.has_permission? current_user, "mute-user", channel_id do
       case Mute.create(%{user_id: user.id, channel_id: channel_id}) do
-        {:error, _cs} ->
-          message = ~g"User" <> " `@" <> user.username <> "` " <> ~g"already muted."
-          {:error, message}
+        {:error, changeset} ->
+          error =
+            SharedView.format_errors(changeset, formatter: fn list, _ ->
+              list |> Enum.map(fn {_, b} -> [b] end) |> Enum.join("\n")
+            end)
+          {:error, gettext("User @%{name} ", name: user.username) <> error}
         {:ok, _} ->
           notify_user_muted(channel_id, user, current_user)
           {:ok, ~g"muted"}

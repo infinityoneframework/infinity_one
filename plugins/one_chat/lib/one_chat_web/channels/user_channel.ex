@@ -763,6 +763,7 @@ defmodule OneChatWeb.UserChannel do
       :delete_subscription
     subscribe_callback "user:" <> user_id, "room:update",
       :room_update
+    subscribe_callback "user:" <> user_id, "logout", :logout
     subscribe_callback "user:" <> user_id, "webrtc:offer", :webrtc_offer
     subscribe_callback "user:" <> user_id, "webrtc:answer", {WebrtcChannel, :webrtc_answer}
     subscribe_callback "user:" <> user_id, "webrtc:leave", {WebrtcChannel, :webrtc_leave}
@@ -1432,6 +1433,19 @@ defmodule OneChatWeb.UserChannel do
     push socket, "update:alerts", %{}
   end
 
+  def logout(_event, payload, socket) do
+    key = Rebel.Core.exec_js!(socket, ~s/window.ucxchat.key/)
+    if key == payload.creds do
+      Client.toastr(socket, :warning,
+        ~g(Logging you out. Someone logged into your account from another device.))
+      spawn fn ->
+        Process.sleep(3_000)
+        Rebel.Core.async_js(socket, ~s(window.location.href="/logout"))
+      end
+    end
+    socket
+  end
+
   def room_update(_event, payload, socket) do
     trace "room_update", payload
 
@@ -1787,8 +1801,9 @@ defmodule OneChatWeb.UserChannel do
   defdelegateadmin :admin_add_user_role
   defdelegateadmin :admin_user_role_remove
   defdelegateadmin :admin_click_user_role_member
-  defdelegateadmin :admin_user_role_search_rooms
-  defdelegateadmin :admin_user_role_search_pages
+  defdelegateadmin :admin_user_role_search_channel
+  # defdelegateadmin :admin_user_role_search_rooms
+  # defdelegateadmin :admin_user_role_search_pages
   defdelegateadmin :admin_click_scoped_room
   defdelegateadmin :admin_autocomplete_mouseenter
   defdelegateadmin :admin_reset_setting_click

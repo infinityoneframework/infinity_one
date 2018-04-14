@@ -482,7 +482,7 @@ defmodule OneAdminWeb.AdminChannel do
     async_js socket, ~s/$('.-autocomplete-container.rooms').removeClass('hidden')/
   end
 
-  def admin_new_pattern(socket, sender) do
+  def admin_new_pattern(socket, _sender) do
     last_id_string = Rebel.Core.exec_js!(socket, ~s/$('.input-line.message-pattern').last().attr('data-id')/)
     index =
       case is_binary(last_id_string) && Integer.parse(last_id_string) do
