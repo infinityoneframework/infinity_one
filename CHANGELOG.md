@@ -5,6 +5,7 @@
 ### Enhancements
 
 * [UCX-3907] Support only one logged in device. Logout other devices automatically
+* Add static pages (wiki)
 
 ### Bug Fixes
 

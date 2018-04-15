@@ -4,17 +4,19 @@
     = # connection status
   .main-content.content-background-color(style="transform: translateX(0px);")
     = #{{#if modal}}main-modal{{/if}}">
-    section.page-container.page-home.page-static.content-background-color
-      header.fixed-title.content-background-color.border-component-color
-        .burger
-          i
-          i
-          i
-        h2
-          .room-title= OneSettings.content_home_title()
-      .content.markdown-body
-        = raw Earmark.as_html!(OneSettings.content_home_body())
-    .flex-tab-container#flex-tabs.border-component-color
+    .main-content-flex
+      .flex-tab-main-content
+        section.page-container.page-home.page-static.content-background-color
+          header.fixed-title.content-background-color.border-component-color
+            .burger
+              i
+              i
+              i
+            h2
+              .room-title= OneSettings.content_home_title()
+          .content.markdown-body
+            = raw Earmark.as_html!(OneSettings.content_home_body())
+      .flex-tab-container#flex-tabs.border-component-color
   div.main-content-cache.hidden
   = render OneChatWeb.SideNavView, "show.html", conn: @conn, chatd: @chatd
 .sweet-container
