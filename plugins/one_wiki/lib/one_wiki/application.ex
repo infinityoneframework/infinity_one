@@ -15,10 +15,10 @@ defmodule OneWiki.Application do
     spawn fn ->
       Process.sleep(3_000)
       settings = Settings.get()
-      if settings.wiki_enabled do
+      if Map.get(settings, :wiki_enabled) do
         OneWikiWeb.FlexBar.Defaults.add_buttons()
 
-        if settings.wiki_history_enabled do
+        if Map.get(settings, :wiki_history_enabled) do
           try do
             OneWiki.initialize()
           rescue
