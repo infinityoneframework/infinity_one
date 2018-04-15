@@ -131,7 +131,7 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
   #   end
   # end
 
-  defp handle_in(%{app: app, state: state} = context, key) do
+  defp handle_in(%{app: app, state: state} = context, _key) do
     if match = Buffer.pattern_mod_match? app, state.head do
       # Logger.warn "matched: #{inspect match}"
       dispatch_handle_in(app, match, context)

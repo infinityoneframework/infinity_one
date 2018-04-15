@@ -1,3 +1,6 @@
+- settings = OneWiki.Settings.Wiki.get()
+- title = settings.wiki_side_nav_title
+- singular_title = Inflex.singularize(title)
 section.page-container.page-home.page-static
   header.fixed-title.content-background-color.border-component-color
     .burger
@@ -8,4 +11,5 @@ section.page-container.page-home.page-static
       span.room-title = @title
   /.content.wiki.markdown-body.message.wiki-content
   .content.wiki-content
-    = render "form.html", title: @title, body: @body, action: :update, submit: ~g(Save page changes), id: @id, format: @format
+    - label = gettext("Save %{title} changes", title: singular_title)
+    = render "form.html", title: @title, body: @body, action: :update, submit: label, id: @id, format: @format

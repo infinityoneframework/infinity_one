@@ -1,0 +1,29 @@
+- item = @changeset.data
+section.page-container.page-home.page-static.page-settings.admin-settings
+  header.fixed-title.border-component-color
+    = render OneChatWeb.MasterView, "burger.html"
+    h2
+      span.room-title= ~g"Wiki Pages"
+    .submit
+      button.button.primary.save(disabled="true")
+        i.icon-send
+        span= ~g"Save changes"
+  = if not InfinityOne.Permissions.has_permission? @user, "view-pages-administration" do
+    .content(style="padding-left: 40px;")
+      p = OneChatWeb.AdminView.unauthorized_message()
+  - else
+    .content.background-transparent-dark
+      = form_for @changeset, "#", [id: "admin-wiki-form", "data-id": "wiki"], fn f ->
+        = hidden_input f, :id, value: item.id
+        .rocket-form
+          .section
+            .section-content.border-component-color
+              - desc = ~g(Server restart requred)
+              = radio_button_line f, item, :wiki_enabled, ~g"Wiki Pages Enabled", description: desc
+          .section
+            .section-content.border-component-color
+              = radio_button_line f, item, :wiki_history_enabled, ~g"Enable Page History", description: ~g(Server restart required. Use Git to manage page history)
+              = text_input_line f, item, :wiki_side_nav_title, ~g"Wiki Pages Navigation Title"
+              - soon = ~g(Feature coming soon)
+              = text_input_line f, item, :wiki_languages, ~g"Page Markup Languages", description: soon
+              = text_input_line f, item, :wiki_default_language, ~g"Page Markup Language Default", description: soon

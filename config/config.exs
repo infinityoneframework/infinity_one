@@ -55,7 +55,8 @@ config :infinity_one, :settings_modules, [
   OneChat.Settings.FileUpload,
   OneChat.Settings.Layout,
   OneChat.Settings.Message,
-  OneWebrtc.Settings.Webrtc
+  OneWebrtc.Settings.Webrtc,
+  OneWiki.Settings.Wiki
 ]
 
 config :phoenix, :template_engines,

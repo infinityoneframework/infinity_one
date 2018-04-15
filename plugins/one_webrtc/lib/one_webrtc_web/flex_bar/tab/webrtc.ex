@@ -50,7 +50,7 @@ defmodule OneWebrtcWeb.FlexBar.Tab.Webrtc do
     {[
       client_device: client_device,
       changeset: changeset,
-      devices: get_client_devices(socket)
+      devices: get_client_devices(socket),
     ], socket}
   end
 

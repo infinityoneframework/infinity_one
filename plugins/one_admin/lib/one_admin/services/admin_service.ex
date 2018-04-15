@@ -17,6 +17,26 @@ defmodule OneAdmin.AdminService do
   alias OneChatWeb.AdminView, as: ChatAdminView
   alias OneAdminWeb.FlexBarView
   alias OneChatWeb.RebelChannel.Client
+  alias OneWiki.Settings.Wiki
+
+  def handle_in("save:wiki", params, socket) do
+    params =
+      params
+      |> Helpers.normalize_form_params
+      |> Map.get("wiki")
+
+    resp =
+      Wiki.get
+      |> Wiki.update(params)
+      |> case do
+        {:ok, _} ->
+          {:ok, %{success: ~g"Wiki settings updated successfully"}}
+        {:error, cs} ->
+          Logger.error "problem updating wiki: #{inspect cs}"
+          {:ok, %{error: ~g"There a problem updating your settings."}}
+      end
+    {:reply, resp, socket}
+  end
 
   def handle_in("save:accounts", params, socket) do
     params =

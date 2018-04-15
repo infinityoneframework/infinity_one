@@ -17,6 +17,7 @@ defmodule OneWikiWeb.WikiChannel do
   alias OneChatWeb.{SharedView, MessageView, UserChannel}
   alias OneChatWeb.RebelChannel.{SideNav}
   alias InfinityOneWeb.Query
+  alias OneWiki.Settings.Wiki, as: Settings
 
   require OneChat.ChatConstants, as: CC
 
@@ -25,8 +26,12 @@ defmodule OneWikiWeb.WikiChannel do
   end
 
   def join(CC.chan_wiki() <> _user_id = ev, payload, socket) do
-    send(self(), :after_join)
-    super(ev, payload, socket)
+    if Settings.wiki_enabled do
+      send(self(), :after_join)
+      super(ev, payload, socket)
+    else
+      {:error, %{reason: "disabled"}}
+    end
   end
 
   ###############

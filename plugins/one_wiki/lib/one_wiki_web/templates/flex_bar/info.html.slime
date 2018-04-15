@@ -1,9 +1,12 @@
+- settings = OneWiki.Settings.Wiki.get()
+- title = settings.wiki_side_nav_title
+- singular_title = Inflex.singularize(title)
 .content rebel-channel="wiki"
   = OneChatWeb.FlexBarView.render("flex_close_button.html")
   .list-view.channel-settings
     = if @page do
       .title
-        h2= ~g"Page Info"
+        h2= gettext("%{title} Info", title: singular_title)
       - rebel_opts = ["rebel-change": "flex_form_save"]
       = form_for @changeset, "#", rebel_opts, fn f ->
         input(type="hidden" name="flex-id" value="wiki_info")
@@ -12,10 +15,11 @@
           ul.nav.nav-tabs#infoTab role="tablist"
             li.nav-item
               a.nav-link.active.show#info-tab data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true"
-                = ~g(Page Info)
-            li.nav-item
-              a.nav-link#history-tab data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"
-                = ~g(Page History)
+                = gettext("%{title} Info", title: singular_title)
+            = if @history_enabled do
+              li.nav-item
+                a.nav-link#history-tab data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false"
+                  = gettext("%{title} History", title: singular_title)
         .tab-content#infoTabContent
           .tab-pane.fade.active.show#info role="tabpanel" aria-labelledby="info-tab"
             ul.list.clearfix
@@ -24,38 +28,45 @@
                 div
                   span.current-setting
                     = @page.title
-              li
-                label = ~g(File name)
-                div
-                  span.current-setting
-                    = @page.title
+              = if @history_enabled do
+                li
+                  label = ~g(File name)
+                  div
+                    span.current-setting
+                      = @page.title
               li
                 label = ~g(Type)
                 div
                   span.current-setting
                     = @page.type
-          .tab-pane.fade#history role="tabpanel" aria-labelledby="history-tab"
-            ul.list.clearfix
-              = for commit <- @log do
-                li.page-info
-                  .commit-entry.commit
-                    span = ~g(Commit) <> ":"
-                    a href="#" rebel-click="show_revision"
-                      .commit = commit.commit
-                  .commit-entry.author
-                    .author = commit.author
-                  .commit-entry
-                    .date = commit.date
-                  .commit-entry
-                    .message: i = commit.message
+          = if @history_enabled do
+            .tab-pane.fade#history role="tabpanel" aria-labelledby="history-tab"
+              ul.list.clearfix
+                = if @log == [] or is_nil(@log) do
+                  li.page-into
+                    .commit-entry.commit
+                      h3 = ~g(No History Information Available)
+                - else
+                  = for commit <- @log do
+                    li.page-info
+                      .commit-entry.commit
+                        span = ~g(Commit) <> ":"
+                        a href="#" rebel-click="show_revision"
+                          .commit = commit.commit
+                      .commit-entry.author
+                        .author = commit.author
+                      .commit-entry
+                        .date = commit.date
+                      .commit-entry
+                        .message: i = commit.message
         nav
           button type="submit" style="display:none"
           button.button.primary title="#{~g(Edit Page)}" rebel-click="edit_page" rebel-channel="wiki" data-id="#{@page.id}"
             i.icon-pencil
-            = ~g(Edit Page)
+            = gettext("Edit %{title}", title: singular_title)
           button.button.danger.delete title="#{~g(Delete Page)}" rebel-click="delete_page" rebel-channel="wiki" data-id="#{@page.id}"
             i.icon-trash
-            = ~g(Delete Page)
+            = gettext("Delete %{title}", title: singular_title)
     - else
       .about.clearfix
-        p(style="margin-left: 10px; margin-top: 40px")= ~g(Please select a Page)
+        p(style="margin-left: 10px; margin-top: 40px") = gettext("Please select a %{title}", title: singular_title)

@@ -1,11 +1,12 @@
 - pages = get_pages(@user)
+- settings = OneWiki.Settings.Wiki.get()
 h3.add-room.wiki
-  = ~g(Pages)
+  = settings.wiki_side_nav_title
   span.room-count-small = "(#{length(pages)})"
   .add-wiki-page rebel-click="new_page" rebel-channel="wiki" title="#{~g(New Page)}"
     i.icon-plus
 ul.wiki rebel-channel="wiki"
   = render "pages.html", pages: pages
 button.more.more-pages.background-transparent-darker-hover rebel-click="more_pages" rebel-channel="wiki"
-  = ~g(More Pages) <> "..."
+  = ~g(More) <> " " <> settings.wiki_side_nav_title <> " ..."
 

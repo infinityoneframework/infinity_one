@@ -3,8 +3,10 @@ defmodule OneWiki.Page do
   The Page context file.
   """
   use OneModel, schema: OneWiki.Schema.Page
+
   alias Ecto.Multi
   alias InfinityOne.Accounts.User
+  alias OneWiki.Settings.Wiki, as: Settings
 
   require Logger
 
@@ -67,49 +69,61 @@ defmodule OneWiki.Page do
   end
 
   defp create_file(user, page, _changeset) do
-    repo = Git.new OneWiki.pages_path()
-    {path, message} = path_and_message(page, user, :added)
-    with :ok <- File.write(path, page.body),
-         {:ok, _} <- Git.add(repo, page.title),
-         {:ok, _} <- Git.commit(repo, ["-m", message]) do
-      {:ok, path}
+    if Settings.wiki_history_enabled do
+      repo = Git.new OneWiki.pages_path()
+      {path, message} = path_and_message(page, user, :added)
+      with :ok <- File.write(path, page.body),
+           {:ok, _} <- Git.add(repo, page.title),
+           {:ok, _} <- Git.commit(repo, ["-m", message]) do
+        {:ok, path}
+      else
+        true -> {:ok, path}
+        {:error, error} -> {:error, error}
+        other -> {:error, other}
+      end
     else
-      true -> {:ok, path}
-      {:error, error} -> {:error, error}
-      other -> {:error, other}
+      {:ok, ""}
     end
   end
 
   defp update_file(user, page, %{changes: %{title: _title}} = changeset) do
-    repo = Git.new OneWiki.pages_path()
-    {path, message} = path_and_message(page, user, :renamed)
-    old_path = Path.join(repo.path, changeset.data.title)
-    old_name = changeset.data.title
+    if Settings.wiki_history_enabled do
+      repo = Git.new OneWiki.pages_path()
+      {path, message} = path_and_message(page, user, :renamed)
+      old_path = Path.join(repo.path, changeset.data.title)
+      old_name = changeset.data.title
 
-    with :ok <- File.write(old_path, page.body),
-         {:ok, _} <- Git.mv(repo, [old_name, page.title]),
-         {:ok, _} <- Git.commit(repo, ["-am", message]) do
-      {:ok, path}
+      with :ok <- File.write(old_path, page.body),
+           {:ok, _} <- Git.mv(repo, [old_name, page.title]),
+           {:ok, _} <- Git.commit(repo, ["-am", message]) do
+        {:ok, path}
+      else
+        true -> {:ok, path}
+        {:error, error} -> {:error, error}
+        other -> {:error, other}
+      end
     else
-      true -> {:ok, path}
-      {:error, error} -> {:error, error}
-      other -> {:error, other}
+      {:ok, ""}
     end
   end
 
   defp update_file(user, page, _changeset) do
-    repo = Git.new OneWiki.pages_path()
-    {path, message} = path_and_message(page, user, :changed)
-    with :ok <- File.write(path, page.body),
-         {:ok, status} <- Git.status(repo),
-         false <- status =~ "nothing to commit",
-         {:ok, _} <- Git.add(repo, page.title),
-         {:ok, _} <- Git.commit(repo, ["-m", message]) do
-      {:ok, path}
+    if Settings.wiki_history_enabled do
+      repo = Git.new OneWiki.pages_path()
+      {path, message} = path_and_message(page, user, :changed)
+      with :ok <- File.write(path, page.body),
+           {:ok, status} <- Git.status(repo),
+           false <- status =~ "nothing to commit",
+           {:ok, _} <- Git.add(repo, page.title),
+           {:ok, _} <- Git.commit(repo, ["-m", message]) do
+        {:ok, path}
+      else
+        true -> {:ok, path}
+        {:error, error} -> {:error, error}
+        other -> {:error, other}
+      end
     else
-      true -> {:ok, path}
-      {:error, error} -> {:error, error}
-      other -> {:error, other}
+      {:ok, ""}
     end
   end
 
@@ -141,15 +155,19 @@ defmodule OneWiki.Page do
   end
 
   defp delete_file(user, page) do
-    repo = Git.new OneWiki.pages_path()
-    message = "'#{page.title}' delete by @#{user.username}"
-    path = Path.join(OneWiki.pages_path(), page.id)
-    with :ok <- File.rm(path),
-         {:ok, _} <- Git.commit(repo, ["-am", message]) do
-      {:ok, path}
+    if Settings.wiki_history_enabled do
+      repo = Git.new OneWiki.pages_path()
+      message = "'#{page.title}' delete by @#{user.username}"
+      path = Path.join(OneWiki.pages_path(), page.id)
+      with :ok <- File.rm(path),
+           {:ok, _} <- Git.commit(repo, ["-am", message]) do
+        {:ok, path}
+      else
+        {:error, error} -> {:error, error}
+        other -> {:error, other}
+      end
     else
-      {:error, error} -> {:error, error}
-      other -> {:error, other}
+      {:ok, ""}
     end
   end
 

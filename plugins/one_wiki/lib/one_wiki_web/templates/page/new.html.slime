@@ -1,3 +1,6 @@
+- settings = OneWiki.Settings.Wiki.get()
+- title = settings.wiki_side_nav_title
+- singular_title = Inflex.singularize(title)
 section.page-container.page-home.page-static
   header.fixed-title.content-background-color.border-component-color
     .burger
@@ -5,7 +8,7 @@ section.page-container.page-home.page-static
       i
       i
     h2
-      - title = if @title == "", do: ~g(New Page), else: @title
+      - title = if @title == "", do: gettext("New %{title}", title: singular_title), else: @title
       span.room-title = title
   .content.wiki-content
-    = render "form.html", title: @title, body: "", action: :create, submit: ~g(Create page), id: nil, format: @format
+    = render "form.html", title: @title, body: "", action: :create, submit: gettext("Create %{title}", title: singular_title), id: nil, format: @format

@@ -11,14 +11,7 @@
   <div id="gollum-editor-format-selector" class="gollum-editor-format-selector">
     <label for="wiki_format">Edit mode:</label>
     <select name="wiki[format]" id="wiki_format" class="form-select select select-sm"><option value="asciidoc">AsciiDoc</option>
-      <option value="creole">Creole</option>
       <option value="markdown">Markdown</option>
-      <option value="mediawiki">MediaWiki</option>
-      <option value="org">Org-mode</option>
-      <option value="pod">Pod</option>
-      <option value="rdoc">RDoc</option>
-      <option value="textile">Textile</option>
-      <option value="rest">reStructuredText</option>
     </select>
   </div>
 </div>

@@ -10,6 +10,7 @@ defmodule OneWikiWeb.FlexBar.Tab.Info do
   alias OneWikiWeb.FlexBarView
   # alias OneChatWeb.RebelChannel.Client
   alias OneWiki.Page
+  alias OneWiki.Settings.Wiki, as: Settings
 
   @doc """
   Show Info about the page.
@@ -39,25 +40,27 @@ defmodule OneWikiWeb.FlexBar.Tab.Info do
     current_user = Helpers.get_user! user_id
     opts = get_opts()
     page = socket.assigns[:page]
+    history_enabled = Settings.wiki_history_enabled
 
     log =
-      case page && OneWiki.Git.log(page.title, ["--follow"]) do
-        nil -> nil
-        {:error, error} -> error
-        results -> results
+      if history_enabled do
+        case page && OneWiki.Git.log(page.title, ["--follow"]) do
+          nil -> nil
+          {:error, _error} -> []
+          results -> results
+        end
+      else
+        false
       end
 
-    if log do
-      {[
-        current_user: current_user,
-        changeset: Page.change(page),
-        opts: opts,
-        page: page,
-        log: log
-      ], socket}
-    else
-      nil
-    end
+    {[
+      current_user: current_user,
+      changeset: Page.change(page),
+      opts: opts,
+      page: page,
+      log: log,
+      history_enabled: history_enabled
+    ], socket}
   end
 
   def resource_id(socket, _, _) do

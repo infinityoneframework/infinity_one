@@ -1,17 +1,20 @@
+- settings = OneWiki.Settings.Wiki.get()
+- title = settings.wiki_side_nav_title
+- singular_title = Inflex.singularize(title)
 section.wiki rebel-channel="wiki"
   header
     div
-      h4 = ~g(Pages)
+      h4 = title
   .content
     .wrapper
       ul
         li
           i.icon-plus
-          a.admin-link rebel-click="new_page" = ~g(New Page)
+          a.admin-link rebel-click="new_page" = ~g(New) <> " " <> singular_title
 
         / li.separator style="border-bottom: 1px solid #999; margin-top: 5px; margin-bottom: 5px"
         li
-          span.heading = ~g(Pages)
+          span.heading = title
         = for page <- @pages do
           li style="position: relative;"
             a.page-link rebel-click="open_page" data-name="#{page.title}" data-id="#{page.id}"
