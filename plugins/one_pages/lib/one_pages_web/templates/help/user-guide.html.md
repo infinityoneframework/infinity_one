@@ -1,22 +1,22 @@
-*   [Chapter 1 - Introduction](#Chapter1)
-*   [Chapter 2 - Rooms](#Chapter2)
+*   [Introduction](#Chapter1)
+*   [Rooms](#Chapter2)
     *   [Channels](#Chapter2-1)
     *   [Direct Messages](#Chapter2-2)
     *   [Private Groups](#Chapter2-3)
-*   [Chapter 3 - Room Operations](#Chapter3)
+*   [Room Operations](#Chapter3)
     *   [Favorites](#Chapter3-1)
     *   [Joining](#Chapter3-2)
     *   [Hiding and Leaving](#Chapter3-3)
-*   [Chapter 4 - Messaging](#Chapter4)
+*   [Messaging](#Chapter4)
     *   [Sending](#Chapter4-1)
     *   [Mentions](#Chapter4-2)
     *   [Attachments](#Chapter4-3)
     *   [Other Functions](#Chapter4-4)
-*   [Chapter 5 - Right Icon Menu](#Chapter5)
-*   [Chapter 6 - Slash Commands](#Chapter6)
-*   [Chapter 7 - FAQ](#Chapter7)
+*   [Right Icon Menu](#Chapter5)
+*   [Slash Commands](#Chapter6)
+*   [FAQ](#Chapter7)
 
-# <a name="Chapter1"></a>Chapter 1 - Introduction
+# <a name="Chapter1"></a>Introduction
 
 Infinity One is a web-based chat service and soft phone provided on the UCx Server that is ideal for companies wanting to privately host their own chat service.
 
@@ -24,7 +24,7 @@ To access Infinity One from a web broswer, enter the IP address or hostname of t
 
 For example: **http://192.168.1.200:4021**
 
-# <a name="Chapter2"></a>Chapter 2 - Rooms
+# <a name="Chapter2"></a>Rooms
 
 Conversations in Infinity One are organized into chat rooms, there are 3 different types of rooms:
 
@@ -65,7 +65,7 @@ To invite users to the group, enter the following command:
 
     /invite @username
 
-# <a name="Chapter3"></a>Chapter 3 - Room Operations
+# <a name="Chapter3"></a>Room Operations
 
 The various rooms are listed on the left-hand navigation panel and organized according to their types.
 
@@ -91,7 +91,7 @@ To hide a room is to remain a member of the channel but to remove it from your
 To leave a room is to no longer be a member of the channel.
 Click on the corresponding icon to "hide" or "leave" a room.
 
-# <a name="Chapter4"></a>Chapter 4 - Messaging
+# <a name="Chapter4"></a>Messaging
 
 ### <a name="Chapter4-1"></a>Sending
 
@@ -139,7 +139,7 @@ The messaging functions supported by Infnity One include:
 
 The functions available depend on the permissions configured by the administrator. The default permission for a normal user typically does not allow the PIN function.
 
-# <a name="RMenu"></a>Chapter 5 - Right Icon Bar
+# <a name="RMenu"></a>Right Icon Bar
 
 Located on the right side of the screen, there is a vertical icon bar that provides quick
 access to the following functions:
@@ -214,7 +214,7 @@ WebRTC must first be enabled to access this feature. To enable WebRTC:
 The client settings icon is visible only when the WebRTC client is displayed. The form allows you to configure the theme and number of keys for your WebRTC client.
 ![](/images/ucc-clientsettings.png)
 
-# <a name="Chapter6"></a>Chapter 6 - Slash Commands
+# <a name="Chapter6"></a>Slash Commands
 
 Some of the functions are accessed by typing '**/** ' followed by the command in the message text box. To view a list of available commands, simply type `**/** `and you can select from the list displayed.
 Here is a list of the available slash commands:
@@ -255,7 +255,7 @@ To remove someone from the current channel.
 
 To leave the current channel.
 
-# <a name="Chapter7"></a>Chapter 7 - FAQ
+# <a name="Chapter7"></a>FAQ
 
 ##### Can we send SMS text messages from this tool?
 
