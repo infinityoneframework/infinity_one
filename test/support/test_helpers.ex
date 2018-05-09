@@ -85,4 +85,8 @@ defmodule InfinityOne.TestHelpers do
 
   defp to_map(attrs) when is_list(attrs), do: Enum.into(attrs, %{})
   defp to_map(attrs), do: attrs
+
+  def assert_schema(schema) do
+    struct(schema, inserted_at: nil, updated_at: nil)
+  end
 end

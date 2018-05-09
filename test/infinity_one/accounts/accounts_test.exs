@@ -128,14 +128,14 @@ defmodule InfinityOne.AccountsTest do
         |> Accounts.set_users_role("admin", nil)
         |> Accounts.set_users_role("owner", id)
 
-      user = Accounts.get_user user.id, preload: [user_roles: :role]
+      user = Accounts.get_user user.id, preload: [:roles, user_roles: :role]
 
       :ok = Accounts.delete_users_role(user, "owner", id)
       :ok = Accounts.delete_users_role(user, "admin", nil)
 
       nil = Accounts.delete_users_role(user, "owner", user.id)
 
-      user = Accounts.get_user user.id, preload: [user_roles: :role]
+      user = Accounts.get_user user.id, preload: [:roles, user_roles: :role]
       assert length(user.user_roles) == 1
     end
   end
@@ -162,12 +162,14 @@ defmodule InfinityOne.AccountsTest do
 
     test "list_phone_numbers/0 returns all phone_numbers" do
       phone_number = phone_number_fixture()
-      assert Accounts.list_phone_numbers() == [phone_number]
+      [pn] = Accounts.list_phone_numbers()
+      assert assert_schema(pn) == assert_schema(phone_number)
     end
 
     test "get_phone_number!/1 returns the phone_number with given id" do
       phone_number = phone_number_fixture()
-      assert Accounts.get_phone_number!(phone_number.id) == phone_number
+      assert assert_schema(Accounts.get_phone_number!(phone_number.id)) ==
+        assert_schema(phone_number)
     end
 
     test "create_phone_number/1 with valid data creates a phone_number" do
@@ -208,7 +210,7 @@ defmodule InfinityOne.AccountsTest do
     test "update_phone_number/2 with invalid data returns error changeset" do
       phone_number = phone_number_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_phone_number(phone_number, @invalid_attrs)
-      assert phone_number == Accounts.get_phone_number!(phone_number.id)
+      assert assert_schema(phone_number) == assert_schema(Accounts.get_phone_number!(phone_number.id))
     end
 
     test "delete_phone_number/1 deletes the phone_number" do
@@ -241,12 +243,14 @@ defmodule InfinityOne.AccountsTest do
 
     test "list_phone_number_labels/0 returns all phone_number_labels" do
       phone_number_label = phone_number_label_fixture()
-      assert Accounts.list_phone_number_labels() == [phone_number_label]
+      [label] = Accounts.list_phone_number_labels()
+      assert assert_schema(label) == assert_schema(phone_number_label)
     end
 
     test "get_phone_number_label!/1 returns the phone_number_label with given id" do
       phone_number_label = phone_number_label_fixture()
-      assert Accounts.get_phone_number_label!(phone_number_label.id) == phone_number_label
+      assert assert_schema(Accounts.get_phone_number_label!(phone_number_label.id)) ==
+        assert_schema(phone_number_label)
     end
 
     test "create_phone_number_label/1 with valid data creates a phone_number_label" do
@@ -267,14 +271,17 @@ defmodule InfinityOne.AccountsTest do
 
     test "update_phone_number_label/2 with invalid data returns error changeset" do
       phone_number_label = phone_number_label_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_phone_number_label(phone_number_label, @invalid_attrs)
-      assert phone_number_label == Accounts.get_phone_number_label!(phone_number_label.id)
+      assert {:error, %Ecto.Changeset{}} =
+        Accounts.update_phone_number_label(phone_number_label, @invalid_attrs)
+      assert assert_schema(phone_number_label) ==
+        assert_schema(Accounts.get_phone_number_label!(phone_number_label.id))
     end
 
     test "delete_phone_number_label/1 deletes the phone_number_label" do
       phone_number_label = phone_number_label_fixture()
       assert {:ok, %PhoneNumberLabel{}} = Accounts.delete_phone_number_label(phone_number_label)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_phone_number_label!(phone_number_label.id) end
+      assert_raise Ecto.NoResultsError,
+        fn -> Accounts.get_phone_number_label!(phone_number_label.id) end
     end
 
     test "change_phone_number_label/1 returns a phone_number_label changeset" do

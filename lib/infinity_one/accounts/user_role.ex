@@ -59,7 +59,7 @@ defmodule InfinityOne.Accounts.UserRole do
   defp prepare_notify(%{action: :delete} = changeset) do
     role = Accounts.get_role! changeset.data.role_id
 
-    if OneSettings.display_roles() and notify_role?(role.name) do
+    if OneSettings.display_roles() && notify_role?(role.name) do
       user = Accounts.get_user changeset.data.user_id
       scope = changeset.data.scope || "global"
 
