@@ -29,6 +29,10 @@ defmodule InfinityOne.Permissions do
     GenServer.cast @name, :initialize
   end
 
+  def initialize(permissions_list) do
+    GenServer.cast(@name, {:initialize, permissions_list})
+  end
+
   def delete_all_objects do
     GenServer.cast @name, :delete_all_objects
   end
@@ -102,13 +106,8 @@ defmodule InfinityOne.Permissions do
 
   def init_state, do: %{permissions: %{}, roles: %{}}
 
-  #################
-  # Casts
-
-  def handle_cast(:initialize, state) do
-    add_missing_permissions()
-
-    Enum.reduce(list_permissions(), state, fn %{name: permission, roles: roles}, acc ->
+  defp initialize_permissions(permissions_list, state) do
+    Enum.reduce(permissions_list, state, fn %{name: permission, roles: roles}, acc ->
       roles = Enum.map(roles, &(&1.name))
       Enum.reduce(roles, put_in(acc, [:permissions, permission], roles), fn role, acc ->
         update_in(acc, [:roles, role], fn
@@ -117,6 +116,22 @@ defmodule InfinityOne.Permissions do
         end)
       end)
     end)
+  end
+
+  #################
+  # Casts
+
+  def handle_cast(:initialize, state) do
+    add_missing_permissions()
+
+    list_permissions()
+    |> initialize_permissions(state)
+    |> noreply
+  end
+
+  def handle_cast({:initialize, permissions_list}, state) do
+    permissions_list
+    |> initialize_permissions(state)
     |> noreply
   end
 

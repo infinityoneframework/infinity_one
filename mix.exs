@@ -74,7 +74,8 @@ defmodule InfinityOne.Mixfile do
       # {:phoenix, "~> 1.3.0-rc"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
-      {:mariaex, ">= 0.0.0", only: [:dev, :prod], override: true},
+      # {:mariaex, ">= 0.0.0", only: [:dev, :prod], override: true},
+      {:mariaex, ">= 0.0.0", override: true},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.13"},
@@ -109,7 +110,7 @@ defmodule InfinityOne.Mixfile do
       {:slime, github: "smpallen99/slime", override: true},
       # {:slime, "~> 1.0", override: true},
       {:inflex, "~> 1.8"},
-      {:postgrex, ">= 0.0.0", only: [:test]},
+      # {:postgrex, ">= 0.0.0", only: [:test]},
       # {:rebel, path: "../rebel"},
       {:rebel, github: "smpallen99/rebel"},
       {:exactor, "~> 2.2", override: true},
@@ -118,7 +119,8 @@ defmodule InfinityOne.Mixfile do
       {:phoenix_markdown, "~> 1.0"},
       {:distillery, "~> 1.4"},
       {:conform, "~> 2.5"},
-      {:ex_syslogger, github: "smpallen99/ex_syslogger", only: [:prod]},
+      # {:ex_syslogger, github: "smpallen99/ex_syslogger", only: [:prod]},
+      {:ex_syslogger, github: "smpallen99/ex_syslogger"},
       {:gen_smtp, "~> 0.12.0"},
       {:exprof, "~> 0.2.0"},
       # {:scrivener_ecto, path: "../scrivener_ecto"}
@@ -141,11 +143,11 @@ defmodule InfinityOne.Mixfile do
       "ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       commit: ["deps.get --only #{Mix.env()}", "dialyzer", "credo --strict"],
-      test: ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]
+      # test: ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]
+      # # Use the following option if you want to run specific test files
+      "test": ["ecto.create --quiet", "unbrella.migrate", "test"]
     ]
 
-    # # Use the following option if you want to run specific test files
-    # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]]
   end
 
   defp plugin_deps do

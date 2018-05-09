@@ -8,7 +8,8 @@ defmodule OneChat.AccountsTest do
   setup do
     Helpers.insert_roles()
     user = Helpers.insert_user()
-    {:ok, user: user, account: Helpers.insert_account(user)}
+    # {:ok, user: user, account: Helpers.insert_account(user)}
+    {:ok, user: user, account: user.account}
   end
 
   test "gets_by_user_id", %{user: user, account: account} do

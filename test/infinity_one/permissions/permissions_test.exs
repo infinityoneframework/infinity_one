@@ -22,8 +22,8 @@ defmodule InfinityOne.PermissionsTest do
       %{name: "perm-4", roles: ["owner", "admin"] },
     ]
     roles = Accounts.create_roles [admin: :global, owner: :rooms, user: :global]
-    Permissions.create_permissions permissions, roles
-    Permissions.initialize()
+    Permissions.create_permissions(permissions, roles)
+    Permissions.initialize(Permissions.list_permissions())
     :ok
   end
 
@@ -35,20 +35,22 @@ defmodule InfinityOne.PermissionsTest do
     test "lists permissions" do
       {:ok, _} = Permissions.create_permission(%{name: "perm-one"})
       {:ok, _} = Permissions.create_permission(%{name: "perm-one-1"})
-      [p1, p2] = Permissions.list_permissions()
-      refute p1.name == p2.name
-      assert p1.name in ~w(perm-one perm-one-1)
-      assert p2.name in ~w(perm-one perm-one-1)
+      permissions = Permissions.list_permissions()
+      assert Enum.find(permissions, & &1.name == "perm-one")
+      assert Enum.find(permissions, & &1.name == "perm-one-1")
     end
     test "delete permissions" do
+      pre_count = length(Permissions.list_permissions())
       {:ok, perm} = Permissions.create_permission(%{name: "perm-one"})
+      assert length(Permissions.list_permissions()) == pre_count + 1
       {:ok, _} = Permissions.delete_permission(perm)
-      assert Permissions.list_permissions() == []
+      assert length(Permissions.list_permissions()) == pre_count
     end
   end
 
   describe "permission_role" do
     test "creates and deletes a PermissionRole" do
+      pre_count = length(Permissions.list_permission_roles())
       {:ok, perm} = Permissions.create_permission(%{name: "perm-one"})
       {:ok, role} = Accounts.create_role %{name: "user", scope: "global"}
       {:ok, pr} = Permissions.create_permission_role(
@@ -58,7 +60,7 @@ defmodule InfinityOne.PermissionsTest do
       assert pr.permission.name == "perm-one"
 
       {:ok, _} = Permissions.delete_permission_role(pr)
-      assert Permissions.list_permission_roles() == []
+      assert length(Permissions.list_permission_roles()) == pre_count
     end
   end
 

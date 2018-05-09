@@ -63,7 +63,7 @@ defmodule InfinityOne.TestHelpers do
     |> UserRole.changeset(%{user_id: user.id, role_id: role.id})
     |> Repo.insert!
 
-    Repo.preload user, [roles: :permissions]
+    Repo.preload(user, [:account, :roles, user_roles: :role])
   end
 
   def insert_account(user, attrs \\ %{}) do
