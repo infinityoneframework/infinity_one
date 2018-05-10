@@ -45,11 +45,12 @@ defmodule OneChatWeb.UserChannel.Notifier do
   end
 
   def broadcast_unread_alert(socket, channel_name, client) do
-    client.broadcast_js socket, """
+    client.async_js(socket, """
       $('.link-room-#{channel_name}')
         .addClass('has-unread')
-        .addClass('has-alert')
-      """
+        .addClass('has-alert');
+      OneChat.sideNav.set_visible('.link-room-#{channel_name}')
+      """)
     socket
   end
 

@@ -68,6 +68,22 @@ class SideNav {
     }, 200))
   }
 
+  set_visible(item) {
+    let list = $('.rooms-list');
+    if (!list) { return; }
+
+    let listOffset = list.offset();
+    let listHeight = list.height();
+
+    if ($(item).offset().top < listOffset.top - $(item).height() + 20) {
+      $('.top-unread-rooms').removeClass('hidden')
+    }
+
+    if ($(item).offset().top > listOffset.top + listHeight - 20) {
+      $('.bottom-unread-rooms').removeClass('hidden')
+    }
+  }
+
   set_nav_top_icon(icon) {
     // console.log('set_nav_top_icon', icon)
     $('aside.side-nav span.arrow')
