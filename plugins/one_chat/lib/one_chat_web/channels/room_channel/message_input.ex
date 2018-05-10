@@ -15,7 +15,6 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
   end
 
   def message_send(socket, _sender, client \\ Client) do
-    Logger.warn "deprecated"
 
     body = socket |> client.get_message_box_value |> String.trim_trailing
     if client.editing_message?(socket) do
@@ -23,8 +22,10 @@ defmodule OneChatWeb.RoomChannel.MessageInput do
     else
       Message.new_message(socket, body, client)
     end
-    Channel.stop_typing socket
+
     socket
+    |> Client.clear_message_box()
+    |> Channel.stop_typing()
   end
 
   def handle_keydown(socket, sender, key, client \\ Client) do

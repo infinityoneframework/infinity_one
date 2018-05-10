@@ -265,6 +265,7 @@ defmodule OneChatWeb.RoomChannel.Channel do
   def update_typing(%{} = socket, channel_id) do
     typing = TypingAgent.get_typing_names(channel_id)
     Phoenix.Channel.broadcast! socket, "typing:update", %{typing: typing}
+    socket
   end
 
   def update_typing(channel_id, room) do
