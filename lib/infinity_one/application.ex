@@ -10,6 +10,9 @@ defmodule InfinityOne.Application do
     # allow plugin access by it name
     # i.e. Application.get_env(:infinity_one, :router)
 
+    # Disable this compiler warning for dynamic code generation
+    Code.compiler_options(ignore_module_conflict: true)
+
     InfinityOne.TabBar.initialize()
 
     Unbrella.apply_plugin_config()

@@ -16,6 +16,7 @@ defmodule InfinityOne.Mixfile do
       ],
       dialyzer: [plt_add_apps: [:mix]],
       elixirc_paths: elixirc_paths(Mix.env()),
+      elixirc_options: [long_compilation_threshold: 45],
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
@@ -143,9 +144,7 @@ defmodule InfinityOne.Mixfile do
       "ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       commit: ["deps.get --only #{Mix.env()}", "dialyzer", "credo --strict"],
-      test: ["ecto.create --quiet", "unbrella.migrate", "unbrella.test", "test"]
-      # # Use the following option if you want to run specific test files
-      # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]
+      test: ["ecto.create --quiet", "unbrella.migrate", "unbrella.test"]
     ]
 
   end

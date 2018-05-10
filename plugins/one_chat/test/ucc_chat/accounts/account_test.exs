@@ -1,5 +1,5 @@
 defmodule OneChat.Accounts.AccountTest do
-  use ExUnit.Case, async: true
+  use OneChat.DataCase
 
   alias InfinityOne.Accounts.Account
 

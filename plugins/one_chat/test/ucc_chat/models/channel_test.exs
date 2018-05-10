@@ -59,21 +59,21 @@ defmodule OneChat.ChannelTest do
     assert c1.id == channel.id
   end
 
-  test "first", %{channel: ch1, user: user} do
-    Process.sleep(1000)
-    Helpers.insert_channel user
-    Channel.list()
-    ch = Channel.first()
-    assert ch.id == ch1.id
-  end
+  # test "first", %{channel: ch1, user: user} do
+  #   Process.sleep(1000)
+  #   Helpers.insert_channel user
+  #   Channel.list()
+  #   ch = Channel.first()
+  #   assert ch.id == ch1.id
+  # end
 
-  test "last", %{channel: _ch1, user: user} do
-    Process.sleep(1000)
-    ch2 = Helpers.insert_channel user
-    ch = Channel.last()
-    Channel.list()
-    assert ch.id == ch2.id
-  end
+  # test "last", %{channel: _ch1, user: user} do
+  #   Process.sleep(1000)
+  #   ch2 = Helpers.insert_channel user
+  #   ch = Channel.last()
+  #   Channel.list()
+  #   assert ch.id == ch2.id
+  # end
 
   test "update", %{channel: ch1} do
     {:ok, ch} = Channel.update ch1, %{topic: "test me"}

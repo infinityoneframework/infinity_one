@@ -60,23 +60,23 @@ defmodule OneChat.NotificationTest do
     assert n1.id == n.id
   end
 
-  test "first", %{channel: ch1, user: user} do
-    ch2 = H.insert_channel user
-    n1 = Notification.create! %{channel_id: ch1.id, settings: %{}}
-    Process.sleep(1000)
-    Notification.create! %{channel_id: ch2.id, settings: %{}}
-    n = Notification.first()
-    assert n.id == n1.id
-  end
+  # test "first", %{channel: ch1, user: user} do
+  #   ch2 = H.insert_channel user
+  #   n1 = Notification.create! %{channel_id: ch1.id, settings: %{}}
+  #   Process.sleep(1000)
+  #   Notification.create! %{channel_id: ch2.id, settings: %{}}
+  #   n = Notification.first()
+  #   assert n.id == n1.id
+  # end
 
-  test "last", %{channel: ch1, user: user} do
-    ch2 = H.insert_channel user
-    Notification.create! %{channel_id: ch1.id, settings: %{}}
-    Process.sleep(1000)
-    n2 = Notification.create! %{channel_id: ch2.id, settings: %{}}
-    n = Notification.last()
-    assert n.id == n2.id
-  end
+  # test "last", %{channel: ch1, user: user} do
+  #   ch2 = H.insert_channel user
+  #   Notification.create! %{channel_id: ch1.id, settings: %{}}
+  #   Process.sleep(1000)
+  #   n2 = Notification.create! %{channel_id: ch2.id, settings: %{}}
+  #   n = Notification.last()
+  #   assert n.id == n2.id
+  # end
 
   test "update", %{channel: ch1} do
     n1 = Notification.create! %{channel_id: ch1.id, settings: %{}}
