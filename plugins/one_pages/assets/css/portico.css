@@ -1160,9 +1160,9 @@ input#terminal:checked ~ #tab-terminal {
 
 .btn-user {
     background-color: #ffffff;
-    border-color: hsl(169, 44%, 54%);
+    border-color: hsl(135, 38%, 48%);
     border-style: solid;
-    color: hsl(170, 40%, 41%);
+    color: hsl(136, 33%, 35%);
 }
 
 .btn-admin {
@@ -1372,7 +1372,7 @@ input.new-organization-button {
 .top-links a:hover {
     text-decoration: none;
     background-color: hsla(0, 0%, 100%, 1.0);
-    color: hsl(170, 50%, 40%);
+    color: #3c774c;
 }
 
 .centered-button {
@@ -1725,8 +1725,9 @@ input.new-organization-button {
 
 .error_page {
     padding: 20px 0px;
-    min-height: calc(100vh - 290px);
-    background-color: #c9e9e0;
+    /*min-height: calc(100vh - 290px);*/
+    height: 100%;
+    background-color: #8ac499;
     font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;
 }
 
@@ -1744,10 +1745,10 @@ input.new-organization-button {
 
 .error_page .errorbox {
     margin: auto;
-    border: 2px solid #44A98C;
+    border: 2px solid #66b27b;
     max-width: 500px;
     background-color: white;
-    box-shadow: 0 0 4px #44A98C;
+    box-shadow: 0 0 4px #66b27b;
     font-size: 18px;
 }
 
@@ -1765,7 +1766,7 @@ input.new-organization-button {
 }
 
 .error_page .lead {
-    color: #39a688;
+    color: #4d9961;
     font-size: 35px;
     margin-bottom: 20px;
     line-height: normal;
