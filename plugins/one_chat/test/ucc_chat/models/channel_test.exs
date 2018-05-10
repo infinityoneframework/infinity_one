@@ -2,15 +2,18 @@ defmodule OneChat.ChannelTest do
   use OneChat.DataCase
 
   alias OneChat.Channel
-  alias OneChat.TestHelpers, as: H
+  alias OneChat.TestHelpers, as: Helpers
+  alias InfinityOne.Permissions
 
   setup do
-    H.insert_roles()
-    user = H.insert_user
+    Helpers.insert_roles()
+    Permissions.initialize_permissions_db()
+    Permissions.initialize(Permissions.list_permissions())
+    user = Helpers.insert_user()
     {:ok,
       user: user,
-      channel: H.insert_channel(user),
-      account: H.insert_account(user)}
+      channel: Helpers.insert_channel(user),
+      account: user.account}
   end
 
   test "create", %{user: user} do
@@ -57,14 +60,18 @@ defmodule OneChat.ChannelTest do
   end
 
   test "first", %{channel: ch1, user: user} do
-    H.insert_channel user
+    Process.sleep(1000)
+    Helpers.insert_channel user
+    Channel.list()
     ch = Channel.first()
     assert ch.id == ch1.id
   end
 
   test "last", %{channel: _ch1, user: user} do
-    ch2 = H.insert_channel user
+    Process.sleep(1000)
+    ch2 = Helpers.insert_channel user
     ch = Channel.last()
+    Channel.list()
     assert ch.id == ch2.id
   end
 
@@ -95,8 +102,8 @@ defmodule OneChat.ChannelTest do
   end
 
   test "delete! id with notifications", %{channel: ch1, account: account} do
-    n = H.insert_notification ch1
-    H.insert_account_notification account, n
+    n = Helpers.insert_notification ch1
+    Helpers.insert_account_notification account, n
     Channel.delete! ch1.id
     assert Channel.list() == []
   end
@@ -107,7 +114,7 @@ defmodule OneChat.ChannelTest do
   end
 
   test "delete_all", %{channel: _ch1, user: user} do
-    H.insert_channel user
+    Helpers.insert_channel user
     Channel.delete_all
     assert Channel.list() == []
   end

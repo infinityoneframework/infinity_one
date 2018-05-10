@@ -143,9 +143,9 @@ defmodule InfinityOne.Mixfile do
       "ecto.setup": ["ecto.create", "unbrella.migrate", "unbrella.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       commit: ["deps.get --only #{Mix.env()}", "dialyzer", "credo --strict"],
-      # test: ["ecto.create --quiet", "unbrella.migrate", "test", "unbrella.test"]
+      test: ["ecto.create --quiet", "unbrella.migrate", "unbrella.test", "test"]
       # # Use the following option if you want to run specific test files
-      "test": ["ecto.create --quiet", "unbrella.migrate", "test"]
+      # "test": ["ecto.create --quiet", "unbrella.migrate", "test"]
     ]
 
   end

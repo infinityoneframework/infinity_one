@@ -16,7 +16,7 @@ defmodule OnePages.DataCase do
 
   using do
     quote do
-      alias OnePages.Repo
+      alias InfinityOne.Repo
 
       import Ecto
       import Ecto.Changeset
@@ -27,10 +27,10 @@ defmodule OnePages.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(OnePages.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(InfinityOne.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(OnePages.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(InfinityOne.Repo, {:shared, self()})
     end
 
     :ok

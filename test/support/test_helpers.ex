@@ -1,7 +1,7 @@
 defmodule InfinityOne.TestHelpers do
   alias FakerElixir, as: Faker
   alias InfinityOne.{Repo, Accounts}
-  alias Accounts.{User, Role, UserRole}
+  alias Accounts.Role
   import Ecto.Query
 
   def strip_ts(schema) do
@@ -54,16 +54,14 @@ defmodule InfinityOne.TestHelpers do
       password_confirmation: "secret",
       }, to_map(attrs))
 
-    user =
-      %User{}
-      |> User.changeset(changes)
-      |> Repo.insert!()
+    {:ok, user} = Accounts.create_user(changes)
+      # %User{}
+      # |> User.changeset(changes)
+      # |> Repo.insert!()
 
-    %UserRole{}
-    |> UserRole.changeset(%{user_id: user.id, role_id: role.id})
-    |> Repo.insert!
+    Accounts.create_user_role(%{user_id: user.id, role_id: role.id})
 
-    Repo.preload(user, [:account, :roles, user_roles: :role])
+    Accounts.preload_schema(user, [:account, :roles, user_roles: :role])
   end
 
   def insert_account(user, attrs \\ %{}) do

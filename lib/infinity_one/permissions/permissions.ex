@@ -303,6 +303,24 @@ defmodule InfinityOne.Permissions do
     |> Repo.insert()
   end
 
+  def create_permission(attrs, role_names) do
+    case create_permission(attrs) do
+      {:ok, permission} ->
+        Enum.each(role_names, fn role_name ->
+          case Accounts.get_by_role(name: role_name) do
+            nil ->
+              # ignore missing roles
+              :ok
+            role ->
+              create_permission_role(%{permission_id: permission.id, role_id: role.id})
+          end
+        end)
+        {:ok, permission}
+      error ->
+        error
+    end
+  end
+
   @doc """
   Updates a permission.
 
@@ -523,6 +541,30 @@ defmodule InfinityOne.Permissions do
 
   defp get_names(list) do
     Enum.map(list, & &1.name)
+  end
+
+  def initialize_permissions_db do
+    default_permissions()
+    |> Enum.map(fn %{name: name, roles: role_names} ->
+      case get_permission_by_name(name) do
+        nil ->
+          create_permission(%{name: name}, role_names)
+        permission ->
+          role_names
+          |> Enum.reduce([], fn role_name, acc ->
+            if role = Accounts.get_by_role(name: role_name) do
+              [role | acc]
+            else
+              acc
+            end
+          end)
+          |> Enum.each(fn role ->
+            if is_nil(get_permission_role(permission, role)) do
+              create_permission_role(%{permission_id: permission.id, role_id: role.id})
+            end
+          end)
+      end
+    end)
   end
 
   @doc """

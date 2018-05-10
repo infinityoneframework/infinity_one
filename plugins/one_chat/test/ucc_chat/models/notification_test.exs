@@ -3,10 +3,13 @@ defmodule OneChat.NotificationTest do
 
   alias OneChat.Notification
   alias OneChat.TestHelpers, as: H
+  alias InfinityOne.Permissions
 
   setup do
     H.insert_roles()
     user = H.insert_user
+    Permissions.initialize_permissions_db()
+    Permissions.initialize(Permissions.list_permissions())
     channel = H.insert_channel user
     {:ok, user: user, channel: channel}
   end
@@ -60,6 +63,7 @@ defmodule OneChat.NotificationTest do
   test "first", %{channel: ch1, user: user} do
     ch2 = H.insert_channel user
     n1 = Notification.create! %{channel_id: ch1.id, settings: %{}}
+    Process.sleep(1000)
     Notification.create! %{channel_id: ch2.id, settings: %{}}
     n = Notification.first()
     assert n.id == n1.id
@@ -68,6 +72,7 @@ defmodule OneChat.NotificationTest do
   test "last", %{channel: ch1, user: user} do
     ch2 = H.insert_channel user
     Notification.create! %{channel_id: ch1.id, settings: %{}}
+    Process.sleep(1000)
     n2 = Notification.create! %{channel_id: ch2.id, settings: %{}}
     n = Notification.last()
     assert n.id == n2.id

@@ -33,6 +33,7 @@ defmodule OnePages.Github.Server do
 
   @name __MODULE__
   @default_poll_timeout 60 * 60 # 1 hour
+  @env Mix.env()
 
   ##############
   ## Public API
@@ -83,7 +84,9 @@ defmodule OnePages.Github.Server do
 
   def init(_) do
     timeout = Application.get_env(:one_pages, :github_poll_timer, @default_poll_timeout)
-    Process.send_after @name, :poll_github, 1_000
+    unless @env == :test do
+      Process.send_after @name, :poll_github, 1_000
+    end
     {:ok, %{version: nil, pending: [], last_polled: nil, poll_timeout: timeout}}
   end
 

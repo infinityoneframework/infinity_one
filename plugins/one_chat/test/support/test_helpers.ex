@@ -34,7 +34,7 @@ defmodule OneChat.TestHelpers do
         name: Faker.Internet.user_name,
         user_id: user.id
       }, to_map(attrs))
-    ChannelService.insert_channel! changes
+    ChannelService.insert_channel! user, changes
   end
 
   def insert_subscription(user, channel, attrs \\ %{}) do

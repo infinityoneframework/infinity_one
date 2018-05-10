@@ -21,15 +21,15 @@ defmodule OnePagesWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint OnePagesWeb.Endpoint
+      @endpoint InfinityOneWeb.Endpoint
     end
   end
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(OnePages.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(InfinityOne.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(OnePages.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(InfinityOne.Repo, {:shared, self()})
     end
     :ok
   end

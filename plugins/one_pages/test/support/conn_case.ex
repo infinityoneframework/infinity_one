@@ -22,15 +22,15 @@ defmodule OnePagesWeb.ConnCase do
       import OnePagesWeb.Router.Helpers
 
       # The default endpoint for testing
-      @endpoint OnePagesWeb.Endpoint
+      @endpoint InfinityOneWeb.Endpoint
     end
   end
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(OnePages.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(InfinityOne.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(OnePages.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(InfinityOne.Repo, {:shared, self()})
     end
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end

@@ -4,10 +4,13 @@ defmodule OneChat.SubscriptionServiceTest do
   import OneChat.TestHelpers
 
   alias OneChat.Subscription, as: Service
+  alias InfinityOne.Permissions
 
   setup do
     InfinityOne.TestHelpers.insert_role "owner"
     user = InfinityOne.TestHelpers.insert_role_user "user"
+    Permissions.initialize_permissions_db()
+    Permissions.initialize(Permissions.list_permissions())
     channel = insert_channel user
     sub = insert_subscription user, channel
     {:ok, %{user: user, channel: channel, sub: sub}}

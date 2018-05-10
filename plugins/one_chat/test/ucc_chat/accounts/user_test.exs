@@ -1,5 +1,5 @@
 defmodule OneChat.Accounts.UserTest do
-  use ExUnit.Case, async: true
+  use OneChat.DataCase
 
   alias InfinityOne.Accounts.User
 
@@ -8,7 +8,8 @@ defmodule OneChat.Accounts.UserTest do
     email: "user@example.com",
     name: "User Name",
     password: "secret",
-    password_confirmation: "secret"
+    password_confirmation: "secret",
+    subscriptions: []
   }
 
   @invalid_attrs %{}
@@ -21,7 +22,8 @@ defmodule OneChat.Accounts.UserTest do
 
     assert changeset.errors == []
     assert changeset.valid?
-    assert changeset.changes |> Map.delete(:password_hash) == Map.put(@valid_attrs, :chat_status, "online")
+    assert changeset.changes |> Map.delete(:password_hash) |> Map.delete(:account) ==
+      Map.put(@valid_attrs, :chat_status, "online")
   end
 
   test "rejects username all and here" do

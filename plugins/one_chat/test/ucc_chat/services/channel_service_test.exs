@@ -4,12 +4,17 @@ defmodule OneChat.ChannelServiceTest do
   import OneChat.TestHelpers
 
   alias OneChat.ChannelService, as: Service
+  alias InfinityOne.{Permissions}
 
   setup do
-    InfinityOne.TestHelpers.insert_role "owner"
-    user = InfinityOne.TestHelpers.insert_role_user "user"
-    channel = insert_channel user
-    OneSettings.init_all
+    InfinityOne.TestHelpers.insert_roles()
+    Permissions.initialize_permissions_db()
+    Permissions.initialize(Permissions.list_permissions())
+
+    user = InfinityOne.TestHelpers.insert_user()
+
+    channel = insert_channel(user)
+    OneSettings.init_all()
     {:ok, %{user: user, channel: channel}}
   end
 
