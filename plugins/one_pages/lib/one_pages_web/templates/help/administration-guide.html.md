@@ -1,13 +1,13 @@
-*   [Introduction](#Introduction)
-*   [Infinity One Package](#Package)
-*   [Installation Wizard](#Wizard)
-*   [First time Login](#Login)
-*   [Adding Users](#Users)
-*   [Setting up WebRTC](#WebRTC)
-*   [Useful Tips](#Tips)
-*   [Known Issues](#Issues)
+*   [Introduction](#introduction)
+*   [Infinity One Package](#package)
+*   [Installation Wizard](#wizard)
+*   [First time Login](#login)
+*   [Adding Users](#users)
+*   [Setting up WebRTC](#webrtc)
+*   [Useful Tips](#tips)
+*   [Known Issues](#issues)
 
-# <a name="Introduction"></a>Introduction
+# <a id="introduction"></a>Introduction
 
 Infinity One is E-MetroTel's framework for the next generation of unified communications clients, providing team collaboration tools and applications for businesses of all sizes. The vision is to provide a set of modern features and tools for the evolving company integrated into one extensible frame work that includes:
 
@@ -26,7 +26,7 @@ Infinity One is E-MetroTel's framework for the next generation of unified commun
 
 And the best part is that the data is safe with encrypted connections between your browser and the server. All the data is stored on your own server, not on someone else's cloud.
 
-# <a name="Package"></a>Infinity One Package
+# <a id="package"></a>Infinity One Package
 
 The Infinity One package (infinity_one) is incompatible with the WebRTC package (mscs). With the introduction of Infinity One, the standalone WebRTC application is no longer supported from Release 6 and up.
 If you have the mscs package already installed from Release 5, please uninstall mscs first before installing the infinity_one package.
@@ -41,7 +41,7 @@ The Infinity One application is installed on the UCx Server. First you have to i
 6.  In the **Name **field, enter **infinity_one**
 7.  Click on the **Install **link to install the **infinity_one** package​
 
-# <a name="Wizard"></a>Installation Wizard
+# <a id="wizard"></a>Installation Wizard
 
 To access Infinity One from a web broswer, enter the IP address or hostname of the UCx Server followed by ' **:4021** '.
 For example: http://192.168.1.200:4021
@@ -83,7 +83,7 @@ Review the information and click on the **SUBMIT** button to complete the instal
 You can now click on the **Login Here** link to access the Infinity One application.
 ![](/images/infinityone-install-6.png)
 
-# <a name="Login"></a>First Time Login
+# <a id="login"></a>First Time Login
 
 Login using the administrator account that was created via the installation wizard.
 ![](/images/infinityone-login-1.png)
@@ -99,7 +99,7 @@ After logging in for the first time, restart the server as per instructions from
 
 If you selected the **Remember Me?** box on the login page, you should automatically be taken back into the application after it restarts (about a minute or so).
 
-# <a name="Users"></a>Adding Users
+# <a id="users"></a>Adding Users
 
 There are three methods to add users.
 
@@ -138,7 +138,7 @@ The advantage of this approach is that you do not have to worry about people fin
 
 It is recommended to setup one additional user as an administrator. This is your backup administrator in case you forget the administrator password and cannot recover it.
 
-# <a name="WebRTC"></a>Setting Up WebRTC
+# <a id="webrtc"></a>Setting Up WebRTC
 
 To allow users to have a WebRTC phone, the administrator must first create WebRTC extensions for each of the users on the UCx Server. (Nortel extensions with Device Type = WebRTC)
 Then each user can associate their own WebRTC extension to their Infinity One account.
@@ -153,7 +153,7 @@ Then each user can associate their own WebRTC extension to their Infinity One a
 7.  Click on **CREATE PHONE NUMBER** button
     ![](/images/UCC-client-7.png)
 
-# <a name="Tips"></a>Useful Tips
+# <a id="tips"></a>Useful Tips
 
 *   You can create new roles or change permissions to the various roles under **Administration** -\> **Permissions**
     ![](/images/UCC-client-8.png)
@@ -161,7 +161,7 @@ Then each user can associate their own WebRTC extension to their Infinity One a
     ![](/images/UCC-client-9.png)
 *   The legacy WebRTC softclient (old) users configured on the UCx Server under **System** -\> **Users**, are not used by Infinity One.
 
-# <a name="Issues"></a>Known Issues
+# <a id="issues"></a>Known Issues
 
 *   Deleting users is not currently supported. (Disable them instead)
 *   Do NOT login to the same account on multiple devices. This is not currently supported and will result in undesirable behaviour.

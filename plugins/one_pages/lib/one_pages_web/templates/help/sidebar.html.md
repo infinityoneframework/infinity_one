@@ -19,7 +19,8 @@
 * [FAQ](/help/faq)
 
 ## Sending Messages
-* [@ Mentions (tbd)](/help/tbd)
+* [@ Mentions](/help/at-mentions)
+* [Attachments](/help/attachments)
 * [Channel references (tbd)](/help/tbd)
 
 ## Rooms & Channels

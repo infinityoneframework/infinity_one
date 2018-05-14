@@ -36,7 +36,7 @@ A direct message channel can be created in the following ways:
 * Under DIRECT MESSAGES on the left-hand panel, click on "**More Users...**" link
   to see all users, then select the user.
 * Open the _Members List_ panel on the right-hand icon bar, click on a user's name.
-  This displays the user's information, click the CONVERSATIOON button. You can
+  This displays the user's information, click the CONVERSATION button. You can
   also access the same panel by clicking on any [@ mention][1] in
   the messages area.
 
@@ -53,7 +53,7 @@ Other than their visibility, private groups work similar to public channels. Pri
 groups can be made public and public channels can be made private in the room info
 panel.
 
-### N-way Conversations
+### <a name="Chapter2-4"></a>N-way Conversations
 
 N-way channels are similar to private groups except in the way they are created. When you
 [@ mention][1] someone else, Infinity One automatically creates a new private group and
