@@ -1,4 +1,4 @@
-# <a name="Chapter3-3"></a>Hiding and leaving channels
+# <a name="Chapter3-3"></a>Leaving and hiding rooms
 
 When you hover your mouse over a channel listed on the left-hand pane, you will see
 two icons appear to the right of the channel name: ![JOIN](/images/ucc-hide.png) 

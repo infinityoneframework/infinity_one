@@ -28,8 +28,7 @@ And the best part is that the data is safe with encrypted connections between yo
 
 # <a id="package"></a>Infinity One Package
 
-The Infinity One package (infinity_one) is incompatible with the WebRTC package (mscs). With the introduction of Infinity One, the standalone WebRTC application is no longer supported from Release 6 and up.
-If you have the mscs package already installed from Release 5, please uninstall mscs first before installing the infinity_one package.
+The Infinity One package (infinity_one) is incompatible with the WebRTC package (mscs). If you have the mscs package already installed from Release 5, please uninstall mscs first before installing the infinity_one package.
 
 The Infinity One application is installed on the UCx Server. First you have to install the **infinity_one** package:
 

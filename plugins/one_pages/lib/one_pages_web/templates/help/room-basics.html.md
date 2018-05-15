@@ -1,4 +1,4 @@
-# <a name="Chapter2"></a>Chapter 2 - Rooms
+# <a name="Chapter2"></a>Room basics
 
 Conversations in Infinity One are organized into chat rooms, there are 4 different types of rooms:
 
