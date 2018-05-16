@@ -1,6 +1,6 @@
-# <a name="Chapter3-2"></a>Joining channels
+# <a name="Chapter3-2"></a>Joining rooms
 
-You have several options to join a channel.
+You have several options to join a room or channel.
 
 Your channels are listed on the left-hand pane under **CHANNELS(X)**, where X represents
 the number of channels you have joined. To view all available channels, click on
