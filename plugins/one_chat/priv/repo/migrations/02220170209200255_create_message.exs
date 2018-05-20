@@ -1,4 +1,4 @@
-defmodule OneChat.Repo.Migrations.CreateMessage do
+defmodule OneChat.Repo.Migrations.Create2Message do
   use Ecto.Migration
 
   def change do
