@@ -14,13 +14,15 @@ config :logger, :console,
   format: "\n$time [$level]$levelpad$metadata$message\n",
   metadata: [:module, :function, :line]
 
-# config :infinity_one, InfinityOne.Repo,
-#   adapter: Ecto.Adapters.Postgres,
-#   username: "postgres",
-#   password: "postgres",
-#   database: "infinity_one_test3",
-#   hostname: "localhost",
-#   pool: Ecto.Adapters.SQL.Sandbox
+config :infinity_one, InfinityOne.Repo,
+  adapter: Ecto.Adapters.MySQL,
+  username: "root",
+  password: System.get_env("DB_PASSWORD") || "password",
+  database: "infinity_one_test3",
+  timeout: 60_000,
+  ownership_timeout: 60_000,
+  pool_timeout: 60_000,
+  pool: Ecto.Adapters.SQL.Sandbox
 
 if File.exists? "config/test.secret.exs" do
   import_config "test.secret.exs"
