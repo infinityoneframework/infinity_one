@@ -11,7 +11,7 @@ defmodule OneChat.Repo.Migrations.CreateChannel do
       add :archived, :boolean, default: false, null: false
       add :blocked, :boolean, default: false, null: false
       add :default, :boolean, default: false, null: false
-      add :description, :text, defaut: ""
+      add :description, :text
       add :user_id, references(:users, on_delete: :nilify_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)

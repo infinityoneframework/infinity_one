@@ -20,7 +20,7 @@ defmodule OneChat.Repo.Migrations.AlterAccount do
       add :enter_key_behaviour, :string, default: "normal"
       add :view_mode, :integer, default: 1
       add :email_notification_mode, :string, default: "all"
-      add :highlights, :text, default: ""
+      add :highlights, :text
       add :new_room_notification, :string, default: "door"
       add :new_message_notification, :string, default: "chime"
       add :chat_mode, :boolean, default: false, null: false
